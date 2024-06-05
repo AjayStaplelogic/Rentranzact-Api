@@ -15,6 +15,7 @@ app.use(bodyParser.json());
 // Routes
 app.use("/api", userRoutes);
 
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
