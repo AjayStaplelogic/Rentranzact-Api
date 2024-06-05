@@ -8,6 +8,7 @@ const app = express();
 
 connectToMongoDB();
 
+
 // Middleware
 app.use(bodyParser.json());
 
