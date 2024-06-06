@@ -26,6 +26,7 @@ jobs:
         SSH_HOST: ${{ secrets.SSH_HOST }}
         SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       run: |
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
         ssh $SSH_USERNAME@$SSH_HOST "if [ ! -d /home/rocky/projects/node/.git ]; then
           mkdir -p /home/rocky/projects/node;
           git clone --branch main git@github.com:AjayStaplelogic/Rentranzact-Api.git /home/rocky/projects/node;
