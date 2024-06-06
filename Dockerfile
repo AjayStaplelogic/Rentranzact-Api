@@ -1,11 +1,11 @@
-# Use the specific Node.js runtime as the base image
-FROM node:16.16.0
+# Use the official Node.js 16 image from the Docker Hub
+FROM node:16
 
-# Set the working directory
+# Create and change to the app directory
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json
-COPY package*.json yarn.lock ./
+# Copy package.json and package-lock.json (if available)
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
@@ -14,8 +14,7 @@ RUN npm install
 COPY . .
 
 # Expose the port the app runs on
-EXPOSE 8080
+EXPOSE 8000
 
-
-# Default command to serve the application in development mode
-CMD ["npm", "run", "serve"]
+# Define the command to run the app
+CMD ["node", "index.js"]
