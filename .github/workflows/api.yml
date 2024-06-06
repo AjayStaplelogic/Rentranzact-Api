@@ -1,4 +1,4 @@
-name: Deploy Application on Docker container
+name: Deploy Rentranzact-API on Docker container
 
 on:
   push:
@@ -7,7 +7,6 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: api
 
     steps:
     - name: Checkout code
