@@ -1,14 +1,9 @@
 import Joi from 'joi';
-import {address, pagination} from "./common-validation";
+import {address, pagination} from "./common-validation.mjs";
 
-export const authUser = Joi.object().keys({
-  username: Joi.string().required().error(new Error('Invalid email/mobile')),
-  password:  Joi.string().allow(null),
-  sendOtp: Joi.string().required().valid('phone', 'email').error(new Error('Please choose where to send otp')),
-  deviceToken: Joi.string(),
-  role: Joi.string().valid('user','engineer','admin','moderator','advertiser').required().error(new Error('User role could be "user" or "engineer"')),
-  countryCode: Joi.string().allow(null),
-  osType: Joi.string().valid('android', 'ios','web').error(new Error('Valid os type is required (android / ios)')),
+export const loginUser = Joi.object().keys({
+  email: Joi.string().required().error(new Error('email is required')),
+  password:  Joi.string().required().error(new Error('password is required'))
 });
 
 export const addUser = Joi.object().keys({
