@@ -7,7 +7,7 @@ import {connectToMongoDB} from '../config/db.mjs'
 const app = express();
 
 connectToMongoDB();
-
+//hhkjhkjhjkh
 
 // Middleware
 app.use(bodyParser.json());
