@@ -28,7 +28,7 @@ jobs:
       run: |
         ssh $SSH_USERNAME@$SSH_HOST "if [ ! -d /home/rocky/projects/node.git ]; then
           mkdir -p /home/rocky/projects/node;
-          git clone --branch dev-deploy git@github.com:Dash-Media-1/WebStore.git /home/rocky/projects/node;
+          git clone --branch main git@github.com:AjayStaplelogic/Rentranzact-Api.git /home/rocky/projects/node;
         else
           git -C /home/rocky/projects/node/ pull origin main;
         fi"
