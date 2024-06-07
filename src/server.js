@@ -9,8 +9,6 @@ const app = express();
 
 connectToMongoDB();
 
-
-
 // Middleware
 app.use(bodyParser.json());
 
@@ -18,13 +16,16 @@ app.use(bodyParser.json());
 app.use("/api", userRoutes);
 
 // Health check endpoint
-app.get('/api/health', async (req, res) => {
+app.get("/api/health", async (req, res) => {
   const startTime = Date.now();
   let connectTime = null;
 
   try {
     // Check database connection
-    const client = new MongoClient(process.env.DATABASE_URL, { useNewUrlParser: true, useUnifiedTopology: true });
+    const client = new MongoClient(process.env.DATABASE_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     connectTime = Date.now();
     await client.connect();
     connectTime = Date.now() - connectTime;
@@ -33,13 +34,15 @@ app.get('/api/health', async (req, res) => {
     const responseTime = Date.now() - startTime;
 
     res.status(200).json({
-      status: 'UP',
-      responseTime: responseTime + 'ms',
-      connectTime: connectTime + 'ms'
+      status: "UP",
+      responseTime: responseTime + "ms",
+      connectTime: connectTime + "ms",
     });
   } catch (error) {
-    console.error('Error checking database health:', error);
-    res.status(500).json({ status: 'DOWN', message: 'Error checking database health' });
+    console.error("Error checking database health:", error);
+    res
+      .status(500)
+      .json({ status: "DOWN", message: "Error checking database health" });
   }
 });
 

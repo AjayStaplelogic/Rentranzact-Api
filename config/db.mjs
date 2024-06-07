@@ -1,10 +1,8 @@
-import { MongoClient } from "mongodb";
+import mongoose from "mongoose";
 
 async function connectToMongoDB() {
-  const client = new MongoClient(process.env.DATABASE_URL);
-
   try {
-    await client.connect();
+    const client = await mongoose.connect(process.env.DATABASE_URL);
 
     console.log("Connected to MongoDB server");
   } catch (err) {
@@ -14,3 +12,4 @@ async function connectToMongoDB() {
 }
 
 export { connectToMongoDB };
+
