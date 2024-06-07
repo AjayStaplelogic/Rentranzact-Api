@@ -13,10 +13,9 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  type: {
+  role: {
     type: String,
-    required: true,
-    enum: ["Landlord", "Project Manager", "Renter"],
+    required: true
   },
   fullName: {
     type: String,
@@ -26,7 +25,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  referal_code: {
+  referralCode: {
     type: Boolean,
     required: false
   },

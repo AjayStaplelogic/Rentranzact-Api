@@ -1,13 +1,14 @@
 import Joi from 'joi';
-import {address, pagination} from "./common-validation.mjs";
+import {address, pagination} from "./common.validation.mjs";
 
-export const loginUser = Joi.object().keys({
+export const login_User = Joi.object().keys({
   email: Joi.string().required().error(new Error('email is required')),
   password:  Joi.string().required().error(new Error('password is required'))
 });
 
-export const addUser = Joi.object().keys({
+export const signup_User = Joi.object().keys({
   fullName: Joi.string().allow(null),
+  referralCode: Joi.string().optional() ,
   sendOtp: Joi.string().required().valid('phone', 'email').error(new Error('Please choose where to send otp')),
   firstName: Joi.string().optional().min(1).max(100).error(new Error('First name is required')),
   lastName: Joi.string().optional().min(1).max(100).error(new Error('Last name is required')),
@@ -17,7 +18,10 @@ export const addUser = Joi.object().keys({
   password: Joi.string().optional().alphanum().min(6).error(new Error('Your password should be at least 6 characters')),
   profilePic: Joi.string().optional().allow(null),
   dob: Joi.string().optional().allow(null),
-  role: Joi.string().valid('user','engineer','admin','moderator','advertiser').required().error(new Error('User role could be "user" only')),
+  role: Joi.string()
+  .valid('Landlord', 'Project_Manager', 'Renter')
+  .required()
+  .error(new Error('User role could be "user" only')),
   geoLocation: Joi.array().items(Joi.number()),
   isActive: Joi.boolean().allow(null).default(true),
   deviceToken: Joi.string(),
@@ -44,7 +48,7 @@ export const registerEngineer = Joi.object().keys({
   profilePic: Joi.string().optional().allow(null),
 });
 
-export const updateUser = addUser.append().keys({
+export const updateUser = signup_User.append().keys({
   active: Joi.boolean().optional(),
   bio: Joi.string().optional(),
   fullName: Joi.string().min(3).max(100).optional(),
