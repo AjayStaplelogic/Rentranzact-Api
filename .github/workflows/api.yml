@@ -1,0 +1,57 @@
+name: Deploy Rentranzact-API on Docker container
+
+on:
+  push:
+    branches:
+      - main # or your production branch
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up SSH
+      env:
+        SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+      run: |
+        mkdir -p ~/.ssh
+        echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        
+    - name: Clone Repository
+      env:
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      run: |
+        ssh-keyscan -H $SSH_HOST >> ~/.ssh/known_hosts
+        ssh $SSH_USERNAME@$SSH_HOST "if [ ! -d /home/rocky/projects/node/.git ]; then
+          mkdir -p /home/rocky/projects/node;
+          git clone --branch main git@github.com:AjayStaplelogic/Rentranzact-Api.git /home/rocky/projects/node;
+        else
+          git -C /home/rocky/projects/node/ pull origin main;
+        fi"
+        
+    - name: Stop application and clean
+      env:
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      run: |
+        ssh $SSH_USERNAME@$SSH_HOST << 'EOF'
+          cd /home/rocky/projects/node/
+          docker-compose down
+          docker volume prune -f
+          docker image prune -af
+        EOF
+        
+    - name: Deploy application
+      env:
+        SSH_HOST: ${{ secrets.SSH_HOST }}
+        SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+      run: |
+        ssh $SSH_USERNAME@$SSH_HOST << 'EOF'
+          cd /home/rocky/projects/node/
+          docker-compose up -d --build
+        EOF
