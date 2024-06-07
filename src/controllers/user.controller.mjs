@@ -16,10 +16,11 @@ async function login(req, res) {
   const { isError, errors } = validator(body, login_User);
 
   if (isError) {
-    res.status(403).json({ error: errors });
+    sendResponse(res, [], errors, false, 403);
   } else {
     const data = await loginUser(body);
-    res.status(200).json(data);
+    // res.status(200).json(data);
+    sendResponse(res , [] , "successfully login" , true , 200 , data.accessToken)
   }
 }
 

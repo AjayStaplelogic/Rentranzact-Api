@@ -7,8 +7,34 @@ import pkg from "bcrypt";
 
 async function loginUser(body) {
   // Add logic to validate user login
-  const accessToken = await accessTokenGenerator(body);
-  return accessToken;
+
+
+  const {email , password} = body;
+
+
+  const user = await User.findOne({email : email});
+
+  const isPasswordValid = await new Promise((resolve, reject) => {
+    pkg.compare(password, user.password , function (err, hash) {
+      if (err) {
+        console.log(err)
+        reject(err); // Reject promise if hashing fails
+      } else {
+        console.log(hash)
+        resolve(hash); // Resolve promise with hashed password
+      }
+    });
+  });
+
+  if(isPasswordValid) {
+    const accessToken = await accessTokenGenerator(body);
+  return {accessToken : accessToken};
+  } else {
+    return {message : "password is incorrect"}
+  }
+
+
+  
 }
 
 async function addUser(body) {
