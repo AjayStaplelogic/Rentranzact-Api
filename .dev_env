@@ -1,3 +1,5 @@
 PORT = 8080
 SAVE_LOGS = false
 DATABASE_URL = mongodb+srv://ajaystaplelogic:QfLm2QjwjbemQz3m@cluster0.i1tphfk.mongodb.net/Rentranzact_Dev
+JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_dev
+JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_dev
