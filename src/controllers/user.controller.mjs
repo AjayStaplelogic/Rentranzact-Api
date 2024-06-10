@@ -7,6 +7,7 @@ import {
   addUser,
   validateCode,
   applyReferralCode,
+  verifyOtp,
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -60,9 +61,40 @@ async function signup(req, res) {
       }
     } else {
       const data = await addUser(body);
-      res.status(200).json(data);
+
+      sendResponse(
+        res,
+        { id: data.data._id, 
+          otp : data.data.otp
+         },
+        data.message,
+        data.status,
+        data.statusCode
+      );
     }
   }
 }
 
-export { login, signup };
+
+
+async function userVerification(req, res) {
+
+  const {body} = req;
+
+  const data = await verifyOtp(body);
+
+
+  sendResponse(
+    res,
+    [],
+    data.message,
+    data.status,
+    data.statusCode,
+    data?.accessToken
+  );
+
+
+}
+
+
+export { login, signup  , userVerification};

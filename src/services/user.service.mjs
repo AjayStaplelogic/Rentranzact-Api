@@ -22,18 +22,23 @@ async function loginUser(body) {
     });
 
     if (isPasswordValid) {
-
-
-
-
-      const accessToken = await accessTokenGenerator(user);
-      return {
-        data: [],
-        message: "logged in successfully",
-        status: true,
-        statusCode: 200,
-        accessToken: accessToken,
-      };
+      if (user.verified) {
+        const accessToken = await accessTokenGenerator(user);
+        return {
+          data: [],
+          message: "logged in successfully",
+          status: true,
+          statusCode: 200,
+          accessToken: accessToken,
+        };
+      } else {
+        return {
+          data: [],
+          message: "please verify email id",
+          status: true,
+          statusCode: 401,
+        };
+      }
     } else {
       return {
         data: [],
@@ -84,7 +89,7 @@ async function addUser(body) {
 
   return {
     data: user,
-    message: "signup successfully",
+    message: "signup successfully. please verify otp",
     status: true,
     statusCode: 201,
   };
@@ -104,4 +109,32 @@ async function applyReferralCode(code, userID) {
   return Boolean(applyReferral);
 }
 
-export { loginUser, addUser, validateCode, applyReferralCode };
+async function verifyOtp(body) {
+  const { otp, _id } = body;
+
+  const user = await User.findById(_id);
+
+  if (user?.otp === otp) {
+    const user_ = await User.findByIdAndUpdate(
+      { _id: _id },
+      { verified: true }
+    );
+
+    return {
+      data: user_,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200,
+      accessToken: accessTokenGenerator(user),
+    };
+  } else {
+    return {
+      data: [],
+      message: "incorrect otp",
+      status: false,
+      statusCode: 201,
+    };
+  }
+}
+
+export { loginUser, addUser, validateCode, applyReferralCode , verifyOtp };
