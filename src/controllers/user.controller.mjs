@@ -19,8 +19,15 @@ async function login(req, res) {
     sendResponse(res, [], errors, false, 403);
   } else {
     const data = await loginUser(body);
-    // res.status(200).json(data);
-    sendResponse(res , [] , "successfully login" , true , 200 , data.accessToken)
+
+    sendResponse(
+      res,
+      [],
+      data.message,
+      data.status,
+      data.statusCode,
+      data.accessToken
+    );
   }
 }
 
@@ -40,7 +47,14 @@ async function signup(req, res) {
 
         await applyReferralCode(referralCode, data._id);
 
-        sendResponse(res, data, "Signup User Successfully", true, 201);
+        sendResponse(
+          res,
+          data.data,
+          data.message,
+          data.status,
+          data.statusCode,
+          data.accessToken
+        );
       } else {
         res.status(400).json({ msg: "Invalid Referral code" });
       }

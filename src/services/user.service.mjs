@@ -1,4 +1,3 @@
-// user.service.mjs
 import { User } from "../models/user.model.mjs";
 import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
@@ -6,39 +5,54 @@ import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
 
 async function loginUser(body) {
-  // Add logic to validate user login
+  const { email, password } = body;
 
+  const user = await User.findOne({ email: email });
 
-  const {email , password} = body;
-
-
-  const user = await User.findOne({email : email});
-
-  const isPasswordValid = await new Promise((resolve, reject) => {
-    pkg.compare(password, user.password , function (err, hash) {
-      if (err) {
-        console.log(err)
-        reject(err); // Reject promise if hashing fails
-      } else {
-        console.log(hash)
-        resolve(hash); // Resolve promise with hashed password
-      }
+  if (user) {
+    const isPasswordValid = await new Promise((resolve, reject) => {
+      pkg.compare(password, user.password, function (err, hash) {
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          resolve(hash);
+        }
+      });
     });
-  });
 
-  if(isPasswordValid) {
-    const accessToken = await accessTokenGenerator(body);
-  return {accessToken : accessToken};
+    if (isPasswordValid) {
+
+
+
+
+      const accessToken = await accessTokenGenerator(user);
+      return {
+        data: [],
+        message: "logged in successfully",
+        status: true,
+        statusCode: 200,
+        accessToken: accessToken,
+      };
+    } else {
+      return {
+        data: [],
+        message: "password is incorrect",
+        status: false,
+        statusCode: 401,
+      };
+    }
   } else {
-    return {message : "password is incorrect"}
+    return {
+      data: [],
+      message: "user not found",
+      status: false,
+      statusCode: 404,
+    };
   }
-
-
-  
 }
 
 async function addUser(body) {
-  // Add logic to create a new user
   const referralCode = generateReferralCode();
 
   body.referralCode = referralCode;
@@ -56,14 +70,9 @@ async function addUser(body) {
       }
     });
   });
-  
+
   // Update body with hashed password
   body.password = hashedPassword;
-  
-
-
-
-  console.log(body,"---- hashed ")
 
   const saveInReferral = new Referral({ code: referralCode });
 
@@ -73,13 +82,16 @@ async function addUser(body) {
 
   await user.save();
 
-  // console.log(user,"-userrrr")
-  return user;
+  return {
+    data: user,
+    message: "signup successfully",
+    status: true,
+    statusCode: 201,
+  };
 }
 
 async function validateCode(code) {
   const validOrNot = await User.findOne({ referralCode: code });
-
   return Boolean(validOrNot);
 }
 
@@ -89,8 +101,6 @@ async function applyReferralCode(code, userID) {
     { $push: { appliedOn: { userId: userID } } },
     { new: true }
   );
-
-  console.log(applyReferral);
   return Boolean(applyReferral);
 }
 

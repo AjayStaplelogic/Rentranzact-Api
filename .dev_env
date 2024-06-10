@@ -4,5 +4,6 @@ DATABASE_URL = mongodb+srv://ajaystaplelogic:tf7SOh6orUITxVyy@cluster0.i1tphfk.m
 JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_dev
 JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_dev
 SALT = 10
+STRIPE_SECRET_KEY = sk_test_51PQ1RDRqqq804lRbjzzhZUk1VB6XvCuM6fEuP1ZlusvZxcNmF8Sj7eqofUH969mBJlyKbfo5RqUkdWbCYczvhCow00yZGNBoKc
 
 
