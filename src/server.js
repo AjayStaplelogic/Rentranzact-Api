@@ -12,6 +12,12 @@ const app = express();
 
 app.use(express.json());
 
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Parse JSON bodies (if applicable)
+app.use(bodyParser.json());
+
+
 const corsOptions = {
   origin: "*", // Allows requests from any origin
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",

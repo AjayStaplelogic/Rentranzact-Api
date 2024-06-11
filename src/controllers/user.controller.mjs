@@ -86,7 +86,7 @@ async function userVerification(req, res) {
 
   sendResponse(
     res,
-    [],
+    data.data,
     data.message,
     data.status,
     data.statusCode,
