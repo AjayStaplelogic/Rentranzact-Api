@@ -11,8 +11,9 @@ import walletRoutes from "./routes/wallet.route.mjs";
 const app = express();
 
 app.use(express.json());
+
 const corsOptions = {
-  origin: ["https://rentranzact.com/" , "http://localhost:3000"],
+  origin: "*", // Allows requests from any origin
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: "Content-Type,Authorization",
 };
