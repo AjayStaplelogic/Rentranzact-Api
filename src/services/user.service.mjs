@@ -3,6 +3,8 @@ import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
+import { sendMail } from "../helpers/sendMail.mjs";
+import { html } from "../helpers/emailTemplate.mjs";
 
 async function loginUser(body) {
   const { email, password } = body;
@@ -58,6 +60,7 @@ async function loginUser(body) {
 }
 
 async function addUser(body) {
+  console.log(body);
   const referralCode = generateReferralCode();
 
   body.referralCode = referralCode;
@@ -86,6 +89,10 @@ async function addUser(body) {
   const user = new User(body);
 
   await user.save();
+
+  const htmlTemplate = html(user.otp);
+
+  sendMail(body.email, "OTP Verification", htmlTemplate);
 
   return {
     data: user,
@@ -137,4 +144,4 @@ async function verifyOtp(body) {
   }
 }
 
-export { loginUser, addUser, validateCode, applyReferralCode , verifyOtp };
+export { loginUser, addUser, validateCode, applyReferralCode, verifyOtp };

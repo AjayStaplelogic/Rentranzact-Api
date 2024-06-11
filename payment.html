@@ -47,7 +47,7 @@
         errorElement.textContent = error.message;
       } else {
         // Call your API endpoint to create a Payment Intent
-        const response = await fetch('http://localhost:8080/api/addInWallet', {
+        const response = await fetch('https://api.rentranzact.com/api/addInWallet', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'
