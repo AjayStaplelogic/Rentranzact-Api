@@ -2,11 +2,10 @@ import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addPropertyService } from "../services/property.service.mjs";
 
-
-
-
 async function addProperty(req, res) {
   const { body } = req;
+
+  console.log(req.PropertyID, req.images , req.documents, req.videos, "kkkkkk");
   const files = req.files;
 
   if (!files || files.length === 0) {
@@ -43,7 +42,6 @@ export { addProperty };
 
 // async function addProperty(req, res) {
 //   const { body } = req;
-  
 
 //   const data = await addPropertyService(body , req);
 

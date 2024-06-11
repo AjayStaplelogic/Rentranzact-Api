@@ -1,14 +1,17 @@
 import express from "express";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/user.route.mjs";
-import { info } from "./helpers/logger.mjs";
+// import { info } from "./helpers/logger.mjs";
 import { connectToMongoDB } from "../config/db.mjs";
 import { MongoClient } from "mongodb";
 import subscriberRoutes from "./routes/newsletter.route.mjs";
 import property from "./routes/property.route.mjs";
 import cors from "cors";
 import walletRoutes from "./routes/wallet.route.mjs";
+import path from 'path'
+
 const app = express();
+
 
 app.use(express.json());
 
@@ -25,6 +28,11 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+const uploadsDirectory = new URL('uploads', import.meta.url).pathname;
+// app.use('/uploads', express.static(uploadsDirectory));
+
+app.use('/property', express.static(uploadsDirectory));
 
 connectToMongoDB();
 
@@ -77,5 +85,5 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT;
 app.listen(PORT, () => {
-  info(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
