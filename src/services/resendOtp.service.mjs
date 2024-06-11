@@ -12,25 +12,16 @@ async function resendOtpService(body) {
     otp: newOtp,
   });
 
-  const htmlTemplate = html(user.otp);
+  const htmlTemplate = html(newOtp);
 
   const resendOTP = sendMail(user.email, "OTP Verification", htmlTemplate);
 
-  if (resendOTP) {
-    return {
-      data: [],
-      message: "otp sent successfully",
-      status: true,
-      statusCode: 200,
-    };
-  } else {
-    return {
-      data: [],
-      message: "unable to send otp",
-      status: false,
-      statusCode: 401,
-    };
-  }
+  return {
+    data: [],
+    message: "otp sent successfully",
+    status: true,
+    statusCode: 200,
+  };
 }
 
 export { resendOtpService };

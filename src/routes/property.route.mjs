@@ -4,9 +4,12 @@ import { newsletter } from '../controllers/newsletter.controller.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import { addProperty } from '../controllers/property.controller.mjs';
+import multer from 'multer';
 
 
-router.post('/property' , authorizer([UserRoles.LANDLORD , UserRoles.RENTER]) , addProperty);
+const upload = multer({ dest: 'uploads/' });
+
+router.post('/property' , authorizer([UserRoles.LANDLORD]) , upload.any(), addProperty);
 
 
 

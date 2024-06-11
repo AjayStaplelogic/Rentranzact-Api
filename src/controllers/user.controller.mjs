@@ -64,8 +64,8 @@ async function signup(req, res) {
 
       sendResponse(
         res,
-        { id: data.data._id, 
-          otp : data.data.otp
+        { id: data?.data?._id, 
+          otp : data?.data?.otp
          },
         data.message,
         data.status,

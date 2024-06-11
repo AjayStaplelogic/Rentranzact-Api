@@ -60,7 +60,17 @@ async function loginUser(body) {
 }
 
 async function addUser(body) {
-  console.log(body);
+  const userExist = await User.findOne({ email: body.email });
+
+  if (userExist) {
+    return {
+      data: [],
+      message: "email already exist ",
+      status: false,
+      statusCode: 409,
+    };
+  }
+
   const referralCode = generateReferralCode();
 
   body.referralCode = referralCode;
