@@ -1,7 +1,7 @@
 PORT = 3001
 SAVE_LOGS = true
 #DATABASE_URL = mongodb+srv://ajaystaplelogic:QfLm2QjwjbemQz3m@cluster0.i1tphfk.mongodb.net/Rentranzact
-DATABASE_URL = mongodb+srv://db_container/Rentranzact
+DATABASE_URL = mongodb://mongo_db:27017/Rentranzact
 JWT_ACCESS_TOKEN_SECRET = rentranzact_access_secret_for_prod
 JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_prod
 SALT = 10
