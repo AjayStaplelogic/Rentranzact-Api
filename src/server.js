@@ -6,21 +6,17 @@ import { connectToMongoDB } from "../config/db.mjs";
 import { MongoClient } from "mongodb";
 import subscriberRoutes from "./routes/newsletter.route.mjs";
 import property from "./routes/property.route.mjs";
-import cors from 'cors'
-import walletRoutes from "./routes/wallet.route.mjs"
+import cors from "cors";
+import walletRoutes from "./routes/wallet.route.mjs";
 const app = express();
 
-
-
-// Define the CORS options
 const corsOptions = {
-    credentials: true,
-    origin: '*' // Whitelist the domains you want to allow
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
 };
 
-app.use(cors(corsOptions)); 
-
-
+app.use(cors(corsOptions));
 
 connectToMongoDB();
 
@@ -31,7 +27,7 @@ app.use(bodyParser.json());
 app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
-app.use("/api" , walletRoutes)
+app.use("/api", walletRoutes);
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
