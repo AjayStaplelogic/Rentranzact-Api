@@ -4,8 +4,27 @@ import userRoutes from "./routes/user.route.mjs";
 import { info } from "./helpers/logger.mjs";
 import { connectToMongoDB } from "../config/db.mjs";
 import { MongoClient } from "mongodb";
-
+import subscriberRoutes from "./routes/newsletter.route.mjs";
+import property from "./routes/property.route.mjs";
+import cors from "cors";
+import walletRoutes from "./routes/wallet.route.mjs";
 const app = express();
+
+app.use(express.json());
+
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Parse JSON bodies (if applicable)
+app.use(bodyParser.json());
+
+
+const corsOptions = {
+  origin: "*", // Allows requests from any origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Content-Type,Authorization",
+};
+
+app.use(cors(corsOptions));
 
 connectToMongoDB();
 
@@ -14,6 +33,9 @@ app.use(bodyParser.json());
 
 // Routes
 app.use("/api", userRoutes);
+app.use("/api", subscriberRoutes);
+app.use("/api", property);
+app.use("/api", walletRoutes);
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {

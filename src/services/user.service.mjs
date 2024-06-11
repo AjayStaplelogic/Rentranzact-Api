@@ -1,44 +1,76 @@
-// user.service.mjs
 import { User } from "../models/user.model.mjs";
 import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
+import { sendMail } from "../helpers/sendMail.mjs";
+import { html } from "../helpers/emailTemplate.mjs";
 
 async function loginUser(body) {
-  // Add logic to validate user login
+  const { email, password } = body;
 
+  const user = await User.findOne({ email: email });
 
-  const {email , password} = body;
-
-
-  const user = await User.findOne({email : email});
-
-  const isPasswordValid = await new Promise((resolve, reject) => {
-    pkg.compare(password, user.password , function (err, hash) {
-      if (err) {
-        console.log(err)
-        reject(err); // Reject promise if hashing fails
-      } else {
-        console.log(hash)
-        resolve(hash); // Resolve promise with hashed password
-      }
+  if (user) {
+    const isPasswordValid = await new Promise((resolve, reject) => {
+      pkg.compare(password, user.password, function (err, hash) {
+        if (err) {
+          console.log(err);
+          reject(err);
+        } else {
+          resolve(hash);
+        }
+      });
     });
-  });
 
-  if(isPasswordValid) {
-    const accessToken = await accessTokenGenerator(body);
-  return {accessToken : accessToken};
+    if (isPasswordValid) {
+      if (user.verified) {
+        const accessToken = await accessTokenGenerator(user);
+        return {
+          data: [],
+          message: "logged in successfully",
+          status: true,
+          statusCode: 200,
+          accessToken: accessToken,
+        };
+      } else {
+        return {
+          data: [],
+          message: "please verify email id",
+          status: true,
+          statusCode: 401,
+        };
+      }
+    } else {
+      return {
+        data: [],
+        message: "password is incorrect",
+        status: false,
+        statusCode: 401,
+      };
+    }
   } else {
-    return {message : "password is incorrect"}
+    return {
+      data: [],
+      message: "user not found",
+      status: false,
+      statusCode: 404,
+    };
   }
-
-
-  
 }
 
 async function addUser(body) {
-  // Add logic to create a new user
+  const userExist = await User.findOne({ email: body.email });
+
+  if (userExist) {
+    return {
+      data: [],
+      message: "email already exist ",
+      status: false,
+      statusCode: 409,
+    };
+  }
+
   const referralCode = generateReferralCode();
 
   body.referralCode = referralCode;
@@ -56,14 +88,9 @@ async function addUser(body) {
       }
     });
   });
-  
+
   // Update body with hashed password
   body.password = hashedPassword;
-  
-
-
-
-  console.log(body,"---- hashed ")
 
   const saveInReferral = new Referral({ code: referralCode });
 
@@ -73,13 +100,20 @@ async function addUser(body) {
 
   await user.save();
 
-  // console.log(user,"-userrrr")
-  return user;
+  const htmlTemplate = html(user.otp);
+
+  sendMail(body.email, "OTP Verification", htmlTemplate);
+
+  return {
+    data: user,
+    message: "signup successfully. please verify otp",
+    status: true,
+    statusCode: 201,
+  };
 }
 
 async function validateCode(code) {
   const validOrNot = await User.findOne({ referralCode: code });
-
   return Boolean(validOrNot);
 }
 
@@ -89,9 +123,37 @@ async function applyReferralCode(code, userID) {
     { $push: { appliedOn: { userId: userID } } },
     { new: true }
   );
-
-  console.log(applyReferral);
   return Boolean(applyReferral);
 }
 
-export { loginUser, addUser, validateCode, applyReferralCode };
+async function verifyOtp(body) {
+  const { otp, id } = body;
+
+  const user = await User.findById(id);
+
+  if (user?.otp === otp) {
+    const user_ = await User.findByIdAndUpdate(
+      { _id: id },
+      { verified: true }
+    );
+
+    console.log(user_,"userrr")
+
+    return {
+      data: user_,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200,
+      accessToken: accessTokenGenerator(user),
+    };
+  } else {
+    return {
+      data: [],
+      message: "incorrect otp",
+      status: false,
+      statusCode: 201,
+    };
+  }
+}
+
+export { loginUser, addUser, validateCode, applyReferralCode, verifyOtp };

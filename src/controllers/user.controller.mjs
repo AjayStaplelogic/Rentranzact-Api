@@ -7,6 +7,7 @@ import {
   addUser,
   validateCode,
   applyReferralCode,
+  verifyOtp,
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -19,8 +20,15 @@ async function login(req, res) {
     sendResponse(res, [], errors, false, 403);
   } else {
     const data = await loginUser(body);
-    // res.status(200).json(data);
-    sendResponse(res , [] , "successfully login" , true , 200 , data.accessToken)
+
+    sendResponse(
+      res,
+      [],
+      data.message,
+      data.status,
+      data.statusCode,
+      data.accessToken
+    );
   }
 }
 
@@ -40,15 +48,53 @@ async function signup(req, res) {
 
         await applyReferralCode(referralCode, data._id);
 
-        sendResponse(res, data, "Signup User Successfully", true, 201);
+        sendResponse(
+          res,
+          data.data,
+          data.message,
+          data.status,
+          data.statusCode,
+          data.accessToken
+        );
       } else {
         res.status(400).json({ msg: "Invalid Referral code" });
       }
     } else {
       const data = await addUser(body);
-      res.status(200).json(data);
+
+      sendResponse(
+        res,
+        { id: data?.data?._id, 
+          otp : data?.data?.otp
+         },
+        data.message,
+        data.status,
+        data.statusCode
+      );
     }
   }
 }
 
-export { login, signup };
+
+
+async function userVerification(req, res) {
+
+  const {body} = req;
+
+  const data = await verifyOtp(body);
+
+
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data?.accessToken
+  );
+
+
+}
+
+
+export { login, signup  , userVerification};

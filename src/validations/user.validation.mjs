@@ -14,8 +14,8 @@ export const signup_User = Joi.object().keys({
   fullName: Joi.string()
     .required()
     .min(3)
-    .max(12)
-    .error(new Error("name should be between 3 to 12 characters")),
+    .max(20)
+    .error(new Error("name should be between 3 to 20 characters")),
   referralCode: Joi.string().optional(),
   email: Joi.string().email().error(new Error("Valid email id is required")),
   phone: Joi.string().required().error(new Error("phone number is required")),

@@ -1,14 +1,12 @@
 import express from 'express'
 const router = express.Router();
-import { login, signup, userVerification } from '../controllers/user.controller.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
-import { resendOTP } from '../controllers/resendOtp.controller.mjs';
+import { addInWallet } from '../controllers/wallet.controller.mjs';
+import { UserRoles } from '../enums/role.enums.mjs';
 
 // Define routes for users
-router.post('/login' ,login);
-router.post('/signup', signup);
-router.post('/otpVerification' , userVerification )
-router.post('/resendOtp', resendOTP)
+router.post('/addInWallet' ,addInWallet);
+// router.post('/signup', signup);
 // router.get('/users/:id', UserController.getUserById);
 // router.post('/users', UserController.createUser);
 // router.put('/users/:id', UserController.updateUser);
