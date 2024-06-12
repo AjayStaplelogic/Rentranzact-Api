@@ -13,9 +13,22 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
     address: {
-      type: Object,
-      required: true,
-    },
+      type: {
+          longitude: {
+              type: Number,
+              required: true
+          },
+          latitude: {
+              type: Number,
+              required: true
+          },
+          addressText: {
+              type: String,
+              required: true
+          }
+      },
+      required: true
+  },
     rent: {
       type: Number,
       required: true,
@@ -40,7 +53,7 @@ const propertySchema = new mongoose.Schema(
       required: false,
     },
 
-    rentedType: {
+    rentType: {
       type: String,
       required: true,
     },
@@ -186,11 +199,19 @@ const propertySchema = new mongoose.Schema(
     landlord_id : {
       type : String,
       required : true
+    },
+    rentFrequency: {
+      type: String ,
+      required : true
     }
 
   },
   { timestamps: true }
 );
+
+
+
+propertySchema.index({ address: '2dsphere' })
 
 // Create the User model from the schema
 const Property = mongoose.model("properties", propertySchema);

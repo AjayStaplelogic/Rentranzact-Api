@@ -9,7 +9,7 @@ const PropertiesStatus = {
     AVAILABLE: "available"
   };
 
-const RentedType = {
+const RentType = {
     MONTHLY : "monthly",
     YEARLY : "yearly",
     QUATERLY : "quaterly"
@@ -25,4 +25,4 @@ const FurnishingType = {
 
   
 
-export { PropertiesCategories , PropertiesStatus  , RentedType , Type , FurnishingType};
+export { PropertiesCategories , PropertiesStatus  , RentType , Type , FurnishingType};

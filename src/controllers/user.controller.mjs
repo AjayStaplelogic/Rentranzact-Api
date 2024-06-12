@@ -8,6 +8,7 @@ import {
   validateCode,
   applyReferralCode,
   verifyOtp,
+  socialSignup
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -88,4 +89,24 @@ async function userVerification(req, res) {
   );
 }
 
-export { login, signup, userVerification };
+async function socialLogin(req, res) {
+  const { body } = req;
+
+  const { isError, errors } = validator(body, signup_User);
+
+  if (isError) {
+    sendResponse(res, [], errors, false, 403);
+  } else {
+    const data = await socialSignup(body);
+
+    sendResponse(
+      res,
+      { id: data?.data?._id, otp: data?.data?.otp },
+      data.message,
+      data.status,
+      data.statusCode
+    );
+  }
+}
+
+export { login, signup, userVerification, socialLogin };

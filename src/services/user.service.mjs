@@ -5,6 +5,8 @@ import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
 import { sendMail } from "../helpers/sendMail.mjs";
 import { html } from "../helpers/emailTemplate.mjs";
+import { OAuth2Client } from "google-auth-library";
+const client = new OAuth2Client();
 
 async function loginUser(body) {
   const { email, password } = body;
@@ -132,12 +134,9 @@ async function verifyOtp(body) {
   const user = await User.findById(id);
 
   if (user?.otp === otp) {
-    const user_ = await User.findByIdAndUpdate(
-      { _id: id },
-      { verified: true }
-    );
+    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
 
-    console.log(user_,"userrr")
+    console.log(user_, "userrr");
 
     return {
       data: user_,
@@ -156,4 +155,23 @@ async function verifyOtp(body) {
   }
 }
 
-export { loginUser, addUser, validateCode, applyReferralCode, verifyOtp };
+async function socialSignup(body) {
+  const { credential, client_id } = body;
+
+  const ticket = await client.verifyIdToken({
+    idToken: credential,
+    audience: client_id,
+  });
+  const payload = ticket.getPayload();
+  const userid = payload["sub"];
+  
+}
+
+export {
+  loginUser,
+  addUser,
+  validateCode,
+  applyReferralCode,
+  verifyOtp,
+  socialSignup,
+};

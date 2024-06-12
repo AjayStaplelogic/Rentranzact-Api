@@ -2,32 +2,39 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 
-async function addPropertyService(PropertyID, images, documents, videos, body , id) {
+async function addPropertyService(
+  PropertyID,
+  images,
+  documents,
+  videos,
+  body,
+  id
+) {
   const { email, role } = body;
-
-  
 
   const propertyPostedBy = await User.findOne({ email: email, role: role });
 
-  console.log(propertyPostedBy,"-=2343", id)
+  console.log(propertyPostedBy, "-=2343", id);
 
+  console.log(role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id);
+  
 
-  console.log(role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id)
 
   if (propertyPostedBy) {
     const Property_ = {
+      rentFrequency: body.rentFrequency,
       propertyID: PropertyID,
       images: images,
       documents: documents,
       videos: videos,
       category: body.category,
-      address: body.address,
+      address: JSON.parse(body.address),
       rent: parseInt(body.rent),
       propertyName: body.propertyName,
       email: propertyPostedBy.email,
       name: propertyPostedBy.fullName,
       bedrooms: body.bedrooms,
-      rentedType: body.rentedType,
+      rentType: body.rentType,
       city: body.city,
       number_of_floors: parseInt(body.number_of_floors),
       number_of_bathrooms: parseInt(body.number_of_bathrooms),
@@ -41,7 +48,8 @@ async function addPropertyService(PropertyID, images, documents, videos, body , 
       availability: body.availability,
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
-      property_manager_id : role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id,
+      property_manager_id:
+        role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id,
       cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
       amenities: parseInt(body.amenities),
@@ -50,7 +58,7 @@ async function addPropertyService(PropertyID, images, documents, videos, body , 
 
     const property = new Property(Property_);
     property.save();
-  
+
     return {
       data: property,
       message: "property created successfully",
@@ -58,8 +66,35 @@ async function addPropertyService(PropertyID, images, documents, videos, body , 
       statusCode: 201,
     };
   }
+}
+
+async function searchInProperty(body) {
+  const { longitude , latitude, type, budget } = body;
+
+
+  const data = await Property.aggregate([
+    {
+        $geoNear: {
+            near: { type: "Point", coordinates: [longitude, latitude] },
+            distanceField: "distance",
+            spherical: true,
+            maxDistance: 10000 // Maximum distance in meters (adjust as needed)
+        }
+    }
+]).exec()
+.then(properties => {
+    res.json(properties);
+})
+.catch(err => {
+    console.error(err);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
+
+console.log(data,"--=-=-")
+  
+
 
 
 }
 
-export { addPropertyService };
+export { addPropertyService, searchInProperty };

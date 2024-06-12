@@ -1,6 +1,6 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addPropertyService } from "../services/property.service.mjs";
+import { addPropertyService , searchInProperty } from "../services/property.service.mjs";
 
 async function addProperty(req, res) {
   const { body } = req;
@@ -46,10 +46,11 @@ async function searchProperty(req, res) {
 
   const {body} = req;
 
-  console.log(body,"===body=====")
+  
+  const data = await searchInProperty(body);
 
 
-
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
 }
