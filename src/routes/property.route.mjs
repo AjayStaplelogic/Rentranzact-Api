@@ -3,10 +3,10 @@ const router = express.Router();
 import { newsletter } from "../controllers/newsletter.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
-import { addProperty } from "../controllers/property.controller.mjs";
+import { addProperty, searchProperty } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import fs from 'fs';
+import fs from "fs";
 import path from "path";
 
 const PropertyID = uuidv4();
@@ -20,15 +20,14 @@ router.use((req, res, next) => {
   next();
 });
 
-
-const baseUploadPath = 'uploads/';
+const baseUploadPath = "uploads/";
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     const propertyFolder = path.join(baseUploadPath, PropertyID);
-    const imagesFolder = path.join(propertyFolder, 'images');
-    const documentsFolder = path.join(propertyFolder, 'documents');
-    const videosFolder = path.join(propertyFolder, 'videos');
+    const imagesFolder = path.join(propertyFolder, "images");
+    const documentsFolder = path.join(propertyFolder, "documents");
+    const videosFolder = path.join(propertyFolder, "videos");
 
     // Create the directories if they don't exist
     if (!fs.existsSync(propertyFolder)) {
@@ -46,11 +45,14 @@ const storage = multer.diskStorage({
 
     // Determine subfolder based on file type
     let destinationFolder = propertyFolder;
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith("image/")) {
       destinationFolder = imagesFolder;
-    } else if (file.mimetype === 'application/pdf' || file.mimetype.startsWith('application/')) {
+    } else if (
+      file.mimetype === "application/pdf" ||
+      file.mimetype.startsWith("application/")
+    ) {
       destinationFolder = documentsFolder;
-    } else if (file.mimetype.startsWith('video/')) {
+    } else if (file.mimetype.startsWith("video/")) {
       destinationFolder = videosFolder;
     }
 
@@ -61,7 +63,6 @@ const storage = multer.diskStorage({
     cb(null, file.originalname);
   },
 });
-
 
 // const storage = multer.diskStorage({
 //   destination: function (req, file, cb) {
@@ -75,35 +76,38 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.post('/property', upload.any(), (req, res) => {
-  // Attach file paths to req.body
-  req.files.forEach(file => {
+const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surrounding quotes
 
-    console.log(req.PropertyID , "reqm body")
+router.post("/property", authorizer([UserRoles.LANDLORD , UserRoles.PROJECT_MANAGER])  ,upload.any(), (req, res) => {
+  // Attach file paths to req.bodyssss
+  req.files.forEach((file) => {
+    const relativePath = path.join(
+      hostUrl,
+      "property",
+      req.PropertyID,
+      file.mimetype.startsWith("image/")
+        ? "images"
+        : file.mimetype.startsWith("video/")
+        ? "videos"
+        : "documents",
+      file.originalname
+    );
 
-    console.log(file.originalname,"file.originalname" , typeof req.body.PropertyID," file.mimetype." )
-    const relativePath = path.join('https://api.rentranzact.com','property', req.PropertyID, file.mimetype.startsWith('image/') ? 'images' : file.mimetype.startsWith('video/') ? 'videos' : 'documents', file.originalname);
-    
-
-
-
-
-
-    if (file.mimetype.startsWith('image/')) {
-      req.images.push(relativePath);
-    } else if (file.mimetype.startsWith('video/')) {
-      req.videos.push(relativePath);
-    } else if (file.mimetype.startsWith('application/')) {
-      req.documents.push(relativePath);
+    if (file.mimetype.startsWith("image/")) {
+      req.images.push({id : uuidv4() , url : relativePath});
+    } else if (file.mimetype.startsWith("video/")) {
+      req.videos.push({id : uuidv4() , url : relativePath});
+    } else if (file.mimetype.startsWith("application/")) {
+      req.documents.push({id : uuidv4() , url : relativePath});
     }
   });
 
   addProperty(req, res);
 });
 
+router.post("/property/search"  , searchProperty)
+
 // router.post("/property", upload.any(), addProperty);
-
-
 
 // router.post('/property' , authorizer([UserRoles.LANDLORD]) , upload.any(), addProperty);
 

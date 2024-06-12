@@ -1,9 +1,13 @@
 // models/User.js
-
 import mongoose from "mongoose";
 // Define the schema for the User model
 const propertySchema = new mongoose.Schema(
   {
+    propertyID: {
+      type: String,
+      required: true,
+    },
+
     category: {
       type: String,
       required: true,
@@ -16,15 +20,26 @@ const propertySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    propertyName: {
+      type: String,
+      required: true,
+    },
+
     name: {
       type: String,
       required: true,
     },
+
+    email: {
+      type: String,
+      required: true,
+    },
+
     renter_id: {
       type: String,
       required: false,
     },
-  
+
     rentedType: {
       type: String,
       required: true,
@@ -94,10 +109,7 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    landlord_id: {
-      type: String,
-      required: true,
-    },
+  
 
     cautionDeposite: {
       type: Number,
@@ -121,48 +133,60 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    verified: {
-      type: Boolean,
-      default: false
-    },
-
-    projectManagerID: {
-      type: String,
+    videos: {
+      type: Array,
       required: true,
     },
 
-    rent_period_start : {
-        type : Date,
-        required : false
-    } ,
-
-
-    rent_period_end : {
-        type : Date,
-        required : false
-    } ,
-
-    rent_paid_due : {
-        type : Boolean,
-        required : false
-    } ,
-
-    rent_start_on :  {
-        type: Date,
-        required: false
-    } ,
-    next_start_on :  {
-        type: Date,
-        required: false
+    verified: {
+      type: Boolean,
+      default: false,
     },
-    rented : {
-        type : Boolean,
-        required : false,
-        default: false
+
+   
+
+    rent_period_start: {
+      type: Date,
+      required: false,
+    },
+
+    rent_period_end: {
+      type: Date,
+      required: false,
+    },
+
+    rent_paid_due: {
+      type: Boolean,
+      required: false,
+    },
+
+    rent_start_on: {
+      type: Date,
+      required: false,
+    },
+    next_start_on: {
+      type: Date,
+      required: false,
+    },
+    rented: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    number_of_rooms: {
+      type: Number,
+      required: true,
+    },
+
+    property_manager_id : {
+      type : String,
+      required : true
+    } ,
+
+    landlord_id : {
+      type : String,
+      required : true
     }
-    
-
-
 
   },
   { timestamps: true }

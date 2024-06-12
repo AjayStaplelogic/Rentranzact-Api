@@ -27,7 +27,7 @@ async function loginUser(body) {
       if (user.verified) {
         const accessToken = await accessTokenGenerator(user);
         return {
-          data: [],
+          data: user,
           message: "logged in successfully",
           status: true,
           statusCode: 200,
@@ -151,7 +151,7 @@ async function verifyOtp(body) {
       data: [],
       message: "incorrect otp",
       status: false,
-      statusCode: 201,
+      statusCode: 400,
     };
   }
 }
