@@ -42,7 +42,6 @@ jobs:
         ssh $SSH_USERNAME@$SSH_HOST << 'EOF'
           cd /home/rocky/projects/node/
           docker-compose down
-          docker volume prune -a -f
           docker image prune -af
         EOF
         
@@ -54,4 +53,5 @@ jobs:
         ssh $SSH_USERNAME@$SSH_HOST << 'EOF'
           cd /home/rocky/projects/node/
           docker-compose up -d --build
+          docker volume prune -a -f
         EOF
