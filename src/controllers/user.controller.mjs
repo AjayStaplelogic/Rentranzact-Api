@@ -23,7 +23,7 @@ async function login(req, res) {
 
     sendResponse(
       res,
-      [],
+      data.data,
       data.message,
       data.status,
       data.statusCode,
@@ -64,9 +64,7 @@ async function signup(req, res) {
 
       sendResponse(
         res,
-        { id: data?.data?._id, 
-          otp : data?.data?.otp
-         },
+        { id: data?.data?._id, otp: data?.data?.otp },
         data.message,
         data.status,
         data.statusCode
@@ -75,14 +73,10 @@ async function signup(req, res) {
   }
 }
 
-
-
 async function userVerification(req, res) {
-
-  const {body} = req;
+  const { body } = req;
 
   const data = await verifyOtp(body);
-
 
   sendResponse(
     res,
@@ -92,9 +86,6 @@ async function userVerification(req, res) {
     data.statusCode,
     data?.accessToken
   );
-
-
 }
 
-
-export { login, signup  , userVerification};
+export { login, signup, userVerification };

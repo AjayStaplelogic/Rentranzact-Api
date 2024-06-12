@@ -4,6 +4,11 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const propertySchema = new mongoose.Schema(
   {
+    propertyID: {
+      type: String,
+      required: true,
+    },
+
     category: {
       type: String,
       required: true,
@@ -24,7 +29,7 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-  
+
     rentedType: {
       type: String,
       required: true,
@@ -121,9 +126,14 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
+    videos: {
+      type: Array,
+      required: true,
+    },
+
     verified: {
       type: Boolean,
-      default: false
+      default: false,
     },
 
     projectManagerID: {
@@ -131,39 +141,34 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    rent_period_start : {
-        type : Date,
-        required : false
-    } ,
-
-
-    rent_period_end : {
-        type : Date,
-        required : false
-    } ,
-
-    rent_paid_due : {
-        type : Boolean,
-        required : false
-    } ,
-
-    rent_start_on :  {
-        type: Date,
-        required: false
-    } ,
-    next_start_on :  {
-        type: Date,
-        required: false
+    rent_period_start: {
+      type: Date,
+      required: false,
     },
-    rented : {
-        type : Boolean,
-        required : false,
-        default: false
-    }
-    
 
+    rent_period_end: {
+      type: Date,
+      required: false,
+    },
 
+    rent_paid_due: {
+      type: Boolean,
+      required: false,
+    },
 
+    rent_start_on: {
+      type: Date,
+      required: false,
+    },
+    next_start_on: {
+      type: Date,
+      required: false,
+    },
+    rented: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
   { timestamps: true }
 );

@@ -8,10 +8,11 @@ import subscriberRoutes from "./routes/newsletter.route.mjs";
 import property from "./routes/property.route.mjs";
 import cors from "cors";
 import walletRoutes from "./routes/wallet.route.mjs";
-import path from 'path'
+
+import { fileURLToPath } from "url";
+import path from "path";
 
 const app = express();
-
 
 app.use(express.json());
 
@@ -19,7 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Parse JSON bodies (if applicable)
 app.use(bodyParser.json());
-
 
 const corsOptions = {
   origin: "*", // Allows requests from any origin
@@ -29,10 +29,12 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-const uploadsDirectory = new URL('uploads', import.meta.url).pathname;
-// app.use('/uploads', express.static(uploadsDirectory));
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-app.use('/property', express.static(uploadsDirectory));
+console.log(__dirname, "---dirname");
+
+// Define the directory for static files
+app.use("/property", express.static(path.join(__dirname, "../uploads")));
 
 connectToMongoDB();
 

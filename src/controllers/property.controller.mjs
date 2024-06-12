@@ -29,7 +29,7 @@ async function addProperty(req, res) {
     });
   }
 
-  const data = await addPropertyService(body);
+  const data = await addPropertyService(req.PropertyID, req.images , req.documents, req.videos,body);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
