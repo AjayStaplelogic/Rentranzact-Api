@@ -5,6 +5,10 @@ import { addPropertyService } from "../services/property.service.mjs";
 async function addProperty(req, res) {
   const { body } = req;
 
+  const id = req.user.data._id;
+
+ 
+
   console.log(req.PropertyID, req.images , req.documents, req.videos, "kkkkkk");
   const files = req.files;
 
@@ -29,12 +33,31 @@ async function addProperty(req, res) {
     });
   }
 
-  const data = await addPropertyService(req.PropertyID, req.images , req.documents, req.videos,body);
+  const data = await addPropertyService(req.PropertyID, req.images , req.documents, req.videos,body , id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { addProperty };
+
+
+
+async function searchProperty(req, res) {
+
+
+  const {body} = req;
+
+  console.log(body,"===body=====")
+
+
+
+
+
+}
+
+
+
+
+export { addProperty ,searchProperty };
 
 // import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 // import { sendResponse } from "../helpers/sendResponse.mjs";

@@ -1,5 +1,4 @@
 // models/User.js
-
 import mongoose from "mongoose";
 // Define the schema for the User model
 const propertySchema = new mongoose.Schema(
@@ -21,10 +20,21 @@ const propertySchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    propertyName: {
+      type: String,
+      required: true,
+    },
+
     name: {
       type: String,
       required: true,
     },
+
+    email: {
+      type: String,
+      required: true,
+    },
+
     renter_id: {
       type: String,
       required: false,
@@ -99,10 +109,7 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    landlord_id: {
-      type: String,
-      required: true,
-    },
+  
 
     cautionDeposite: {
       type: Number,
@@ -136,10 +143,7 @@ const propertySchema = new mongoose.Schema(
       default: false,
     },
 
-    projectManagerID: {
-      type: String,
-      required: true,
-    },
+   
 
     rent_period_start: {
       type: Date,
@@ -169,6 +173,21 @@ const propertySchema = new mongoose.Schema(
       required: false,
       default: false,
     },
+    number_of_rooms: {
+      type: Number,
+      required: true,
+    },
+
+    property_manager_id : {
+      type : String,
+      required : true
+    } ,
+
+    landlord_id : {
+      type : String,
+      required : true
+    }
+
   },
   { timestamps: true }
 );

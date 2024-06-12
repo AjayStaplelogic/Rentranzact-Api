@@ -3,7 +3,7 @@ const router = express.Router();
 import { newsletter } from "../controllers/newsletter.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
-import { addProperty } from "../controllers/property.controller.mjs";
+import { addProperty, searchProperty } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
 import fs from "fs";
@@ -78,7 +78,7 @@ const upload = multer({ storage: storage });
 
 const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surrounding quotes
 
-router.post("/property", upload.any(), (req, res) => {
+router.post("/property", authorizer([UserRoles.LANDLORD , UserRoles.PROJECT_MANAGER])  ,upload.any(), (req, res) => {
   // Attach file paths to req.bodyssss
   req.files.forEach((file) => {
     const relativePath = path.join(
@@ -104,6 +104,8 @@ router.post("/property", upload.any(), (req, res) => {
 
   addProperty(req, res);
 });
+
+router.post("/property/search"  , searchProperty)
 
 // router.post("/property", upload.any(), addProperty);
 
