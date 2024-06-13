@@ -4,6 +4,12 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const userSchema = new mongoose.Schema(
   {
+    socialPlatform :{
+    type : String,
+
+    required: false
+
+    },
     email: {
       type: String,
       required: true,
@@ -12,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+     required :  false
     },
     otp : {
      type:String
@@ -27,12 +33,13 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-      required: true,
+     required : false
     },
     countryCode: {
       type: String,
-      required: true,
-    },
+      required : false
+      }
+    ,
     referralCode: {
       type: String,
       required: false,
@@ -44,6 +51,11 @@ const userSchema = new mongoose.Schema(
     verified: {
       type :  Boolean,
       default : false
+    },
+    picture : {
+      type : String,
+      default : "https://st3.depositphotos.com/6672868/13801/v/1600/depositphotos_138013506-stock-illustration-user-profile-group.jpg",
+      required : true
     }
   },
   { timestamps: true }

@@ -6,7 +6,7 @@ import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 
 // Define routes for users
 router.post('/login' ,login);
-router.post('/social-login', socialLogin)
+router.post('/socialLogin', socialLogin)
 router.post('/signup', signup);
 router.post('/otpVerification' , userVerification )
 router.post('/resendOtp', resendOTP)

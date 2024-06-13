@@ -31,8 +31,6 @@ app.use(cors(corsOptions));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-console.log(__dirname, "---dirname");
-
 // Define the directory for static files
 app.use("/property", express.static(path.join(__dirname, "../uploads")));
 
