@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import userRoutes from "./routes/user.route.mjs";
+import inspection from "./routes/inspection.route.mjs"
 // import { info } from "./helpers/logger.mjs";
 import { connectToMongoDB } from "../config/db.mjs";
 import { MongoClient } from "mongodb";
@@ -11,6 +12,7 @@ import walletRoutes from "./routes/wallet.route.mjs";
 
 import { fileURLToPath } from "url";
 import path from "path";
+
 
 const app = express();
 
@@ -44,6 +46,10 @@ app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
 app.use("/api", walletRoutes);
+
+
+
+app.use("/api" , inspection)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {

@@ -6,6 +6,8 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import {
   addProperty,
   searchProperty,
+  propertiesList,
+  propertyByID
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -67,15 +69,7 @@ const storage = multer.diskStorage({
   },
 });
 
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     cb(null, "uploads/"); // Specify the destination directory
-//   },
-//   filename: function (req, file, cb) {
-//     // Ensure the filename includes the original file extension
-//     cb(null, file.originalname);
-//   },
-// });
+
 
 const upload = multer({ storage: storage });
 
@@ -83,7 +77,7 @@ const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surro
 
 router.post(
   "/property",
-  authorizer([UserRoles.LANDLORD, UserRoles.PROJECT_MANAGER]),
+  authorizer([UserRoles.LANDLORD, UserRoles.PROJECT_MANAGER , UserRoles.RENTER]),
   upload.any(),
   (req, res) => {
     // Attach file paths to req.bodyssss
@@ -114,6 +108,10 @@ router.post(
 );
 
 router.post("/property/search", searchProperty);
+
+
+router.post("/property/list", propertiesList)
+router.get("/property/:id", propertyByID)
 
 // router.post("/property", upload.any(), addProperty);
 

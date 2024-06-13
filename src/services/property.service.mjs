@@ -17,8 +17,6 @@ async function addPropertyService(
   console.log(propertyPostedBy, "-=2343", id);
 
   console.log(role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id);
-  
-
 
   if (propertyPostedBy) {
     const Property_ = {
@@ -69,32 +67,164 @@ async function addPropertyService(
 }
 
 async function searchInProperty(body) {
-  const { longitude , latitude, type, budget } = body;
+  const { longitude, latitude, type, budget, maxDistance } = body;
 
+  if (!longitude || !latitude) {
+    return "Longitude and latitude are required";
+  }
 
-  const data = await Property.aggregate([
-    {
-        $geoNear: {
-            near: { type: "Point", coordinates: [longitude, latitude] },
-            distanceField: "distance",
-            spherical: true,
-            maxDistance: 10000 // Maximum distance in meters (adjust as needed)
-        }
+  try {
+    const query = {
+      "address.coordinates": {
+        $geoWithin: {
+          $centerSphere: [
+            [parseFloat(longitude), parseFloat(latitude)],
+            maxDistance / 3963.2, // Convert distance to radians (Earth's radius in miles)
+          ],
+        },
+      },
+    };
+
+    if (budget && budget.min !== undefined) {
+      query.rent = { $gte: budget.min };
     }
-]).exec()
-.then(properties => {
-    res.json(properties);
-})
-.catch(err => {
-    console.error(err);
-    res.status(500).json({ error: 'Internal Server Error' });
-});
 
-console.log(data,"--=-=-")
-  
+    if (budget && budget.max !== undefined) {
+      if (!query.rent) query.rent = {};
+      query.rent.$lte = budget.max;
+    }
 
+    if (type) {
+      query.type = type;
+    }
 
+    const properties = await Property.find(query);
 
+    return {
+      data: properties,
+      message: "property search results successfully",
+      status: true,
+      statusCode: 200,
+    };
+  } catch (error) {
+    console.log(error);
+    // res.status(500).send("Error searching for properties: " + error.message);
+  }
 }
 
-export { addPropertyService, searchInProperty };
+async function filterProperies(body) {
+  const { filters } = body;
+
+  const data = await Property.find(filters);
+
+  return {
+    data: data,
+    message: "Search Results",
+    status: true,
+    statusCode: 200,
+  };
+
+  // const jobs = await MongoPaging.find(this.db.models.Jobs, {
+  //   query: filters,
+  //   limit: payload.limit,
+  //   paginatedField: payload.paginatedField,
+  //   sortAscending: payload.sortAscending,
+  //   next: payload.next,
+  //   previous: payload.previous,
+  // });
+}
+
+async function nearbyProperies(body) {
+  const { maxDistance, latitude, longitude } = body;
+
+  console.log(maxDistance, latitude, longitude, "=----body");
+
+  if (maxDistance && latitude && longitude) {
+    const data = await Property.find({
+      "address.coordinates": {
+        $geoWithin: {
+          $centerSphere: [
+            [parseFloat(longitude), parseFloat(latitude)],
+            maxDistance / 3963.2, // Convert distance to radians (Earth's radius in miles)
+          ],
+        },
+      },
+    });
+
+    return {
+      data: data,
+      message: "Nearby Property listing",
+      status: true,
+      statusCode: 200,
+    };
+  } else {
+    const data = await Property.find().limit(9);
+    return {
+      data: data,
+      message: "Property listing",
+      status: true,
+      statusCode: 200,
+    };
+  }
+}
+
+async function getPropertyByID(id) {
+  const data = await Property.findById(id);
+
+  const dataMerge = {
+   
+  };
+
+  if(data.landlord_id) {
+
+    const landlord = await User.findById(data.landlord_id);
+
+
+    dataMerge.propertyData = data;
+
+
+    const {fullName , picture , verified , role  } = landlord;
+
+
+    dataMerge.landlord = {
+      fullName ,
+      picture,
+      verified, role
+    }
+
+    
+
+
+  } else {
+
+    const propertyManager = await User.findById(data.property_manager_id);
+
+
+    const {fullName , picture , verified , role  } = propertyManager;
+
+
+    dataMerge.property_manager = {
+      fullName ,
+      picture,
+      verified, role
+    }
+
+
+  }
+
+
+  return {
+    data: dataMerge,
+    message: "Nearby Property listing",
+    status: true,
+    statusCode: 200,
+  };
+}
+
+export {
+  addPropertyService,
+  searchInProperty,
+  filterProperies,
+  nearbyProperies,
+  getPropertyByID,
+};

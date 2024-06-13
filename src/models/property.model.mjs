@@ -12,23 +12,39 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+
     address: {
       type: {
-          longitude: {
-              type: Number,
-              required: true
-          },
-          latitude: {
-              type: Number,
-              required: true
-          },
-          addressText: {
-              type: String,
-              required: true
-          }
+        type: String,
+        enum: ["Point"],
+        required: true,
       },
-      required: true
-  },
+      coordinates: {
+        type: [Number], // [longitude, latitude]
+        required: true,
+      },
+      addressText: {
+        type: String,
+        required: true,
+      },
+    },
+    //   address: {
+    //     type: {
+    //         longitude: {
+    //             type: Number,
+    //             required: true
+    //         },
+    //         latitude: {
+    //             type: Number,
+    //             required: true
+    //         },
+    //         addressText: {
+    //             type: String,
+    //             required: true
+    //         }
+    //     },
+    //     required: true
+    // },
     rent: {
       type: Number,
       required: true,
@@ -114,15 +130,13 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
     availability: {
-      type: String,
+      type: Number,
       required: true,
     },
     communityType: {
       type: String,
       required: true,
     },
-
-  
 
     cautionDeposite: {
       type: Number,
@@ -155,8 +169,6 @@ const propertySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
-   
 
     rent_period_start: {
       type: Date,
@@ -191,28 +203,28 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    property_manager_id : {
-      type : String,
-      required : true
-    } ,
+    property_manager_id: {
+      type: String,
+      required: true,
+    },
 
-    landlord_id : {
-      type : String,
-      required : true
+    landlord_id: {
+      type: String,
+      required: true,
     },
     rentFrequency: {
-      type: String ,
-      required : true
+      type: String,
+      required: true,
+    },
+    inDemand : {
+      type : Boolean,
+      default : false
     }
-
   },
   { timestamps: true }
 );
 
-
-
-propertySchema.index({ address: '2dsphere' })
-
+propertySchema.index({ "address.coordinates": "2dsphere" });
 // Create the User model from the schema
 const Property = mongoose.model("properties", propertySchema);
 
