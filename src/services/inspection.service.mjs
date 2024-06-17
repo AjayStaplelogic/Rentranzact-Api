@@ -25,6 +25,7 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
+  
   body.propertyName = property.name;
 
   console.log("property.landlord_id", property.landlord_id);
