@@ -44,6 +44,7 @@ async function addProperty(req, res) {
       console.log(document.originalname);
     });
   }
+  
 
   const data = await addPropertyService(
     req.PropertyID,
