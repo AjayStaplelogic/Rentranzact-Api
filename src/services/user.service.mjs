@@ -101,9 +101,6 @@ async function addUser(body) {
 
   const user = new User(body);
 
-
-  
-
   await user.save();
 
   const htmlTemplate = html(user.otp);
