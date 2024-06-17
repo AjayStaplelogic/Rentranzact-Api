@@ -4,19 +4,21 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const inspectionSchema = new mongoose.Schema(
   {
+    RenterDetails: {
+      type: Object,
+      required: true,
+    },
+
     inspectionTime: {
       type: String,
       required: true,
     },
     inspectionDate: {
-      type: Date,
-      required: true,
-    },
-
-    renterID: {
       type: String,
       required: true,
     },
+
+   
     message: {
       type: String,
       required: false,
@@ -59,6 +61,6 @@ const inspectionSchema = new mongoose.Schema(
 );
 
 // Create the User model from the schema
-const inspection = mongoose.model("inspection", inspectionSchema);
+const Inspection = mongoose.model("inspection", inspectionSchema);
 
-export { inspection };
+export { Inspection };

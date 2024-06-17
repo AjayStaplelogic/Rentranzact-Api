@@ -8,7 +8,7 @@ export const login_User = Joi.object().keys({
   password: Joi.string().required().error(new Error("password is required")),
 });
 
-const { RENTER, LANDLORD, PROJECT_MANAGER } = UserRoles;
+const { RENTER, LANDLORD, PROPERTY_MANAGER } = UserRoles;
 
 export const signup_User = Joi.object().keys({
   fullName: Joi.string()
@@ -21,7 +21,7 @@ export const signup_User = Joi.object().keys({
   phone: Joi.string().required().error(new Error("phone number is required")),
   countryCode: Joi.string().required(),
   gender: Joi.string().valid("male", "female").required(),
-  role: Joi.string().valid(RENTER, LANDLORD, PROJECT_MANAGER).required().error(new Error("Role should be valid")),
+  role: Joi.string().valid(RENTER, LANDLORD, PROPERTY_MANAGER).required().error(new Error("Role should be valid")),
   password: Joi.string()
     .optional()
     .alphanum()

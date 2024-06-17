@@ -4,11 +4,10 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const userSchema = new mongoose.Schema(
   {
-    socialPlatform :{
-    type : String,
+    socialPlatform: {
+      type: String,
 
-    required: false
-
+      required: false,
     },
     email: {
       type: String,
@@ -18,11 +17,11 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-     required :  false
+      required: false,
     },
-    otp : {
-     type:String
-    }, 
+    otp: {
+      type: String,
+    },
     role: {
       type: String,
       required: true,
@@ -33,13 +32,12 @@ const userSchema = new mongoose.Schema(
     },
     phone: {
       type: String,
-     required : false
+      required: false,
     },
     countryCode: {
       type: String,
-      required : false
-      }
-    ,
+      required: false,
+    },
     referralCode: {
       type: String,
       required: false,
@@ -49,30 +47,30 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
     verified: {
-      type :  Boolean,
-      default : false
+      type: Boolean,
+      default: false,
     },
-    picture : {
-      type : String,
-      default : "https://st3.depositphotos.com/6672868/13801/v/1600/depositphotos_138013506-stock-illustration-user-profile-group.jpg",
-      required : true
-    }
+    picture: {
+      type: String,
+      default:
+        "https://st3.depositphotos.com/6672868/13801/v/1600/depositphotos_138013506-stock-illustration-user-profile-group.jpg",
+      required: true,
+    },
+
+    favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: "properties" }],
   },
   { timestamps: true }
 );
 
-
 //middleware
 
-userSchema.pre('save', function(next) {
+userSchema.pre("save", function (next) {
   // Generate OTP only if it's not already set
   if (!this.otp) {
-      this.otp = generateOTP();
+    this.otp = generateOTP();
   }
   next();
 });
-
-
 
 // Create the User model from the schema
 const User = mongoose.model("users", userSchema);
