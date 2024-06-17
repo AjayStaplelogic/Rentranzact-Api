@@ -5,7 +5,8 @@ import {
   searchInProperty,
   filterProperies,
   nearbyProperies,
-  getPropertyByID
+  getPropertyByID, 
+  addFavoriteProperties
 } from "../services/property.service.mjs";
 
 async function addProperty(req, res) {
@@ -53,6 +54,8 @@ async function addProperty(req, res) {
     id
   );
 
+  console.log(data,"====daataaaaa ")
+
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
@@ -97,4 +100,15 @@ async function propertyByID (req , res) {
 
 }
 
-export { addProperty, searchProperty, propertiesList , propertyByID };
+
+async function addFavorite(req, res) {
+  console.log(req.params)
+  const { id } = req.params;
+  const {_id} = req.user.data;
+
+  const data = await addFavoriteProperties(id,_id);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
+export { addProperty, searchProperty, propertiesList , propertyByID , addFavorite };

@@ -1,6 +1,6 @@
 const UserRoles = {
     LANDLORD: 'Landlord',
-    PROJECT_MANAGER: 'Project Manager',
+    PROPERTY_MANAGER: 'Property Manager',
     RENTER: 'Renter'
   };
   

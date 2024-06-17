@@ -1,6 +1,8 @@
+import mongoose from "mongoose";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
+
 
 async function addPropertyService(
   PropertyID,
@@ -14,9 +16,11 @@ async function addPropertyService(
 
   const propertyPostedBy = await User.findOne({ email: email, role: role });
 
-  console.log(propertyPostedBy, "-=2343", id);
+  console.log(role, email);
 
-  console.log(role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id);
+  console.log(propertyPostedBy, "---property posted by");
+
+  // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
   if (propertyPostedBy) {
     const Property_ = {
@@ -43,16 +47,18 @@ async function addPropertyService(
       furnishingType: body.furnishingType,
       landmark: body.landmark,
       superArea: body.superArea,
-      availability: body.availability,
+      availability: parseInt(body.availability),
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
       property_manager_id:
-        role === UserRoles.PROJECT_MANAGER ? propertyPostedBy._id : id,
+        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
       amenities: parseInt(body.amenities),
       number_of_rooms: body.number_of_rooms,
     };
+
+    console.log(Property_, "======Property_");
 
     const property = new Property(Property_);
     property.save();
@@ -171,47 +177,33 @@ async function nearbyProperies(body) {
 async function getPropertyByID(id) {
   const data = await Property.findById(id);
 
-  const dataMerge = {
-   
-  };
+  const dataMerge = {};
 
-  if(data.landlord_id) {
-
+  if (data.landlord_id) {
     const landlord = await User.findById(data.landlord_id);
-
 
     dataMerge.propertyData = data;
 
-
-    const {fullName , picture , verified , role  } = landlord;
-
+    const { fullName, picture, verified, role } = landlord;
 
     dataMerge.landlord = {
-      fullName ,
+      fullName,
       picture,
-      verified, role
-    }
-
-    
-
-
+      verified,
+      role,
+    };
   } else {
-
     const propertyManager = await User.findById(data.property_manager_id);
 
-
-    const {fullName , picture , verified , role  } = propertyManager;
-
+    const { fullName, picture, verified, role } = propertyManager;
 
     dataMerge.property_manager = {
-      fullName ,
+      fullName,
       picture,
-      verified, role
-    }
-
-
+      verified,
+      role,
+    };
   }
-
 
   return {
     data: dataMerge,
@@ -221,10 +213,44 @@ async function getPropertyByID(id) {
   };
 }
 
+async function addFavoriteProperties(propertyID, renterID) {
+  const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
+
+  if (isFavorite) {
+
+    const data = await User.findByIdAndUpdate(
+      renterID,
+      { $pull: { favorite: propertyID } },
+      { new: true }
+    );
+    
+
+    return {
+      data: data,
+      message: "Property unfavorite successfully",
+      status: true,
+      statusCode: 200,
+    };
+  } else {
+    const data = await User.findByIdAndUpdate(
+      renterID,
+      { $push: { favorite: propertyID } },
+      { new: true }
+    );
+    return {
+      data: data,
+      message: "Property favorite successfully",
+      status: true,
+      statusCode: 200,
+    };
+  }
+}
+
 export {
   addPropertyService,
   searchInProperty,
   filterProperies,
   nearbyProperies,
   getPropertyByID,
+  addFavoriteProperties,
 };

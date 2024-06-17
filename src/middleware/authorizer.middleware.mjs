@@ -24,15 +24,17 @@
 
 // export default authorizer;
 
-
 import jwt from "jsonwebtoken";
 
 const secret = process.env.JWT_ACCESS_TOKEN_SECRET;
 
 function authorizer(roles) {
-  return function(req, res, next) {
+  console.log(roles);
+  return function (req, res, next) {
     // Get the access token from the request headers, query string, or cookies
     const accessToken = req.headers.authorization?.split(" ")[1]; // Assuming token is passed in the Authorization header
+
+    console.log(accessToken, "----access Tokenss----");
 
     if (!accessToken) {
       return res.status(401).json({ message: "Access token not found" });
@@ -41,7 +43,7 @@ function authorizer(roles) {
     try {
       // Decode the access token
       const decoded = jwt.verify(accessToken, secret);
-      
+
       // Attach the decoded data to the request object
       req.user = decoded;
 
@@ -50,7 +52,11 @@ function authorizer(roles) {
 
       // Check if the user has any of the required roles to access the endpoint
       if (!roles.includes(req.role)) {
-        return res.status(403).json({ message: "You don't have permission to access this resource" });
+        return res
+          .status(403)
+          .json({
+            message: "You don't have permission to access this resource",
+          });
       }
 
       next(); // Call the next middleware
@@ -62,4 +68,3 @@ function authorizer(roles) {
 }
 
 export default authorizer;
-

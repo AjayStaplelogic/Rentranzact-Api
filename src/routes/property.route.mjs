@@ -7,7 +7,7 @@ import {
   addProperty,
   searchProperty,
   propertiesList,
-  propertyByID
+  propertyByID,addFavorite
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -77,7 +77,7 @@ const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surro
 
 router.post(
   "/property",
-  authorizer([UserRoles.LANDLORD, UserRoles.PROJECT_MANAGER , UserRoles.RENTER]),
+  authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]),
   upload.any(),
   (req, res) => {
     // Attach file paths to req.bodyssss
@@ -112,6 +112,7 @@ router.post("/property/search", searchProperty);
 
 router.post("/property/list", propertiesList)
 router.get("/property/:id", propertyByID)
+router.get("/property/favorite/:id" ,  authorizer([UserRoles.RENTER]), addFavorite)
 
 // router.post("/property", upload.any(), addProperty);
 
