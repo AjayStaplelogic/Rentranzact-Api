@@ -180,7 +180,6 @@ async function getPropertyByID(id) {
   const dataMerge = {};
 
   if (data.landlord_id) {
-    
     const landlord = await User.findById(data.landlord_id);
 
     dataMerge.propertyData = data;
