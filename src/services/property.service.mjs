@@ -193,6 +193,7 @@ async function getPropertyByID(id) {
       role,
     };
   } else {
+    
     const propertyManager = await User.findById(data.property_manager_id);
 
     const { fullName, picture, verified, role } = propertyManager;
