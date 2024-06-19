@@ -207,13 +207,16 @@ async function getPropertyByID(id) {
   }
 
 
-  
+
   return {
     data: dataMerge,
     message: "Nearby Property listing",
     status: true,
     statusCode: 200,
   };
+
+
+  
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
