@@ -76,10 +76,11 @@ async function fetchInspections(userData) {
       statusCode: 200,
     };
   } else if (userData.role === UserRoles.RENTER) {
-    console.log(userData, "-----------userData");
     const data = await Inspection.find({
       "RenterDetails.id": userData?._id,
     });
+
+    console.log(data, "========+++ dataaaaaa");
 
     return {
       data: data,
@@ -91,25 +92,14 @@ async function fetchInspections(userData) {
 }
 
 async function updateInspectionStatus(body, id) {
-  const { status, inspectionID , reason } = body;
+  const { status, inspectionID, reason } = body;
 
   if (InspectionStatus.CANCELED === status) {
-    console.log(inspectionID);
-
-    // const test = await Inspection.findById(inspectionID);
-
-    // console.log(test , "---------");
-
-
-
     const data = await Inspection.findByIdAndUpdate(inspectionID, {
       inspectionStatus: status,
       canceledID: id,
-      cancelReason : reason
+      cancelReason: reason,
     });
-
-
-    console.log(status , id , "====status , id ======    , inspectionID" , inspectionID)
 
     return {
       data: data,
@@ -118,17 +108,10 @@ async function updateInspectionStatus(body, id) {
       statusCode: 200,
     };
   } else if (InspectionStatus.COMPLETED === status) {
-    // const data = await Inspection.findById(inspectionID).updateOne({
-    //   status: status,
-    //   approverID: id,
-    // });
-
     const data = await Inspection.findByIdAndUpdate(inspectionID, {
       inspectionStatus: status,
       approverID: id,
     });
-
-    console.log(data, "-----data completed   ");
 
     return {
       data: data,

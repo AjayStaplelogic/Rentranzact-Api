@@ -48,7 +48,6 @@ app.use("/api", property);
 app.use("/api", walletRoutes);
 
 
-
 app.use("/api" , inspection)
 
 // Health check endpoint
