@@ -77,11 +77,11 @@ async function fetchInspections(userData) {
       statusCode: 201,
     };
   } else if (userData.role === UserRoles.RENTER) {
+    console.log(userData,"-----------userData")
     const data = await Inspection.find({
-      RenterDetails: {
-        id: userData?._id,
-      },
+      'RenterDetails.id': userData?._id,
     });
+    
     console.log(data,'datatdatdtdtadt')
     return {
       data: data,
