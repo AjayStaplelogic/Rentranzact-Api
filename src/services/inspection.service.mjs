@@ -25,7 +25,6 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
-  
   body.propertyName = property.name;
 
   console.log("property.landlord_id", property.landlord_id);
@@ -77,12 +76,11 @@ async function fetchInspections(userData) {
       statusCode: 200,
     };
   } else if (userData.role === UserRoles.RENTER) {
-    console.log(userData,"-----------userData")
+    console.log(userData, "-----------userData");
     const data = await Inspection.find({
-      'RenterDetails.id': userData?._id,
+      "RenterDetails.id": userData?._id,
     });
-    
-    console.log(data,'datatdatdtdtadt')
+
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -92,24 +90,26 @@ async function fetchInspections(userData) {
   }
 }
 
-
-
-
-
 async function updateInspectionStatus(body, id) {
-  const { status, inspectionID } = body;
+  const { status, inspectionID , reason } = body;
 
   if (InspectionStatus.CANCELED === status) {
     console.log(inspectionID);
 
-    const test = await Inspection.findById(inspectionID);
+    // const test = await Inspection.findById(inspectionID);
 
-    console.log(test);
+    // console.log(test , "---------");
+
+
 
     const data = await Inspection.findByIdAndUpdate(inspectionID, {
       inspectionStatus: status,
       canceledID: id,
+      cancelReason : reason
     });
+
+
+    console.log(status , id , "====status , id ======    , inspectionID" , inspectionID)
 
     return {
       data: data,
