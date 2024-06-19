@@ -92,6 +92,10 @@ async function fetchInspections(userData) {
   }
 }
 
+
+
+
+
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID } = body;
 
