@@ -206,6 +206,8 @@ async function getPropertyByID(id) {
     };
   }
 
+
+  
   return {
     data: dataMerge,
     message: "Nearby Property listing",
