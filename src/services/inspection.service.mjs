@@ -66,7 +66,7 @@ async function fetchInspections(userData) {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   } else if (userData.role === UserRoles.PROPERTY_MANAGER) {
     const data = await Inspection.find({ propertyID: userData?._id });
@@ -74,7 +74,7 @@ async function fetchInspections(userData) {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   } else if (userData.role === UserRoles.RENTER) {
     console.log(userData,"-----------userData")
@@ -87,7 +87,7 @@ async function fetchInspections(userData) {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   }
 }
