@@ -4,7 +4,9 @@ import {
   addInspection,
   getInsepction,
   inspectionUpdate,
-  inspectionEdit
+  inspectionEdit ,
+
+  getAvailableDates
 } from "../controllers/inspection.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -25,6 +27,9 @@ router.post(
   "/inspection/edit",
   authorizer([UserRoles.RENTER]),
   inspectionEdit)
+
+
+router.get("/available-inspection-dates/:id" , authorizer([UserRoles.RENTER]) , getAvailableDates)
 
 
 

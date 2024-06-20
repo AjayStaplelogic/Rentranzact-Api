@@ -4,8 +4,19 @@ import {
   createInspection,
   fetchInspections,
   updateInspectionStatus,
-  inspectionEditService
+  inspectionEditService,
+  getAvailableDatesService,
 } from "../services/inspection.service.mjs";
+import { Inspection } from "../models/inspection.model.mjs";
+
+async function getAvailableDates(req, res) {
+  const { id } = req.params;
+
+  const data = await getAvailableDatesService(id);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
 async function addInspection(req, res) {
   const { body } = req;
 
@@ -18,30 +29,33 @@ async function addInspection(req, res) {
 
 async function getInsepction(req, res) {
   const userData = req.user.data;
-  console.log(userData , 'userdata')
+  console.log(userData, "userdata");
 
   const data = await fetchInspections(userData);
-sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
-
 
 async function inspectionUpdate(req, res) {
   const id = req.user.data._id;
-  const {body} = req;
+  const { body } = req;
 
-  const data = await updateInspectionStatus(body,id);
+  const data = await updateInspectionStatus(body, id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-
 async function inspectionEdit(req, res) {
-
-  const {body} = req;
+  const { body } = req;
 
   const data = await inspectionEditService(body);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { addInspection, getInsepction, inspectionUpdate , inspectionEdit };
+export {
+  addInspection,
+  getInsepction,
+  inspectionUpdate,
+  inspectionEdit,
+  getAvailableDates,
+};

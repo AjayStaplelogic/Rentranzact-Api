@@ -187,9 +187,24 @@ async function inspectionEditService(body) {
   };
 }
 
+async function getAvailableDatesService(id) {
+  const data = await Inspection.find(
+    { propertyID: id },
+    { inspectionTime: 1, inspectionDate: 1, _id: 0 }
+  ).exec();
+
+  return {
+    data: data,
+    message: "successfully fetched available dates",
+    status: true,
+    statusCode: 200,
+  };
+}
+
 export {
   createInspection,
   fetchInspections,
   updateInspectionStatus,
   inspectionEditService,
+  getAvailableDatesService,
 };
