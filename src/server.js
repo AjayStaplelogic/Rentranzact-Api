@@ -46,9 +46,10 @@ app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
 app.use("/api", walletRoutes);
+app.use("/api" , inspection);
 
 
-app.use("/api" , inspection)
+
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {

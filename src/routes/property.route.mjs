@@ -10,6 +10,7 @@ import {
   propertiesList,
   propertyByID,
   addFavorite,
+  searchPropertyByKeywords,
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -158,12 +159,13 @@ router.post(
     // });
 
     addProperty(req, res);
-
-
-
-    
-
   }
+);
+
+router.get(
+  "/property",
+  authorizer([UserRoles.RENTER]),
+  searchPropertyByKeywords
 );
 
 // router.post("/property", upload.any(), addProperty);
