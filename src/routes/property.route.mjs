@@ -173,3 +173,17 @@ router.get(
 // router.post('/property' , authorizer([UserRoles.LANDLORD]) , upload.any(), addProperty);
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --env-file=.dev_env ./src/server.js",
+    "dev": "nodemon --env-file=.dev_env ./src/server.js",
     "prod": "node --env-file=.prod_env ./src/server.js"
   },
   "type": "module",
@@ -27,7 +27,6 @@
     "mongoose": "^8.4.1",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.13",
-    "pm2": "^5.4.0",
     "stripe": "^15.10.0",
     "uuid": "^10.0.0"
   }
