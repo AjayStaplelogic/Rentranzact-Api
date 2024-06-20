@@ -12,6 +12,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      restart: always
     ports:
       - "8000:3001"
     volumes:
