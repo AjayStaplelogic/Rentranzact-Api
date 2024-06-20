@@ -6,3 +6,4 @@ JWT_ACCESS_TOKEN_SECRET = rentranzact_access_secret_for_prod
 JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_prod
 SALT = 10
 HOST_URL = "https://api.rentranzact.com/"
+#HOST_URL = "http://localhost:8000/"

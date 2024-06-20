@@ -3,7 +3,6 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 
-
 async function addPropertyService(
   PropertyID,
   images,
@@ -213,13 +212,11 @@ async function addFavoriteProperties(propertyID, renterID) {
   const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
 
   if (isFavorite) {
-
     const data = await User.findByIdAndUpdate(
       renterID,
       { $pull: { favorite: propertyID } },
       { new: true }
     );
-    
 
     return {
       data: data,
@@ -242,6 +239,27 @@ async function addFavoriteProperties(propertyID, renterID) {
   }
 }
 
+async function searchPropertyByString(search) {
+  const query = {
+    $or: [
+      { propertyName: { $regex: new RegExp(search, "i") } }, // Case-insensitive regex search for name
+      { city: { $regex: new RegExp(search, "i") } }, // Case-insensitive regex search for city
+    ],
+  };
+
+  // Execute the query
+  const results = await Property.find(query);
+
+  console.log(results);
+
+  return {
+    data: results,
+    message: "Search found",
+    status: true,
+    statusCode: 200,
+  };
+}
+
 export {
   addPropertyService,
   searchInProperty,
@@ -249,4 +267,5 @@ export {
   nearbyProperies,
   getPropertyByID,
   addFavoriteProperties,
+  searchPropertyByString,
 };

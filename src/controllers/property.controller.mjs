@@ -5,14 +5,15 @@ import {
   searchInProperty,
   filterProperies,
   nearbyProperies,
-  getPropertyByID, 
-  addFavoriteProperties
+  getPropertyByID,
+  addFavoriteProperties,
+  searchPropertyByString
 } from "../services/property.service.mjs";
 
 async function addProperty(req, res) {
   const { body } = req;
 
-  console.log(body)
+  console.log(body);
 
   const id = req.user.data._id;
 
@@ -26,12 +27,10 @@ async function addProperty(req, res) {
   const images = files.filter((file) => file.mimetype.startsWith("image/"));
   const documents = files.filter((file) => file.mimetype === "application/pdf");
 
-
-  console.log(images,"----images ")
+  console.log(images, "----images ");
 
   if (images.length > 0) {
     console.log("Images uploaded:");
-
 
     images.forEach((image) => {
       console.log(image.originalname);
@@ -54,7 +53,7 @@ async function addProperty(req, res) {
     id
   );
 
-  console.log(data,"====daataaaaa ")
+  console.log(data, "====daataaaaa ");
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
@@ -68,47 +67,57 @@ async function searchProperty(req, res) {
 }
 
 async function propertiesList(req, res) {
-  const { body  } = req;
+  const { body } = req;
 
-
-  const {nearByProperty} = body;
+  const { nearByProperty } = body;
 
   if (nearByProperty) {
-    console.log("coming here")
+    console.log("coming here");
     const data = await nearbyProperies(body);
 
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
-      const data = await filterProperies(body);
+    const data = await filterProperies(body);
 
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }
-
-
-
 }
 
-async function propertyByID (req , res) {
+async function propertyByID(req, res) {
   const { id } = req.params;
 
-
-  console.log(id)
+  console.log(id);
 
   const data = await getPropertyByID(id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
 }
 
-
 async function addFavorite(req, res) {
-  console.log(req.params)
+  console.log(req.params);
   const { id } = req.params;
-  const {_id} = req.user.data;
+  const { _id } = req.user.data;
 
-  const data = await addFavoriteProperties(id,_id);
+  const data = await addFavoriteProperties(id, _id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { addProperty, searchProperty, propertiesList , propertyByID , addFavorite };
+async function searchPropertyByKeywords(req, res) {
+  const { search } = req.query;
+
+
+  const data = await searchPropertyByString(search);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+}
+
+export {
+  addProperty,
+  searchProperty,
+  propertiesList,
+  propertyByID,
+  addFavorite,
+  searchPropertyByKeywords,
+};

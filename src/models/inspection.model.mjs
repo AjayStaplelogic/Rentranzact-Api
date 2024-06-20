@@ -18,7 +18,6 @@ const inspectionSchema = new mongoose.Schema(
       required: true,
     },
 
-   
     message: {
       type: String,
       required: false,
@@ -31,6 +30,10 @@ const inspectionSchema = new mongoose.Schema(
     inspectionStatus: {
       type: String,
       default: "initiated",
+    },
+    cancelReason: {
+      type: String,
+      required: false,
     },
 
     approverID: {

@@ -56,7 +56,7 @@ app.use("/api" , rentApplication )
 
 
 
-app.use("/api" , inspection)
+
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {

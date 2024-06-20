@@ -18,12 +18,12 @@ async function addInspection(req, res) {
 
 async function getInsepction(req, res) {
   const userData = req.user.data;
+  console.log(userData , 'userdata')
 
   const data = await fetchInspections(userData);
-  console.log(data , '.................data')
-
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
+
 
 async function inspectionUpdate(req, res) {
   const id = req.user.data._id;

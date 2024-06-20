@@ -65,7 +65,7 @@ async function fetchInspections(userData) {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   } else if (userData.role === UserRoles.PROPERTY_MANAGER) {
     const data = await Inspection.find({ propertyID: userData?._id });
@@ -73,37 +73,32 @@ async function fetchInspections(userData) {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   } else if (userData.role === UserRoles.RENTER) {
     const data = await Inspection.find({
-      RenterDetails: {
-        id: userData?._id,
-      },
+      "RenterDetails.id": userData?._id,
     });
-    console.log(data,'datatdatdtdtadt')
+
+    console.log(data, "========+++ dataaaaaa");
+
     return {
       data: data,
       message: "inspection list fetched successfully",
       status: true,
-      statusCode: 201,
+      statusCode: 200,
     };
   }
 }
 
 async function updateInspectionStatus(body, id) {
-  const { status, inspectionID } = body;
+  const { status, inspectionID, reason } = body;
 
   if (InspectionStatus.CANCELED === status) {
-    console.log(inspectionID);
-
-    const test = await Inspection.findById(inspectionID);
-
-    console.log(test);
-
     const data = await Inspection.findByIdAndUpdate(inspectionID, {
       inspectionStatus: status,
       canceledID: id,
+      cancelReason: reason,
     });
 
     return {
@@ -113,17 +108,10 @@ async function updateInspectionStatus(body, id) {
       statusCode: 200,
     };
   } else if (InspectionStatus.COMPLETED === status) {
-    // const data = await Inspection.findById(inspectionID).updateOne({
-    //   status: status,
-    //   approverID: id,
-    // });
-
     const data = await Inspection.findByIdAndUpdate(inspectionID, {
       inspectionStatus: status,
       approverID: id,
     });
-
-    console.log(data, "-----data completed   ");
 
     return {
       data: data,
