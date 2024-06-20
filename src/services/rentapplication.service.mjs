@@ -24,6 +24,7 @@ async function addRentApplicationService(body, fileUrl, renterID) {
     permanentCity,
     permanentState,
     permanentZipcode,
+    permanentContactNumber
   } = body;
 
   const payload = {
@@ -50,6 +51,7 @@ async function addRentApplicationService(body, fileUrl, renterID) {
     permanentCity,
     permanentState,
     permanentZipcode,
+    permanentContactNumber
   };
 
   console.log(payload, "=====payload");

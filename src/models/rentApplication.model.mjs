@@ -112,15 +112,18 @@ const rentApplicationSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    applicationStatus : {
+    permanentContactNumber: {
       type: String,
-      default : "Pending"
+      required: true,
     },
-    statusUpdateBy : {
-      type : String,
-      required: false
-    }
-
+    applicationStatus: {
+      type: String,
+      default: "Pending",
+    },
+    statusUpdateBy: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );

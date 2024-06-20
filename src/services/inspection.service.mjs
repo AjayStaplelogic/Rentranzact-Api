@@ -76,9 +76,57 @@ async function fetchInspections(userData) {
       statusCode: 200,
     };
   } else if (userData.role === UserRoles.RENTER) {
-    const data = await Inspection.find({
+    const data2 = await Inspection.find({
       "RenterDetails.id": userData?._id,
     });
+
+    console.log(data2, "dataaaaa2222");
+
+    // Import ObjectId from MongoDB driver
+
+    const data = await Inspection.aggregate([
+      {
+        $match: {
+          "RenterDetails.id": userData?._id,
+        },
+      },
+      {
+        $lookup: {
+          from: "properties",
+          let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
+              },
+            },
+            { $project: { images: 1 } }, // Project only the images array from properties
+          ],
+          as: "propertyDetails",
+        },
+      },
+      {
+        $unwind: "$propertyDetails", // Unwind to destructure the array from the lookup
+      },
+      {
+        $project: {
+          _id: 1,
+          RenterDetails: 1,
+          inspectionTime: 1,
+          inspectionDate: 1,
+          message: 1,
+          inspectionApproved: 1,
+          inspectionStatus: 1,
+          propertyID: 1,
+          landlordID: 1,
+          property_manager_id: 1,
+          createdAt: 1,
+          updatedAt: 1,
+          __v: 1,
+          "propertyDetails.images": 1, // Include only the images array from propertyDetails
+        },
+      },
+    ]);
 
     console.log(data, "========+++ dataaaaaa");
 
