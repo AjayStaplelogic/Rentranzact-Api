@@ -119,3 +119,17 @@ router.get("/property/favorite/:id" ,  authorizer([UserRoles.RENTER]), addFavori
 // router.post('/property' , authorizer([UserRoles.LANDLORD]) , upload.any(), addProperty);
 
 export default router;
+
+
+
+
+
+
+
+
+
+
+
+
+
+

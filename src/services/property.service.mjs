@@ -16,10 +16,6 @@ async function addPropertyService(
 
   const propertyPostedBy = await User.findOne({ email: email, role: role });
 
-  console.log(role, email);
-
-  console.log(propertyPostedBy, "---property posted by");
-
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
   if (propertyPostedBy) {

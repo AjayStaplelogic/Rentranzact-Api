@@ -9,6 +9,7 @@ import subscriberRoutes from "./routes/newsletter.route.mjs";
 import property from "./routes/property.route.mjs";
 import cors from "cors";
 import walletRoutes from "./routes/wallet.route.mjs";
+import rentApplication from './routes/rentApplication.route.mjs'
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -36,6 +37,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // Define the directory for static files
 app.use("/property", express.static(path.join(__dirname, "../uploads")));
 
+
+
+app.use("/ids" , express.static(path.join(__dirname , "../uploads/RentApplicationDocs")) )
+
 connectToMongoDB();
 
 // Middleware
@@ -46,6 +51,8 @@ app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
 app.use("/api", walletRoutes);
+app.use("/api" , inspection);
+app.use("/api" , rentApplication )
 
 
 
