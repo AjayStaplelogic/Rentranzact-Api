@@ -30,6 +30,9 @@ export const sendMail = (to, subject, html) => {
 
     console.log(mailOptions,"---mail Opitons")
 
+
+    console.log(process.env.USERNAME , process.env.PASSWORD , "ennnnnnvvvv")
+
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         throw new Error('Error sending email: ', error);
