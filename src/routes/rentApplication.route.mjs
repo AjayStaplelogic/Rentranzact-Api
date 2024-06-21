@@ -54,11 +54,10 @@ router.post(
       // Here you can process the uploaded file, save the file details to database, etc.
       const fileUrl = `${hostUrl}ids/images/${req.file.filename}`;
 
-
       const renterID = req.user.data._id;
 
       // Example of calling controller function to handle further logic (saving to DB, etc.)
-      const result = await addRentApplication(req.body, fileUrl, res , renterID); // Assuming addRentApplication is async and handles DB logic
+      const result = await addRentApplication(req.body, fileUrl, res, renterID); // Assuming addRentApplication is async and handles DB logic
 
       //   res.status(200).json({ message: "File uploaded successfully.", result });
     } catch (err) {

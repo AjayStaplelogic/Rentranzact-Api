@@ -105,7 +105,7 @@ async function addUser(body) {
 
   const htmlTemplate = html(user.otp);
 
-  // sendMail(body.email, "OTP Verification", htmlTemplate);
+  sendMail(body.email, "OTP Verification", htmlTemplate);
 
   return {
     data: user,
