@@ -21,11 +21,14 @@ export const sendMail = (to, subject, html) => {
       }
     });
     const mailOptions = {
-      from: "rentranzact@yopmail.com",
+      from: process.env.FROM,
       to,
       subject,
       html,
     };
+
+
+    console.log(mailOptions,"---mail Opitons")
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
