@@ -4,7 +4,7 @@ const transporterOptions = {
   host: process.env.SMTP,
   port: parseInt(process.env.SENDGRID_PORT),
   auth: {
-    user: process.env.USERNAME,
+    user: "apikey",
     pass: process.env.PASSWORD
   }
 };
