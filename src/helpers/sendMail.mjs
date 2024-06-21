@@ -21,7 +21,7 @@ export const sendMail = (to, subject, html) => {
       }
     });
     const mailOptions = {
-      from: process.env.FROM,
+      from: "rentranzact@yopmail.com",
       to,
       subject,
       html,
