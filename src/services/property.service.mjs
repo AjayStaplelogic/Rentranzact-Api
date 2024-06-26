@@ -17,7 +17,12 @@ async function addPropertyService(
 
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
+
+
+  console.log(propertyPostedBy , "-----property posedted by ")
+
   if (propertyPostedBy) {
+    console.log("property [posedted by true")
     const Property_ = {
       rentFrequency: body.rentFrequency,
       propertyID: PropertyID,
@@ -57,6 +62,8 @@ async function addPropertyService(
 
     const property = new Property(Property_);
     property.save();
+
+    console.log("propertyyyyyy ")
 
     return {
       data: property,
