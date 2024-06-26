@@ -7,7 +7,6 @@ const rentApplicationSchema = new mongoose.Schema(
     propertyID: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
     },
     employmentStatus: {

@@ -11,6 +11,7 @@ import {
   propertyByID,
   addFavorite,
   searchPropertyByKeywords,
+  myProperties
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -167,6 +168,9 @@ router.get(
   authorizer([UserRoles.RENTER]),
   searchPropertyByKeywords
 );
+
+
+router.get("/my-properties" , authorizer([UserRoles.RENTER , UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , myProperties)
 
 // router.post("/property", upload.any(), addProperty);
 

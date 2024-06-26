@@ -7,7 +7,8 @@ import {
   nearbyProperies,
   getPropertyByID,
   addFavoriteProperties,
-  searchPropertyByString
+  searchPropertyByString,
+  getMyProperties
 } from "../services/property.service.mjs";
 
 async function addProperty(req, res) {
@@ -113,6 +114,17 @@ async function searchPropertyByKeywords(req, res) {
 
 }
 
+
+async function myProperties (req, res) {
+  const {role , _id} = req.user.data;
+
+
+  const data = await getMyProperties(role, _id);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode); 
+
+}
+
 export {
   addProperty,
   searchProperty,
@@ -120,4 +132,5 @@ export {
   propertyByID,
   addFavorite,
   searchPropertyByKeywords,
+  myProperties
 };

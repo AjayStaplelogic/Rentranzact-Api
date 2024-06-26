@@ -260,7 +260,109 @@ async function searchPropertyByString(search) {
   };
 }
 
+async function getMyProperties(role, id) {
+
+
+  let data = [];
+  if (role === UserRoles.RENTER) {
+
+    data = await Property.find({ renterID: id });
+
+  } else if (role === UserRoles.LANDLORD) {
+
+    
+
+   data =   await Property.aggregate([
+    // Match properties owned by the specified landlord_id
+    {
+      $match: {
+        landlord_id: id
+      }
+    },
+    // Lookup stage to join with rentapplications collection
+    {
+      $lookup: {
+        from: "rentapplications",
+        let: { propertyID: "$_id" }, // Local field: Property's _id
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$propertyID", "$$propertyID"] }, // Match rentapplications with propertyID
+              status: "pending" // Additional condition: Only pending applications
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              count: { $sum: 1 } // Count the number of pending applications
+            }
+          },
+          {
+            $project: {
+              _id: 0,
+              count: 1 // Project the count field
+            }
+          }
+        ],
+        as: "pending_applications"
+      }
+    },
+    // Lookup stage to join with inspections collection
+    {
+      $lookup: {
+        from: "inspections",
+        let: { landlordID: id },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$landlordID", "$$landlordID"] }, // Match inspections with landlordID
+              inspectionStatus: "initiated" // Only count inspections with status "initiated"
+            }
+          },
+          {
+            $count: "inspectionCount" // Count the number of inspections
+          }
+        ],
+        as: "inspections" // Store the result in the 'inspections' array
+      }
+    },
+    // Project to shape the final output
+    {
+      $project: {
+        _id: 1,
+        propertyName: 1,
+        propertyType: 1,
+        pendingApplicationsCount: { $cond: { if: { $isArray: "$pending_applications" }, then: { $arrayElemAt: ["$pending_applications.count", 0] }, else: 0 } },
+        inspectionCount: { $cond: { if: { $isArray: "$inspections" }, then: { $arrayElemAt: ["$inspections.inspectionCount", 0] }, else: 0 } }
+        // Add more fields as needed
+      }
+    }
+  ]);
+  
+
+
+
+
+    //data = await Property.find({ landlord_id: id });
+    console.log(id, "=========idddddd")
+    console.log(data);
+
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    data = await Property.find({ property_manager_id: id });
+
+  }
+
+  return {
+    data: data,
+    message: "Search found",
+    status: true,
+    statusCode: 200,
+  };
+
+}
+
 export {
+  getMyProperties,
   addPropertyService,
   searchInProperty,
   filterProperies,
