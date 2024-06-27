@@ -123,6 +123,10 @@ const rentApplicationSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    cancelReason : {
+      type : String,
+      required : false
+    }
   },
   { timestamps: true }
 );

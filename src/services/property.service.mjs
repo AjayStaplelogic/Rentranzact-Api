@@ -24,6 +24,11 @@ async function addPropertyService(
 
   console.log(propertyPostedBy, "-----property posedted by ")
 
+  let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
+
+  // Step 2: Parse the JSON string into a JavaScript array
+  let arr = JSON.parse("[" + trimmedStr + "]");
+
   if (propertyPostedBy) {
     console.log("property [posedted by true")
     const Property_ = {
@@ -57,7 +62,7 @@ async function addPropertyService(
         role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
-      amenities: parseInt(body.amenities),
+      amenities: arr,
       number_of_rooms: body.number_of_rooms,
     };
 

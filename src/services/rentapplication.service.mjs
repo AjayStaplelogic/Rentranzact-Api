@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import { rentApplication } from "../models/rentApplication.model.mjs";
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 
 
 
@@ -76,58 +77,78 @@ async function addRentApplicationService(body, fileUrl, renterID) {
 async function rentApplicationsList(user) {
 
 
+  let data;
+
   if (user?.role === "Renter") {
 
-    console.log("====== renter " , user)
-
-    /**
-     * 
-     * 
-     * 
-     * 
-     * $lookup: {
-          from: "properties",
-          let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
-              },
-            },
-            { $project: { images: 1 } }, // Project only the images array from properties
-          ],
-          as: "propertyDetails",
-        },
-     */
+    console.log(user, "====userrrrr")
 
 
-    const data = await rentApplication.aggregate([
-      // Match stage to filter based on Renter role and token ID
+
+
+
+
+
+
+
+
+
+    data = await rentApplication.aggregate([
       {
         $match: {
-          renterID: user._id
+          renterID: user?._id // Match documents where renterID matches user._id
         }
       },
-      // Lookup stage to join with users collection to get renter's info
       {
         $lookup: {
           from: "users",
-          let :  { renterID: { $toObjectId: "$renterID" } },
-          pipeline : [
+          let: { renter_ID: { $toObjectId: "$renterID" } },
+          pipeline: [
             {
               $match: {
-                $expr: { $eq: ["$_id", "$$renterID"] }, // Match ObjectId type
-              },
+                $expr: { $eq: ["$_id", "$$renter_ID"] }
+              }
             },
+            {
+              $project: {
+                _id: 1,
+                fullName: 1, // Include fullName field from users collection
+                countryCode: 1,
+                phone: 1
+              }
+            }
           ],
-          localField: "renterID",
-          foreignField: "_id",
-          as: "renter_info"
+          as: "renter_info",
+
+        }
+      }, {
+        $lookup: {
+          from: "properties",
+          let: { propertyID: { $toObjectId: "$propertyID" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$propertyID"]
+                }
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                propertyName: 1
+              }
+            }
+          ],
+          as: "property_info"
         }
       }
+
     ]);
-    
-    
+    console.log(data);
+
+
+
 
     return {
       data: data,
@@ -137,14 +158,12 @@ async function rentApplicationsList(user) {
     };
 
 
-  } 
-  
-  else if (user?.role === "Landlord") 
-    
-    {
+  }
+
+  else if (user?.role === "Landlord") {
 
 
-    console.log(user,"======================userid")
+    console.log(user, "======================userid")
 
     const data = await rentApplication.aggregate([
       // Match stage to filter based on Renter role and token ID
@@ -192,8 +211,8 @@ async function rentApplicationsList(user) {
       }
     ]);
 
-  
-    
+
+
 
     console.log(data, "-------sajksjaksj")
 
@@ -204,4 +223,35 @@ async function rentApplicationsList(user) {
 
 }
 
-export { addRentApplicationService, rentApplicationsList };
+
+async function updateRentApplications(body, id) {
+  const { status, rentApplicationID, reason } = body;
+
+  if (RentApplicationStatus.ACCEPTED === status) {
+    const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
+      status: status
+    });
+
+    return {
+      data: data,
+      message: "rent application completed successfully",
+      status: true,
+      statusCode: 200,
+    };
+  } else if (RentApplicationStatus.CANCELED === status) {
+    const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
+      status: status,
+      statusUpdateBy: id,
+      cancelReason: reason
+    });
+
+    return {
+      data: data,
+      message: "rent application canceled successfully",
+      status: true,
+      statusCode: 200,
+    };
+  }
+}
+
+export { addRentApplicationService, rentApplicationsList, updateRentApplications };

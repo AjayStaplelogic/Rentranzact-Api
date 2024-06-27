@@ -1,5 +1,5 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addRentApplicationService, rentApplicationsList } from "../services/rentapplication.service.mjs"
+import { addRentApplicationService, rentApplicationsList , updateRentApplications } from "../services/rentapplication.service.mjs"
 
 async function addRentApplication(body, fileUrl, res, renterID) {
   console.log(body)
@@ -23,4 +23,16 @@ async function rentApplications(req, res) {
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { addRentApplication, rentApplications };
+
+async function rentApplicationUpdate(req, res) {
+
+  const id = req.user.data._id;
+  const { body } = req;
+
+  const data = await updateRentApplications(body, id);
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
+
+
+export { addRentApplication, rentApplications, rentApplicationUpdate };
