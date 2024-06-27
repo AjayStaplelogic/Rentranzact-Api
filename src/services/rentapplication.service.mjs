@@ -7,7 +7,10 @@ import { Property } from "../models/property.model.mjs";
 
 async function addRentApplicationService(body, fileUrl, renterID) {
 
-  console.log(body , renterID ,  fileUrl )
+  console.log(body, renterID, fileUrl)
+
+
+
   const {
     propertyID,
     employmentStatus,
@@ -33,6 +36,17 @@ async function addRentApplicationService(body, fileUrl, renterID) {
     permanentContactNumber
   } = body;
 
+
+  
+  const landlord = await Property.findById(propertyID);
+
+
+
+
+
+
+
+
   const payload = {
     propertyID: propertyID,
     employmentStatus,
@@ -57,7 +71,8 @@ async function addRentApplicationService(body, fileUrl, renterID) {
     permanentCity,
     permanentState,
     permanentZipcode,
-    permanentContactNumber
+    permanentContactNumber,
+    landlordID : landlord.landlord_id
   };
 
 
@@ -83,18 +98,6 @@ async function rentApplicationsList(user) {
   let data;
 
   if (user?.role === "Renter") {
-
-    console.log(user, "====userrrrr")
-
-
-
-
-
-
-
-
-
-
 
     data = await rentApplication.aggregate([
       {
@@ -148,11 +151,7 @@ async function rentApplicationsList(user) {
       }
 
     ]);
-    console.log(data);
-
-
-
-
+  
     return {
       data: data,
       message: "rent application fetched successfully",
@@ -166,56 +165,66 @@ async function rentApplicationsList(user) {
   else if (user?.role === "Landlord") {
 
 
-    console.log(user, "======================userid")
-
-    const data = await rentApplication.aggregate([
-      // Match stage to filter based on Renter role and token ID
+    data = await rentApplication.aggregate([
       {
         $match: {
-          renterID: user?._id // Assuming user._id is an ObjectId
+          landlordID: user?._id // Match documents where renterID matches user._id
         }
       },
-      // Lookup stage to join with users collection to get renter's name, mobile, and profilepic
       {
         $lookup: {
           from: "users",
-          localField: "renterID",
-          foreignField: "_id",
-          as: "renter_info"
+          let: { renter_ID: { $toObjectId: "$renterID" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$renter_ID"] }
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                fullName: 1, // Include fullName field from users collection
+                countryCode: 1,
+                phone: 1
+              }
+            }
+          ],
+          as: "renter_info",
+
         }
-      },
-      // Unwind the renter_info array since lookup returns an array
-      {
-        $unwind: "$renter_info"
-      },
-      // Lookup stage to join with properties collection to get property name
-      {
+      }, {
         $lookup: {
           from: "properties",
-          localField: "propertyID",
-          foreignField: "_id",
+          let: { propertyID: { $toObjectId: "$propertyID" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $eq: ["$_id", "$$propertyID"]
+                }
+              }
+            },
+            {
+              $project: {
+                _id: 1,
+                propertyName: 1
+              }
+            }
+          ],
           as: "property_info"
         }
-      },
-      // Unwind the property_info array since lookup returns an array
-      {
-        $unwind: "$property_info"
-      },
-      // Project to shape the final output
-      {
-        $project: {
-          _id: 0,
-          renter_name: "$renter_info.fullName",
-          renter_mobile: "$renter_info.phone",
-          renter_profilepic: "$renter_info.picture",
-          property_name: "$property_info.propertyName"
-          // Add more fields if needed
-        }
       }
+
     ]);
 
 
-
+    return {
+      data: data,
+      message: "rent application fetched successfully",
+      status: true,
+      statusCode: 200,
+    };
 
     console.log(data, "-------sajksjaksj")
 
@@ -236,13 +245,13 @@ async function updateRentApplications(body, id) {
     const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
       applicationStatus: status
     },
-  {new: true});
+      { new: true });
 
     console.log(data, "===data ====")
 
     const data2 = await Property.findByIdAndUpdate(data.propertyID, {
-      rented : true,
-      renterID : data.renterID
+      rented: true,
+      renterID: data.renterID
     })
 
 
@@ -256,7 +265,6 @@ async function updateRentApplications(body, id) {
   } else if (RentApplicationStatus.CANCELED === status) {
     const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
       applicationStatus: status,
-      statusUpdateBy: id,
       cancelReason: reason
     });
 

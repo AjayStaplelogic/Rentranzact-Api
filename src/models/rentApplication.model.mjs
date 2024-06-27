@@ -126,6 +126,10 @@ const rentApplicationSchema = new mongoose.Schema(
     cancelReason : {
       type : String,
       required : false
+    },
+    landlordID : {
+      type : String,
+      required: true
     }
   },
   { timestamps: true }
