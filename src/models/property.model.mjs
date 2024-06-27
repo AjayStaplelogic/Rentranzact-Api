@@ -64,7 +64,7 @@ const propertySchema = new mongoose.Schema(
       required: true,
     },
 
-    renter_id: {
+    renterID: {
       type: String,
       required: false,
     },

@@ -69,7 +69,7 @@ router.post(
 router.get('/rentApplications', authorizer([UserRoles.RENTER , UserRoles.LANDLORD]) , rentApplications);
 
 
-router.get("/rentApplication/update-status",
+router.post("/rentApplication/update-status",
   authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]),
   rentApplicationUpdate
 )

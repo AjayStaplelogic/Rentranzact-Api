@@ -10,6 +10,7 @@ async function addRentApplication(body, fileUrl, res, renterID) {
 
   console.log(data, "====daataaaaa ");
 
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 }
 
@@ -30,6 +31,8 @@ async function rentApplicationUpdate(req, res) {
   const { body } = req;
 
   const data = await updateRentApplications(body, id);
+
+  
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 

@@ -1,10 +1,13 @@
 import mongoose from "mongoose";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { Property } from "../models/property.model.mjs";
 
 
 
 async function addRentApplicationService(body, fileUrl, renterID) {
+
+  console.log(body , renterID ,  fileUrl )
   const {
     propertyID,
     employmentStatus,
@@ -227,10 +230,22 @@ async function rentApplicationsList(user) {
 async function updateRentApplications(body, id) {
   const { status, rentApplicationID, reason } = body;
 
+  console.log(body, "----")
+
   if (RentApplicationStatus.ACCEPTED === status) {
     const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
-      status: status
-    });
+      applicationStatus: status
+    },
+  {new: true});
+
+    console.log(data, "===data ====")
+
+    const data2 = await Property.findByIdAndUpdate(data.propertyID, {
+      rented : true,
+      renterID : data.renterID
+    })
+
+
 
     return {
       data: data,
@@ -240,7 +255,7 @@ async function updateRentApplications(body, id) {
     };
   } else if (RentApplicationStatus.CANCELED === status) {
     const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
-      status: status,
+      applicationStatus: status,
       statusUpdateBy: id,
       cancelReason: reason
     });
