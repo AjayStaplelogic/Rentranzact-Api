@@ -122,8 +122,8 @@ router.post(
         file.mimetype.startsWith("image/")
           ? "images"
           : file.mimetype.startsWith("video/")
-          ? "videos"
-          : "documents",
+            ? "videos"
+            : "documents",
         randomFileName // Use random filename instead of file.originalname
       );
 
@@ -170,7 +170,7 @@ router.get(
 );
 
 
-router.get("/my-properties" , authorizer([UserRoles.RENTER , UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , myProperties)
+router.get("/my-properties", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), myProperties)
 
 // router.post("/property", upload.any(), addProperty);
 

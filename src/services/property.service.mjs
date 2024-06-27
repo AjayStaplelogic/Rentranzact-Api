@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
+import { Inspection } from "../models/inspection.model.mjs"
+
+
 
 async function addPropertyService(
   PropertyID,
@@ -19,7 +22,7 @@ async function addPropertyService(
 
 
 
-  console.log(propertyPostedBy , "-----property posedted by ")
+  console.log(propertyPostedBy, "-----property posedted by ")
 
   if (propertyPostedBy) {
     console.log("property [posedted by true")
@@ -70,6 +73,13 @@ async function addPropertyService(
       message: "property created successfully",
       status: true,
       statusCode: 201,
+    };
+  } else {
+    return {
+      data: [],
+      message: "kindly give correct project manager or landlord email",
+      status: false,
+      statusCode: 403,
     };
   }
 }
@@ -270,89 +280,58 @@ async function searchPropertyByString(search) {
 async function getMyProperties(role, id) {
 
 
-  let data = [];
+  let data;
   if (role === UserRoles.RENTER) {
 
     data = await Property.find({ renterID: id });
 
   } else if (role === UserRoles.LANDLORD) {
 
-    
 
-   data =   await Property.aggregate([
-    // Match properties owned by the specified landlord_id
-    {
-      $match: {
-        landlord_id: id
+
+    data = await Property.aggregate([
+      {
+        $match: {
+          landlord_id: id
+        }
+      },
+      {
+        $lookup: {
+          from: "rentapplications",
+          localField: "id",
+          foreignField: "propertyID",
+          as: "rentapplications"
+        }
+      },
+      {
+        $lookup: {
+          from: "inspections",
+          localField: "id",
+          foreignField: "propertyID",
+          as: "inspections"
+        }
+      },
+      {
+        $addFields: {
+          rentapplicationsCount: { $size: "$rentapplications" },
+          inspectionsCount: { $size: "$inspections" }
+        }
+      },
+      {
+        $project: {
+          rentapplications: 0,
+          inspections: 0
+        }
       }
-    },
-    // Lookup stage to join with rentapplications collection
-    {
-      $lookup: {
-        from: "rentapplications",
-        let: { propertyID: "$_id" }, // Local field: Property's _id
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$propertyID", "$$propertyID"] }, // Match rentapplications with propertyID
-              status: "pending" // Additional condition: Only pending applications
-            }
-          },
-          {
-            $group: {
-              _id: null,
-              count: { $sum: 1 } // Count the number of pending applications
-            }
-          },
-          {
-            $project: {
-              _id: 0,
-              count: 1 // Project the count field
-            }
-          }
-        ],
-        as: "pending_applications"
-      }
-    },
-    // Lookup stage to join with inspections collection
-    {
-      $lookup: {
-        from: "inspections",
-        let: { landlordID: id },
-        pipeline: [
-          {
-            $match: {
-              $expr: { $eq: ["$landlordID", "$$landlordID"] }, // Match inspections with landlordID
-              inspectionStatus: "initiated" // Only count inspections with status "initiated"
-            }
-          },
-          {
-            $count: "inspectionCount" // Count the number of inspections
-          }
-        ],
-        as: "inspections" // Store the result in the 'inspections' array
-      }
-    },
-    // Project to shape the final output
-    {
-      $project: {
-        _id: 1,
-        propertyName: 1,
-        propertyType: 1,
-        pendingApplicationsCount: { $cond: { if: { $isArray: "$pending_applications" }, then: { $arrayElemAt: ["$pending_applications.count", 0] }, else: 0 } },
-        inspectionCount: { $cond: { if: { $isArray: "$inspections" }, then: { $arrayElemAt: ["$inspections.inspectionCount", 0] }, else: 0 } }
-        // Add more fields as needed
-      }
-    }
-  ]);
-  
+    ])
 
 
 
 
-    //data = await Property.find({ landlord_id: id });
-    console.log(id, "=========idddddd")
-    console.log(data);
+    console.log(data, "====dat=aa=a==a=a=")
+
+
+
 
   } else if (role === UserRoles.PROPERTY_MANAGER) {
     data = await Property.find({ property_manager_id: id });
