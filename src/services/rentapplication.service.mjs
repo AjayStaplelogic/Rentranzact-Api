@@ -120,8 +120,8 @@ async function rentApplicationsList(user) {
                 _id: 1,
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
-                phone: 1,
-                picture
+                phone: 1
+                
               }
             }
           ],
@@ -187,8 +187,8 @@ async function rentApplicationsList(user) {
                 _id: 1,
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
-                phone: 1,
-                picture
+                phone: 1
+                
               }
             }
           ],
