@@ -7,65 +7,71 @@
   <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
+
   <form id="payment-form">
-    <div id="card-element">
-      <!-- A Stripe Element will be inserted here. -->
+    <div class="form-row">
+      <label for="card-element">
+        Credit or debit card
+      </label>
+      <div id="card-element">
+        <!-- A Stripe Element will be inserted here. -->
+      </div>
+  
+      <!-- Used to display Element errors. -->
+      <div id="card-errors" role="alert"></div>
     </div>
-
-    <!-- Used to display form errors. -->
-    <div id="card-errors" role="alert"></div>
-
-    <button id="submit-payment-btn" type="submit">Submit Payment</button>
+  
+    <button id="submit-payment-btn">Submit Payment</button>
   </form>
-
+  
   <script>
-    // Initialize Stripe.js
     const stripe = Stripe('pk_test_51PQ1RDRqqq804lRbOVN1IwxZ597vxtADFMnSBitWcAIDTjxtoIRmOiNsjBZCS8c5dL9YkpNhI59aK40BBDq8dix300eyPAWrpt');
-
-    // Create an instance of Elements
     const elements = stripe.elements();
-
-    // Create an instance of the card Element
     const cardElement = elements.create('card');
-
-    // Add an instance of the card Element into the `card-element` div
     cardElement.mount('#card-element');
-
-    // Handle form submission
-    document.getElementById('payment-form').addEventListener('submit', async (event) => {
+  
+    const form = document.getElementById('payment-form');
+    const errorElement = document.getElementById('card-errors');
+    const submitButton = document.getElementById('submit-payment-btn');
+  
+    form.addEventListener('submit', async (event) => {
       event.preventDefault();
-
-      // Create a payment method using the card Element
-      const { paymentMethod, error } = await stripe.createPaymentMethod({
-        type: 'card',
-        card: cardElement,
-      });
-
+  
+      const { token, error } = await stripe.createToken(cardElement);
+  
       if (error) {
-        // Display error message
-        const errorElement = document.getElementById('card-errors');
         errorElement.textContent = error.message;
       } else {
-        // Call your API endpoint to create a Payment Intent
-        const response = await fetch('https://api.rentranzact.com/api/addInWallet', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ 
-            amount: 1000, // Specify the amount to add to your Stripe account
-            paymentMethodId: paymentMethod.id // Pass the payment method ID to the server
-          })
-        });
+        const amount = 1000; // Replace with your desired amount in cents or get it dynamically from your form
+        const payload = {
+          amount: amount,
+          token: token.id
+        };
 
-        const data = await response.json();
+        try {
+          const response = await fetch('http://localhost:8080/api/payRent', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+          });
 
-        // Use the client secret to complete the payment
-        const result = await stripe.confirmCardPayment(data.data.clientSecret.client_secret);
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
 
-        console.log(result);
+          // Handle successful payment response
+          // Example: show a success message or redirect to a thank you page
+          console.log('Payment successful!');
+        } catch (error) {
+          console.error('Error:', error);
+          // Handle error
+          errorElement.textContent = 'Payment failed. Please try again.';
+        }
       }
     });
   </script>
+
 </body>
 </html>

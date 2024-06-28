@@ -130,14 +130,13 @@ async function applyReferralCode(code, userID) {
 }
 
 async function verifyOtp(body) {
-  const { otp, id } = body;
+  const { otp, userID } = body;
 
-  const user = await User.findById(id);
+  const user = await User.findById(userID);
 
   if (user?.otp === otp) {
-    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
-
-    console.log(user_, "userrr");
+    
+    const user_ = await User.findByIdAndUpdate({ _id: userID }, { verified: true });
 
     return {
       data: user_,
@@ -157,7 +156,11 @@ async function verifyOtp(body) {
 }
 
 async function socialSignup(body) {
+
   const { socialPlatform, email, email_verified, name, picture, exp } = body;
+
+
+
 
   if (socialPlatform === "google") {
     const timestampMoment = moment.unix(exp);

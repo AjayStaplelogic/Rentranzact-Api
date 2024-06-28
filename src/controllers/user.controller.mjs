@@ -1,7 +1,5 @@
-import { signup_User, login_User } from "../validations/user.validation.mjs";
+import { userSignup, userLogin, userVerify, socialAuth } from "../validations/user.validation.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
-import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
-import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import {
   loginUser,
   addUser,
@@ -11,11 +9,12 @@ import {
   socialSignup,
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import axios from "axios";
+
+
 async function login(req, res) {
   const { body } = req;
 
-  const { isError, errors } = validator(body, login_User);
+  const { isError, errors } = validator(body, userLogin);
 
   if (isError) {
     sendResponse(res, [], errors, false, 403);
@@ -37,7 +36,7 @@ async function signup(req, res) {
   const { body } = req;
   const { referralCode } = body;
 
-  const { isError, errors } = validator(body, signup_User);
+  const { isError, errors } = validator(body, userSignup);
 
   if (isError) {
     sendResponse(res, [], errors, false, 403);
@@ -77,32 +76,36 @@ async function signup(req, res) {
 async function userVerification(req, res) {
   const { body } = req;
 
-  const data = await verifyOtp(body);
 
-  sendResponse(
-    res,
-    data.data,
-    data.message,
-    data.status,
-    data.statusCode,
-    data?.accessToken
-  );
+  const { isError, errors } = validator(body, userVerify);
+
+  if (isError) {
+    sendResponse(res, [], errors, false, 403);
+  } else {
+
+    const data = await verifyOtp(body);
+
+    sendResponse(
+      res,
+      data.data,
+      data.message,
+      data.status,
+      data.statusCode,
+      data?.accessToken
+    );
+  }
+
 }
 
 async function socialLogin(req, res) {
   const { body } = req;
 
-  console.log(body);
+  const { isError, errors } = validator(body, socialAuth)
 
-  // const { isError, errors } = validator(body, signup_User);
-
-  // if (isError) {
-  //   sendResponse(res, [], errors, false, 403);
-  // } else {
+  if (isError) {
+    sendResponse(res, [], errors, false, 403);
+  } else {
     const data = await socialSignup(body);
-
-
-    console.log(data, "=====data ,,,,")
 
     sendResponse(
       res,
@@ -112,9 +115,9 @@ async function socialLogin(req, res) {
       data.statusCode,
       data.accessToken
     );
-  // 
+  }
+
+
 }
-
-
 
 export { login, signup, userVerification, socialLogin };
