@@ -201,10 +201,29 @@ async function getAvailableDatesService(id) {
   };
 }
 
+async function getInspectionsByUserID(id, role , PropertyID) {
+  let data;
+  if (role === UserRoles.LANDLORD) {
+    data = await Inspection.find({
+      landlordID: id,
+      propertyID: PropertyID,
+      inspectionStatus: InspectionStatus.INITIATED
+    })
+  }
+  return {
+    data: data,
+    message: "rent application completed successfully",
+    status: true,
+    statusCode: 200,
+  };
+
+}
+
 export {
   createInspection,
   fetchInspections,
   updateInspectionStatus,
   inspectionEditService,
   getAvailableDatesService,
+  getInspectionsByUserID
 };

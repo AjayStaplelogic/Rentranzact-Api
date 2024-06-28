@@ -5,7 +5,7 @@ import {
   getInsepction,
   inspectionUpdate,
   inspectionEdit ,
-
+  getInspectionRequests,
   getAvailableDates
 } from "../controllers/inspection.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
@@ -28,13 +28,10 @@ router.post(
   authorizer([UserRoles.RENTER]),
   inspectionEdit)
 
+router.get("/inspections/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getInspectionRequests)
+
 
 router.get("/available-inspection-dates/:id" , authorizer([UserRoles.RENTER]) , getAvailableDates)
-
-
-
-
-
 
 
 export default router;

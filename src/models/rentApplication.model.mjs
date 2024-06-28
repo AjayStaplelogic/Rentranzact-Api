@@ -1,6 +1,7 @@
 // models/User.js
 
 import mongoose from "mongoose";
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 // Define the schema for the User model
 const rentApplicationSchema = new mongoose.Schema(
   {
@@ -117,7 +118,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     applicationStatus: {
       type: String,
-      default: "Pending",
+      default:  RentApplicationStatus.PENDING , 
     },
     statusUpdateBy: {
       type: String,

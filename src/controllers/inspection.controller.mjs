@@ -6,6 +6,7 @@ import {
   updateInspectionStatus,
   inspectionEditService,
   getAvailableDatesService,
+  getInspectionsByUserID
 } from "../services/inspection.service.mjs";
 import { Inspection } from "../models/inspection.model.mjs";
 
@@ -52,10 +53,23 @@ async function inspectionEdit(req, res) {
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
+async function getInspectionRequests(req, res) {
+ 
+  const id = req.user.data._id;
+  const role = req.user.data.role;
+  const PropertyID = req.params.id;
+
+  const data = await getInspectionsByUserID(id, role, PropertyID)
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+
+}
+
 export {
   addInspection,
   getInsepction,
   inspectionUpdate,
   inspectionEdit,
   getAvailableDates,
+  getInspectionRequests
 };

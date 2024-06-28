@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Property } from "../models/property.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 
 
@@ -37,7 +38,7 @@ async function addRentApplicationService(body, fileUrl, renterID) {
   } = body;
 
 
-  
+
   const landlord = await Property.findById(propertyID);
 
 
@@ -72,7 +73,7 @@ async function addRentApplicationService(body, fileUrl, renterID) {
     permanentState,
     permanentZipcode,
     permanentContactNumber,
-    landlordID : landlord.landlord_id
+    landlordID: landlord.landlord_id
   };
 
 
@@ -121,7 +122,7 @@ async function rentApplicationsList(user) {
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
                 phone: 1
-                
+
               }
             }
           ],
@@ -152,7 +153,7 @@ async function rentApplicationsList(user) {
       }
 
     ]);
-  
+
     return {
       data: data,
       message: "rent application fetched successfully",
@@ -188,7 +189,7 @@ async function rentApplicationsList(user) {
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
                 phone: 1
-                
+
               }
             }
           ],
@@ -281,4 +282,22 @@ async function updateRentApplications(body, id) {
   }
 }
 
-export { addRentApplicationService, rentApplicationsList, updateRentApplications };
+async function getRentApplicationsByUserID(id, role, PropertyID) {
+
+  let data;
+  if (role === UserRoles.LANDLORD) {
+    data = await rentApplication.find({
+      landlordID: id,
+      propertyID: PropertyID,
+      applicationStatus: RentApplicationStatus.PENDING
+    })
+  }
+  return {
+    data: data,
+    message: "rent application completed successfully",
+    status: true,
+    statusCode: 200,
+  };
+}
+
+export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID };
