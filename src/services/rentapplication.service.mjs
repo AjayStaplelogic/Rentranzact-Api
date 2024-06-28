@@ -270,6 +270,8 @@ async function updateRentApplications(body, id) {
       cancelReason: reason
     });
 
+    console.log(data)
+
     return {
       data: data,
       message: "rent application canceled successfully",

@@ -292,8 +292,6 @@ async function getMyProperties(role, id) {
 
   } else if (role === UserRoles.LANDLORD) {
 
-
-
     data = await Property.aggregate([
       {
         $match: {
@@ -303,34 +301,72 @@ async function getMyProperties(role, id) {
       {
         $lookup: {
           from: "rentapplications",
-          localField: "id",
-          foreignField: "propertyID",
-          as: "rentapplications"
+          let: { propertyId: { $toObjectId: "$_id" } }, // Convert _id from Property to ObjectId
+          pipeline: [
+            {
+              $addFields: {
+                propertyIDObjectId: { $toObjectId: "$propertyID" } // Convert propertyID to ObjectId
+              }
+            },
+            {
+              $match: {
+                $and: [
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
+                  { applicationStatus: { $ne: "accepted" } }
+                ]
+              }
+            },
+            {
+              $count: "applicationCount"
+            }
+          ],
+          as: "propertyApplication"
         }
       },
+
       {
         $lookup: {
           from: "inspections",
-          localField: "id",
-          foreignField: "propertyID",
-          as: "inspections"
+          let: { propertyId: { $toObjectId: "$_id" } }, // Convert _id from Property to ObjectId
+          pipeline: [
+            {
+              $addFields: {
+                propertyIDObjectId: { $toObjectId: "$propertyID" } // Convert propertyID to ObjectId
+              }
+            },
+            {
+              $match: {
+                $and: [
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } }
+                ]
+              }
+            },
+            {
+              $count: "inspectionCount"
+            }
+          ],
+          as: "inspectionRequest"
         }
       },
       {
         $addFields: {
-          rentapplicationsCount: { $size: "$rentapplications" },
-          inspectionsCount: { $size: "$inspections" }
+          applicationCount: { $arrayElemAt: ["$propertyApplication.applicationCount", 0] },
+          inspectionCount: { $arrayElemAt: ["$inspectionRequest.inspectionCount", 0] }
         }
       },
       {
         $project: {
-          rentapplications: 0,
-          inspections: 0
+          _id: 1,
+          applicationCount: 1,
+          inspectionCount: 1,
+          address: 1,
+          propertyName: 1,
+          rent: 1,
+          rentType: 1,
+          images: 1
         }
       }
-    ])
-
-
+    ]);
 
 
     console.log(data, "====dat=aa=a==a=a=")

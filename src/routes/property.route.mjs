@@ -91,8 +91,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surrounding quotes
+console.log(process.env.HOST_URL , "before replacing")
 
+const hostUrl = process.env.HOST_URL;
+console.log(hostUrl , "after replacing")
 router.post("/property/search", searchProperty);
 
 router.post("/property/list", propertiesList);

@@ -5,8 +5,7 @@ JWT_ACCESS_TOKEN_SECRET = rentranzact_access_secret_for_prod
 JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_prod
 SALT = 10
 STRIPE_SECRET_KEY = sk_test_51PQ1RDRqqq804lRbjzzhZUk1VB6XvCuM6fEuP1ZlusvZxcNmF8Sj7eqofUH969mBJlyKbfo5RqUkdWbCYczvhCow00yZGNBoKc
-HOST_URL = "https://api.rentranzact.com/"
-#HOST_URL = "http://localhost:8000/"
+HOST_URL = https://api.rentranzact.com/
 GOOGLE_CLIENT_ID = 550090857989-qqjf9m568ab1d41g6ih3rvqktimuo8d2.apps.googleusercontent.com
 
 
