@@ -130,13 +130,13 @@ async function applyReferralCode(code, userID) {
 }
 
 async function verifyOtp(body) {
-  const { otp, userID } = body;
+  const { otp, id } = body;
 
   const user = await User.findById(userID);
 
   if (user?.otp === otp) {
     
-    const user_ = await User.findByIdAndUpdate({ _id: userID }, { verified: true });
+    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
 
     return {
       data: user_,

@@ -77,11 +77,11 @@ async function userVerification(req, res) {
   const { body } = req;
 
 
-  const { isError, errors } = validator(body, userVerify);
+  // const { isError, errors } = validator(body, userVerify);
 
-  if (isError) {
-    sendResponse(res, [], errors, false, 403);
-  } else {
+  // if (isError) {
+  //   sendResponse(res, [], errors, false, 403);
+  // } else {
 
     const data = await verifyOtp(body);
 
@@ -95,16 +95,16 @@ async function userVerification(req, res) {
     );
   }
 
-}
+// }
 
 async function socialLogin(req, res) {
   const { body } = req;
 
-  const { isError, errors } = validator(body, socialAuth)
+  // const { isError, errors } = validator(body, socialAuth)
 
-  if (isError) {
-    sendResponse(res, [], errors, false, 403);
-  } else {
+  // if (isError) {
+  //   sendResponse(res, [], errors, false, 403);
+  // } else {
     const data = await socialSignup(body);
 
     sendResponse(
@@ -118,6 +118,6 @@ async function socialLogin(req, res) {
   }
 
 
-}
+// }
 
 export { login, signup, userVerification, socialLogin };
