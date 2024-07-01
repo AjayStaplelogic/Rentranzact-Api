@@ -3,90 +3,133 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { identityVerifier } from "../helpers/identityVerifier.mjs";
 
-
-
-async function addRentApplicationService(body, fileUrl, renterID) {
-
-  console.log(body, renterID, fileUrl)
-
-
-
-  const {
-    propertyID,
-    employmentStatus,
-    employerName,
-    employerAddress,
-    occupation,
-    kinName,
-    kinContactNumber,
-    kinEmail,
-    relationshipKin,
-    name,
-    no_of_occupant,
-    checkinDate,
-    emailID,
-    contactNumber,
-    martialStatus,
-    age,
-    rentNowPayLater,
-    permanentAddress,
-    permanentCity,
-    permanentState,
-    permanentZipcode,
-    permanentContactNumber
-  } = body;
-
-
-
-  const landlord = await Property.findById(propertyID);
-
-
-
-
-
-
-
-
-  const payload = {
-    propertyID: propertyID,
-    employmentStatus,
-    employerName,
-    employerAddress,
-    occupation,
-    kinName,
-    kinContactNumber,
-    kinEmail,
-    relationshipKin,
-    name,
-    no_of_occupant: parseInt(no_of_occupant),
-    checkinDate,
-    emailID,
-    contactNumber,
-    martialStatus,
-    age: parseInt(age),
-    rentNowPayLater: Boolean(rentNowPayLater),
-    idImage: fileUrl,
-    renterID: renterID,
-    permanentAddress,
-    permanentCity,
-    permanentState,
-    permanentZipcode,
-    permanentContactNumber,
-    landlordID: landlord.landlord_id
-  };
-
-
+async function addRentApplicationService(body, user) {
   try {
-    const data = new rentApplication(payload);
-    data.save();
+    const renterID = user._id;
 
-    return {
-      data: data,
-      message: "rent application successfully created",
-      status: true,
-      statusCode: 200,
+    const {
+      propertyID,
+      employmentStatus,
+      employerName,
+      employerAddress,
+      occupation,
+      kinFirstName,
+      kinLastName,
+      kinDOB,
+      kinDriverLicence,
+      kinContactNumber,
+      kinEmail,
+      relationshipKin,
+      name,
+      no_of_occupant,
+      checkinDate,
+      emailID,
+      contactNumber,
+      martialStatus,
+      age,
+      rentNowPayLater,
+      permanentAddress,
+      permanentCity,
+      permanentState,
+      permanentZipcode,
+      permanentContactNumber
+    } = body;
+
+    const landlord = await Property.findById(propertyID);
+
+    console.log(landlord ," -==-=-=-=-landlordd ")
+
+    const payload = {
+      propertyID: propertyID,
+      employmentStatus,
+      employerName,
+      employerAddress,
+      occupation,
+      kinFirstName,
+      kinLastName,
+      kinDOB,
+      kinDriverLicence,
+      kinContactNumber,
+      kinEmail,
+      relationshipKin,
+      name,
+      no_of_occupant: no_of_occupant,
+      checkinDate,
+      emailID,
+      contactNumber,
+      martialStatus,
+      age: age,
+      rentNowPayLater: rentNowPayLater,
+      renterID: renterID,
+      permanentAddress,
+      permanentCity,
+      permanentState,
+      permanentZipcode,
+      permanentContactNumber,
+      landlordID: landlord.landlord_id
     };
+
+
+    const kinDetails = {
+      first_name: kinFirstName,
+      last_name: kinLastName,
+      drivers_license: kinDriverLicence,
+      dob: kinDOB
+    }
+
+    const verifyStatus = await identityVerifier(kinDetails);
+
+    console.log(verifyStatus, "=====verifyStatus")
+
+    let data;
+
+    if (verifyStatus.error) {
+
+      return {
+        data: [],
+        message: verifyStatus.message,
+        status: false,
+        statusCode: 400,
+      };
+
+
+    } else {
+
+      if (verifyStatus.status) {
+
+        payload.kinIdentityCheck = verifyStatus.status;
+
+        data = new rentApplication(payload);
+
+        data.save();
+
+
+        return {
+          data: data,
+          message: "rent application successfully created",
+          status: true,
+          statusCode: 200,
+        };
+
+      } else {
+
+        data = new rentApplication(payload);
+
+        data.save();
+
+
+        return {
+          data: data,
+          message: "rent application successfully created",
+          status: true,
+          statusCode: 200,
+        };
+      }
+    }
+
+
   } catch (error) {
     console.log(error);
     // res.status(500).send("Error searching for properties: " + error.message);

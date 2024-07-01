@@ -1,9 +1,12 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID } from "../services/rentapplication.service.mjs"
 
-async function addRentApplication(body, fileUrl, res, renterID) {
+async function addRentApplication(req, res) {
+  
+  const body = req.body;
+  const user = req.user.data;
 
-  const data = await addRentApplicationService(body, fileUrl, renterID);
+  const data = await addRentApplicationService(body, user);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

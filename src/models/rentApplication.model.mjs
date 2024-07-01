@@ -2,6 +2,7 @@
 
 import mongoose from "mongoose";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+
 // Define the schema for the User model
 const rentApplicationSchema = new mongoose.Schema(
   {
@@ -29,9 +30,21 @@ const rentApplicationSchema = new mongoose.Schema(
       required: true,
     },
 
-    kinName: {
+    kinFirstName: {
       type: String,
       required: true,
+    },
+    kinLastName: {
+      type: String,
+      required: true,
+    },
+    kinDriverLicence: {
+      type: String,
+      required: false,
+    },
+    kinDOB: {
+   type : String,
+   required : false
     },
 
     kinContactNumber: {
@@ -76,12 +89,6 @@ const rentApplicationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-
-    idImage: {
-      type: String,
-      required: true,
-    },
-
     age: {
       type: Number,
       required: true,
@@ -118,18 +125,23 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     applicationStatus: {
       type: String,
-      default:  RentApplicationStatus.PENDING , 
+      default: RentApplicationStatus.PENDING,
     },
     statusUpdateBy: {
       type: String,
       required: false,
     },
-    cancelReason : {
-      type : String,
-      required : false
+    cancelReason: {
+      type: String,
+      required: false
     },
-    landlordID : {
-      type : String,
+    landlordID: {
+      type: String,
+      required: true
+    },
+    kinIdentityCheck: {
+      type: Boolean,
+      default: false,
       required: true
     }
   },
