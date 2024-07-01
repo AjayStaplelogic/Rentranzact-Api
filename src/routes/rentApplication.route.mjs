@@ -10,7 +10,7 @@ import fs from "fs";
 const baseUploadPath = "uploads/RentApplicationDocs";
 const hostUrl = process.env.HOST_URL.replace(/^"(.*)"$/, "$1"); // Removes surrounding quotes
 
-console.log(hostUrl, "=====host url ");
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {

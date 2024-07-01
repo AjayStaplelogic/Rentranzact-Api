@@ -29,9 +29,9 @@ import jwt from "jsonwebtoken";
 const secret = process.env.JWT_ACCESS_TOKEN_SECRET;
 
 function authorizer(roles) {
-  console.log(roles);
+
   return function (req, res, next) {
-    console.log(req.headers, "========req headers");
+
     // Get the access token from the request headers, query string, or cookies
     const accessToken = req.headers.authorization?.split(" ")[1]; // Assuming token is passed in the Authorization header
 
@@ -39,10 +39,10 @@ function authorizer(roles) {
       return res.status(401).json({ message: "Access token not found" });
     }
 
-    console.log(accessToken, "----access Tokenss----");
+   
 
     if (!accessToken) {
-      console.log("======acccesstopken ");
+   
       return res.status(401).json({ message: "Access token not found" });
     }
 

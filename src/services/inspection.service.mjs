@@ -27,8 +27,6 @@ async function createInspection(body, renterID) {
 
   body.propertyName = property.name;
 
-  console.log("property.landlord_id", property.landlord_id);
-
   body.landlordID = property.landlord_id;
 
   body.property_manager_id = property.property_manager_id;
@@ -38,11 +36,9 @@ async function createInspection(body, renterID) {
   const data = new Inspection(body);
   data.save();
 
-  console.log(inspectionDate);
-
   const formattedDate = moment(inspectionDate).format("DD MMMM");
 
-  console.log(formattedDate, "formattedDate");
+
 
   data.messageDetails = {
     date: formattedDate,
@@ -79,8 +75,6 @@ async function fetchInspections(userData) {
     const data2 = await Inspection.find({
       "RenterDetails.id": userData?._id,
     });
-
-    console.log(data2, "dataaaaa2222");
 
     // Import ObjectId from MongoDB driver
 
@@ -128,7 +122,7 @@ async function fetchInspections(userData) {
       },
     ]);
 
-    console.log(data, "========+++ dataaaaaa");
+
 
     return {
       data: data,

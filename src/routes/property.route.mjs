@@ -90,11 +90,8 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage });
-
-console.log(process.env.HOST_URL , "before replacing")
-
 const hostUrl = process.env.HOST_URL;
-console.log(hostUrl , "after replacing")
+
 router.post("/property/search", searchProperty);
 
 router.post("/property/list", propertiesList);
@@ -137,29 +134,6 @@ router.post(
         req.documents.push({ id: uuidv4(), url: relativePath });
       }
     });
-    // Attach file paths to req.bodyssss
-    // req.files.forEach((file) => {
-    //   const relativePath = path.join(
-    //     hostUrl,
-    //     "property",
-    //     req.PropertyID,
-    //     file.mimetype.startsWith("image/")
-    //       ? "images"
-    //       : file.mimetype.startsWith("video/")
-    //       ? "videos"
-    //       : "documents",
-    //     file.originalname
-    //   );
-
-    //   if (file.mimetype.startsWith("image/")) {
-    //     console.log(relativePath,"---======relative apth ")
-    //     req.images.push({ id: uuidv4(), url: relativePath });
-    //   } else if (file.mimetype.startsWith("video/")) {
-    //     req.videos.push({ id: uuidv4(), url: relativePath });
-    //   } else if (file.mimetype.startsWith("application/")) {
-    //     req.documents.push({ id: uuidv4(), url: relativePath });
-    //   }
-    // });
 
     addProperty(req, res);
   }

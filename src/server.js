@@ -12,6 +12,7 @@ import walletRoutes from "./routes/wallet.route.mjs";
 import rentApplication from './routes/rentApplication.route.mjs'
 import webhookRoutes from "./routes/webhook.route.mjs"
 import stripeRoutes from "./routes/stripe.route.mjs"
+import dashboardRoutes from "./routes/dashboard.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -41,7 +42,7 @@ app.use("/property", express.static(path.join(__dirname, "../uploads")));
 
 
 
-app.use("/ids" , express.static(path.join(__dirname , "../uploads/RentApplicationDocs")) )
+app.use("/ids", express.static(path.join(__dirname, "../uploads/RentApplicationDocs")))
 
 connectToMongoDB();
 
@@ -53,10 +54,11 @@ app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
 app.use("/api", walletRoutes);
-app.use("/api" , inspection);
-app.use("/api" , rentApplication )
-app.use("/api" , webhookRoutes )
+app.use("/api", inspection);
+app.use("/api", rentApplication)
+app.use("/api", webhookRoutes)
 app.use("/api", stripeRoutes)
+app.use("/api", dashboardRoutes)
 
 
 

@@ -30,7 +30,6 @@ async function addInspection(req, res) {
 
 async function getInsepction(req, res) {
   const userData = req.user.data;
-  console.log(userData, "userdata");
 
   const data = await fetchInspections(userData);
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
