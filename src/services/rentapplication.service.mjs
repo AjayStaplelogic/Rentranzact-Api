@@ -7,6 +7,9 @@ import { identityVerifier } from "../helpers/identityVerifier.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
+
+    console.log(body , "=========bodyyyyyyyyyyyyyyyy==========")
+
     const renterID = user._id;
 
     const {
@@ -36,6 +39,11 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber
     } = body;
+
+
+
+    
+
 
     const landlord = await Property.findById(propertyID);
 
