@@ -24,6 +24,7 @@ async function addInspection(req, res) {
   const renterID = req.user.data._id;
 
   const data = await createInspection(body, renterID);
+  
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }

@@ -59,6 +59,16 @@ const inspectionSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    propertyName : {
+      type : String,
+      required : true
+    } ,
+    images : {
+      type: Array,
+      required : true 
+    }
+
+
   },
   { timestamps: true }
 );

@@ -15,9 +15,14 @@ async function createInspection(body, renterID) {
 
   const { fullName, picture, phone, countryCode } = renterDetails;
 
-  body.renterID = renterID;
 
-  body.RenterDetails = {
+  const payload ={
+    ...body
+  }
+
+  payload.renterID = renterID;
+
+  payload.RenterDetails = {
     id: renterID,
     fullName: fullName,
     picture: picture,
@@ -25,47 +30,39 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
-  body.propertyName = property.name;
+  payload.propertyName = property.propertyName;
 
-  body.landlordID = property.landlord_id;
+  
 
-  body.property_manager_id = property.property_manager_id;
+  payload.landlordID = property.landlord_id;
 
-  body.images = property.images;
+  payload.property_manager_id = property.property_manager_id;
 
-  const data = new Inspection(body);
+  payload.images = property.images;
+
+  console.log(payload,"----------BODY")
+
+  const data = new Inspection(payload);
   data.save();
 
-  const formattedDate = moment(inspectionDate).format("DD MMMM");
+  console.log(data , "====+++++++data ")
 
 
 
-  data.messageDetails = {
-    date: formattedDate,
-    time: inspectionTime,
-    propertyName: property.name,
-  };
+
 
   return {
     data: data,
     message: "successfully booked inspection",
     status: true,
-    statusCode: 201,
+    statusCode: 201
   };
 }
 
 async function fetchInspections(userData) {
   if (userData.role === UserRoles.LANDLORD) {
     const data = await Inspection.find({ landlordID: userData?._id });
-
-    const data1 = await Inspection.aggregate([
-      {
-        $match : {
-          landlordID : userData?._id
-        }
-      }
-
-    ]);
+   
     return {
       data: data,
       message: "inspection list fetched successfully",
