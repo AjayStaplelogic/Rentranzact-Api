@@ -73,7 +73,8 @@ async function addRentApplicationService(body, user) {
       permanentState,
       permanentZipcode,
       permanentContactNumber,
-      landlordID: landlord.landlord_id
+      landlordID: landlord.landlord_id,
+      propertyName : landlord.propertyName
     };
 
 

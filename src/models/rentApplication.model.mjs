@@ -147,8 +147,13 @@ const rentApplicationSchema = new mongoose.Schema(
     verifcationType: {
       type : String,
       required : true
+    },
+    propertyName : {
+      type : String,
+      required : true
     }
   },
+  
   { timestamps: true }
 );
 
