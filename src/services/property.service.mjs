@@ -295,7 +295,8 @@ async function getMyProperties(role, id) {
     data = await Property.aggregate([
       {
         $match: {
-          landlord_id: id
+          landlord_id: id,
+          
         }
       },
       {
@@ -312,7 +313,8 @@ async function getMyProperties(role, id) {
               $match: {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
-                  { applicationStatus: { $ne: "accepted" } }
+                  { applicationStatus: { $ne: "accepted" } },
+                  {kinIdentityCheck : { $ne : true} }
                 ]
               }
             },

@@ -84,7 +84,7 @@ async function addRentApplicationService(body, user) {
 
     const verifyStatus = await identityVerifier(identificationType, body);
 
-    console.log(verifyStatus.data.status, "=====verifyStatus")
+    console.log(verifyStatus, "=====verifyStatus")
 
     let data;
 
@@ -112,7 +112,9 @@ async function addRentApplicationService(body, user) {
 
         if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
 
-          payload.kinIdentityCheck = verifyStatus.data.data.status;
+          console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
+
+          payload.kinIdentityCheck = verifyStatus.data.status;
           payload.verifcationType = identificationType;
 
           data = new rentApplication(payload);
