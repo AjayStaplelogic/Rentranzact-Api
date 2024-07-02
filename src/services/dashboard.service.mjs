@@ -15,45 +15,19 @@ async function getDashboardStats(user) {
     const total = await Property.find({ landlord_id: user._id }).countDocuments()
 
 
-    // const mostRecentInspection = await Inspection.aggregate([
-    //     { $sort: { createdAt: -1 } },
+    const mostRecentInspection = await Inspection.aggregate([
+        { $sort: { createdAt: -1 } },
+        { $limit: 1 }
+    ])
 
-    //     // Limit to the first document (which will be the newest one)
-    //     { $limit: 1 },
-
-    //     {
-    //         $lookup: {
-    //             from: "properties",
-    //             let: { propertyID: { $toObject: "$_id" } },
-    //             pipeline: [
-    //                 {
-    //                     $addFields: {
-    //                         propertyIDObjectId: { $toObjectId: "$propertyID" }
-    //                     }
-    //                 },
-    //                 {
-    //                     $match: {
-    //                         $and: [
-    //                             { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } }
-    //                         ]
-    //                     }
-    //                 }
-    //             ],
-    //             as: "propertyDetails"
-    //         }
-    //     }
-
-
-    // ])
+    console.log(mostRecentInspection , "==========mostRecentInspectionmostRecentInspectionmostRecentInspection")
 
     return {
         data: {
             count: {
                 rented, vacant, maintenance, total
             },
-            newestInspectionRequest: {
-
-            }
+            newestInspectionRequest: mostRecentInspection
 
 
         },

@@ -44,7 +44,7 @@ async function addRentApplicationService(body, user) {
 
     const landlord = await Property.findById(propertyID);
 
-    console.log(landlord , ":=======landloard")
+    console.log(landlord, ":=======landloard")
 
     const payload = {
       propertyID: propertyID,
@@ -74,12 +74,10 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber,
       landlordID: landlord.landlord_id,
-      propertyName : landlord.propertyName
+      propertyName: landlord.propertyName
     };
 
-
-    console.log(payload ," ===============payload")
-
+    console.log(payload, " ===============payload")
 
     const kinDetails = {
       first_name: kinFirstName,
@@ -117,7 +115,7 @@ async function addRentApplicationService(body, user) {
         const lastName = verifyStatus.data.data.lastName.toLowerCase();
 
 
-        console.log(verifyStatus.data.data.dateOfBirth , formattedDate ,  firstName , kinFirstName.toLowerCase() ,  lastName , kinLastName.toLowerCase()   )
+        console.log(verifyStatus.data.data.dateOfBirth, formattedDate, firstName, kinFirstName.toLowerCase(), lastName, kinLastName.toLowerCase())
 
         if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
 
