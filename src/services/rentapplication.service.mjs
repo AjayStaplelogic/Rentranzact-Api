@@ -89,7 +89,7 @@ async function addRentApplicationService(body, user) {
 
     const verifyStatus = await identityVerifier(identificationType, body);
 
-    console.log(verifyStatus, "=====verifyStatus")
+    console.log(verifyStatus.data, "=====verifyStatus")
 
     let data;
 
