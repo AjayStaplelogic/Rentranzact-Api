@@ -7,6 +7,7 @@ import {
   applyReferralCode,
   verifyOtp,
   socialSignup,
+  myProfileDetails
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -118,6 +119,20 @@ async function socialLogin(req, res) {
   }
 
 
+async function myprofile(req, res) {
+  console.log(req.user.data,  "====user")
+  const { _id, role } = req.user.data;
+  const data = await myProfileDetails(_id, role);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+}
+
+
 // }
 
-export { login, signup, userVerification, socialLogin };
+export { login, signup, userVerification, socialLogin ,myprofile };

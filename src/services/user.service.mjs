@@ -120,6 +120,23 @@ async function validateCode(code) {
   return Boolean(validOrNot);
 }
 
+
+async function myProfileDetails(id, role) {
+
+  const data = await User.find({
+    _id: id,
+    role : role
+  })
+
+  return {
+    data: data,
+    message: "fetched user details successfully",
+    status: true,
+    statusCode: 200
+  };
+  
+}
+
 async function applyReferralCode(code, userID) {
   const applyReferral = await Referral.findOneAndUpdate(
     { code: code },
@@ -280,4 +297,5 @@ export {
   applyReferralCode,
   verifyOtp,
   socialSignup,
+  myProfileDetails
 };
