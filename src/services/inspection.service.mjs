@@ -57,6 +57,15 @@ async function createInspection(body, renterID) {
 async function fetchInspections(userData) {
   if (userData.role === UserRoles.LANDLORD) {
     const data = await Inspection.find({ landlordID: userData?._id });
+
+    const data1 = await Inspection.aggregate([
+      {
+        $match : {
+          landlordID : userData?._id
+        }
+      }
+
+    ]);
     return {
       data: data,
       message: "inspection list fetched successfully",

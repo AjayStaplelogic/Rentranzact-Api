@@ -4,11 +4,12 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
+import moment from "moment";
 
 async function addRentApplicationService(body, user) {
   try {
 
-    console.log(body , "=========bodyyyyyyyyyyyyyyyy==========")
+    console.log(body, "=========bodyyyyyyyyyyyyyyyy==========")
 
     const renterID = user._id;
 
@@ -37,17 +38,11 @@ async function addRentApplicationService(body, user) {
       permanentCity,
       permanentState,
       permanentZipcode,
-      permanentContactNumber
+      permanentContactNumber,
+      identificationType
     } = body;
 
-
-
-    
-
-
     const landlord = await Property.findById(propertyID);
-
-    console.log(landlord ," -==-=-=-=-landlordd ")
 
     const payload = {
       propertyID: propertyID,
@@ -87,13 +82,13 @@ async function addRentApplicationService(body, user) {
       dob: kinDOB
     }
 
-    const verifyStatus = await identityVerifier(kinDetails);
+    const verifyStatus = await identityVerifier(identificationType, body);
 
-    console.log(verifyStatus, "=====verifyStatus")
+    console.log(verifyStatus.data.status, "=====verifyStatus")
 
     let data;
 
-    if (verifyStatus.error) {
+    if (verifyStatus.data.error) {
 
       return {
         data: [],
@@ -105,21 +100,32 @@ async function addRentApplicationService(body, user) {
 
     } else {
 
-      if (verifyStatus.status) {
+      if (verifyStatus.data.status) {
 
-        payload.kinIdentityCheck = verifyStatus.status;
+        const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
 
-        data = new rentApplication(payload);
+        console.log(verifyStatus.data.data.firstName, "-----lowercase")
 
-        data.save();
+        const firstName = verifyStatus.data.data.firstName.toLowerCase();
 
+        const lastName = verifyStatus.data.data.lastName.toLowerCase();
 
-        return {
-          data: data,
-          message: "rent application successfully created",
-          status: true,
-          statusCode: 200,
-        };
+        if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
+
+          payload.kinIdentityCheck = verifyStatus.data.data.status;
+          payload.verifcationType = identificationType;
+
+          data = new rentApplication(payload);
+
+          data.save();
+
+          return {
+            data: data,
+            message: "rent application successfully created",
+            status: true,
+            statusCode: 200,
+          };
+        }
 
       } else {
 
@@ -127,13 +133,13 @@ async function addRentApplicationService(body, user) {
 
         data.save();
 
-
         return {
           data: data,
           message: "rent application successfully created",
           status: true,
           statusCode: 200,
         };
+
       }
     }
 
