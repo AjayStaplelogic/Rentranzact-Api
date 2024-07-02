@@ -35,7 +35,7 @@ async function identityVerifier(identificationType, kinDetails) {
             headers: {
                 'token': token
             }
-        }).then((res) => res).catch((err) => err.response.data)
+        }).then((res) => res& console.log(res,"=====dahsjhsa")).catch((err) => err.response.data)
 
         return response;
 
