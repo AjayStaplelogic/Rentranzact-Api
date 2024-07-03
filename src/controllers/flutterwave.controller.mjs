@@ -1,18 +1,18 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import {payRentService} from "../services/stripe.service.mjs"
+import { addFlutterwaveTransaction } from "../services/flutterwave.service.mjs";
 
 async function flutterwave(req, res) {
   const { body } = req;
 
- console.log(body, "=========body==============")
 
 
- 
 
- 
-//   const data = await payRentService(body);
+  console.log(req.body, "=========boddyyyy")
 
-//   sendResponse(res, data.data, data.message, data.status, data.statusCode);
+ const data = await addFlutterwaveTransaction(body)
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
 }
 
 export { flutterwave };

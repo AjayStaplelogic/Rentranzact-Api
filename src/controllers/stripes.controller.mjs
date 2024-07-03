@@ -1,14 +1,13 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import {payRentService} from "../services/stripe.service.mjs"
+import { addStripeTransaction } from "../services/strips.service.mjs";
+async function stripe(req, res) {
 
-async function payRent(req, res) {
-  const { body } = req;
+    console.log(body, "=========boddddyyyyy")
+    const { body } = req;
 
- 
+    const data = await addStripeTransaction(body);
 
-  const data = await payRentService(body);
-
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { payRent };
+export { stripe };
