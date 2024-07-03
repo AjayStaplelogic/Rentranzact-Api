@@ -28,6 +28,8 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const { bvn } = kinDetails;
 
+        console.log(bvn , "==============bvnnnnn")
+
         apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?bvn=${bvn}`;
 
 
@@ -35,9 +37,14 @@ async function identityVerifier(identificationType, kinDetails) {
             headers: {
                 'token': token
             }
-        }).then((res) => res).catch((err) => err.response.data)
+        }).then((res) => res).catch((err) => err.response.data);
+
+        console.log(response , "----response e e e e e e")
 
         return response;
+
+
+        
 
     }
 
