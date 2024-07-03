@@ -20,8 +20,6 @@ async function getDashboardStats(user) {
         { $limit: 1 }
     ])
 
-    console.log(mostRecentInspection , "==========mostRecentInspectionmostRecentInspectionmostRecentInspection")
-
     return {
         data: {
             count: {

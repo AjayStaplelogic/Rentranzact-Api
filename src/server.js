@@ -56,7 +56,7 @@ app.use("/api", property);
 app.use("/api", walletRoutes);
 app.use("/api", inspection);
 app.use("/api", rentApplication)
-app.use("/api", webhookRoutes)
+app.use("/api/webhook", webhookRoutes)
 app.use("/api", stripeRoutes)
 app.use("/api", dashboardRoutes)
 

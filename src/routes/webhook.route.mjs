@@ -1,9 +1,10 @@
 import express from 'express'
 const router = express.Router();
-import { idVerification } from '../controllers/webhook.controller.mjs';
+import { flutterwave } from '../controllers/flutterwave.controller.mjs';
 
 
-router.post('/idVerification' ,idVerification);
+router.post('/flutterwave' ,flutterwave);
+// router.post('/stripe' , stripe)
 
 
 
