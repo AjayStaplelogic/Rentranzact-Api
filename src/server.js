@@ -1,18 +1,24 @@
 import express from "express";
 import bodyParser from "body-parser";
-import userRoutes from "./routes/user.route.mjs";
-import inspection from "./routes/inspection.route.mjs"
+import userRoutes from "./user/routes/user.route.mjs";
+import inspection from "./user/routes/inspection.route.mjs"
 // import { info } from "./helpers/logger.mjs";
 import { connectToMongoDB } from "../config/db.mjs";
 import { MongoClient } from "mongodb";
-import subscriberRoutes from "./routes/newsletter.route.mjs";
-import property from "./routes/property.route.mjs";
+import subscriberRoutes from "./user/routes/newsletter.route.mjs";
+import property from "./user/routes/property.route.mjs";
 import cors from "cors";
-import walletRoutes from "./routes/wallet.route.mjs";
-import rentApplication from './routes/rentApplication.route.mjs'
-import webhookRoutes from "./routes/webhook.route.mjs"
-import stripeRoutes from "./routes/stripe.route.mjs"
-import dashboardRoutes from "./routes/dashboard.route.mjs"
+import walletRoutes from "./user/routes/wallet.route.mjs";
+import rentApplication from './user/routes/rentApplication.route.mjs'
+import webhookRoutes from "./user/routes/webhook.route.mjs"
+import stripeRoutes from "./user/routes/stripe.route.mjs"
+import dashboardRoutes from "./user/routes/dashboard.route.mjs"
+
+
+
+//admin imports
+import adminRoutes from "./admin/routes/admin.route.mjs"
+import adminDashboardRoutes from "./admin/routes/dashboard.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -49,7 +55,7 @@ connectToMongoDB();
 // Middleware
 app.use(bodyParser.json());
 
-// Routes
+// user Routes
 app.use("/api", userRoutes);
 app.use("/api", subscriberRoutes);
 app.use("/api", property);
@@ -59,6 +65,18 @@ app.use("/api", rentApplication)
 app.use("/api/webhook", webhookRoutes)
 app.use("/api", stripeRoutes)
 app.use("/api", dashboardRoutes)
+
+
+//admin
+app.use("/api/admin" , adminRoutes)
+app.use("/api/admin" , adminDashboardRoutes)
+
+
+
+
+
+
+
 
 
 

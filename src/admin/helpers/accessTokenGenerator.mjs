@@ -1,0 +1,15 @@
+import jwt from "jsonwebtoken";
+
+async function accessTokenGenerator(user) {
+  const secret = process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET;
+
+  return jwt.sign(
+    {
+      exp: Math.floor(Date.now() / 1000) + 30 * 24 * 60 * 60,
+      data: user,
+    },
+    secret
+  );
+}
+
+export { accessTokenGenerator };
