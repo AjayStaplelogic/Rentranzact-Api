@@ -70,25 +70,25 @@ async function getPropertyByID(id) {
     {
 
       $match: {
-     "_id" : id1
+        "_id": id1
       }
     },
-   
-    {
-    $lookup: {
-      from: "users",
-      let: { renter_ID: { $toObjectId: "$landlord_id" } },
-      pipeline: [
-        {
-          $match: {
-            $expr: { $eq: ["$_id", "$$renter_ID"] }
-          }
-        }
-      ],
-      as: "landlord_info",
 
+    {
+      $lookup: {
+        from: "users",
+        let: { renter_ID: { $toObjectId: "$landlord_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$renter_ID"] }
+            }
+          }
+        ],
+        as: "landlord_info",
+
+      }
     }
-  }
   ])
 
   return {
@@ -100,7 +100,19 @@ async function getPropertyByID(id) {
 
 }
 
+async function deletePropertyByID(id) {
+  const data = await Property.findByIdAndDelete(id)
+  return {
+    data: data,
+    message: `deleted property successfully`,
+    status: true,
+    statusCode: 201,
+  };
+
+}
+
 export {
   getPropertiesList,
-  getPropertyByID
+  getPropertyByID,
+  deletePropertyByID
 }

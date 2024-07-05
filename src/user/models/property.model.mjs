@@ -219,6 +219,10 @@ const propertySchema = new mongoose.Schema(
     inDemand : {
       type : Boolean,
       default : false
+    },
+    postedByAdmin: {
+      type: Boolean,
+      default : false
     }
   },
   { timestamps: true }

@@ -64,6 +64,7 @@ async function addPropertyService(
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: body.number_of_rooms,
+      postedByAdmin : body.postedByAdmin
     };
 
     console.log(Property_, "======Property_");
