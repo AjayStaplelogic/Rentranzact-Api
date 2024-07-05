@@ -8,7 +8,7 @@ async function payRentService(body) {
 
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
-        currency: 'usd',
+        currency: 'ngn',
         automatic_payment_methods: {
             enabled: true,
         },
