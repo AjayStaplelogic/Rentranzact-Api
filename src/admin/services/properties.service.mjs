@@ -1,4 +1,5 @@
 import { Property } from "../../user/models/property.model.mjs";
+import { ObjectId } from 'bson';
 
 async function getPropertiesList() {
   const data = await Property.aggregate([{
@@ -63,8 +64,15 @@ async function getPropertiesList() {
 
 
 async function getPropertyByID(id) {
-
+  const id1 = new ObjectId(id)
   const data = await Property.aggregate([
+
+    {
+
+      $match: {
+     "_id" : id1
+      }
+    },
    
     {
     $lookup: {
@@ -74,15 +82,6 @@ async function getPropertyByID(id) {
         {
           $match: {
             $expr: { $eq: ["$_id", "$$renter_ID"] }
-          }
-        },
-        {
-          $project: {
-            _id: 1,
-            fullName: 1, // Include fullName field from users collection
-            countryCode: 1,
-            phone: 1
-
           }
         }
       ],
@@ -100,7 +99,6 @@ async function getPropertyByID(id) {
   };
 
 }
-
 
 export {
   getPropertiesList,

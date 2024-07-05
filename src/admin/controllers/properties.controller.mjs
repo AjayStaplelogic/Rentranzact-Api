@@ -17,7 +17,6 @@ async function properties(req, res) {
 
 async function property(req, res) {
 
-
   const {id} = req.params;
 
   const data = await getPropertyByID(id);
