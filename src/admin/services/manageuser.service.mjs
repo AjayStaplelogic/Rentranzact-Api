@@ -5,34 +5,50 @@ import pkg from "bcrypt";
 
 async function addUserByAdmin(body) {
 
-  let { password } = body;
+  let { password, role, email } = body;
 
-  const salt = parseInt(process.env.SALT);
+  const isUser = await User.exists({ role: role, email: email })
 
-  const hashedPassword = await new Promise((resolve, reject) => {
-    pkg.hash(password, salt, function (err, hash) {
-      if (err) {
-        reject(err); // Reject promise if hashing fails
-      } else {
-        resolve(hash); // Resolve promise with hashed password
-      }
+  if (isUser) {
+
+    return {
+      data: [],
+      message: "user already exist",
+      status: false,
+      statusCode: 401,
+    };
+  } else {
+
+    const salt = parseInt(process.env.SALT);
+
+    const hashedPassword = await new Promise((resolve, reject) => {
+      pkg.hash(password, salt, function (err, hash) {
+        if (err) {
+          reject(err); // Reject promise if hashing fails
+        } else {
+          resolve(hash); // Resolve promise with hashed password
+        }
+      });
     });
-  });
 
-  body.password = hashedPassword;
+    body.password = hashedPassword;
 
- 
 
-  const data = new User(body);
-  data.save();
 
-  return {
-    data: data,
-    message: "user created",
-    status: true,
-    statusCode: 201,
-  };
+    const data = new User(body);
+    data.save();
+
+    return {
+      data: data,
+      message: "user created",
+      status: true,
+      statusCode: 201,
+    };
+  }
+
 }
+
+
 
 async function getUsersList(body) {
   const { role } = body;
@@ -74,4 +90,4 @@ async function deleteUserService(id) {
 }
 
 
-export { addUserByAdmin, getUsersList, getUserByID , deleteUserService };
+export { addUserByAdmin, getUsersList, getUserByID, deleteUserService };
