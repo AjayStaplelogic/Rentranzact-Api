@@ -81,14 +81,6 @@ app.use("/api/admin" , employeeRoutes)
 
 
 
-
-
-
-
-
-
-
-
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
   const startTime = Date.now();

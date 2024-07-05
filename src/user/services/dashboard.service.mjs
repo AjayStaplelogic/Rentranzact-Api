@@ -16,6 +16,11 @@ async function getDashboardStats(user) {
 
 
     const mostRecentInspection = await Inspection.aggregate([
+        {
+            $match: {
+                "landlordID": user._id
+            }
+        },
         { $sort: { createdAt: -1 } },
         { $limit: 1 }
     ])
