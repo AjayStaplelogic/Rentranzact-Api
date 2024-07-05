@@ -21,6 +21,8 @@ import adminRoutes from "./admin/routes/admin.route.mjs"
 import adminDashboardRoutes from "./admin/routes/dashboard.route.mjs"
 import manageuserRoutes from "./admin/routes/manageruser.route.mjs"
 import propertyRoutes from "./admin/routes/properties.route.mjs"
+import roleRoutes from "./admin/routes/role.route.mjs"
+import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -74,6 +76,8 @@ app.use("/api/admin" , adminRoutes)
 app.use("/api/admin" , adminDashboardRoutes)
 app.use("/api/admin" , manageuserRoutes)
 app.use("/api/admin" , propertyRoutes)
+app.use("/api/admin" , roleRoutes)
+app.use("/api/admin" , employeeRoutes)
 
 
 
