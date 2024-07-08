@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --env-file=.dev_env ./src/server.js",
-    "prod": "node --env-file=.prod_env ./src/server.js"
+    "prod": "node --env-file=.prod_env ./src/server.js",
+    "create-doc" : "apidoc -i src -o apidoc"
   },
   "type": "module",
   "author": "",

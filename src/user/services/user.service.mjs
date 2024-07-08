@@ -123,13 +123,16 @@ async function validateCode(code) {
 
 async function myProfileDetails(id, role) {
 
-  const data = await User.find({
+  const data = await User.findOne({
     _id: id,
     role : role
-  })
+  });
+
+  
+  let data_ = data.toObject();
 
   return {
-    data: data,
+    data: data_,
     message: "fetched user details successfully",
     status: true,
     statusCode: 200

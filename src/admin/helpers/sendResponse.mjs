@@ -3,7 +3,8 @@ function sendResponse(res, data, message, status, code , accessToken, additional
 let responseObject;
   if (accessToken) {
     let additionalResponse;
-    if(additionalData) {
+    additionalData
+    if(additionalData,"-additional data--") {
       additionalResponse = additionalData
     } else {additionalResponse = []}
     responseObject = { data, message, status, accessToken, additionalData : additionalResponse  };

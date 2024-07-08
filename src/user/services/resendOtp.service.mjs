@@ -17,7 +17,7 @@ async function resendOtpService(body) {
   const resendOTP = sendMail(user.email, "OTP Verification", htmlTemplate);
 
   return {
-    data: [newOtp],
+    data: {otp : newOtp},
     message: "otp sent successfully",
     status: true,
     statusCode: 200,
