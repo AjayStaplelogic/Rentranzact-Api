@@ -35,7 +35,7 @@ const adminSchema = new mongoose.Schema(
       type: String,
       default:
         "https://st3.depositphotos.com/6672868/13801/v/1600/depositphotos_138013506-stock-illustration-user-profile-group.jpg",
-      required: true,
+      required: false,
     }
   },
   { timestamps: true }
