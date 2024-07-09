@@ -30,9 +30,52 @@ async function loginAdmin(body) {
 
     if (isPasswordValid) {
       if (admin.verified) {
+
+        const adminData = await Admin.aggregate([
+          {
+            $match: {
+              email: email
+            }
+          },
+          {
+            $lookup: {
+              from: "roles",
+              localField: "role",
+              foreignField: "name",
+              as: "permissions",
+            }
+          },
+          {
+            $project: {
+              // Project all fields from the Admin collection
+              // Include other fields from Admin as needed
+              _id: 1, // Exclude the default MongoDB _id field
+              email: 1, // Include the email field from the Admin collection
+              role: 1, // Include other fields from Admin collection
+              fullName: 1, // Include other fields from Admin collection
+              status : 1,
+              verified : 1,
+              picture : 1,
+              createdAt : 1, 
+              updatedAt : 1,
+              // Project the permissions array with selected fields
+              permissions: {
+                $map: {
+                  input: "$permissions",
+                  as: "perm",
+                  in: {
+                    permissions: "$$perm.permissions"
+                  }
+                }
+              }
+            }
+          }
+        ])
+
+        
         const accessToken = await accessTokenGenerator(admin);
         return {
-          data: admin,
+          data: adminData,
           message: "logged in successfully",
           status: true,
           statusCode: 200,
@@ -65,44 +108,44 @@ async function loginAdmin(body) {
 }
 
 async function addAdmin(body) {
-    const adminExist = await Admin.findOne({ email: body.email });
-  
-    if (adminExist) {
-      return {
-        data: [],
-        message: "email already exist ",
-        status: false,
-        statusCode: 409,
-      };
-    }
-  
-    let { password } = body;
-  
-    const salt = parseInt(process.env.SALT);
-  
-    const hashedPassword = await new Promise((resolve, reject) => {
-      pkg.hash(password, salt, function (err, hash) {
-        if (err) {
-          reject(err); // Reject promise if hashing fails
-        } else {
-          resolve(hash); // Resolve promise with hashed password
-        }
-      });
-    });
-  
-    body.password = hashedPassword;
-    
-    const admin = new Admin(body);
-  
-    await admin.save();
-    
+  const adminExist = await Admin.findOne({ email: body.email });
+
+  if (adminExist) {
     return {
-      data: admin,
-      message: "signup successfully",
-      status: true,
-      statusCode: 201,
+      data: [],
+      message: "email already exist ",
+      status: false,
+      statusCode: 409,
     };
   }
+
+  let { password } = body;
+
+  const salt = parseInt(process.env.SALT);
+
+  const hashedPassword = await new Promise((resolve, reject) => {
+    pkg.hash(password, salt, function (err, hash) {
+      if (err) {
+        reject(err); // Reject promise if hashing fails
+      } else {
+        resolve(hash); // Resolve promise with hashed password
+      }
+    });
+  });
+
+  body.password = hashedPassword;
+
+  const admin = new Admin(body);
+
+  await admin.save();
+
+  return {
+    data: admin,
+    message: "signup successfully",
+    status: true,
+    statusCode: 201,
+  };
+}
 
 // async function validateCode(code) {
 //   const validOrNot = await User.findOne({ referralCode: code });
@@ -123,7 +166,7 @@ async function addAdmin(body) {
 //     status: true,
 //     statusCode: 200
 //   };
-  
+
 // }
 
 // async function applyReferralCode(code, userID) {
@@ -141,7 +184,7 @@ async function addAdmin(body) {
 //   const user = await User.findById(id);
 
 //   if (user?.otp === otp) {
-    
+
 //     const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
 
 //     return {
