@@ -64,15 +64,27 @@ async function loginAdmin(body) {
           }
         ]);
 
-        
         const accessToken = await accessTokenGenerator(admin);
-        return {
-          data: adminData,
-          message: "logged in successfully",
-          status: true,
-          statusCode: 200,
-          accessToken: accessToken,
-        };
+        if (admin.role === "superAdmin") {
+          return {
+            data: admin,
+            message: "logged in successfully",
+            status: true,
+            statusCode: 200,
+            accessToken: accessToken,
+          };
+
+        } else {
+
+          return {
+            data: adminData,
+            message: "logged in successfully",
+            status: true,
+            statusCode: 200,
+            accessToken: accessToken,
+          };
+        }
+
       } else {
         return {
           data: [],
