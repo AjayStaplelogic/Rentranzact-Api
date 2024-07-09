@@ -128,8 +128,8 @@ router.post('/otpVerification', userVerification)
 router.post('/login', login);
 
 /** 
-  @api {post} /socialLogin socail login
-  @apiName socailLogin
+  @api {post} /socialLogin social login
+  @apiName socialLogin
   @apiGroup User
     
   @apiBody {String} socialPlatform social platform of the user like ("google", "facebook")
