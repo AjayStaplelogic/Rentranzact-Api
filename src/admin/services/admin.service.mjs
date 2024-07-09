@@ -42,35 +42,27 @@ async function loginAdmin(body) {
               from: "roles",
               localField: "role",
               foreignField: "name",
-              as: "permissions",
+              as: "roles"
             }
           },
           {
+            $unwind: "$roles" // Unwind to access each role document
+          },
+          {
             $project: {
-              // Project all fields from the Admin collection
-              // Include other fields from Admin as needed
-              _id: 1, // Exclude the default MongoDB _id field
+              _id: 0, // Exclude the default MongoDB _id field
               email: 1, // Include the email field from the Admin collection
               role: 1, // Include other fields from Admin collection
               fullName: 1, // Include other fields from Admin collection
-              status : 1,
-              verified : 1,
-              picture : 1,
-              createdAt : 1, 
-              updatedAt : 1,
-              // Project the permissions array with selected fields
-              permissions: {
-                $map: {
-                  input: "$permissions",
-                  as: "perm",
-                  in: {
-                    permissions: "$$perm.permissions"
-                  }
-                }
-              }
+              status: 1, // Include other fields from Admin collection
+              verified: 1, // Include other fields from Admin collection
+              picture: 1, // Include other fields from Admin collection
+              createdAt: 1, // Include other fields from Admin collection
+              updatedAt: 1, // Include other fields from Admin collection
+              permissions: "$roles.permissions" // Include the 'permissions' array from the 'roles' collection
             }
           }
-        ])
+        ]);
 
         
         const accessToken = await accessTokenGenerator(admin);
