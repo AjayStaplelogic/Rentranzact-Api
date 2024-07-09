@@ -117,9 +117,9 @@ router.get(
   @apiName property
   @apiGroup Property
 
-@apiParam {Files} images images of property
-@apiParam {Files} documents documents of property
-@apiParam {Files} videos videos of property
+@apiParam {File} images images of property
+@apiParam {File} documents documents of property
+@apiParam {File} videos videos of property
 @apiParam {String} category category of property (residential , commercial , etc)
 @apiParam {Object} address address of property ({
 "type": "Point",
@@ -150,7 +150,40 @@ router.get(
 @apiParam {String} role role of person who posting the property. (landlord, property , manager)
 @apiParam {String} rentFrequency rent frequency of the property. (monthly)
  
-
+@apiParamExample {multipart/form-data} Request Example:
+       images=files
+       documents=files
+       videos=files
+       category="residence"
+       address={
+        "type": "Point",
+        "coordinates": [76.688688,30.709525],
+        "addressText": "isbt sector 43 chandigarh"
+      }
+      propertyName="taj hotel"
+      bedrooms=3
+      rentType="monthly"
+      city="pathankot"
+      number_of_floors=2
+      number_of_bathrooms=1
+      carpetArea=1000
+      age_of_construction=12
+      aboutProperty="good property. visit anytime"
+      type="detached duplexed"
+      furnishingType="fully furnished"
+      landmark="railway station"
+      superArea=1204
+      availabilty=12
+      communityType="colony"
+      cautionDeposite=2000
+      serviceCharges=12355
+      amenities=['parking','swimming pool']
+      email="landlord@gmail.com"
+      name="rahul"
+      number_of_rooms=12
+      role="landlord"
+      rentFrequency="quaterly"
+       
 @apiSuccess {Object} data data which have information of property
 @apiSuccess {Boolean} status status of api true or false
 @apiSuccess {String} message property created successfully
