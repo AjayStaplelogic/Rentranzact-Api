@@ -4,7 +4,7 @@ let responseObject;
   if (accessToken) {
     let additionalResponse;
     additionalData
-    if(additionalData,"-additional data--") {
+    if(additionalData) {
       additionalResponse = additionalData
     } else {additionalResponse = []}
     responseObject = { data, message, status, accessToken, additionalData : additionalResponse  };

@@ -64,6 +64,9 @@ async function loginAdmin(body) {
           }
         ]);
 
+
+        
+
         const accessToken = await accessTokenGenerator(admin);
         if (admin.role === "superAdmin") {
           return {
@@ -77,7 +80,7 @@ async function loginAdmin(body) {
         } else {
 
           return {
-            data: adminData,
+            data: adminData[0],
             message: "logged in successfully",
             status: true,
             statusCode: 200,
