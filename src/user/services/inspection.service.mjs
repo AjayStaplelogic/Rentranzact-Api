@@ -206,8 +206,7 @@ async function getInspectionsByUserID(id, role , PropertyID) {
   if (role === UserRoles.LANDLORD) {
     data = await Inspection.find({
       landlordID: id,
-      propertyID: PropertyID,
-      inspectionStatus: InspectionStatus.INITIATED
+      propertyID: PropertyID
     })
   }
   return {

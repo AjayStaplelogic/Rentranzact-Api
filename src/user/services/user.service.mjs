@@ -8,6 +8,7 @@ import { html } from "../helpers/emailTemplate.mjs";
 import { OAuth2Client } from "google-auth-library";
 import moment from "moment";
 import { UserRoles } from "../enums/role.enums.mjs";
+
 const client = new OAuth2Client();
 
 async function loginUser(body) {
@@ -290,6 +291,10 @@ async function socialSignup(body) {
     }
   } else {
     console.log("login with apple");
+    const applePublicKey = await axios.get(`https://appleid.apple.com/auth/keys`);
+    const decoded = jwt.verify(id_token, "eyJraWQiOiJCaDZIN3JIVm1iIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLnByb3BlcnR5dHlwZS5pbiIsImV4cCI6MTcyMDY3NzMwOSwiaWF0IjoxNzIwNTkwOTA5LCJzdWIiOiIwMDAxNDYuNjhkYWNmNDlkMGU5NDZhOTlhOGUwMmNmNzg0ZWZhN2IuMTgxOCIsIm5vbmNlIjoiYTU4MzRjZmMwOGM3NTE4ZDAwYzg5OTJhZDJkN2EwODQ3ZTk2ZjQ1ZGQzM2MxMWFmYTQ0MDNjNTNhODJjYjA4NyIsImNfaGFzaCI6ImM2UzBkeUJ6bzVEbF9TUkp4RTFONEEiLCJlbWFpbCI6InN0YXBsZXJzLnN0YXBsZWxvZ2ljQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdXRoX3RpbWUiOjE3MjA1OTA5MDksIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZX0.KAQJXY_Jrpeo9zMj0rX44onJff1P-4x4RdRopBdZT7fPC_6_Zu6ioC6BOzqpc4N1aim9t7BEDX-ULbKIOPwA72Kn5fMY9cSEP7Jw_e-w2fG5bnCd_jnLuY33_shLqahjTHzJtHd8O9KpMkzSNm1XnlbH3Kxm4Y7dZd0ipCLjEVhdcZaxfjHsxxxPbYHVN6oT7_m3vC-GlWppwc0IlU2uQxkbLyX49inJAKNYzmhCpEqRrLvz2ReK7E6TlL1f0bEYA4ClnIvhmI9g1N4PgevfYak3iV4FIySlnQ2xN6HKt-BdEIm4h6uQQjDbmHmLMsXCEfFKHwXhmxbIZwbVdyPJFg", { algorithms: ['RS256'] });
+
+    console.log(decoded, "-==-=-=decodedd")
   }
 }
 
