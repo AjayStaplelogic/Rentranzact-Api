@@ -1,16 +1,10 @@
 import express from 'express'
 const router = express.Router();
 import { payRent } from '../controllers/stripe.controller.mjs';
+import { UserRoles } from '../enums/role.enums.mjs';
+import authorizer from "../middleware/authorizer.middleware.mjs";
 
-// Define routes for users
-router.post('/payRent' ,payRent);
-// router.post('/signup', signup);
-// router.get('/users/:id', UserController.getUserById);
-// router.post('/users', UserController.createUser);
-// router.put('/users/:id', UserController.updateUser);
-// router.delete('/users/:id', UserController.deleteUser);
-
-
+router.post('/payRent', authorizer([UserRoles.RENTER]), payRent);
 
 export default router;
 

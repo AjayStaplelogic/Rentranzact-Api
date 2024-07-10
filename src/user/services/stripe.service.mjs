@@ -2,9 +2,9 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-async function payRentService(body) {
-
-    const { amount } = body;
+async function payRentService(body, userID) {
+    
+    const { amount , propertyID } = body;
 
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -12,10 +12,14 @@ async function payRentService(body) {
         automatic_payment_methods: {
             enabled: true,
         },
+        metadata: {
+            propertyID: propertyID,
+            userID : userID
+        }
     });
 
     return {
-        data: {client_secret :paymentIntent.client_secret } ,
+        data: { client_secret: paymentIntent.client_secret },
         message: "client secret created successfully",
         status: true,
         statusCode: 200,
