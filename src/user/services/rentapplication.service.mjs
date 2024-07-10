@@ -310,26 +310,23 @@ async function rentApplicationsList(user) {
 async function updateRentApplications(body, id) {
   const { status, rentApplicationID, reason } = body;
 
-  console.log(body, "----")
-
   if (RentApplicationStatus.ACCEPTED === status) {
     const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
       applicationStatus: status
     },
       { new: true });
 
-    console.log(data, "===data ====")
 
-    const data2 = await Property.findByIdAndUpdate(data.propertyID, {
-      rented: true,
-      renterID: data.renterID
-    })
+   const newNotification = new Notification({propertyID : data.propertyID , userID : IDBCursor})
 
-
+    // const data2 = await Property.findByIdAndUpdate(data.propertyID, {
+    //   rented: true,
+    //   renterID: data.renterID
+    // })
 
     return {
       data: data,
-      message: "rent application completed successfully",
+      message: "rent application updated successfully",
       status: true,
       statusCode: 200,
     };
