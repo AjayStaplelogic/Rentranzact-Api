@@ -5,6 +5,7 @@ import { Property } from "../models/property.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
 import moment from "moment";
+import { Notification } from "../models/notification.model.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -317,6 +318,8 @@ async function updateRentApplications(body, id) {
       applicationStatus: status
     },
       { new: true });
+
+      Notification
 
 
    const newNotification = new Notification({propertyID : data.propertyID , renterID : id , message : "Your rent application is accepted kindly Pay Rent Now"})
