@@ -319,7 +319,7 @@ async function updateRentApplications(body, id) {
     },
       { new: true });
 
-      Notification
+     
 
 
    const newNotification = new Notification({propertyID : data.propertyID , renterID : id , message : "Your rent application is accepted kindly Pay Rent Now"})
