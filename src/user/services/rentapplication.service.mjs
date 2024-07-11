@@ -87,14 +87,14 @@ async function addRentApplicationService(body, user) {
       dob: kinDOB
     }
 
-    const verifyStatus = await identityVerifier(identificationType, body);
+    // const verifyStatus = await identityVerifier(identificationType, body);
 
-    console.log(verifyStatus.data, "=====verifyStatus")
+    // console.log(verifyStatus.data, "=====verifyStatus")
 
     let data;
 
-    if (verifyStatus.data.error) {
-
+    // if (verifyStatus.data.error) {
+      if (true) {
       return {
         data: [],
         message: verifyStatus.message,
@@ -105,18 +105,17 @@ async function addRentApplicationService(body, user) {
 
     } else {
 
-      if (verifyStatus.data.status) {
+      // if (verifyStatus.data.status) {
+        if (true) {
 
-        const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
+        // const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
 
-        console.log(verifyStatus.data.data.firstName, "-----lowercase")
+        // console.log(verifyStatus.data.data.firstName, "-----lowercase")
 
-        const firstName = verifyStatus.data.data.firstName.toLowerCase();
+        // const firstName = verifyStatus.data.data.firstName.toLowerCase();
 
-        const lastName = verifyStatus.data.data.lastName.toLowerCase();
+        // const lastName = verifyStatus.data.data.lastName.toLowerCase();
 
-
-        console.log(verifyStatus.data.data.dateOfBirth, formattedDate, firstName, kinFirstName.toLowerCase(), lastName, kinLastName.toLowerCase())
 
 
         if(true) {
