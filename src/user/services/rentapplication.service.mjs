@@ -164,7 +164,7 @@ async function rentApplicationsList(user) {
 
   let data;
 
-  if (user?.role === "Renter") {
+  if (user?.role === UserRoles.RENTER) {
 
     data = await rentApplication.aggregate([
       {
@@ -231,8 +231,10 @@ async function rentApplicationsList(user) {
 
   }
 
-  else if (user?.role === "Landlord") {
+  else if (user?.role === UserRoles.LANDLORD) {
 
+
+    console.log(user , "==============useerrrrrr")
 
     data = await rentApplication.aggregate([
       {
