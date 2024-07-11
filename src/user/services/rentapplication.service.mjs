@@ -317,7 +317,7 @@ async function updateRentApplications(body, id) {
       { new: true });
 
 
-   const newNotification = new Notification({propertyID : data.propertyID , userID : IDBCursor})
+   const newNotification = new Notification({propertyID : data.propertyID , renterID : id , message : "Your rent application is accepted kindly Pay Rent Now"})
 
     // const data2 = await Property.findByIdAndUpdate(data.propertyID, {
     //   rented: true,

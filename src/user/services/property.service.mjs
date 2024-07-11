@@ -195,10 +195,12 @@ async function nearbyProperies(body) {
 async function getPropertyByID(id) {
   const data = await Property.findById(id);
 
+  console.log(data, "----dataa of property")
   const dataMerge = {};
 
   if (data.landlord_id) {
     const landlord = await User.findById(data.landlord_id);
+    console.log(landlord, "----dataa of landlord")
 
     dataMerge.propertyData = data;
 

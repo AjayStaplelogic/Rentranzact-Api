@@ -13,8 +13,7 @@ import rentApplication from './user/routes/rentApplication.route.mjs'
 import webhookRoutes from "./user/routes/webhook.route.mjs"
 import stripeRoutes from "./user/routes/stripe.route.mjs"
 import dashboardRoutes from "./user/routes/dashboard.route.mjs"
-
-
+import notificationRoutes from "./user/routes/notification.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -71,6 +70,7 @@ app.use("/api", rentApplication)
 app.use("/api/webhook", webhookRoutes)
 app.use("/api", stripeRoutes)
 app.use("/api", dashboardRoutes)
+app.use("/api", notificationRoutes)
 
 
 //admin

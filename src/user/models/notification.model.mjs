@@ -6,10 +6,18 @@ const notificationSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        userID: {
+        renterID: {
             type: String,
             required: true
         },
+        messages: {
+            type: String,
+            required: true
+        },
+        read : {
+            type : Boolean,
+            default : false
+        }
     },
     { timestamps: true }
 );
