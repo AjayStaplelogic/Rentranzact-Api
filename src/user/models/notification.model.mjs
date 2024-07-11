@@ -10,13 +10,19 @@ const notificationSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        message: {
+        notificationHeading: {
             type: String,
             required: true
         },
-        read : {
-            type : Boolean,
-            default : false
+
+        notificationBody: {
+            type: String,
+            required: true
+        },
+
+        read: {
+            type: Boolean,
+            default: false
         }
     },
     { timestamps: true }

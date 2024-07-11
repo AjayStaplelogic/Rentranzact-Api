@@ -6,6 +6,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
 import moment from "moment";
 import { Notification } from "../models/notification.model.mjs";
+import { User } from "../models/user.model.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -94,7 +95,7 @@ async function addRentApplicationService(body, user) {
     let data;
 
     // if (verifyStatus.data.error) {
-      if (false) {
+    if (false) {
       return {
         data: [],
         message: "verifyStatus.message",
@@ -106,7 +107,7 @@ async function addRentApplicationService(body, user) {
     } else {
 
       // if (verifyStatus.data.status) {
-        if (true) {
+      if (true) {
 
         // const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
 
@@ -118,8 +119,8 @@ async function addRentApplicationService(body, user) {
 
 
 
-        if(true) {
-        // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
+        if (true) {
+          // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
 
           // console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
 
@@ -191,7 +192,7 @@ async function rentApplicationsList(user) {
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
                 phone: 1,
-                picture : 1
+                picture: 1
 
               }
             }
@@ -237,7 +238,7 @@ async function rentApplicationsList(user) {
   else if (user?.role === UserRoles.LANDLORD) {
 
 
-    console.log(user , "==============useerrrrrr")
+    console.log(user, "==============useerrrrrr")
 
     data = await rentApplication.aggregate([
       {
@@ -261,7 +262,7 @@ async function rentApplicationsList(user) {
                 fullName: 1, // Include fullName field from users collection
                 countryCode: 1,
                 phone: 1,
-                picture : 1
+                picture: 1
 
               }
             }
@@ -320,13 +321,18 @@ async function updateRentApplications(body, id) {
       applicationStatus: status
     },
       { new: true });
-     
+
+    const propertyDetails = await Property.findById(data.propertyID);
 
 
-   const newNotification = new Notification({propertyID : data.propertyID , renterID : id , message : "Your rent application is accepted kindly Pay Rent Now"})
+    const landlordDetails = await User.findById(data._id);
+
+    let currentDate = moment().format('Do MMM YYYY');
+
+    const newNotification = new Notification({ propertyID: data.propertyID, renterID: id, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
 
 
-   await newNotification.save()
+    await newNotification.save()
     // const data2 = await Property.findByIdAndUpdate(data.propertyID, {
     //   rented: true,
     //   renterID: data.renterID
