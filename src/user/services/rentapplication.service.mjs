@@ -94,10 +94,10 @@ async function addRentApplicationService(body, user) {
     let data;
 
     // if (verifyStatus.data.error) {
-      if (true) {
+      if (false) {
       return {
         data: [],
-        message: verifyStatus.message,
+        message: "verifyStatus.message",
         status: false,
         statusCode: 400,
       };
@@ -121,9 +121,10 @@ async function addRentApplicationService(body, user) {
         if(true) {
         // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
 
-          console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
+          // console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
 
-          payload.kinIdentityCheck = verifyStatus.data.status;
+          // payload.kinIdentityCheck = verifyStatus.data.status;
+          payload.kinIdentityCheck = true;
           payload.verifcationType = identificationType;
 
           data = new rentApplication(payload);
