@@ -329,6 +329,8 @@ async function updateRentApplications(body, id) {
 
     let currentDate = moment().format('Do MMM YYYY');
 
+    console.log("propertyID", data.propertyID , "renterid" , id , "landlord details " , landlordDetails , "property details" , propertyDetails, "timestamp", currentDate )
+
     const newNotification = new Notification({ propertyID: data.propertyID, renterID: id, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
 
 

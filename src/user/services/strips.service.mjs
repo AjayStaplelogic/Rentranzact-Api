@@ -7,7 +7,9 @@ async function addStripeTransaction(body) {
 
     console.log(body, "---=-=body")
 
-    console.log(body.data.object.metadata   , "//////////////")
+    console.log(body.data.object.metadata.   , "//////////////")
+
+    const {userID , propertyID } = body.data.object.metadata;
 
     console.log(body.data.metadata)
    
