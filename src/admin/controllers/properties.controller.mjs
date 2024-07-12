@@ -19,6 +19,8 @@ async function property(req, res) {
 
   const {id} = req.params;
 
+  console.log(id, "-----did")
+
   const data = await getPropertyByID(id);
 
   sendResponse(
