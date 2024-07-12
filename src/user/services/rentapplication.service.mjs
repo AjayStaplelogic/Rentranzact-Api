@@ -325,7 +325,7 @@ async function updateRentApplications(body, id) {
     const propertyDetails = await Property.findById(data.propertyID);
 
 
-    const landlordDetails = await User.findById(data._id);
+    const landlordDetails = await User.findById(data.landlordID);
 
     let currentDate = moment().format('Do MMM YYYY');
 
