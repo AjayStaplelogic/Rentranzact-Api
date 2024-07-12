@@ -20,6 +20,7 @@
     "crypto": "^1.0.1",
     "express": "^4.19.2",
     "google-auth-library": "^9.10.0",
+    "http": "^0.0.1-security",
     "joi": "^17.13.1",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.30.1",
