@@ -7,6 +7,8 @@ async function addStripeTransaction(body) {
 
     console.log(body, "---=-=body")
 
+    console.log(body.data    , "//////////////")
+
     console.log(body.data.metadata)
    
 
