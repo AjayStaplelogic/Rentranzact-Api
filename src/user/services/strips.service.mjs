@@ -15,7 +15,14 @@ async function addStripeTransaction(body) {
 
     data.save()
 
-    return data;
+    return {
+
+        data: [],
+        message: "success",
+        status: true,
+        statusCode: 200,
+
+    }
 
 
 
