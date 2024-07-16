@@ -127,6 +127,8 @@ async function fetchInspections(userData) {
           updatedAt: 1,
           __v: 1,
           "propertyDetails.images": 1, // Include only the images array from propertyDetails
+          "propertyDetails.propertyName": 1,
+          "propertyDetails.address": 1,
         },
       },
     ]);
