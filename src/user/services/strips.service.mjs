@@ -5,20 +5,19 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function addStripeTransaction(body) {
 
-    console.log(body, "---=-=body")
-
     console.log(body.data.object.metadata, "//////////////")
 
     const { userID, propertyID } = body.data.object.metadata;
 
     const { amount, status, created, id } = body.data.object;
 
-
-
     const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id })
 
     data.save()
-    console.log(body.data.metadata)
+
+    return data;
+
+
 
 }
 
