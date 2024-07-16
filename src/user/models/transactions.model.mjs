@@ -1,6 +1,21 @@
 import mongoose from "mongoose";
 const transactionSchema = new mongoose.Schema(
   {
+
+    intentID: {
+      type: String,
+      required: true
+    },
+
+    propertyID: {
+      type: String,
+      required: true
+    },
+
+    renterID: {
+      type: String,
+      required: false
+    },
     status: {
       type: String,
       required: true,
@@ -9,7 +24,7 @@ const transactionSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-     date: {
+    date: {
       type: String,
       required: true,
     }
