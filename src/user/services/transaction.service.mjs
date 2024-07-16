@@ -15,7 +15,7 @@ async function getMyTransaction(userID, role) {
 
     } else if (role === UserRoles.LANDLORD) {
 
-        const data = await Transaction.find({ landlord: userID });
+        const data = await Transaction.find({ landlordID: userID });
 
         return {
             data: data,
