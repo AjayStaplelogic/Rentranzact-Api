@@ -30,15 +30,18 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
+  console.log(property,"==========property")
+
   payload.propertyName = property.propertyName;
-
-  
-
+ 
   payload.landlordID = property.landlord_id;
 
   payload.property_manager_id = property.property_manager_id;
 
   payload.images = property.images;
+
+
+
 
   console.log(payload,"----------BODY")
 
@@ -100,7 +103,7 @@ async function fetchInspections(userData) {
                 $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
               },
             },
-            { $project: { images: 1 } }, // Project only the images array from properties
+            { $project: { images: 1 , propertyName : 1, address: 1} }, // Project only the images array from properties
           ],
           as: "propertyDetails",
         },
