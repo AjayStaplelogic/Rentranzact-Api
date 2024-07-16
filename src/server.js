@@ -14,6 +14,7 @@ import webhookRoutes from "./user/routes/webhook.route.mjs"
 import stripeRoutes from "./user/routes/stripe.route.mjs"
 import dashboardRoutes from "./user/routes/dashboard.route.mjs"
 import notificationRoutes from "./user/routes/notification.route.mjs"
+import transactionRoutes from "./user/routes/transaction.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -22,7 +23,7 @@ import manageuserRoutes from "./admin/routes/manageruser.route.mjs"
 import propertyRoutes from "./admin/routes/properties.route.mjs"
 import roleRoutes from "./admin/routes/role.route.mjs"
 import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
-import transactionRoutes from "./admin/routes/transaction.route.mjs"
+import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -42,6 +43,7 @@ const corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   allowedHeaders: "Content-Type,Authorization",
 };
+
 
 app.use(cors(corsOptions));
 
@@ -72,6 +74,7 @@ app.use("/api/webhook", webhookRoutes)
 app.use("/api", stripeRoutes)
 app.use("/api", dashboardRoutes)
 app.use("/api", notificationRoutes)
+app.use("/api", transactionRoutes)
 
 
 //admin
@@ -81,7 +84,7 @@ app.use("/api/admin" , manageuserRoutes)
 app.use("/api/admin" , propertyRoutes)
 app.use("/api/admin" , roleRoutes)
 app.use("/api/admin" , employeeRoutes)
-app.use("/api/admin", transactionRoutes)
+app.use("/api/admin", transactionAdminRoutes)
 
 
 
