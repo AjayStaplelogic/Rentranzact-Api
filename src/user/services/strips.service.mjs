@@ -61,7 +61,7 @@ async function addStripeTransaction(body) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.name, renter: renterDetails.fullName, landlord: landlordDetails.fullName , landlordID : landlordDetails._id })
+    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName , landlordID : landlordDetails._id })
 
         
 
