@@ -3,6 +3,7 @@ import { Transaction } from "../models/transactions.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { RentType } from "../enums/property.enums.mjs";
 import moment from "moment";
+import { User } from "../models/user.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -56,8 +57,11 @@ async function addStripeTransaction(body) {
 
     }
 
+    const renterDetails = await User.findById(userID);
 
-    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id })
+    const landlordDetails = await User.findById(propertyDetails.landlord_id)
+
+    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.name, renter: renterDetails.fullName, landlord: landlordDetails.fullName })
 
     data.save()
 

@@ -27,6 +27,18 @@ const transactionSchema = new mongoose.Schema(
     date: {
       type: String,
       required: true,
+    },
+    renter: {
+      type: String,
+      required: true
+    },
+    property: {
+      type: String,
+      required: true
+    },
+    landlord: {
+      type: String,
+      required: true
     }
   },
   { timestamps: true }
