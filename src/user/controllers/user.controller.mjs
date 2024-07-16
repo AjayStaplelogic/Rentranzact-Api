@@ -7,7 +7,8 @@ import {
   applyReferralCode,
   verifyOtp,
   socialSignup,
-  myProfileDetails
+  myProfileDetails,
+  forgotPasswordService
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -77,50 +78,38 @@ async function signup(req, res) {
 async function userVerification(req, res) {
   const { body } = req;
 
+  const data = await verifyOtp(body);
 
-  // const { isError, errors } = validator(body, userVerify);
-
-  // if (isError) {
-  //   sendResponse(res, [], errors, false, 403);
-  // } else {
-
-    const data = await verifyOtp(body);
-
-    sendResponse(
-      res,
-      data.data,
-      data.message,
-      data.status,
-      data.statusCode,
-      data?.accessToken
-    );
-  }
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data?.accessToken
+  );
+}
 
 // }
 
 async function socialLogin(req, res) {
   const { body } = req;
 
-  // const { isError, errors } = validator(body, socialAuth)
+  const data = await socialSignup(body);
 
-  // if (isError) {
-  //   sendResponse(res, [], errors, false, 403);
-  // } else {
-    const data = await socialSignup(body);
-
-    sendResponse(
-      res,
-      data.data,
-      data.message,
-      data.status,
-      data.statusCode,
-      data.accessToken
-    );
-  }
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data.accessToken
+  );
+}
 
 
 async function myprofile(req, res) {
-  console.log(req.user.data,  "====user")
+  console.log(req.user.data, "====user")
   const { _id, role } = req.user.data;
   const data = await myProfileDetails(_id, role);
   sendResponse(
@@ -133,6 +122,19 @@ async function myprofile(req, res) {
 }
 
 
-// }
+async function forgotPassword(req, res) {
 
-export { login, signup, userVerification, socialLogin ,myprofile };
+  const { email } = req.user.data;
+
+  const data = await forgotPasswordService(email);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+}
+
+
+export { login, signup, userVerification, socialLogin, myprofile, forgotPassword };

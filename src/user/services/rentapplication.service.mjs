@@ -321,9 +321,9 @@ async function updateRentApplications(body, id) {
       applicationStatus: status
     },
       { new: true });
+    
 
     const propertyDetails = await Property.findById(data.propertyID);
-
 
     const landlordDetails = await User.findById(data.landlordID);
 
@@ -331,7 +331,7 @@ async function updateRentApplications(body, id) {
 
     console.log("propertyID", data.propertyID , "renterid" , id , "landlord details " , landlordDetails , "property details" , propertyDetails, "timestamp", currentDate )
 
-    const newNotification = new Notification({ propertyID: data.propertyID, renterID: id, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
+    const newNotification = new Notification({amount : propertyDetails.rent ,  propertyID: data.propertyID, renterID: data.renterID, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
 
 
     await newNotification.save()

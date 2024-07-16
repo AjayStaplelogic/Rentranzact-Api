@@ -121,7 +121,6 @@ async function validateCode(code) {
   return Boolean(validOrNot);
 }
 
-
 async function myProfileDetails(id, role) {
 
   const data = await User.findOne({
@@ -298,6 +297,52 @@ async function socialSignup(body) {
   }
 }
 
+async function forgotPasswordService(email) {
+
+  const user = await User.findOne({email : email});
+
+  if(user.verified) {
+    const htmlTemplate = "<h1>Change password</h1>"
+
+    const resendOTP = sendMail(user.email, "OTP Verification", htmlTemplate);
+
+  }
+  
+  // if (user?.otp === otp) {
+    
+  //   const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
+
+  //   return {
+  //     data: user_,
+  //     message: "otp verified successfully",
+  //     status: true,
+  //     statusCode: 200,
+  //     accessToken: await accessTokenGenerator(user),
+  //   };
+  // } else {
+  //   return {
+  //     data: [],
+  //     message: "incorrect otp",
+  //     status: false,
+  //     statusCode: 400,
+  //   };
+  // }
+
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
 export {
   loginUser,
   addUser,
@@ -305,5 +350,6 @@ export {
   applyReferralCode,
   verifyOtp,
   socialSignup,
-  myProfileDetails
+  myProfileDetails,
+  forgotPasswordService
 };
