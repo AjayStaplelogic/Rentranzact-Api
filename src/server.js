@@ -15,6 +15,7 @@ import stripeRoutes from "./user/routes/stripe.route.mjs"
 import dashboardRoutes from "./user/routes/dashboard.route.mjs"
 import notificationRoutes from "./user/routes/notification.route.mjs"
 import transactionRoutes from "./user/routes/transaction.route.mjs"
+import rentingHistoryRoutes from "./user/routes/rentingHistory.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -75,6 +76,7 @@ app.use("/api", stripeRoutes)
 app.use("/api", dashboardRoutes)
 app.use("/api", notificationRoutes)
 app.use("/api", transactionRoutes)
+app.use("/api", rentingHistoryRoutes)
 
 
 //admin
