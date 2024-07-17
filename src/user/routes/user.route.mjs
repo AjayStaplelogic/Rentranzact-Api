@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { login, signup, userVerification, socialLogin, myprofile, forgotPassword } from '../controllers/user.controller.mjs'
+import { login, signup, userVerification, socialLogin, myprofile, forgotPassword  , favourites} from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
@@ -245,6 +245,7 @@ router.get("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, User
 
 router.get("/forgot-password" , authorizer([UserRoles.RENTER , UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , forgotPassword)
 
+router.get("/favourites", authorizer([UserRoles.RENTER]) , favourites)
 
 export default router;
 

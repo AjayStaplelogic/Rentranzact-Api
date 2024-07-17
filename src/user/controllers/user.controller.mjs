@@ -8,7 +8,8 @@ import {
   verifyOtp,
   socialSignup,
   myProfileDetails,
-  forgotPasswordService
+  forgotPasswordService,
+  favouritesProperties
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -90,6 +91,23 @@ async function userVerification(req, res) {
   );
 }
 
+async function favourites(req , res) {
+
+  const id = req.user.data._id;
+
+  const data = await favouritesProperties(id);
+
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data.accessToken
+  );
+
+}
+
 // }
 
 async function socialLogin(req, res) {
@@ -137,4 +155,4 @@ async function forgotPassword(req, res) {
 }
 
 
-export { login, signup, userVerification, socialLogin, myprofile, forgotPassword };
+export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites };

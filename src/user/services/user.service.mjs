@@ -125,10 +125,10 @@ async function myProfileDetails(id, role) {
 
   const data = await User.findOne({
     _id: id,
-    role : role
+    role: role
   });
 
-  
+
   let data_ = data.toObject();
 
   return {
@@ -137,7 +137,7 @@ async function myProfileDetails(id, role) {
     status: true,
     statusCode: 200
   };
-  
+
 }
 
 async function applyReferralCode(code, userID) {
@@ -155,7 +155,7 @@ async function verifyOtp(body) {
   const user = await User.findById(id);
 
   if (user?.otp === otp) {
-    
+
     const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
 
     return {
@@ -299,17 +299,17 @@ async function socialSignup(body) {
 
 async function forgotPasswordService(email) {
 
-  const user = await User.findOne({email : email});
+  const user = await User.findOne({ email: email });
 
-  if(user.verified) {
+  if (user.verified) {
     const htmlTemplate = "<h1>Change password</h1>"
 
     const resendOTP = sendMail(email, "OTP Verification", htmlTemplate);
 
   }
-  
+
   // if (user?.otp === otp) {
-    
+
   //   const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
 
   //   return {
@@ -335,6 +335,38 @@ async function forgotPasswordService(email) {
 
 }
 
+async function favouritesProperties(id) {
+
+  const data = await User.aggregate([{
+    $lookup: {
+      from: "users",
+      let: { user_id_from_token: id },  // Pass the id variable here
+      pipeline: [
+        {
+          $match: {
+            $expr: { $eq: ["$_id", "$$user_id_from_token"] }
+          }
+        }
+      ],
+      as: "user"
+    }
+  },
+  { $unwind: "$user" }])
+
+  return {
+    data: data,
+    message: "otp verified successfully",
+    status: true,
+    statusCode: 200,
+    accessToken: await accessTokenGenerator(user),
+  };
+
+
+
+
+
+}
+
 
 
 
@@ -351,5 +383,6 @@ export {
   verifyOtp,
   socialSignup,
   myProfileDetails,
-  forgotPasswordService
+  forgotPasswordService,
+  favouritesProperties
 };
