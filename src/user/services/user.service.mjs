@@ -8,6 +8,9 @@ import { html } from "../helpers/emailTemplate.mjs";
 import { OAuth2Client } from "google-auth-library";
 import moment from "moment";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { ObjectId } from 'bson';
+import { Property } from "../models/property.model.mjs";
+
 
 const client = new OAuth2Client();
 
@@ -337,33 +340,20 @@ async function forgotPasswordService(email) {
 
 async function favouritesProperties(id) {
 
-  const data = await User.aggregate([{
-    $lookup: {
-      from: "users",
-      let: { user_id_from_token: id },  // Pass the id variable here
-      pipeline: [
-        {
-          $match: {
-            $expr: { $eq: ["$_id", "$$user_id_from_token"] }
-          }
-        }
-      ],
-      as: "user"
-    }
-  },
-  { $unwind: "$user" }])
+  const { favorite } = await User.findById(id).select("favorite")
+  const data = await Property.aggregate([
+    {
+      $match: {
+        _id: { $in: favorite }
+      }
+    }])
 
   return {
     data: data,
     message: "otp verified successfully",
     status: true,
-    statusCode: 200,
-    accessToken: await accessTokenGenerator(user),
+    statusCode: 200
   };
-
-
-
-
 
 }
 

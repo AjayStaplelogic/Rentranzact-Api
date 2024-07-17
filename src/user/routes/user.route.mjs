@@ -245,7 +245,7 @@ router.get("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, User
 
 router.get("/forgot-password" , authorizer([UserRoles.RENTER , UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , forgotPassword)
 
-router.get("/favourites", authorizer([UserRoles.RENTER]) , favourites)
+router.get("/favorites", authorizer([UserRoles.RENTER]) , favourites)
 
 export default router;
 

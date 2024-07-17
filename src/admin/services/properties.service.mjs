@@ -1,6 +1,7 @@
 import { Property } from "../../user/models/property.model.mjs";
 import { ObjectId } from 'bson';
 
+
 async function getPropertiesList() {
   const data = await Property.aggregate([{
     $lookup: {
