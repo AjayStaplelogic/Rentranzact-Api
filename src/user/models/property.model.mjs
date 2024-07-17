@@ -171,12 +171,12 @@ const propertySchema = new mongoose.Schema(
     },
 
     rent_period_start: {
-      type: Date,
+      type: String,
       required: false,
     },
 
     rent_period_end: {
-      type: Date,
+      type: String,
       required: false,
     },
 

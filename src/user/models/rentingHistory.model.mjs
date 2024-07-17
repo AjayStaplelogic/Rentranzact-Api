@@ -2,8 +2,12 @@ import mongoose from "mongoose";
 
 const rentingHistorySchema = new mongoose.Schema(
     {
+        propertyID : {
+            type: String,
+            required: true,
+        }, 
         renterID: {
-            type: Object,
+            type: String,
             required: true,
         },
 
