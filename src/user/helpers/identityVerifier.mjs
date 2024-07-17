@@ -25,13 +25,9 @@ async function identityVerifier(identificationType, kinDetails) {
 
     } else if (identificationType === IdentificationType.BVN) {
 
-
         const { bvn } = kinDetails;
 
-        console.log(bvn , "==============bvnnnnn")
-
         apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?bvn=${bvn}`;
-
 
         const response = await axios.post(apiUrl, {}, {
             headers: {
@@ -39,12 +35,24 @@ async function identityVerifier(identificationType, kinDetails) {
             }
         }).then((res) => res).catch((err) => err.response.data);
 
-        console.log(response , "----response e e e e e e")
-
         return response;
 
 
-        
+    } else if (identificationType === IdentificationType.NIN) {
+
+        const { nin } = kinDetails;
+
+        apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?nin=${nin}`;
+
+        const response = await axios.post(apiUrl, {}, {
+            headers: {
+                'token': token
+            }
+        }).then((res) => res).catch((err) => err.response.data);
+
+        console.log(response, "====response ===")
+
+        return response;
 
     }
 

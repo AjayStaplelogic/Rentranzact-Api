@@ -1,6 +1,7 @@
 const IdentificationType = {
     BVN : "bankverificationnumber",
-    DL: "drivinglicence"
+    DL: "drivinglicence",
+    NIN: "nin"
   };
   
   export { IdentificationType };

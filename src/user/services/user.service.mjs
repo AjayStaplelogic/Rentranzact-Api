@@ -304,7 +304,7 @@ async function forgotPasswordService(email) {
   if(user.verified) {
     const htmlTemplate = "<h1>Change password</h1>"
 
-    const resendOTP = sendMail(user.email, "OTP Verification", htmlTemplate);
+    const resendOTP = sendMail(email, "OTP Verification", htmlTemplate);
 
   }
   
