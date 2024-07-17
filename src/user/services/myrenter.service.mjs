@@ -28,9 +28,24 @@ async function myRentersService(id) {
                             $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
                         },
                     },
-                    { $project: { propertyName: 1, address: 1 } }, // Project only the images array from properties
+                    { $project: { propertyName: 1 , rent_period_start : 1 } }, // Project only the images array from properties
                 ],
                 as: "propertyDetails",
+            }
+        },
+        {
+            $lookup: {
+                from: "users",
+                let: { userID: { $toObjectId: "$renterID" } }, // Convert propertyID to ObjectId
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+                        },
+                    },
+                    { $project: { picture: 1, fullName: 1 , phone : 1 , email : 1 ,  } }, // Project only the images array from properties
+                ],
+                as: "renterDetails",
             }
         }
     ])
