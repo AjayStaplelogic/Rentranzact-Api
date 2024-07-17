@@ -115,6 +115,7 @@ async function fetchInspections(userData) {
       {
         $project: {
           _id: 1,
+          landlordName : 1,
           RenterDetails: 1,
           inspectionTime: 1,
           inspectionDate: 1,
