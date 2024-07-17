@@ -17,11 +17,11 @@ const rentingHistorySchema = new mongoose.Schema(
         },
         rentingEnd: {
             type: String,
-            required: false,
+            required: true,
         },
         rentingType: {
-            type: Boolean,
-            default: false,
+            type: String,
+            required: true,
         }
     },
     { timestamps: true }
