@@ -66,6 +66,10 @@ const inspectionSchema = new mongoose.Schema(
     images : {
       type: Array,
       required : true 
+    },
+    landlordName : {
+     type : String,
+     required : true
     }
 
 
