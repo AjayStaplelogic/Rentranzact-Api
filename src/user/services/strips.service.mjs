@@ -20,9 +20,9 @@ async function addStripeTransaction(body) {
 
         const originalDate = moment.unix(created);
 
-        const oneYearLater = originalDate.add(1, 'months');
+        const oneMonthLater = originalDate.add(1, 'months');
 
-        const timestampOneYearLater = oneYearLater.unix();
+        const timestampOneMonthLater = oneMonthLater.unix();
 
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater })
 
@@ -30,18 +30,23 @@ async function addStripeTransaction(body) {
 
         addRenterHistory.save()
 
+        console.log(timestampOneMonthLater , "-------------timestampOneMonthLater")
+
     } else if (propertyDetails.rentType === RentType.QUATERLY) {
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(created);
 
         // Add one year to the original date
-        const oneYearLater = originalDate.add(3, 'months');
+        const oneQuaterLater = originalDate.add(3, 'months');
 
         // Get the Unix timestamp of one year later
-        const timestampOneYearLater = oneYearLater.unix();
+        const timestampOneQuaterLater = oneQuaterLater.unix();
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater })
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created })
+        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created })
+
+
+        console.log(timestampOneQuaterLater , "------------------timestampOneQuaterLater")
 
 
         addRenterHistory.save()
@@ -55,6 +60,8 @@ async function addStripeTransaction(body) {
 
         // Get the Unix timestamp of one year later
         const timestampOneYearLater = oneYearLater.unix();
+
+        console.log(timestampOneYearLater , "-----timestampOneYearLater")
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater })
 
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created })
