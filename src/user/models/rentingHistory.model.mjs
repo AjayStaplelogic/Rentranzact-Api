@@ -26,6 +26,10 @@ const rentingHistorySchema = new mongoose.Schema(
         rentingType: {
             type: String,
             required: true,
+        },
+        renterActive  : {
+            type : Boolean,
+            required: true
         }
     },
     { timestamps: true }
