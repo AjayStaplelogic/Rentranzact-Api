@@ -69,15 +69,18 @@ async function searchProperty(req, res) {
 async function propertiesList(req, res) {
   const { body } = req;
 
+  const id = req.user.data._id;
+
   const { nearByProperty } = body;
 
   if (nearByProperty) {
    
     const data = await nearbyProperies(body);
+   
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
-    const data = await filterProperies(body);
+    const data = await filterProperies(body , id);
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }

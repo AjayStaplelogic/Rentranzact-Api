@@ -136,13 +136,20 @@ async function searchInProperty(body) {
   }
 }
 
-async function filterProperies(body) {
+async function filterProperies(body , id) {
   const { filters } = body;
 
   const data = await Property.find(filters);
 
+  const { favorite } = await User.findById(id).select("favorite")
+
+  const modifiedProperties = data.map(property => {
+    const liked = favorite.includes(property._id);
+    return { ...property.toObject(), liked };
+  });
+
   return {
-    data: data,
+    data: modifiedProperties,
     message: "Search Results",
     status: true,
     statusCode: 200,
