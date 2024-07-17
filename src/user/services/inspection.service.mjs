@@ -13,6 +13,8 @@ async function createInspection(body, renterID) {
 
   const renterDetails = await User.findById(renterID);
 
+  const landlordDetails = await User.findById(property.landlord_id)
+
   const { fullName, picture, phone, countryCode } = renterDetails;
 
 
@@ -40,8 +42,7 @@ async function createInspection(body, renterID) {
 
   payload.images = property.images;
 
-
-
+  payload.landlordName = landlordDetails.fullName;
 
   console.log(payload,"----------BODY")
 
