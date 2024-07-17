@@ -13,26 +13,27 @@ async function myRentersService(id) {
 
 
 
-    const data = await RentingHistory.aggregate([{
-        $match: {
-            landlordID: id
-        },
-
-        $lookup: {
-            from: "properties",
-            let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
-            pipeline: [
-                {
-                    $match: {
-                        $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
+    const data = await RentingHistory.aggregate([
+        {
+            $match: {
+                landlordID: id
+            },
+        }, {
+            $lookup: {
+                from: "properties",
+                let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
+                        },
                     },
-                },
-                { $project: { propertyName: 1, address: 1 } }, // Project only the images array from properties
-            ],
-            as: "propertyDetails",
+                    { $project: { propertyName: 1, address: 1 } }, // Project only the images array from properties
+                ],
+                as: "propertyDetails",
+            }
         }
-
-    }])
+    ])
 
 
     return {
