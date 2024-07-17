@@ -28,6 +28,8 @@ async function addStripeTransaction(body) {
 
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created })
 
+        addRenterHistory.save()
+
     } else if (propertyDetails.rentType === RentType.QUATERLY) {
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(created);
@@ -41,6 +43,9 @@ async function addStripeTransaction(body) {
 
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created })
 
+
+        addRenterHistory.save()
+
     } else if (propertyDetails.rentType === RentType.YEARLY) {
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(created);
@@ -53,6 +58,7 @@ async function addStripeTransaction(body) {
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater })
 
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created })
+        addRenterHistory.save()
     }
 
     const renterDetails = await User.findById(userID);
