@@ -23,7 +23,7 @@ async function getMyTransaction(userID, role) {
                         },
                         { $project: { picture: 1 } }, // Project only the images array from properties
                     ],
-                    as: "landlordDetials",
+                    as: "landlordDetails",
                 }
             }
         ])
