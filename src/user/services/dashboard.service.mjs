@@ -28,6 +28,7 @@ async function getDashboardStats(user) {
 
     let data = [{}];
 
+    console.log(totalIncome ,"===toal income")
     totalIncome.map((i) => {
         const date = moment.unix(i.date);
         const month = date.month() + 1;
