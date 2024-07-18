@@ -39,3 +39,5 @@ function sendResponse(res, data, message, status, code, accessToken, additionalD
     responseObject = { data, message, status, accessToken, additionalData: additionalResponse };
 
   }
+}
+export { sendResponse };
