@@ -17,4 +17,3 @@ let responseObject;
   res.status(code).json(responseObject);
 }
 export { sendResponse };
-
