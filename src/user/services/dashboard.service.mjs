@@ -26,34 +26,28 @@ async function getDashboardStats(user) {
 
     const totalIncome = await Transaction.find({ landlordID: user._id, status: "succeeded" });
 
-    // let data = [{}];
+     let data = [{1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0 }];
 
-    // totalIncome.map((i) => {
-    //     const date = moment.unix(i.date);
-    //     const month = date.month() + 1;
-        
+     console.log(totalIncome)
 
-    //     for (let obj of data) {
-    //         if (obj?.hasOwnProperty(month)) {
-    //             obj[7] += i.amount;
-    //         } else {
-    //             data = {...data, [month] : i.amount}
-    //         }
-    //     }
+    totalIncome.map((i) => {
+        const date = moment.unix(i.date);
+        const month = date.month() + 1;      
 
-    //     console.log(data, "===data ")
-    // })
-
-
-    // console.log(totalIncome, "--=-=-sdkskds-==-sdkdskdsds=d=s-d=sdk")
+        for (let obj of data) {
+            if (obj?.hasOwnProperty(month)) {
+                obj[month] += i.amount;
+            } 
+        }
+    })
 
     return {
         data: {
             count: {
                 rented, vacant, maintenance, total
             },
-            newestInspectionRequest: mostRecentInspection
-
+            newestInspectionRequest: mostRecentInspection,
+            totalIncome : data
 
         },
         message: "dashboard stats",
