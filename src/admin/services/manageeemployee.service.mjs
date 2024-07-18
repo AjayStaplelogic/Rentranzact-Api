@@ -1,18 +1,24 @@
 import { Admin } from "../models/admin.model.mjs";
 import pkg from "bcrypt";
 
-async function getEmployeeService() {
+async function getEmployeeService(pageNo, pageSize) {
  
     const data = await Admin.find({
         role: { $ne: "superAdmin" }
-    });
+    }).skip(pageNo * pageSize).limit(pageSize);
+
+    const count = await Admin.countDocuments({
+      role: { $ne: "superAdmin" }
+  });
     
   
     return {
       data: data,
       message: `successfully fetched employee list`,
       status: true,
-      statusCode: 201,
+      statusCode: 200,
+      additionalData : {pageNo , pageSize , count }
+      
     };
   }
 

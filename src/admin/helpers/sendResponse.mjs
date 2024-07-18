@@ -1,16 +1,22 @@
-function sendResponse(res, data, message, status, code , accessToken, additionalData) {
-  console.log(additionalData)
-let responseObject;
+function sendResponse(res, data, message, status, code, accessToken, additionalData) {
+  console.log(additionalData, "===additionl")
+  let responseObject;
+  let additionalResponse;
   if (accessToken) {
-    let additionalResponse;
-    additionalData
-    if(additionalData) {
+
+
+    if (additionalData) {
+
       additionalResponse = additionalData
-    } else {additionalResponse = []}
-    responseObject = { data, message, status, accessToken, additionalData : additionalResponse  };
+    } else { additionalResponse = [] }
+    responseObject = { data, message, status, accessToken, additionalData: additionalResponse };
 
   } else {
-     responseObject = { data, message, status };
+    if (additionalData) {
+
+      additionalResponse = additionalData
+    } else { additionalResponse = [] }
+    responseObject = { data, message, status, accessToken, additionalData: additionalResponse };
 
   }
 

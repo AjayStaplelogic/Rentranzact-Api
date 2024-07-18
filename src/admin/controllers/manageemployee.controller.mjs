@@ -3,9 +3,12 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getEmployeeService , addEmployeeService} from "../services/manageeemployee.service.mjs";
 
 async function getEmployee(req, res) {
-    const { body } = req;
+    const pageNo =  parseInt(req.query.pageNo);
+
+    const pageSize =  parseInt(req.query.pageSize);
   
-    const data = await getEmployeeService(body);
+  
+    const data = await getEmployeeService(pageNo, pageSize)
   
     sendResponse(
       res,
@@ -13,7 +16,8 @@ async function getEmployee(req, res) {
       data.message,
       data.status,
       data.statusCode,
-      data.accessToken
+      data.accessToken,
+      data.additionalData
     );
   }
 
