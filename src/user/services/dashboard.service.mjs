@@ -10,7 +10,7 @@ async function getDashboardStats(user) {
 
     const vacant = await Property.find({ landlord_id: user._id, rented: false }).countDocuments();
 
-    const maintenance = await Maintenance.find({ landlordID: user._id, status: true });
+    const maintenance = await Maintenance.find({ landlordID: user._id, status: true }).countDocuments();
 
     const total = await Property.find({ landlord_id: user._id }).countDocuments()
 
