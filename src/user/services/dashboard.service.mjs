@@ -52,10 +52,7 @@ async function getDashboardStats(user) {
             count: {
                 rented, vacant, maintenance, total
             },
-            newestInspectionRequest: mostRecentInspection,
-            totalIncome: {
-
-            }
+            newestInspectionRequest: mostRecentInspection
 
 
         },
