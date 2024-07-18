@@ -1,5 +1,6 @@
 import { Maintenance } from "../models/maintenance.model.mjs";
 import { Property } from "../models/property.model.mjs";
+import { User } from "../models/user.model.mjs";
 
 async function addMaintenanceRequests(body) {
 
@@ -69,6 +70,32 @@ async function getMaintenanceRequestsLandlord(id) {
     };
 }
 
+async function resolveMaintenanceRequests(id) {
+
+    const data = await Maintenance.findByIdAndUpdate(id ,{ status : true , resolvedOn : Date.now()})
+
+    const renterDetails = await User.findById(data.renterID);
+
+    return {
+        data: data,
+        message: `Maintenance request from ${renterDetails.fullName} has been marked resolved, and a notification has been sent to  ${renterDetails.fullName}.`,
+        status: true,
+        statusCode: 201,
+    };
+
+}
 
 
-export { addMaintenanceRequests, getMaintenanceRequestsRenter , getMaintenanceRequestsLandlord };
+async function addRemarkToRequest(landlordRemark , maintenanceID) {
+
+   const data = await Maintenance.findByIdAndUpdate(maintenanceID, {landlordRemark : landlordRemark})
+
+    return {
+        data: data,
+        message: "remark has been added successfully",
+        status: true,
+        statusCode: 201,
+    };
+}
+
+export {addRemarkToRequest , addMaintenanceRequests, getMaintenanceRequestsRenter , getMaintenanceRequestsLandlord , resolveMaintenanceRequests };

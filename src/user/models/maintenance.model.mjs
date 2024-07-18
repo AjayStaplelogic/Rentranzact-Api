@@ -30,6 +30,10 @@ const maintenanceSchema = new mongoose.Schema(
         status : {
             type : Boolean,
             default : true
+        },
+        resolvedOn : {
+            type: String,
+            required: false
         }
     },
     { timestamps: true }
