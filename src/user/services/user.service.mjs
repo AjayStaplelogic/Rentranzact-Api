@@ -5,14 +5,9 @@ import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
 import { sendMail } from "../helpers/sendMail.mjs";
 import { html } from "../helpers/emailTemplate.mjs";
-import { OAuth2Client } from "google-auth-library";
 import moment from "moment";
 import { UserRoles } from "../enums/role.enums.mjs";
-import { ObjectId } from 'bson';
 import { Property } from "../models/property.model.mjs";
-
-
-const client = new OAuth2Client();
 
 async function loginUser(body) {
   const { email, password } = body;
@@ -356,14 +351,6 @@ async function favouritesProperties(id) {
   };
 
 }
-
-
-
-
-
-
-
-
 
 export {
   loginUser,

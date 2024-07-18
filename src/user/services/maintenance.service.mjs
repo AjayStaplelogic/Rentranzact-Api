@@ -9,7 +9,7 @@ async function addMaintenanceRequests(body) {
     body.landlordID = landlord_id;
 
 
-    console.log(body,"===body")
+    console.log(body, "===body")
 
 
     const data = new Maintenance(body);
@@ -23,4 +23,52 @@ async function addMaintenanceRequests(body) {
     };
 }
 
-export { addMaintenanceRequests };
+async function getMaintenanceRequestsRenter(id) {
+
+    const data = await Maintenance.find({renterID : id})
+
+    return {
+        data: data,
+        message: "maintenance list fetched successfully",
+        status: true,
+        statusCode: 201,
+    };
+}
+
+async function getMaintenanceRequestsLandlord(id) {
+
+    const data = await Maintenance.aggregate([
+        {
+            $match: {
+                landlordID: id
+            },
+        }, {
+            $lookup: {
+                from: "users",
+                let: { userID: { $toObjectId: "$renterID" } }, // Convert propertyID to ObjectId
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+                        },
+                    },
+                    { $project: { picture: 1, fullName: 1, phone: 1, email: 1, } }, // Project only the images array from properties
+                ],
+                as: "renterDetails",
+            }
+        }
+
+
+    ])
+
+    return {
+        data: data,
+        message: "maintenance list fetched successfully",
+        status: true,
+        statusCode: 201,
+    };
+}
+
+
+
+export { addMaintenanceRequests, getMaintenanceRequestsRenter , getMaintenanceRequestsLandlord };

@@ -19,9 +19,17 @@ const maintenanceSchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        remark: {
+        landlordRemark: {
             type: String,
             required: false,
+        },
+        renterRemark: {
+            type: String,
+            required: false,
+        },
+        status : {
+            type : Boolean,
+            default : true
         }
     },
     { timestamps: true }

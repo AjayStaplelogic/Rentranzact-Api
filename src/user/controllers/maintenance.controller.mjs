@@ -1,6 +1,7 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addMaintenanceRequests } from "../services/maintenance.service.mjs";
+import { addMaintenanceRequests, getMaintenanceRequestsRenter , getMaintenanceRequestsLandlord } from "../services/maintenance.service.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenance(req, res) {
   const { body } = req;
@@ -14,4 +15,27 @@ async function addMaintenance(req, res) {
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
-export { addMaintenance };
+async function getMaintenanceRenter(req, res) {
+
+  const id = req.user.data._id;
+
+  if (req?.user?.data?.role === UserRoles.RENTER) {
+
+    const data = await getMaintenanceRequestsRenter(id);
+
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+
+  } else if (req?.user?.data?.role === UserRoles.LANDLORD) {
+
+    const data = await getMaintenanceRequestsLandlord(id);
+
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+  }
+
+
+
+}
+
+export { addMaintenance, getMaintenanceRenter };
