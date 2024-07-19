@@ -64,7 +64,7 @@ async function addPropertyService(
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: body.number_of_rooms,
-      postedByAdmin : body.postedByAdmin
+      postedByAdmin: body.postedByAdmin
     };
 
     console.log(Property_, "======Property_");
@@ -136,15 +136,23 @@ async function searchInProperty(body) {
   }
 }
 
-async function filterProperies(body , id) {
+async function filterProperies(body, id) {
   const { filters } = body;
 
   const data = await Property.find(filters);
 
-  const { favorite } = await User.findById(id).select("favorite")
+  const favorite = await User.findById(id).select("favorite")
+
+  console.log(favorite, "---=-=favrotie")
 
   const modifiedProperties = data.map(property => {
+
     const liked = favorite.includes(property._id);
+
+
+    console.log(liked , "---likedddddddd")
+    
+
     return { ...property.toObject(), liked };
   });
 
@@ -243,6 +251,8 @@ async function getPropertyByID(id) {
 async function addFavoriteProperties(propertyID, renterID) {
   const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
 
+  console.log(isFavorite , "====is Favrotiessss")
+
   if (isFavorite) {
     const data = await User.findByIdAndUpdate(
       renterID,
@@ -306,7 +316,7 @@ async function getMyProperties(role, id) {
       {
         $match: {
           landlord_id: id,
-          
+
         }
       },
       {
@@ -324,7 +334,7 @@ async function getMyProperties(role, id) {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
                   { applicationStatus: { $ne: "accepted" } },
-                  {kinIdentityCheck : { $ne : true} }
+                  { kinIdentityCheck: { $ne: true } }
                 ]
               }
             },
