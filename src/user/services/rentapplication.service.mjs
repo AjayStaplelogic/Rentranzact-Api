@@ -215,7 +215,9 @@ async function rentApplicationsList(user) {
             {
               $project: {
                 _id: 1,
-                propertyName: 1
+                propertyName: 1,
+                address: 1, 
+                images : 1
               }
             }
           ],
