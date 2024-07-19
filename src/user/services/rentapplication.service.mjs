@@ -321,7 +321,7 @@ async function updateRentApplications(body, id) {
       applicationStatus: status
     },
       { new: true });
-    
+
 
     const propertyDetails = await Property.findById(data.propertyID);
 
@@ -329,9 +329,9 @@ async function updateRentApplications(body, id) {
 
     let currentDate = moment().format('Do MMM YYYY');
 
-    console.log("propertyID", data.propertyID , "renterid" , id , "landlord details " , landlordDetails , "property details" , propertyDetails, "timestamp", currentDate )
+    console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
 
-    const newNotification = new Notification({amount : propertyDetails.rent ,  propertyID: data.propertyID, renterID: data.renterID, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
 
 
     await newNotification.save()
@@ -367,11 +367,36 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
 
   let data;
   if (role === UserRoles.LANDLORD) {
-    data = await rentApplication.find({
-      landlordID: id,
-      propertyID: PropertyID,
-      applicationStatus: RentApplicationStatus.PENDING
-    })
+    data = await rentApplication.aggregate([{
+      $match: {
+        landlordID: id,
+        propertyID: PropertyID,
+        applicationStatus: RentApplicationStatus.PENDING
+      }
+    }, {
+      $lookup: {
+        from: "users",
+        let: { renter_ID: { $toObjectId: "$renterID" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$renter_ID"] }
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              fullName: 1, // Include fullName field from users collection
+              countryCode: 1,
+              phone: 1,
+              picture: 1
+
+            }
+          }
+        ],
+        as: "renter_info",
+      }
+    }])
   }
   return {
     data: data,
