@@ -3,6 +3,7 @@ import { Transaction } from "../models/transactions.model.mjs";
 import moment from "moment";
 import { RentType } from "../enums/property.enums.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
+import { User } from "../models/user.model.mjs";
 
 async function adddummyTransactionService(body) {
 
