@@ -25,6 +25,8 @@ async function addPropertyService(
 
   console.log(propertyPostedBy, "-----property posedted by ")
 
+  
+
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
   // Step 2: Parse the JSON string into a JavaScript array
