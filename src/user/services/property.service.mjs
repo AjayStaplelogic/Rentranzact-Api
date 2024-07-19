@@ -336,8 +336,8 @@ async function getMyProperties(role, id) {
               $match: {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
-                  { applicationStatus: { $ne: RentApplicationStatus.PENDING } },
-                  { kinIdentityCheck: { $ne: true } }
+                  { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
+                  { kinIdentityCheck: { $eq: true } }
                 ]
               }
             },
