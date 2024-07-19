@@ -43,7 +43,7 @@ async function addPropertyService(
       rent: parseInt(body.rent),
       propertyName: body.propertyName,
       email: body?.email,
-      name: body?.fullName,
+      name: "property manager",
       bedrooms: body.bedrooms,
       rentType: body.rentType,
       city: body.city,
