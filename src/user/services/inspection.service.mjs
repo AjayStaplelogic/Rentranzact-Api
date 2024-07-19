@@ -38,6 +38,8 @@ async function createInspection(body, renterID) {
  
   payload.landlordID = property.landlord_id;
 
+  payload.landlordEmail = landlordDetails.email;
+
   payload.property_manager_id = property.property_manager_id;
 
   payload.images = property.images;

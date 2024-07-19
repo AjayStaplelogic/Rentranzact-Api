@@ -70,6 +70,10 @@ const inspectionSchema = new mongoose.Schema(
     landlordName : {
      type : String,
      required : true
+    },
+    landlordEmail : {
+      type : String,
+      required: true
     }
 
 
