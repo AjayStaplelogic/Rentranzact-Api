@@ -14,6 +14,8 @@ import {
 async function addProperty(req, res) {
   const { body } = req;
 
+  console.log(body , "body in add propertyyyyyy")
+
 
   const id = req.user.data._id;
 
