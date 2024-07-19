@@ -3,6 +3,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { Inspection } from "../models/inspection.model.mjs"
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 
 
 
@@ -335,7 +336,7 @@ async function getMyProperties(role, id) {
               $match: {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
-                  { applicationStatus: { $ne: "accepted" } },
+                  { applicationStatus: { $ne: RentApplicationStatus.PENDING } },
                   { kinIdentityCheck: { $ne: true } }
                 ]
               }
