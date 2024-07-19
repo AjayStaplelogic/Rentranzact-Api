@@ -147,7 +147,7 @@ async function filterProperies(body, id) {
 
   const modifiedProperties = data.map(property => {
 
-    const liked = favorite.includes(property._id);
+    const liked = favorite?.favorite.includes(property._id);
 
 
     console.log(liked , "---likedddddddd")
@@ -267,11 +267,13 @@ async function addFavoriteProperties(propertyID, renterID) {
       statusCode: 200,
     };
   } else {
+    
     const data = await User.findByIdAndUpdate(
       renterID,
       { $push: { favorite: propertyID } },
       { new: true }
     );
+    console.log(data,"")
     return {
       data: data,
       message: "Property favorite successfully",
