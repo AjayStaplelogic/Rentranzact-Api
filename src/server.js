@@ -80,7 +80,7 @@ app.use("/api", notificationRoutes)
 app.use("/api", transactionRoutes)
 app.use("/api", rentingHistoryRoutes)
 app.use("/api", maintenanceRoutes)
-app.use("/api" , dummyRoutes)
+app.use("/api/dummy" , dummyRoutes)
 
 
 
