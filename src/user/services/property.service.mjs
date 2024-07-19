@@ -17,7 +17,7 @@ async function addPropertyService(
 ) {
   const { email, role } = body;
 
-  const propertyPostedBy = await User.findOne({ email: email, role: role });
+  const propertyPostedBy = await User.findOne({ email: "obinna.eze@yopmail.com", role: UserRoles.PROPERTY_MANAGER });
 
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
@@ -30,7 +30,7 @@ async function addPropertyService(
   // Step 2: Parse the JSON string into a JavaScript array
   let arr = JSON.parse("[" + trimmedStr + "]");
 
-  if (true) {
+  if (propertyPostedBy) {
     console.log("property [posedted by true")
     const Property_ = {
       rentFrequency: body.rentFrequency,
@@ -42,8 +42,8 @@ async function addPropertyService(
       address: JSON.parse(body.address),
       rent: parseInt(body.rent),
       propertyName: body.propertyName,
-      email: body?.email,
-      name: "property manager",
+      email: propertyPostedBy.email,
+      name: propertyPostedBy.fullName,
       bedrooms: body.bedrooms,
       rentType: body.rentType,
       city: body.city,
@@ -59,8 +59,8 @@ async function addPropertyService(
       availability: parseInt(body.availability),
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
-      // property_manager_id:
-      //   role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
+      property_manager_id:
+        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
