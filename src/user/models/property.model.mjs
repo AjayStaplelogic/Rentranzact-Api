@@ -205,7 +205,7 @@ const propertySchema = new mongoose.Schema(
 
     property_manager_id: {
       type: String,
-      required: true,
+      required: false,
     },
 
     landlord_id: {

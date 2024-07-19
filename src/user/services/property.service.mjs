@@ -30,7 +30,7 @@ async function addPropertyService(
   // Step 2: Parse the JSON string into a JavaScript array
   let arr = JSON.parse("[" + trimmedStr + "]");
 
-  if (propertyPostedBy) {
+  if (true) {
     console.log("property [posedted by true")
     const Property_ = {
       rentFrequency: body.rentFrequency,
@@ -59,8 +59,8 @@ async function addPropertyService(
       availability: parseInt(body.availability),
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
-      property_manager_id:
-        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
+      // property_manager_id:
+      //   role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,

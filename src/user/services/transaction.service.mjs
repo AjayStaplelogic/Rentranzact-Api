@@ -56,26 +56,52 @@ async function getMyTransaction(userID, role) {
 async function transactionByIdService(id) {
 
 
+    // const data = await Transaction.aggregate([
+    //     {
+    //         $match: {
+    //             renterID: userID
+    //         },
+    //     }, {
+    //         $lookup: {
+    //             from: "users",
+    //             let: { userID: { $toObjectId: "$landlordID" } }, // Convert propertyID to ObjectId
+    //             pipeline: [
+    //                 {
+    //                     $match: {
+    //                         $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+    //                     },
+    //                 },
+    //                 { $project: { picture: 1 } }, // Project only the images array from properties
+    //             ],
+    //             as: "landlordDetails",
+    //         }
+    //     }
+    // ])
+
+
+    const id1 = new ObjectId(id)
     const data = await Transaction.aggregate([
-        {
-            $match: {
-                renterID: userID
-            },
-        }, {
-            $lookup: {
-                from: "users",
-                let: { userID: { $toObjectId: "$landlordID" } }, // Convert propertyID to ObjectId
-                pipeline: [
-                    {
-                        $match: {
-                            $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
-                        },
-                    },
-                    { $project: { picture: 1 } }, // Project only the images array from properties
-                ],
-                as: "landlordDetails",
-            }
+      {
+  
+        $match: {
+          "_id": id1
         }
+      },  
+      {
+        $lookup: {
+          from: "users",
+          let: { renter_ID: { $toObjectId: "$landlord_id" } },
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$renter_ID"] }
+              }
+            }
+          ],
+          as: "landlord_info",
+  
+        }
+      }
     ])
 
     return {
