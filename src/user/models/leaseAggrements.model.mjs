@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const LeaseAggrementsSchema = new mongoose.Schema(
     {
+        propertyName : {
+            type: String,
+            required: true
+        },
         propertyID: {
             type: String,
             required: true
