@@ -439,7 +439,7 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
       uploadedAt : Date.now(),
       url : dataUrl,
       landlordID : landlord_id,
-      uploadedBy : fullName
+      uploadedBy : role
       })
   
       data.save();    
