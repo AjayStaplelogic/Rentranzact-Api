@@ -421,7 +421,7 @@ async function favouritesProperties(id) {
 
   return {
     data: data,
-    message: "otp verified successfully",
+    message: "successfully fetched favorite properties",
     status: true,
     statusCode: 200
   };
@@ -447,7 +447,7 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
   
     return {
       data: data,
-      message: "otp verified successfully",
+      message: "successfully uploaded lease aggrement",
       status: true,
       statusCode: 200
     };
@@ -493,7 +493,7 @@ async function getLeaseAggrementList(id, role) {
      const data = await LeaseAggrements.find({renterID : id})
      return {
       data: data,
-      message: "otp verified successfully",
+      message: "successfully fetched lease aggrements",
       status: true,
       statusCode: 200
     };
@@ -502,7 +502,7 @@ async function getLeaseAggrementList(id, role) {
     const data = await LeaseAggrements.find({landlordID : id})
     return {
       data: data,
-      message: "otp verified successfully",
+      message: "successfully fetched lease aggrements",
       status: true,
       statusCode: 200
     };
