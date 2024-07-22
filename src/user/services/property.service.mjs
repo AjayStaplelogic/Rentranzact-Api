@@ -5,8 +5,6 @@ import { User } from "../models/user.model.mjs";
 import { Inspection } from "../models/inspection.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 
-
-
 async function addPropertyService(
   PropertyID,
   images,
@@ -21,11 +19,7 @@ async function addPropertyService(
 
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
-
-
   console.log(propertyPostedBy, "-----property posedted by ")
-
-  
 
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
@@ -153,8 +147,8 @@ async function filterProperies(body, id) {
     const liked = favorite?.favorite.includes(property._id);
 
 
-    console.log(liked , "---likedddddddd")
-    
+    console.log(liked, "---likedddddddd")
+
 
     return { ...property.toObject(), liked };
   });
@@ -254,7 +248,7 @@ async function getPropertyByID(id) {
 async function addFavoriteProperties(propertyID, renterID) {
   const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
 
-  console.log(isFavorite , "====is Favrotiessss")
+  console.log(isFavorite, "====is Favrotiessss")
 
   if (isFavorite) {
     const data = await User.findByIdAndUpdate(
@@ -270,13 +264,13 @@ async function addFavoriteProperties(propertyID, renterID) {
       statusCode: 200,
     };
   } else {
-    
+
     const data = await User.findByIdAndUpdate(
       renterID,
       { $push: { favorite: propertyID } },
       { new: true }
     );
-    console.log(data,"")
+    console.log(data, "")
     return {
       data: data,
       message: "Property favorite successfully",

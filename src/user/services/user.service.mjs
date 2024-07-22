@@ -8,6 +8,8 @@ import { html } from "../helpers/emailTemplate.mjs";
 import moment from "moment";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
+import crypto from 'crypto';
+import appleSigninAuth from 'apple-signin-auth';
 
 async function loginUser(body) {
   const { email, password } = body;
@@ -288,10 +290,82 @@ async function socialSignup(body) {
     }
   } else {
     console.log("login with apple");
-    const applePublicKey = await axios.get(`https://appleid.apple.com/auth/keys`);
-    const decoded = jwt.verify(id_token, "eyJraWQiOiJCaDZIN3JIVm1iIiwiYWxnIjoiUlMyNTYifQ.eyJpc3MiOiJodHRwczovL2FwcGxlaWQuYXBwbGUuY29tIiwiYXVkIjoiY29tLnByb3BlcnR5dHlwZS5pbiIsImV4cCI6MTcyMDY3NzMwOSwiaWF0IjoxNzIwNTkwOTA5LCJzdWIiOiIwMDAxNDYuNjhkYWNmNDlkMGU5NDZhOTlhOGUwMmNmNzg0ZWZhN2IuMTgxOCIsIm5vbmNlIjoiYTU4MzRjZmMwOGM3NTE4ZDAwYzg5OTJhZDJkN2EwODQ3ZTk2ZjQ1ZGQzM2MxMWFmYTQ0MDNjNTNhODJjYjA4NyIsImNfaGFzaCI6ImM2UzBkeUJ6bzVEbF9TUkp4RTFONEEiLCJlbWFpbCI6InN0YXBsZXJzLnN0YXBsZWxvZ2ljQGdtYWlsLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJhdXRoX3RpbWUiOjE3MjA1OTA5MDksIm5vbmNlX3N1cHBvcnRlZCI6dHJ1ZX0.KAQJXY_Jrpeo9zMj0rX44onJff1P-4x4RdRopBdZT7fPC_6_Zu6ioC6BOzqpc4N1aim9t7BEDX-ULbKIOPwA72Kn5fMY9cSEP7Jw_e-w2fG5bnCd_jnLuY33_shLqahjTHzJtHd8O9KpMkzSNm1XnlbH3Kxm4Y7dZd0ipCLjEVhdcZaxfjHsxxxPbYHVN6oT7_m3vC-GlWppwc0IlU2uQxkbLyX49inJAKNYzmhCpEqRrLvz2ReK7E6TlL1f0bEYA4ClnIvhmI9g1N4PgevfYak3iV4FIySlnQ2xN6HKt-BdEIm4h6uQQjDbmHmLMsXCEfFKHwXhmxbIZwbVdyPJFg", { algorithms: ['RS256'] });
 
-    console.log(decoded, "-==-=-=decodedd")
+    const { id_token, nonce, email, socialPlatform } = body;
+
+    const appleIdTokenClaims = await appleSigninAuth.verifyIdToken(id_token, {
+      /** sha256 hex hash of raw nonce */
+      nonce: nonce ? crypto.createHash('sha256').update(nonce).digest('hex') : undefined,
+    });
+
+    const { exp, email_verified } = appleIdTokenClaims;
+
+    const currentMoment = moment();
+
+    const expiresTimeStamp = currentMoment + exp;
+
+    const timestampMoment = moment.unix(expiresTimeStamp);
+
+    if (timestampMoment.isBefore(currentMoment)) {
+      return {
+        data: [],
+        message: "token expired try again",
+        status: false,
+        statusCode: 401,
+      };
+    } else {
+      const user = await User.findOne({
+        email: email,
+        socialPlatform: socialPlatform,
+      });
+
+      if (user) {
+        return {
+          data: user,
+          message: "login successfully",
+          status: true,
+          statusCode: 200,
+          accessToken: await accessTokenGenerator(user),
+        };
+      } else {
+        const userPayload = {
+          email: email,
+          role: UserRoles.RENTER,
+          fullName: name,
+          verified: email_verified,
+          picture: picture?.data?.url,
+          socialPlatform: socialPlatform,
+        };
+
+        const newUser = new User(userPayload);
+        newUser.save();
+
+        return {
+          data: newUser,
+          message: "login successfully",
+          status: true,
+          statusCode: 200,
+          accessToken: await accessTokenGenerator(newUser),
+        };
+      }
+    }
+
+    // appleIDtokencliams 
+    // {
+    //   iss: 'https://appleid.apple.com',
+    //   aud: 'com.rentranzact.mobile',
+    //   exp: 1721717184,
+    //   iat: 1721630784,
+    //   sub: '000146.68dacf49d0e946a99a8e02cf784efa7b.1818',
+    //   nonce: '1e4918cb32db603039286f280b06f1dd907f6f2b226dfa225f94373f0000935f',
+    //   c_hash: '8UUiOGEdhcAi83JevY4AfQ',
+    //   email: 'staplers.staplelogic@gmail.com',
+    //   email_verified: true,
+    //   auth_time: 1721630784,
+    //   nonce_supported: true
+    // } 
+
+
   }
 }
 
