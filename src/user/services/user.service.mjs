@@ -291,7 +291,7 @@ async function socialSignup(body) {
   } else {
     console.log("login with apple");
 
-    const { id_token, nonce, email, socialPlatform } = body;
+    const { id_token, nonce, email, socialPlatform , name} = body;
 
     const appleIdTokenClaims = await appleSigninAuth.verifyIdToken(id_token, {
       /** sha256 hex hash of raw nonce */
