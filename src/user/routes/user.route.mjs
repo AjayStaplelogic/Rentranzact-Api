@@ -59,7 +59,7 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
     console.log(relativePath, "===relative path")
 
-    req.documents = ({ url: relativePath });
+    req.documents = relativePath;
     uploadLeaseAggrement(req, res);
 })
 
