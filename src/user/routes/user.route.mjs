@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement } from '../controllers/user.controller.mjs'
+import { login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
@@ -62,5 +62,7 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
     req.documents = relativePath;
     uploadLeaseAggrement(req, res);
 })
+
+router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getLeaseAggrements )
 
 export default router;

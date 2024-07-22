@@ -10,7 +10,8 @@ import {
   myProfileDetails,
   forgotPasswordService,
   favouritesProperties,
-  uploadLeaseAggrementService
+  uploadLeaseAggrementService,
+  getLeaseAggrementList
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -171,4 +172,22 @@ async function uploadLeaseAggrement(req, res) {
 }
 
 
-export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement};
+
+async function getLeaseAggrements(req, res) {
+
+  const {_id, role} = req.user.data;
+
+
+  const data = await getLeaseAggrementList(_id , role);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+
+}
+
+
+export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};

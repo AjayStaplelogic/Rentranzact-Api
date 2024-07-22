@@ -472,9 +472,9 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
   
     return {
       data: data,
-      message: "otp verified successfully",
+      message: "submitted lease aggrement successfully",
       status: true,
-      statusCode: 200
+      statusCode: 201
     };
 
 
@@ -484,6 +484,35 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
  
 }
 
+async function getLeaseAggrementList(id, role) {
+
+  
+
+  if(role === UserRoles.RENTER ) {
+
+     const data = await LeaseAggrements.find({renterID : id})
+     return {
+      data: data,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200
+    };
+  } else if(role === UserRoles.LANDLORD) {
+
+    const data = await LeaseAggrements.find({landlordID : id})
+    return {
+      data: data,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200
+    };
+  }
+
+ 
+
+
+
+}
 
 
 
@@ -498,5 +527,6 @@ export {
   myProfileDetails,
   forgotPasswordService,
   favouritesProperties,
-  uploadLeaseAggrementService
+  uploadLeaseAggrementService,
+  getLeaseAggrementList
 };
