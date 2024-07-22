@@ -430,7 +430,7 @@ async function favouritesProperties(id) {
 
 async function uploadLeaseAggrementService({propertyID,userID, role, dataUrl}) {
   if(role === UserRoles.RENTER ) {
-    const {landlordID, name} = await Property.findById(propertyID);
+    const {landlord_id, name} = await Property.findById(propertyID);
 
     const data = new LeaseAggrements({
       propertyName : name,
@@ -438,7 +438,7 @@ async function uploadLeaseAggrementService({propertyID,userID, role, dataUrl}) {
       renterID : userID,
       uploadedAt : Date.now(),
       url : dataUrl,
-      landlordID : landlordID,
+      landlordID : landlord_id,
       uploadedBy : fullName
       })
   
