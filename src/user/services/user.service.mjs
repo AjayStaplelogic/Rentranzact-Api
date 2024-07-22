@@ -10,6 +10,8 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import crypto from 'crypto';
 import appleSigninAuth from 'apple-signin-auth';
+import { LeaseAggrements } from "../models/leaseAggrements.model.mjs";
+
 
 async function loginUser(body) {
   const { email, password } = body;
@@ -426,6 +428,34 @@ async function favouritesProperties(id) {
 
 }
 
+async function uploadLeaseAggrementService({propertyID,userID, role, dataUrl}) {
+
+  const {landlordID, fullName} = await Property.findById(propertyID);
+
+  const data = new LeaseAggrements({
+    propertyID : propertyID,
+    renterID : userID,
+    uploadedAt : Date.now(),
+    url : dataUrl,
+    landlordID : landlordID,
+    uploadedBy : fullName
+    })
+
+    data.save();    
+
+
+  return {
+    data: data,
+    message: "otp verified successfully",
+    status: true,
+    statusCode: 200
+  };
+}
+
+
+
+
+
 export {
   loginUser,
   addUser,
@@ -435,5 +465,6 @@ export {
   socialSignup,
   myProfileDetails,
   forgotPasswordService,
-  favouritesProperties
+  favouritesProperties,
+  uploadLeaseAggrementService
 };

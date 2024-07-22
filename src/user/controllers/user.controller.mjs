@@ -9,7 +9,8 @@ import {
   socialSignup,
   myProfileDetails,
   forgotPasswordService,
-  favouritesProperties
+  favouritesProperties,
+  uploadLeaseAggrementService
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 
@@ -108,8 +109,6 @@ async function favourites(req , res) {
 
 }
 
-// }
-
 async function socialLogin(req, res) {
   const { body } = req;
 
@@ -125,7 +124,6 @@ async function socialLogin(req, res) {
   );
 }
 
-
 async function myprofile(req, res) {
   console.log(req.user.data, "====user")
   const { _id, role } = req.user.data;
@@ -138,7 +136,6 @@ async function myprofile(req, res) {
     data.statusCode
   );
 }
-
 
 async function forgotPassword(req, res) {
 
@@ -154,5 +151,22 @@ async function forgotPassword(req, res) {
   );
 }
 
+async function uploadLeaseAggrement(req, res) {
 
-export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites };
+  const propertyID = req.propertyID;
+  const userID = req.user.data._id;
+  const role = req.user.data.role;
+  const dataUrl = req.documents;
+  const data = await uploadLeaseAggrementService(propertyID,userID, role, dataUrl);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+
+}
+
+
+export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement};
