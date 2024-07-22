@@ -154,7 +154,7 @@ async function forgotPassword(req, res) {
 
 async function uploadLeaseAggrement(req, res) {
   const role = req.user.data.role;
-    const propertyID = req.propertyID;
+    const propertyID = req.body.propertyID;
   
   const userID = req.user.data._id;
  
