@@ -429,27 +429,59 @@ async function favouritesProperties(id) {
 }
 
 async function uploadLeaseAggrementService({propertyID,userID, role, dataUrl}) {
+  if(role === UserRoles.RENTER ) {
+    const {landlordID, name} = await Property.findById(propertyID);
 
-  const {landlordID, fullName} = await Property.findById(propertyID);
+    const data = new LeaseAggrements({
+      propertyName : name,
+      propertyID : propertyID,
+      renterID : userID,
+      uploadedAt : Date.now(),
+      url : dataUrl,
+      landlordID : landlordID,
+      uploadedBy : fullName
+      })
+  
+      data.save();    
+  
+  
+    return {
+      data: data,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200
+    };
 
-  const data = new LeaseAggrements({
-    propertyID : propertyID,
-    renterID : userID,
-    uploadedAt : Date.now(),
-    url : dataUrl,
-    landlordID : landlordID,
-    uploadedBy : fullName
-    })
-
-    data.save();    
+  } else if(role === UserRoles.LANDLORD) {
 
 
-  return {
-    data: data,
-    message: "otp verified successfully",
-    status: true,
-    statusCode: 200
-  };
+    const {renterID, name} = await Property.findById(propertyID);
+
+    const data = new LeaseAggrements({
+      propertyName : name,
+      propertyID : propertyID,
+      renterID : renterID,
+      uploadedAt : Date.now(),
+      url : dataUrl,
+      landlordID : userID,
+      uploadedBy : role
+      })
+  
+      data.save();    
+  
+  
+    return {
+      data: data,
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200
+    };
+
+
+
+  }
+
+ 
 }
 
 

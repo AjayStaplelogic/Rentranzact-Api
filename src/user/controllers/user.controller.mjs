@@ -13,6 +13,7 @@ import {
   uploadLeaseAggrementService
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 
 async function login(req, res) {
@@ -152,10 +153,11 @@ async function forgotPassword(req, res) {
 }
 
 async function uploadLeaseAggrement(req, res) {
-
-  const propertyID = req.propertyID;
-  const userID = req.user.data._id;
   const role = req.user.data.role;
+    const propertyID = req.propertyID;
+  
+  const userID = req.user.data._id;
+ 
   const dataUrl = req.documents;
   const data = await uploadLeaseAggrementService(propertyID,userID, role, dataUrl);
   sendResponse(
