@@ -4,14 +4,31 @@ import { ObjectId } from 'bson';
 
 
 async function leaseAggrementsList(filters) {
-  console.log(filters , "----filterrrrrrr")
-  const data = await LeaseAggrements.find({uploadedBy : filters})
-  return {
-    data: data,
-    message: `successfully fetched  list`,
-    status: true,
-    statusCode: 201,
-  };
+
+
+  if(filters) {
+    const data = await LeaseAggrements.find({uploadedBy : filters})
+    return {
+      data: data,
+      message: `successfully fetched  list`,
+      status: true,
+      statusCode: 201,
+    };
+
+
+  } else {
+
+    const data = await LeaseAggrements.find()
+    return {
+      data: data,
+      message: `successfully fetched  list`,
+      status: true,
+      statusCode: 201,
+    };
+
+  }
+
+  
 }
 
 
