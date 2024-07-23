@@ -4,7 +4,7 @@ import { ObjectId } from 'bson';
 
 
 async function leaseAggrementsList(filters) {
-  const data = await LeaseAggrements.find({role : filters})
+  const data = await LeaseAggrements.find({uploadedBy : filters})
   return {
     data: data,
     message: `successfully fetched  list`,
