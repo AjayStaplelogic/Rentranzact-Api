@@ -1,5 +1,17 @@
+import { LeaseAggrements } from "../../user/models/leaseAggrements.model.mjs";
 import { Property } from "../../user/models/property.model.mjs";
 import { ObjectId } from 'bson';
+
+
+async function leaseAggrementsList(filters) {
+  const data = await LeaseAggrements.find({role : filters})
+  return {
+    data: data,
+    message: `successfully fetched  list`,
+    status: true,
+    statusCode: 201,
+  };
+}
 
 
 async function getPropertiesList() {
@@ -117,5 +129,6 @@ async function deletePropertyByID(id) {
 export {
   getPropertiesList,
   getPropertyByID,
-  deletePropertyByID
+  deletePropertyByID,
+  leaseAggrementsList
 }

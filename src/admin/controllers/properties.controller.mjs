@@ -1,5 +1,5 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { getPropertiesList , getPropertyByID , deletePropertyByID} from "../services/properties.service.mjs";
+import { getPropertiesList , getPropertyByID , deletePropertyByID , leaseAggrementsList} from "../services/properties.service.mjs";
 
 async function properties(req, res) {
 
@@ -14,6 +14,26 @@ async function properties(req, res) {
     data.accessToken
   );
 }
+
+async function leaseAggrements(req, res) {
+
+  const {filters} = req.query;
+
+  const data = await leaseAggrementsList(filters);
+
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data.accessToken
+  );
+}
+
+
+
+
 
 async function property(req, res) {
 
@@ -52,5 +72,6 @@ async function deleteProperty(req, res) {
 export {
   properties,
   property,
-  deleteProperty
+  deleteProperty,
+  leaseAggrements
 }
