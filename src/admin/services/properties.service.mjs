@@ -4,6 +4,7 @@ import { ObjectId } from 'bson';
 
 
 async function leaseAggrementsList(filters) {
+  console.log(filters , "----filterrrrrrr")
   const data = await LeaseAggrements.find({uploadedBy : filters})
   return {
     data: data,
