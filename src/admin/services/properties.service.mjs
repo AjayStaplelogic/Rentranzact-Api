@@ -4,8 +4,6 @@ import { ObjectId } from 'bson';
 
 
 async function leaseAggrementsList(filters) {
-
-
   if(filters) {
     const data = await LeaseAggrements.find({uploadedBy : filters})
     return {
@@ -14,10 +12,7 @@ async function leaseAggrementsList(filters) {
       status: true,
       statusCode: 201,
     };
-
-
   } else {
-
     const data = await LeaseAggrements.find()
     return {
       data: data,
@@ -25,9 +20,7 @@ async function leaseAggrementsList(filters) {
       status: true,
       statusCode: 201,
     };
-
   }
-
   
 }
 

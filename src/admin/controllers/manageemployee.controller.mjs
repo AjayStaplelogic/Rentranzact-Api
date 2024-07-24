@@ -4,10 +4,7 @@ import { getEmployeeService , addEmployeeService} from "../services/manageeemplo
 
 async function getEmployee(req, res) {
     const pageNo =  parseInt(req.query.pageNo);
-
     const pageSize =  parseInt(req.query.pageSize);
-  
-  
     const data = await getEmployeeService(pageNo, pageSize)
   
     sendResponse(

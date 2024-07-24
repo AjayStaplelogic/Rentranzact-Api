@@ -3,9 +3,10 @@ import pkg from "bcrypt";
 
 async function getEmployeeService(pageNo, pageSize) {
  
+  const skip = (pageNo - 1) * pageSize;
     const data = await Admin.find({
         role: { $ne: "superAdmin" }
-    }).skip(pageNo * pageSize).limit(pageSize);
+    }).skip(skip).limit(pageSize);
 
     const count = await Admin.countDocuments({
       role: { $ne: "superAdmin" }
