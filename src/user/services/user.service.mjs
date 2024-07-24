@@ -517,7 +517,7 @@ async function getWalletDetails(id) {
   const { walletPoints } = await User.findById(id);
 
   const results = await Wallet.aggregate([
-    { $match: { userID: userID } },
+    { $match: { userID: id } },
     {
         $group: {
             _id: '$type',
