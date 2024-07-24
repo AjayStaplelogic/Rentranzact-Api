@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements } from '../controllers/user.controller.mjs'
+import { wallet,login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
@@ -64,5 +64,9 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 })
 
 router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getLeaseAggrements )
+
+
+router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , wallet )
+
 
 export default router;

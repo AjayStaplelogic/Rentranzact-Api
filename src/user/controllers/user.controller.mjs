@@ -11,7 +11,8 @@ import {
   forgotPasswordService,
   favouritesProperties,
   uploadLeaseAggrementService,
-  getLeaseAggrementList
+  getLeaseAggrementList,
+  getWalletDetails
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -189,5 +190,20 @@ async function getLeaseAggrements(req, res) {
 
 }
 
+async function wallet(req, res) {
+  const {_id} = req.user.data;
 
-export { login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};
+
+  const data = await getWalletDetails(_id);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+
+}
+
+
+export {wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};

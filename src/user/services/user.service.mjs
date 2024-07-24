@@ -11,6 +11,8 @@ import { Property } from "../models/property.model.mjs";
 import crypto from 'crypto';
 import appleSigninAuth from 'apple-signin-auth';
 import { LeaseAggrements } from "../models/leaseAggrements.model.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
+
 
 
 async function loginUser(body) {
@@ -293,7 +295,7 @@ async function socialSignup(body) {
   } else {
     console.log("login with apple");
 
-    const { id_token, nonce, email, socialPlatform , name} = body;
+    const { id_token, nonce, email, socialPlatform, name } = body;
 
     const appleIdTokenClaims = await appleSigninAuth.verifyIdToken(id_token, {
       /** sha256 hex hash of raw nonce */
@@ -428,23 +430,23 @@ async function favouritesProperties(id) {
 
 }
 
-async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
-  if(role === UserRoles.RENTER ) {
-    const {landlord_id, propertyName} = await Property.findById(propertyID);
+async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
+  if (role === UserRoles.RENTER) {
+    const { landlord_id, propertyName } = await Property.findById(propertyID);
 
     const data = new LeaseAggrements({
-      propertyName : propertyName,
-      propertyID : propertyID,
-      renterID : userID,
-      uploadedAt : Date.now(),
-      url : dataUrl,
-      landlordID : landlord_id,
-      uploadedBy : role
-      })
-  
-      data.save();    
-  
-  
+      propertyName: propertyName,
+      propertyID: propertyID,
+      renterID: userID,
+      uploadedAt: Date.now(),
+      url: dataUrl,
+      landlordID: landlord_id,
+      uploadedBy: role
+    })
+
+    data.save();
+
+
     return {
       data: data,
       message: "successfully uploaded lease aggrement",
@@ -452,24 +454,24 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
       statusCode: 200
     };
 
-  } else if(role === UserRoles.LANDLORD) {
+  } else if (role === UserRoles.LANDLORD) {
 
 
-    const {renterID, propertyName} = await Property.findById(propertyID);
+    const { renterID, propertyName } = await Property.findById(propertyID);
 
     const data = new LeaseAggrements({
-      propertyName : propertyName,
-      propertyID : propertyID,
-      renterID : renterID,
-      uploadedAt : Date.now(),
-      url : dataUrl,
-      landlordID : userID,
-      uploadedBy : role
-      })
-  
-      data.save();    
-  
-  
+      propertyName: propertyName,
+      propertyID: propertyID,
+      renterID: renterID,
+      uploadedAt: Date.now(),
+      url: dataUrl,
+      landlordID: userID,
+      uploadedBy: role
+    })
+
+    data.save();
+
+
     return {
       data: data,
       message: "submitted lease aggrement successfully",
@@ -481,25 +483,25 @@ async function uploadLeaseAggrementService(propertyID,userID, role, dataUrl) {
 
   }
 
- 
+
 }
 
 async function getLeaseAggrementList(id, role) {
 
-  
 
-  if(role === UserRoles.RENTER ) {
 
-     const data = await LeaseAggrements.find({renterID : id})
-     return {
+  if (role === UserRoles.RENTER) {
+
+    const data = await LeaseAggrements.find({ renterID: id })
+    return {
       data: data,
       message: "successfully fetched lease aggrements",
       status: true,
       statusCode: 200
     };
-  } else if(role === UserRoles.LANDLORD) {
+  } else if (role === UserRoles.LANDLORD) {
 
-    const data = await LeaseAggrements.find({landlordID : id})
+    const data = await LeaseAggrements.find({ landlordID: id })
     return {
       data: data,
       message: "successfully fetched lease aggrements",
@@ -507,14 +509,45 @@ async function getLeaseAggrementList(id, role) {
       statusCode: 200
     };
   }
-
- 
-
-
-
 }
 
+async function getWalletDetails(id) {
 
+
+  const { walletPoints } = await User.findById(id);
+
+  const Deposited = await Wallet.aggregate([
+    {
+      $match: { userID: id }
+    },
+    {
+      $group: {
+        _id: '$type',
+        totalAmount: { $sum: '$amount' }
+      }
+    }
+  ]).exec((err, results) => {
+    if (err) {
+      console.error('Error:', err);
+    } else {
+      console.log('Credit Amount:', results.find(result => result._id === 'CREDIT').totalAmount || 0);
+      console.log('Debit Amount:', results.find(result => result._id === 'DEBIT').totalAmount || 0);
+    }
+  });
+
+
+
+  return {
+    data: {
+      walletPoints,
+      Deposited
+    },
+    message: "successfully fetched lease aggrements",
+    status: true,
+    statusCode: 200
+  };
+
+}
 
 
 export {
@@ -528,5 +561,6 @@ export {
   forgotPasswordService,
   favouritesProperties,
   uploadLeaseAggrementService,
-  getLeaseAggrementList
+  getLeaseAggrementList,
+  getWalletDetails
 };
