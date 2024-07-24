@@ -528,8 +528,9 @@ async function getWalletDetails(id) {
 
 console.log(results , "==-=-=-=-=-resultsss")
 
-const Deposited = results.find(result => result.type === 'CREDIT')?.amount || 0;
-const Withdrawn = results.find(result => result.type === 'DEBIT')?.amount || 0;
+
+const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
+const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
 
 
 
