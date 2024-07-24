@@ -520,7 +520,7 @@ async function getWalletDetails(id) {
     { $match: { userID: id } },
     {
         $group: {
-            type: '$type',
+            _id: '$type',
             totalAmount: { $sum: '$amount' }
         }
     }
