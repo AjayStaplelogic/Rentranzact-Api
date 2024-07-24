@@ -520,11 +520,13 @@ async function getWalletDetails(id) {
     { $match: { userID: id } },
     {
         $group: {
-            _id: '$type',
+            type: '$type',
             totalAmount: { $sum: '$amount' }
         }
     }
 ]);
+
+console.log(results , "==-=-=-=-=-resultsss")
 
 const Deposited = results.find(result => result.type === 'CREDIT')?.amount || 0;
 const Withdrawn = results.find(result => result.type === 'DEBIT')?.amount || 0;
