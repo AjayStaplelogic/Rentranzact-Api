@@ -21,8 +21,10 @@ async function addUser(req, res) {
 
 async function userList(req, res) {
   const { body } = req;
+  const pageNo =  parseInt(req.query.pageNo);
+  const pageSize =  parseInt(req.query.pageSize);
 
-  const data = await getUsersList(body);
+  const data = await getUsersList(body, pageNo , pageSize);
 
   sendResponse(
     res,

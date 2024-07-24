@@ -50,10 +50,13 @@ async function addUserByAdmin(body) {
 
 
 
-async function getUsersList(body) {
+async function getUsersList(body, pageNo , pageSize) {
   const { role } = body;
+  const skip = (pageNo - 1) * pageSize;
 
-  const data = await User.find({ role: role });
+
+
+  const data = await User.find({ role: role }).skip(skip).limit(pageSize);
 
   return {
     data: data,
