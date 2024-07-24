@@ -27,7 +27,7 @@ async function addStripeTransaction(body) {
 
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneMonthLater })
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: created, propertyID: propertyID , renterActive : true })
+        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: created, propertyID: propertyID, renterActive: true })
 
         addRenterHistory.save()
 
@@ -44,7 +44,7 @@ async function addStripeTransaction(body) {
         const timestampOneQuaterLater = oneQuaterLater.unix();
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneQuaterLater })
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created, propertyID: propertyID , renterActive : true })
+        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created, propertyID: propertyID, renterActive: true })
 
 
         console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
@@ -65,7 +65,7 @@ async function addStripeTransaction(body) {
         console.log(timestampOneYearLater, "-----timestampOneYearLater")
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater })
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created, propertyID: propertyID , renterActive : true})
+        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created, propertyID: propertyID, renterActive: true })
         addRenterHistory.save()
     }
 
@@ -73,7 +73,7 @@ async function addStripeTransaction(body) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id , type : "DEBIT"})
+    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT" })
 
 
 
@@ -99,18 +99,28 @@ async function rechargeWallet(body) {
     const { amount, status, created, id } = body.data.object;
 
     const payload = {
-     amount,
-     status, 
-     createdAt : created,
-     type : "CREDIT",
-     userID,
-     intentID : id
+        amount,
+        status,
+        createdAt: created,
+        type: "CREDIT",
+        userID,
+        intentID: id
     }
-  
+
+    if (status === "succeeded") {
+
+        const data__ = await User.findByIdAndUpdate(
+            userID,
+            { $inc: { amount: amount } },
+            { new: true }
+        );
+
+    }
+
     const data = new Wallet(payload)
     data.save()
 
-    const data_ = new Transaction({ renterID: userID,  amount: amount, status: status, date: created, intentID: id, type : "CREDIT" })
+    const data_ = new Transaction({ renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT" })
 
     data_.save()
 
@@ -130,4 +140,4 @@ async function rechargeWallet(body) {
 
 }
 
-export { addStripeTransaction , rechargeWallet };
+export { addStripeTransaction, rechargeWallet };
