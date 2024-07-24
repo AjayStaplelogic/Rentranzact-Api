@@ -12,7 +12,8 @@ import {
   favouritesProperties,
   uploadLeaseAggrementService,
   getLeaseAggrementList,
-  getWalletDetails
+  getWalletDetails,
+  deleteAggrementByID
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -205,5 +206,21 @@ async function wallet(req, res) {
 
 }
 
+async function deleteAggrement(req, res) {
+  const {_id , role} = req.user.data;
+  const {id} = req.params;
 
-export {wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};
+
+  const data = await deleteAggrementByID(_id, id , role);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+
+}
+
+
+export {deleteAggrement , wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};

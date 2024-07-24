@@ -548,6 +548,30 @@ const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount ||
 }
 
 
+async function deleteAggrementByID(userID , aggrementID , role) {
+
+  if(role === UserRoles.RENTER) {
+    const data = await LeaseAggrements.findOneAndDelete({renterID : userID, _id : aggrementID })
+
+
+    return {
+      data,
+      message: "successfully fetched lease aggrements",
+      status: true,
+      statusCode: 200
+    };
+
+  } else if (role === UserRoles.LANDLORD) {
+
+
+
+  }
+
+
+
+
+}
+
 export {
   loginUser,
   addUser,
@@ -560,5 +584,6 @@ export {
   favouritesProperties,
   uploadLeaseAggrementService,
   getLeaseAggrementList,
-  getWalletDetails
+  getWalletDetails,
+  deleteAggrementByID
 };
