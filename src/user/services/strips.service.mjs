@@ -5,6 +5,7 @@ import { RentType } from "../enums/property.enums.mjs";
 import moment from "moment";
 import { User } from "../models/user.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -72,7 +73,7 @@ async function addStripeTransaction(body) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id })
+    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id , type : "DEBIT"})
 
 
 
@@ -91,4 +92,42 @@ async function addStripeTransaction(body) {
 
 }
 
-export { addStripeTransaction };
+async function rechargeWallet(body) {
+
+    const { userID } = body.data.object.metadata;
+
+    const { amount, status, created, id } = body.data.object;
+
+    const payload = {
+     amount,
+     status, 
+     createdAt : created,
+     type : "CREDIT",
+     userID,
+     intentID : id
+    }
+  
+    const data = new Wallet(payload)
+    data.save()
+
+    const data_ = new Transaction({ renterID: userID,  amount: amount, status: status, date: created, intentID: id, type : "CREDIT" })
+
+    data_.save()
+
+
+
+
+    return {
+
+        data: [],
+        message: "success",
+        status: true,
+        statusCode: 200,
+
+    }
+
+
+
+}
+
+export { addStripeTransaction , rechargeWallet };
