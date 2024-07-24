@@ -526,8 +526,8 @@ async function getWalletDetails(id) {
     }
 ]);
 
-const Deposited = results.find(result => result._id === 'CREDIT')?.amount || 0;
-const Withdrawn = results.find(result => result._id === 'DEBIT')?.amount || 0;
+const Deposited = results.find(result => result.type === 'CREDIT')?.amount || 0;
+const Withdrawn = results.find(result => result.type === 'DEBIT')?.amount || 0;
 
 
 
