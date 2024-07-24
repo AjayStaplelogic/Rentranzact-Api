@@ -3,8 +3,8 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function payRentService(body, userID) {
-    
-    const { amount , propertyID } = body;
+
+    const { amount, propertyID, wallet } = body;
 
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -14,7 +14,37 @@ async function payRentService(body, userID) {
         },
         metadata: {
             propertyID: propertyID,
-            userID : userID
+            userID: userID,
+            wallet : wallet
+        }
+    });
+
+    return {
+        data: { client_secret: paymentIntent.client_secret },
+        message: "client secret created successfully",
+        status: true,
+        statusCode: 200,
+    };
+
+
+
+
+}
+
+
+async function addToWallet(body, userID) {
+
+    const { amount, wallet  } = body;
+
+    const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: 'ngn',
+        automatic_payment_methods: {
+            enabled: true,
+        },
+        metadata: {
+            wallet : wallet,
+            userID: userID
         }
     });
 
@@ -26,4 +56,5 @@ async function payRentService(body, userID) {
     };
 }
 
-export { payRentService };
+
+export { payRentService, addToWallet };
