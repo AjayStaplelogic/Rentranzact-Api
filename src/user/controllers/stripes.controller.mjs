@@ -6,6 +6,8 @@ async function stripe(req, res) {
 
     if (body.type === "payment_intent.succeeded") {
 
+        console.log(body , "===bodyyyyyyyyy webhook ")
+
         const data = await addStripeTransaction(body);
 
         sendResponse(res, data.data, data.message, data.status, data.statusCode);
