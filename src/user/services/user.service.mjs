@@ -12,6 +12,9 @@ import crypto from 'crypto';
 import appleSigninAuth from 'apple-signin-auth';
 import { LeaseAggrements } from "../models/leaseAggrements.model.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
+import fs from "fs";
+import path from "path";
+
 
 
 
@@ -519,18 +522,18 @@ async function getWalletDetails(id) {
   const results = await Wallet.aggregate([
     { $match: { userID: id } },
     {
-        $group: {
-            _id: '$type',
-            totalAmount: { $sum: '$amount' }
-        }
+      $group: {
+        _id: '$type',
+        totalAmount: { $sum: '$amount' }
+      }
     }
-]);
+  ]);
 
-console.log(results , "==-=-=-=-=-resultsss")
+  console.log(results, "==-=-=-=-=-resultsss")
 
 
-const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
-const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
+  const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
+  const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
 
 
 
@@ -548,10 +551,27 @@ const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount ||
 }
 
 
-async function deleteAggrementByID(userID , aggrementID , role) {
+async function deleteAggrementByID(userID, aggrementID, role) {
 
-  if(role === UserRoles.RENTER) {
+  if (role === UserRoles.RENTER) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
+
+
+
+
+    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
+    const match = data.url.match(regex);
+
+    if (match) {
+      const filenameWithExtension = match[1]; 
+      const filePath = path.join(__dirname,  "../", "uploads", "LeaseAggrements", filenameWithExtension)
+      fs.unlinkSync(filePath)
+      console.log(filenameWithExtension);
+    } else {
+      console.log('Filename not found in URL');
+    }
+
+   
 
 
     return {
