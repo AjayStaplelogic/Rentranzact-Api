@@ -551,7 +551,7 @@ const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount ||
 async function deleteAggrementByID(userID , aggrementID , role) {
 
   if(role === UserRoles.RENTER) {
-    const data = await LeaseAggrements.findOneAndDelete({renterID : userID, _id : aggrementID })
+    const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
 
 
     return {
