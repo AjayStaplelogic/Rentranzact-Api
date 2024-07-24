@@ -516,31 +516,26 @@ async function getWalletDetails(id) {
 
   const { walletPoints } = await User.findById(id);
 
-  const Deposited = await Wallet.aggregate([
+  const results = await Wallet.aggregate([
+    { $match: { userID: userID } },
     {
-      $match: { userID: id }
-    },
-    {
-      $group: {
-        _id: '$type',
-        totalAmount: { $sum: '$amount' }
-      }
+        $group: {
+            _id: '$type',
+            totalAmount: { $sum: '$amount' }
+        }
     }
-  ]).exec((err, results) => {
-    if (err) {
-      console.error('Error:', err);
-    } else {
-      console.log('Credit Amount:', results.find(result => result._id === 'CREDIT').totalAmount || 0);
-      console.log('Debit Amount:', results.find(result => result._id === 'DEBIT').totalAmount || 0);
-    }
-  });
+]);
+
+const Deposited = results.find(result => result._id === 'CREDIT')?.amount || 0;
+const Withdrawn = results.find(result => result._id === 'DEBIT')?.amount || 0;
 
 
 
   return {
     data: {
       walletPoints,
-      Deposited
+      Deposited,
+      Withdrawn
     },
     message: "successfully fetched lease aggrements",
     status: true,
