@@ -111,7 +111,7 @@ async function rechargeWallet(body) {
 
         const data__ = await User.findByIdAndUpdate(
             userID,
-            { $inc: { amount: amount } },
+            { $inc: { walletPoints: amount } },
             { new: true }
         );
 
