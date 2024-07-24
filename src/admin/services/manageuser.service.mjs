@@ -58,11 +58,18 @@ async function getUsersList(body, pageNo , pageSize) {
 
   const data = await User.find({ role: role }).skip(skip).limit(pageSize);
 
+
+  const count = await User.countDocuments({
+    role: role
+  })
+
+
   return {
     data: data,
     message: `successfully fetched ${role} list`,
     status: true,
     statusCode: 201,
+    additionalData : {pageNo , pageSize , count }
   };
 }
 

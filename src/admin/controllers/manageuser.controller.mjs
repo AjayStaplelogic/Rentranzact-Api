@@ -32,7 +32,8 @@ async function userList(req, res) {
     data.message,
     data.status,
     data.statusCode,
-    data.accessToken
+    data.accessToken,
+    data.additionalData
   );
 }
 
