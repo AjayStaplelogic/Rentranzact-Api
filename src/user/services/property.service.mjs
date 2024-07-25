@@ -29,7 +29,6 @@ async function addPropertyService(
   if (propertyPostedBy) {
     console.log("property [posedted by true")
     const Property_ = {
-      rentFrequency: body.rentFrequency,
       propertyID: PropertyID,
       images: images,
       documents: documents,
@@ -40,11 +39,8 @@ async function addPropertyService(
       propertyName: body.propertyName,
       email: propertyPostedBy.email,
       name: propertyPostedBy.fullName,
-      bedrooms: body.bedrooms,
       rentType: body.rentType,
       city: body.city,
-      number_of_floors: parseInt(body.number_of_floors),
-      number_of_bathrooms: parseInt(body.number_of_bathrooms),
       carpetArea: parseInt(body.carpetArea),
       age_of_construction: parseInt(body.age_of_construction),
       aboutProperty: body.aboutProperty,
@@ -64,12 +60,14 @@ async function addPropertyService(
       postedByAdmin: body.postedByAdmin
     };
 
-    console.log(Property_, "======Property_");
+    if(body.type != "Open Space") {
+      Property_[bedrooms] = body.bedrooms 
+      Property_[number_of_floors] = body.number_of_floors
+      Property_[number_of_bathrooms] = body.number_of_bathrooms
+    } 
 
     const property = new Property(Property_);
     property.save();
-
-    console.log("propertyyyyyy ")
 
     return {
       data: property,

@@ -1,4 +1,9 @@
-// models/User.js
+// 1. Add dropdown in Bathroom, Bedrooms and Floor numbers
+// 2. When the landlord chooses Property type as open space, he should not get the option of Bathroom, Bedrooms and Floor numbers.
+// 3. Remove rent type from property detail page as it is already given in the next page.
+// 4. Remove Caution deposit from pricing page.
+// 5. In image and documents page, Add the text after Tap to upload the documents(Deed of assignment, deed of sublease, power of attorney).
+
 import mongoose from "mongoose";
 // Define the schema for the User model
 const propertySchema = new mongoose.Schema(
@@ -28,23 +33,6 @@ const propertySchema = new mongoose.Schema(
         required: true,
       },
     },
-    //   address: {
-    //     type: {
-    //         longitude: {
-    //             type: Number,
-    //             required: true
-    //         },
-    //         latitude: {
-    //             type: Number,
-    //             required: true
-    //         },
-    //         addressText: {
-    //             type: String,
-    //             required: true
-    //         }
-    //     },
-    //     required: true
-    // },
     rent: {
       type: Number,
       required: true,
@@ -84,12 +72,12 @@ const propertySchema = new mongoose.Schema(
 
     number_of_floors: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     number_of_bathrooms: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     carpetArea: {
@@ -122,7 +110,7 @@ const propertySchema = new mongoose.Schema(
 
     bedrooms: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     superArea: {
@@ -212,24 +200,20 @@ const propertySchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    rentFrequency: {
-      type: String,
-      required: true,
-    },
-    inDemand : {
-      type : Boolean,
-      default : false
+    
+    inDemand: {
+      type: Boolean,
+      default: false
     },
     postedByAdmin: {
       type: Boolean,
-      default : false
+      default: false
     }
   },
   { timestamps: true }
 );
 
 propertySchema.index({ "address.coordinates": "2dsphere" });
-// Create the User model from the schema
 const Property = mongoose.model("properties", propertySchema);
 
 export { Property };
