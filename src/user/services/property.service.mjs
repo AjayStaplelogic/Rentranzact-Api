@@ -61,9 +61,9 @@ async function addPropertyService(
     };
 
     if(body.type != "Open Space") {
-      Property_[bedrooms] = body.bedrooms 
-      Property_[number_of_floors] = body.number_of_floors
-      Property_[number_of_bathrooms] = body.number_of_bathrooms
+      Property_["bedrooms"] = body.bedrooms 
+      Property_["number_of_floors"] = body.number_of_floors
+      Property_["number_of_bathrooms"] = body.number_of_bathrooms
     } 
 
     const property = new Property(Property_);

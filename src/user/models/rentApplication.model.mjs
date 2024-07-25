@@ -12,17 +12,17 @@ const rentApplicationSchema = new mongoose.Schema(
       lowercase: true,
     },
     employmentStatus: {
-      type: Boolean,
+      type: String,
       required: true,
     },
     employerName: {
       type: String,
-      required: true,
+      required: false,
     },
 
     employerAddress: {
       type: String,
-      required: true,
+      required: false,
     },
 
     occupation: {
@@ -85,7 +85,7 @@ const rentApplicationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    martialStatus: {
+    maritialStatus: {
       type: String,
       required: true,
     },
