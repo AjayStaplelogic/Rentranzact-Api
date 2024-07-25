@@ -245,9 +245,9 @@ async function searchInspectionService(id, role, text, status) {
         $match: {
           " RenterDetails.id": id,
           $or: [
-            { "propertyDetails.propertyName": { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
+            { propertyName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
             { landlordName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for landlordName
-            { "propertyDetails.address": { $regex: regex, $options: "i" } } // Case-insensitive regex match for address
+            { propertyDetails.address: { $regex: regex, $options: "i" } } // Case-insensitive regex match for address
           ]
         }
       }
