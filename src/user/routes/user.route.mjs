@@ -67,8 +67,6 @@ router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
 router.delete("/lease-aggerment/:id" , authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), deleteAggrement)
 
-
-router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , wallet )
-
+router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , wallet)
 
 export default router;

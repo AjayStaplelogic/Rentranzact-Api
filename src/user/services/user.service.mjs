@@ -555,24 +555,17 @@ async function deleteAggrementByID(userID, aggrementID, role) {
 
   if (role === UserRoles.RENTER) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
-
-
-
-
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
     const match = data.url.match(regex);
 
     if (match) {
-      const filenameWithExtension = match[1]; 
-      const filePath = path.join(__dirname,  "../", "uploads", "LeaseAggrements", filenameWithExtension)
+      const filenameWithExtension = match[1];
+      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", filenameWithExtension)
       fs.unlinkSync(filePath)
       console.log(filenameWithExtension);
     } else {
       console.log('Filename not found in URL');
     }
-
-   
-
 
     return {
       data,
