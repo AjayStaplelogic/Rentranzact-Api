@@ -563,7 +563,7 @@ async function deleteAggrementByID(userID, aggrementID, role) {
 
     if (match) {
       const filenameWithExtension = match[1];
-      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", filenameWithExtension)
+      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
       fs.unlinkSync(filePath)
       console.log(filenameWithExtension);
     } else {
