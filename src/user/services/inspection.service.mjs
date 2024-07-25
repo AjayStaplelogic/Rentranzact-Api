@@ -237,6 +237,9 @@ async function searchInspectionService(id, role, text, status) {
 
 
     const regex = new RegExp(text, "ig");
+
+
+    console.log("------new object id" , ObjectID(id))
     const data = await Inspection.aggregate([
       {
         $match: {
