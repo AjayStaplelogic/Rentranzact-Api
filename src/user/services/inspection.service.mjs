@@ -238,16 +238,14 @@ async function searchInspectionService(id, role, text, status) {
 
     const regex = new RegExp(text, "ig");
 
-
-    console.log("------new object id", ObjectID(id))
     const data = await Inspection.aggregate([
       {
         $match: {
           "RenterDetails.id": id,
           $or: [
-            { propertyName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
-            { landlordName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for landlordName
-            { addressText: { $regex: regex, $options: "i" } } // Case-insensitive regex match for address
+            { propertyName: { $regex: regex } }, // Case-insensitive regex match for propertyName
+            { landlordName: { $regex: regex } }, // Case-insensitive regex match for landlordName
+            { addressText: { $regex: regex } } // Case-insensitive regex match for address
           ]
         }
       }
