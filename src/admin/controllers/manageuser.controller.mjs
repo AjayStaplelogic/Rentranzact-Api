@@ -71,8 +71,9 @@ async function deleteUser(req, res) {
 async function searchUsers(req, res) {
 
   const {search} = req.query;
+  const {role} = req.body;
 
-  const data = await searchUsersService(search);
+  const data = await searchUsersService(search, role);
 
 
   sendResponse(

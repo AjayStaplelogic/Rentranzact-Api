@@ -4,7 +4,7 @@ import { addUser , userList , user , deleteUser , searchUsers} from '../controll
 
 router.post('/addUser' ,addUser);
 router.post('/userList', userList);
-router.get('/user', searchUsers)
+router.post('/user', searchUsers)
 router.get('/user/:id' , user )
 router.delete('/user/:id' , deleteUser)
 

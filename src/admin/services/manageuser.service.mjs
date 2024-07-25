@@ -100,7 +100,7 @@ async function deleteUserService(id) {
 }
 
 
-async function searchUsersService(text) {
+async function searchUsersService(text, role) {
 
 
   const regex = new RegExp(text, "ig");
@@ -108,7 +108,7 @@ async function searchUsersService(text) {
    const data = await User.aggregate([
     {
       $match: {
-        role : UserRoles.RENTER,
+        role :role,
         $or: [
           { fullName: regex },
           { email: regex },
