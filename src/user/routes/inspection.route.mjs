@@ -6,7 +6,8 @@ import {
   inspectionUpdate,
   inspectionEdit ,
   getInspectionRequests,
-  getAvailableDates
+  getAvailableDates,
+  searchInspection
 } from "../controllers/inspection.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -17,6 +18,13 @@ router.get(
   authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]),
   getInsepction
 );
+
+router.get(
+  "/inspection/search",
+  authorizer([UserRoles.RENTER]),
+  searchInspection
+);
+
 router.post(
   "/inspection/update-status",
   authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]),

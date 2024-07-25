@@ -3,6 +3,7 @@ import { Inspection } from "../models/inspection.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import ObjectID from "bson-objectid";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
 
@@ -18,7 +19,7 @@ async function createInspection(body, renterID) {
   const { fullName, picture, phone, countryCode } = renterDetails;
 
 
-  const payload ={
+  const payload = {
     ...body
   }
 
@@ -32,10 +33,12 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
-  console.log(property,"==========property")
+  console.log(property, "==========property")
 
   payload.propertyName = property.propertyName;
- 
+
+  payload.addressText = property.address.addressText;
+
   payload.landlordID = property.landlord_id;
 
   payload.landlordEmail = landlordDetails.email;
@@ -46,12 +49,12 @@ async function createInspection(body, renterID) {
 
   payload.landlordName = landlordDetails.fullName;
 
-  console.log(payload,"----------BODY")
+  console.log(payload, "----------BODY")
 
   const data = new Inspection(payload);
   data.save();
 
-  console.log(data , "====+++++++data ")
+  console.log(data, "====+++++++data ")
 
 
 
@@ -68,7 +71,7 @@ async function createInspection(body, renterID) {
 async function fetchInspections(userData) {
   if (userData.role === UserRoles.LANDLORD) {
     const data = await Inspection.find({ landlordID: userData?._id });
-   
+
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -106,7 +109,7 @@ async function fetchInspections(userData) {
                 $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
               },
             },
-            { $project: { images: 1 , propertyName : 1, address: 1} }, // Project only the images array from properties
+            { $project: { images: 1, propertyName: 1, address: 1 } }, // Project only the images array from properties
           ],
           as: "propertyDetails",
         },
@@ -117,8 +120,8 @@ async function fetchInspections(userData) {
       {
         $project: {
           _id: 1,
-          landlordEmail : 1,
-          landlordName : 1,
+          landlordEmail: 1,
+          landlordName: 1,
           RenterDetails: 1,
           inspectionTime: 1,
           inspectionDate: 1,
@@ -211,7 +214,7 @@ async function getAvailableDatesService(id) {
   };
 }
 
-async function getInspectionsByUserID(id, role , PropertyID) {
+async function getInspectionsByUserID(id, role, PropertyID) {
   let data;
   if (role === UserRoles.LANDLORD) {
     data = await Inspection.find({
@@ -228,11 +231,72 @@ async function getInspectionsByUserID(id, role , PropertyID) {
 
 }
 
+
+async function searchInspectionService(id, role, text, status) {
+  if (status === InspectionStatus.COMPLETED) {
+
+
+    const regex = new RegExp(text, "ig");
+    const data = await Inspection.aggregate([
+      {
+        $match: {
+          "_id": ObjectID(id)  // Match inspection document by _id
+        }
+      },
+      {
+        $lookup: {
+          from: "properties",
+          let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$propertyID"] } // Match ObjectId type
+              }
+            },
+            {
+              $project: {
+                propertyName: 1,
+                address: 1 // Concatenate address fields
+              }
+            }
+          ],
+          as: "propertyDetails"
+        }
+      },
+      {
+        $match: {
+          $or: [
+            { "propertyDetails.propertyName": { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
+            { landlordName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for landlordName
+            { "propertyDetails.address": { $regex: regex, $options: "i" } } // Case-insensitive regex match for address
+          ]
+        }
+      }
+    ]);
+
+    return {
+      data: data,
+      message: "rent application completed successfully",
+      status: true,
+      statusCode: 200,
+    };
+
+
+  } else if (status === InspectionStatus.INITIATED) {
+
+
+
+  } else if (status === InspectionStatus.CANCELED) {
+
+  }
+}
+
 export {
   createInspection,
   fetchInspections,
   updateInspectionStatus,
   inspectionEditService,
   getAvailableDatesService,
-  getInspectionsByUserID
+  getInspectionsByUserID,
+  searchInspectionService
 };

@@ -6,7 +6,8 @@ import {
   updateInspectionStatus,
   inspectionEditService,
   getAvailableDatesService,
-  getInspectionsByUserID
+  getInspectionsByUserID,
+  searchInspectionService
 } from "../services/inspection.service.mjs";
 import { Inspection } from "../models/inspection.model.mjs";
 
@@ -65,11 +66,24 @@ async function getInspectionRequests(req, res) {
 
 }
 
+async function searchInspection(req, res) {
+ 
+  const id = req.user.data._id;
+  const role = req.user.data.role;
+  const {search} = req.query;
+  const {status} = req.query;
+
+  const data = await searchInspectionService(id, role, search ,status)
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+}
+
 export {
   addInspection,
   getInsepction,
   inspectionUpdate,
   inspectionEdit,
   getAvailableDates,
-  getInspectionRequests
+  getInspectionRequests,
+  searchInspection
 };
