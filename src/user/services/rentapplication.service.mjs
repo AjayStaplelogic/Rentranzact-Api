@@ -41,14 +41,7 @@ async function addRentApplicationService(body, user) {
       permanentContactNumber,
       identificationType
     } = body;
-
-
-    if(employmentStatus !== "unemployed") {
-
-      body["employerName"] =  body.employerName
-
-      body["employerAddress"] = body.employerAddress
-    }
+   
 
     const landlord = await Property.findById(propertyID);
 
@@ -57,8 +50,6 @@ async function addRentApplicationService(body, user) {
     const payload = {
       propertyID: propertyID,
       employmentStatus,
-      employerName,
-      employerAddress,
       occupation,
       kinFirstName,
       kinLastName,
@@ -84,6 +75,12 @@ async function addRentApplicationService(body, user) {
       landlordID: landlord.landlord_id,
       propertyName: landlord.propertyName
     };
+    if(employmentStatus !== "unemployed") {
+
+      payload["employerName"] =  body.employerName
+
+      payload["employerAddress"] = body.employerAddress
+    }
 
     console.log(payload, " ===============payload")
 
