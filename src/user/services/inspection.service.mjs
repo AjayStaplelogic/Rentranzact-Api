@@ -239,35 +239,11 @@ async function searchInspectionService(id, role, text, status) {
     const regex = new RegExp(text, "ig");
 
 
-    console.log("------new object id" , ObjectID(id))
+    console.log("------new object id", ObjectID(id))
     const data = await Inspection.aggregate([
       {
         $match: {
-          "_id": ObjectID(id)  // Match inspection document by _id
-        }
-      },
-      {
-        $lookup: {
-          from: "properties",
-          let: { propertyID: { $toObjectId: "$propertyID" } }, // Convert propertyID to ObjectId
-          pipeline: [
-            {
-              $match: {
-                $expr: { $eq: ["$_id", "$$propertyID"] } // Match ObjectId type
-              }
-            },
-            {
-              $project: {
-                propertyName: 1,
-                address: 1 // Concatenate address fields
-              }
-            }
-          ],
-          as: "propertyDetails"
-        }
-      },
-      {
-        $match: {
+          " RenterDetails.id": id,
           $or: [
             { "propertyDetails.propertyName": { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
             { landlordName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for landlordName
@@ -277,7 +253,7 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    console.log(data , "==d=dyaaaadtaa ")
+    console.log(data, "==d=dyaaaadtaa ")
 
     return {
       data: data,
