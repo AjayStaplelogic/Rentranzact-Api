@@ -45,13 +45,12 @@ async function addRentApplicationService(body, user) {
 
     if(employmentStatus !== "") {
 
-      body[employerName] =  body.
+      body["employerName"] =  body.employerName
 
-
+      body["employerAddress"] = body.employerAddress
     }
 
-    ,
-    employerAddress,
+  
 
     const landlord = await Property.findById(propertyID);
 
