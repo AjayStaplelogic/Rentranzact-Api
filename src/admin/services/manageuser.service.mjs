@@ -100,4 +100,31 @@ async function deleteUserService(id) {
 }
 
 
-export { addUserByAdmin, getUsersList, getUserByID, deleteUserService };
+async function searchUsersService(text) {
+
+
+  const regex = new RegExp(text, "ig");
+
+   const data = await User.aggregate([
+    {
+      $match: {
+        role : UserRoles.RENTER,
+        $or: [
+          { fullName: regex },
+          { email: regex },
+          { phone: regex }
+        ],
+      },
+    },
+   ])
+ 
+  return {
+    data: data,
+    message: `search results`,
+    status: true,
+    statusCode: 201,
+  };
+
+}
+
+export { addUserByAdmin, getUsersList, getUserByID, deleteUserService , searchUsersService };
