@@ -274,6 +274,8 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
+    console.log(data , "==d=dyaaaadtaa ")
+
     return {
       data: data,
       message: "rent application completed successfully",
