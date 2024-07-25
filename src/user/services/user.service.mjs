@@ -14,6 +14,7 @@ import { LeaseAggrements } from "../models/leaseAggrements.model.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import fs from "fs";
 import path from "path";
+import { dirname } from 'path';
 
 
 
