@@ -556,6 +556,8 @@ async function deleteAggrementByID(userID, aggrementID, role) {
   if (role === UserRoles.RENTER) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
+
+    console.log(data, "===data aaaaaaa")
     const match = data.url.match(regex);
 
     if (match) {
