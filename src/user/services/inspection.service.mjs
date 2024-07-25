@@ -243,7 +243,7 @@ async function searchInspectionService(id, role, text, status) {
     const data = await Inspection.aggregate([
       {
         $match: {
-          " RenterDetails.id": id,
+          "RenterDetails.id": id,
           $or: [
             { propertyName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for propertyName
             { landlordName: { $regex: regex, $options: "i" } }, // Case-insensitive regex match for landlordName
