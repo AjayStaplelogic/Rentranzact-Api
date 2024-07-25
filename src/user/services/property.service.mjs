@@ -15,7 +15,7 @@ async function addPropertyService(
 ) {
   const { email, role } = body;
 
-  const propertyPostedBy = await User.findOne({ email: "obinna.eze@yopmail.com", role: UserRoles.PROPERTY_MANAGER });
+  const propertyPostedBy = await User.findOne({ email: "akanke@gmail.com", role: UserRoles.PROPERTY_MANAGER });
 
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
