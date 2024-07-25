@@ -128,7 +128,7 @@ const propertySchema = new mongoose.Schema(
 
     cautionDeposite: {
       type: Number,
-      required: true,
+      required: false,
     },
 
     servicesCharges: {

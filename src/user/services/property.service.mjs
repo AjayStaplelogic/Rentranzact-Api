@@ -53,7 +53,6 @@ async function addPropertyService(
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
       property_manager_id:
         role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
-      cautionDeposite: parseInt(body.cautionDeposite),
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: body.number_of_rooms,
