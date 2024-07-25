@@ -116,7 +116,7 @@ async function searchUsersService(text) {
         ],
       },
     },
-   ])
+   ]);
  
   return {
     data: data,
