@@ -75,6 +75,34 @@ async function getToCalender(userID) {
 
 
 
+async function getRenterCalender(userID) {
+
+    const result2 = await Inspection.find({
+        inspectionStatus: InspectionStatus.INITIATED,
+        "RenterDetails.id": userID
+    }).select('id inspectionTime inspectionDate userID');
+
+    const result = await Calender.find({ userID: result2.userID })
+
+    console.log(result, "====resulttttttttt")
+
+    
 
 
-export { addToCalender, getToCalender };
+    console.log(result2, "====resulttttttttt")
+
+    const data = result.concat(result2);
+
+    return {
+        data: data,
+        message: "dashboard stats",
+        status: true,
+        statusCode: 201,
+    };
+
+}
+
+
+
+
+export { addToCalender, getToCalender , getRenterCalender};

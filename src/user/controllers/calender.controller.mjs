@@ -1,6 +1,6 @@
 import { UserRoles } from "../enums/role.enums.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addToCalender  , getToCalender} from "../services/calender.service.mjs";
+import { addToCalender  , getToCalender , getRenterCalender} from "../services/calender.service.mjs";
 
 
 async function calender(req, res) {
@@ -29,6 +29,13 @@ async function getCalender(req, res) {
         const data = await getToCalender(_id);
 
         sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+    } else if (role === UserRoles.RENTER) {
+
+        const data = await getRenterCalender(_id);
+
+        sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
 
     }
 
