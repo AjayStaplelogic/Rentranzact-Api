@@ -108,6 +108,8 @@ async function getRenterCalender(userID, propertyID) {
 
 async function getTimeSlotByDate(date, userID) {
 
+    console.log(data, userId ,"paramssss")
+
     const data = await Inspection.find({
         "inspectionDate": date,
         inspectionStatus: InspectionStatus.INITIATED,

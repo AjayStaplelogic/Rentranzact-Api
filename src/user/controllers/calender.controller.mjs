@@ -44,7 +44,7 @@ async function getCalender(req, res) {
 async function getTimeSlot(req, res) {
 
     const { role, _id } = req.user.data;
-    const { date } = req.params;
+    const { date } = req.body;
    
 
     if (role === UserRoles.RENTER) {
