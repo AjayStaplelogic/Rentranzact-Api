@@ -1,4 +1,6 @@
+import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import { Calender } from "../models/calender.model.mjs";
+import { Inspection } from "../models/inspection.model.mjs";
 
 async function addToCalender(body, userID) {
 
@@ -48,18 +50,24 @@ async function addToCalender(body, userID) {
 
 async function getToCalender(userID) {
 
-        const data = await Calender.find({userID : userID})
+    const result = await Calender.find({ userID: userID })
 
-  
+    const result2 = await Inspection.find({
+        inspectionStatus: InspectionStatus.INITIATED,
+        landlordID: userID,
+        inspectionApproved: true
+    })
 
-        return {
-            data: data,
-            message: "dashboard stats",
-            status: true,
-            statusCode: 201,
-        };
+    const data = { ...result, ...result2 }
 
-    }
+    return {
+        data: data,
+        message: "dashboard stats",
+        status: true,
+        statusCode: 201,
+    };
+
+}
 
 
 
