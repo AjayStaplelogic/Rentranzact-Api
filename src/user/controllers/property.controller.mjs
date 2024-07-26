@@ -100,6 +100,8 @@ async function propertyByID(req, res) {
 
 async function addFavorite(req, res) {
   const { id } = req.params;
+
+  console.log(id, "this is property which liked or dislikeddddd")
   const { _id } = req.user.data;
 
   const data = await addFavoriteProperties(id, _id);
