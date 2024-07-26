@@ -8,7 +8,7 @@ import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
 
 async function createInspection(body, renterID) {
-  const { propertyID, inspectionDate, inspectionTime } = body;
+  const { propertyID, inspectionDate, inspectionTime , id} = body;
 
   const property = await Property.findById(propertyID);
 
@@ -48,6 +48,8 @@ async function createInspection(body, renterID) {
   payload.images = property.images;
 
   payload.landlordName = landlordDetails.fullName;
+
+  payload.id = id;
 
   console.log(payload, "----------BODY")
 

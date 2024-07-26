@@ -78,7 +78,15 @@ const inspectionSchema = new mongoose.Schema(
     addressText : {
       type : String,
       required: true
-    }
+    },
+    id: {
+      type: String,
+      required: false
+  },
+  fullDay: {
+    type: Boolean,
+    default : false
+}
 
 
   },
