@@ -11,7 +11,7 @@ const calenderSchema = new mongoose.Schema(
         },
         id: {
             type: String,
-            required: true
+            required: false
         },
         date: {
 
@@ -20,7 +20,7 @@ const calenderSchema = new mongoose.Schema(
         },
         time: {
             type: String,
-            required: true
+            required: false
         },
         fullDay: {
             type: Boolean,
