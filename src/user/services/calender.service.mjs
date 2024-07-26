@@ -82,7 +82,7 @@ async function getRenterCalender(userID) {
         "RenterDetails.id": userID
     }).select('id inspectionTime inspectionDate landlordID');
 
-    const result = await Calender.find({ userID: result2.landlordID })
+    const result = await Calender.find({ userID: result2[0]?.landlordID })
 
     console.log(result, "====resulttttttttt")
 
