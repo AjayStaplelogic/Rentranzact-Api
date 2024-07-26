@@ -52,11 +52,16 @@ async function getToCalender(userID) {
 
     const result = await Calender.find({ userID: userID })
 
+    console.log(result, "====resulttttttttt")
+
     const result2 = await Inspection.find({
         inspectionStatus: InspectionStatus.INITIATED,
         landlordID: userID,
         inspectionApproved: true
-    })
+    }).select('id', 'inspectionTime' , 'inspectionDate')
+
+
+    console.log(result2, "====resulttttttttt")
 
     const data = { ...result, ...result2 }
 
