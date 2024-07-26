@@ -7,6 +7,7 @@ async function calender(req, res) {
 
     const { role, _id } = req.user.data;
     const { body } = req;
+   
 
     if (role === UserRoles.LANDLORD) {
 
@@ -22,6 +23,7 @@ async function calender(req, res) {
 async function getCalender(req, res) {
 
     const { _id , role } = req.user.data;
+    const {propertyID} = req.query;
 
 
     if (role === UserRoles.LANDLORD) {
@@ -32,7 +34,7 @@ async function getCalender(req, res) {
 
     } else if (role === UserRoles.RENTER) {
 
-        const data = await getRenterCalender(_id);
+        const data = await getRenterCalender(_id, propertyID);
 
         sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

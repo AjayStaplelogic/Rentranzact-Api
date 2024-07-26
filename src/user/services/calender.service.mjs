@@ -1,6 +1,7 @@
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import { Calender } from "../models/calender.model.mjs";
 import { Inspection } from "../models/inspection.model.mjs";
+import { Property } from "../models/property.model.mjs";
 
 async function addToCalender(body, userID) {
 
@@ -75,14 +76,16 @@ async function getToCalender(userID) {
 
 
 
-async function getRenterCalender(userID) {
+async function getRenterCalender(userID , propertyID) {
+
+    const property = await Property.findById(propertyID);
 
     const result2 = await Inspection.find({
         inspectionStatus: InspectionStatus.INITIATED,
         "RenterDetails.id": userID
     }).select('id inspectionTime inspectionDate landlordID');
 
-    const result = await Calender.find({ userID: result2[0]?.landlordID })
+    const result = await Calender.find({ userID: property.landlord_id})
 
     console.log(result, "====resulttttttttt")
 
