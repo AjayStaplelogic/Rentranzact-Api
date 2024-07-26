@@ -45,4 +45,24 @@ async function addToCalender(body, userID) {
 
 }
 
-export { addToCalender };
+
+async function getToCalender(userID) {
+
+        const data = await Calender.find({userID : userID})
+
+  
+
+        return {
+            data: data,
+            message: "dashboard stats",
+            status: true,
+            statusCode: 201,
+        };
+
+    }
+
+
+
+
+
+export { addToCalender, getToCalender };
