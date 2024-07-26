@@ -62,7 +62,7 @@ async function getToCalender(userID) {
 
     console.log(result2, "====resulttttttttt")
 
-    const data = { ...result, ...result2 }
+    const data = result.concat(result2);
 
     return {
         data: data,
