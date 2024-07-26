@@ -49,6 +49,8 @@ async function getTimeSlot(req, res) {
 
     if (role === UserRoles.RENTER) {
 
+        console.log("======user id" , _id , "------------- date" , date)
+
         const data = await getTimeSlotByDate(date, _id);
 
         sendResponse(res, data.data, data.message, data.status, data.statusCode);

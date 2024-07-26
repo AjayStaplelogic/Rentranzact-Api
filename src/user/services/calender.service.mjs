@@ -107,8 +107,8 @@ async function getRenterCalender(userID, propertyID) {
 
 
 async function getTimeSlotByDate(date, userID) {
-
-    console.log(data, userId ,"paramssss")
+    // 66a1f13f4f67e9c871bda6e0 Renter hom initiated ==parammmmsss
+    console.log(date, userID ,"paramssss")
 
     const data = await Inspection.find({
         "inspectionDate": date,
