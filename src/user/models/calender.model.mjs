@@ -22,7 +22,7 @@ const calenderSchema = new mongoose.Schema(
             type: String,
             required: true
         },
-        fulLDay: {
+        fullDay: {
             type: Boolean,
             required: true
         }
