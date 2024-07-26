@@ -76,7 +76,7 @@ async function getToCalender(userID) {
 
 
 
-async function getRenterCalender(userID , propertyID) {
+async function getRenterCalender(userID, propertyID) {
 
     const property = await Property.findById(propertyID);
 
@@ -85,11 +85,11 @@ async function getRenterCalender(userID , propertyID) {
         "RenterDetails.id": userID
     }).select('id inspectionTime inspectionDate landlordID fullDay');
 
-    const result = await Calender.find({ userID: property.landlord_id})
+    const result = await Calender.find({ userID: property.landlord_id })
 
     console.log(result, "====resulttttttttt")
 
-    
+
 
 
     console.log(result2, "====resulttttttttt")
@@ -106,6 +106,23 @@ async function getRenterCalender(userID , propertyID) {
 }
 
 
+async function getTimeSlotByDate(date, userID) {
+
+    const data = await Inspection.find({
+        "inspectionDate": date,
+        inspectionStatus: InspectionStatus.INITIATED,
+        "RenterDetails.id": userID
+    }).select('id inspectionTime inspectionDate landlordID fullDay');
+
+    return {
+        data: data,
+        message: "dashboard stats",
+        status: true,
+        statusCode: 201,
+    };
+
+}
 
 
-export { addToCalender, getToCalender , getRenterCalender};
+
+export { addToCalender, getToCalender, getRenterCalender, getTimeSlotByDate };
