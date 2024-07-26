@@ -235,17 +235,17 @@ async function getInspectionsByUserID(id, role, PropertyID) {
 async function searchInspectionService(id, role, text, status) {
   if (status === InspectionStatus.COMPLETED) {
 
-
     const regex = new RegExp(text, "ig");
 
     const data = await Inspection.aggregate([
       {
         $match: {
           "RenterDetails.id": id,
+          status : InspectionStatus.COMPLETED,
           $or: [
-            { propertyName: { $regex: regex } }, // Case-insensitive regex match for propertyName
-            { landlordName: { $regex: regex } }, // Case-insensitive regex match for landlordName
-            { addressText: { $regex: regex } } // Case-insensitive regex match for address
+            { propertyName: { $regex: regex } },
+            { landlordName: { $regex: regex } }, 
+            { addressText: { $regex: regex } },
           ]
         }
       }
@@ -261,11 +261,57 @@ async function searchInspectionService(id, role, text, status) {
     };
 
 
-  } else if (status === InspectionStatus.INITIATED) {
+  } else if (status === "pending") {
 
+    const regex = new RegExp(text, "ig");
 
+    const data = await Inspection.aggregate([
+      {
+        $match: {
+          "RenterDetails.id": id,
+          status : InspectionStatus.INITIATED,
+          $or: [
+            { propertyName: { $regex: regex } },
+            { landlordName: { $regex: regex } }, 
+            { addressText: { $regex: regex } },
+          ]
+        }
+      }
+    ]);
 
-  } else if (status === InspectionStatus.CANCELED) {
+    return {
+      data: data,
+      message: "rent application completed successfully",
+      status: true,
+      statusCode: 200,
+    };
+
+  } else if (status === "upcoming") {
+
+    const regex = new RegExp(text, "ig");
+
+    const data = await Inspection.aggregate([
+      {
+        $match: {
+          "RenterDetails.id": id,
+          status : InspectionStatus.INITIATED,
+          $or: [
+            { propertyName: { $regex: regex } },
+            { landlordName: { $regex: regex } }, 
+            { addressText: { $regex: regex } },
+          ]
+        }
+      }
+    ]);
+
+    console.log(data, "==d=dyaaaadtaa ")
+
+    return {
+      data: data,
+      message: "rent application completed successfully",
+      status: true,
+      statusCode: 200,
+    };
 
   }
 }
