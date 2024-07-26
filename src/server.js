@@ -18,6 +18,7 @@ import transactionRoutes from "./user/routes/transaction.route.mjs"
 import rentingHistoryRoutes from "./user/routes/rentingHistory.route.mjs";
 import maintenanceRoutes from "./user/routes/maintenance.route.mjs"
 import dummyRoutes from "./user/routes/dummy.route.mjs"
+import calenderRoutes from "./user/routes/calender.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -78,6 +79,7 @@ app.use("/api", notificationRoutes)
 app.use("/api", transactionRoutes)
 app.use("/api", rentingHistoryRoutes)
 app.use("/api", maintenanceRoutes)
+app.use("/api" , calenderRoutes)
 app.use("/api/dummy" , dummyRoutes)
 
 
