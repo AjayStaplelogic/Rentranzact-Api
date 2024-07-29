@@ -38,10 +38,7 @@ function authorizer(roles) {
     if (accessToken === undefined) {
       return res.status(401).json({ message: "Access token not found" });
     }
-
-    console.log(accessToken ,"-====-=-=-=access token")
-   
-
+ 
     if (!accessToken) {
    
       return res.status(401).json({ message: "Access token not found" });
