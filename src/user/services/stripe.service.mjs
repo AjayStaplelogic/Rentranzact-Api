@@ -49,7 +49,10 @@ async function addToWallet(body, userID) {
             wallet : wallet,
             userID: userID
         }
-    }).then((res) => console.log(res , "====ressssss")).catch((error ) => console.log(error , "====errror "))
+    })
+
+
+    console.log(paymentIntent , "=====PAYMENT INTENT  ")
 
     return {
         data: { client_secret: paymentIntent.client_secret },
