@@ -127,8 +127,7 @@ router.post(
   (req, res) => {
 
     req.files.forEach(async (file) => {
-      const destinationFolder = path.dirname(file.path);
-
+   
       const thumbnailWidth = 89; // Set your desired thumbnail width
       const thumbnailHeight = 68; // Set your desired thumbnail height
 
