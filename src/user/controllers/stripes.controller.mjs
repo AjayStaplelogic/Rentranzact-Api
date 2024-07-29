@@ -10,17 +10,18 @@ async function stripe(req, res) {
 
         if (wallet) {
 
+            const data = await rechargeWallet(body);
+
+            sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+           
+        } else {
 
             const data = await addStripeTransaction(body);
 
             sendResponse(res, data.data, data.message, data.status, data.statusCode);
-        } else {
 
-
-
-            const data = await rechargeWallet(body);
-
-            sendResponse(res, data.data, data.message, data.status, data.statusCode);
+          
 
         }
 
