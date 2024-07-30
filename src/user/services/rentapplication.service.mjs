@@ -411,4 +411,18 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
   };
 }
 
-export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID };
+
+async function getRentApplicationByID(id) {
+const data = await rentApplication.findById(id)
+
+  return {
+    data: data,
+    message: "rent application completed successfully",
+    status: true,
+    statusCode: 200,
+  };
+}
+
+
+
+export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID , getRentApplicationByID };

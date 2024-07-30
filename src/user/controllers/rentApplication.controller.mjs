@@ -19,6 +19,15 @@ async function rentApplications(req, res) {
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
+
+async function rentApplicationsByID(req, res) {
+
+  const id = req.params.id;
+  const data = await getRentApplicationByID(id);
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
+
 async function rentApplicationUpdate(req, res) {
 
   const id = req.user.data._id;
@@ -41,4 +50,4 @@ async function getRentApplications(req, res) {
 
 }
 
-export { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications };
+export { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications , rentApplicationsByID};
