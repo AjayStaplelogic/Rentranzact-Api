@@ -60,11 +60,11 @@ async function addPropertyService(
       postedByAdmin: body.postedByAdmin
     };
 
-    if (body.type != "Open Space") {
-      Property_["bedrooms"] = body.bedrooms
+    if(body.type != "Open Space") {
+      Property_["bedrooms"] = body.bedrooms 
       Property_["number_of_floors"] = body.number_of_floors
       Property_["number_of_bathrooms"] = body.number_of_bathrooms
-    }
+    } 
 
     const property = new Property(Property_);
     property.save();
@@ -202,7 +202,7 @@ async function nearbyProperies(body) {
   }
 }
 
-async function getPropertyByID(id, userID) {
+async function getPropertyByID(id , userID) {
   const data = await Property.findById(id);
 
   console.log(data, "----dataa of property")
@@ -211,22 +211,30 @@ async function getPropertyByID(id, userID) {
   if (data.landlord_id) {
     const favorite = await User.findById(userID).select("favorite")
 
-
+ 
     const landlord = await User.findById(data.landlord_id);
     console.log(landlord, "----dataa of landlord")
 
-    console.log(favorite, "===================favroite", favorite.favorite.includes(id))
-    if (favorite.favorite.includes(id)) {
-      data["liked"] = true
-    } else {
-      data["liked"] = false
-    }
+    console.log(favorite , "===================favroite" , favorite.favorite.includes(id))
 
+
+    console.log(dataMerge , "===========data mergeeee" )
+ 
     dataMerge.propertyData = data;
 
+    console.log(dataMerge.propertyData , "===========dataMerge.propertyData " )
 
+    if(favorite.favorite.includes(id)) {
 
+      dataMerge.propertyData["liked"] = 
+      console.log(dataMerge.propertyData , "=========== dataMerge.propertyData[] " )
+    } else {
 
+      dataMerge.propertyData["liked"] = false
+      console.log(dataMerge.propertyData , "=========== dataMerge.propertyData[] " )
+    }
+
+    console.log(dataMerge.propertyData , "==final " )
     const { fullName, picture, verified, role } = landlord;
 
     dataMerge.landlord = {
@@ -240,15 +248,15 @@ async function getPropertyByID(id, userID) {
 
     const favorite = await User.findById(userID).select("favorite")
 
-    console.log(favorite, "===================favroite", favorite.favorite.includes(id))
+    console.log(favorite , "===================favroite" , favorite.favorite.includes(id))
 
-    if (favorite.favorite.includes(id)) {
+    if(favorite.favorite.includes(id)) {
       dataMerge["liked"] = true
     } else {
       dataMerge["liked"] = false
     }
 
-    console.log(dataMerge, "----datam,ergherbrrbkjrbkjhrkjh")
+    console.log(dataMerge , "----datam,ergherbrrbkjrbkjhrkjh")
 
 
 
@@ -338,7 +346,7 @@ async function getMyProperties(role, id) {
 
   } else if (role === UserRoles.LANDLORD) {
 
-
+    
 
     data = await Property.aggregate([
       {
