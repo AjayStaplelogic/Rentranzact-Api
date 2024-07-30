@@ -217,13 +217,15 @@ async function getPropertyByID(id , userID) {
 
     console.log(favorite , "===================favroite" , favorite.favorite.includes(id))
 
-    if(favorite.favorite.includes(id)) {
-      dataMerge["liked"] = true
-    } else {
-      dataMerge["liked"] = false
-    }
 
     dataMerge.propertyData = data;
+
+    
+    if(favorite.favorite.includes(id)) {
+      dataMerge.propertyData["liked"] = true
+    } else {
+      dataMerge.propertyData["liked"] = false
+    }
 
     const { fullName, picture, verified, role } = landlord;
 
