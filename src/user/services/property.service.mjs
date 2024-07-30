@@ -214,7 +214,7 @@ async function getPropertyByID(id, userID) {
 
     const landlord = await User.findById(data.landlord_id);
 
-    dataMerge.propertyData = {...data};
+    dataMerge.propertyData = {data};
 
     if (favorite.favorite.includes(id)) {
 
