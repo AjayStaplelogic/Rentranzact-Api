@@ -11,8 +11,6 @@ import { User } from "../models/user.model.mjs";
 async function addRentApplicationService(body, user) {
   try {
 
-    console.log(body, "=========bodyyyyyyyyyyyyyyyy==========")
-
     const renterID = user._id;
 
     const {
@@ -39,13 +37,12 @@ async function addRentApplicationService(body, user) {
       permanentState,
       permanentZipcode,
       permanentContactNumber,
-      identificationType
+      identificationType,
+      bvn
     } = body;
    
 
     const landlord = await Property.findById(propertyID);
-
-    console.log(landlord, ":=======landloard")
 
     const payload = {
       propertyID: propertyID,
@@ -75,6 +72,7 @@ async function addRentApplicationService(body, user) {
       landlordID: landlord.landlord_id,
       propertyName: landlord.propertyName
     };
+
     if(employmentStatus !== "unemployed") {
 
       payload["employerName"] =  body.employerName
@@ -82,16 +80,15 @@ async function addRentApplicationService(body, user) {
       payload["employerAddress"] = body.employerAddress
     }
 
-    console.log(payload, " ===============payload")
 
     const kinDetails = {
       first_name: kinFirstName,
       last_name: kinLastName,
-      drivers_license: kinDriverLicence,
+      bvn: bvn,
       dob: kinDOB
     }
 
-    // const verifyStatus = await identityVerifier(identificationType, body);
+     const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
     // console.log(verifyStatus.data, "=====verifyStatus")
 

@@ -1,25 +1,49 @@
 import axios from "axios"
+import smileIdentityCore from "smile-identity-core"
 import { IdentificationType } from "../enums/indentificationTypes.enums.mjs";
+import { v4 as uuidv4 } from 'uuid';
+
+const IDApi = smileIdentityCore.IDApi;
+let partner_id = "7023"; 
+let sid_server = "1"; 
+const connection = new IDApi(partner_id, api_key, sid_server);
+
+let partner_params = {
+    job_id: uuidv4(),
+    user_id: uuidv4(),
+    job_type: 5,
+  };
+
 async function identityVerifier(identificationType, kinDetails) {
 
-    let token = "1QAexV2tTU1eU9CXOyAlHzQdKfQ8o09hrMV4MoL2wKBIqhP2/3lmByPLT5MTnbLD"
 
-    let apiUrl;
+    if (identificationType === IdentificationType.BVN) {
 
-    if (identificationType === IdentificationType.DL) {
+        const { first_name, last_name, dob, bvn } = kinDetails;
 
-        const { first_name, last_name, dob, drivers_license } = kinDetails;
+        let id_info = {
+            first_name: "<first name>",
+            last_name: "<surname>",
+            country: "NG",
+            id_type: "NIN_V2",
+            id_number: "80621738457",
+            dob: "1994-02-33", // yyyy-mm-dd
+            phone_number: "9988666666",
+          };
+          
+          // Set the options for the job
+          let options = {
+            signature: true,
+          };
+          
+          // Submit the job
+          // This method returns a promise
+          
+          
+          
+       const response = connection.submit_job(partner_params, id_info, options).then((res) => res).catch((catch) => return 200)
 
-        apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?drivers_license=${drivers_license}&dob=${dob}&first_name=${first_name}&last_name=${last_name}`;
-
-
-        const response = await axios.post(apiUrl, {}, {
-            headers: {
-                'token': token
-            }
-        }).then((res) => res).catch((err) => err.response.data)
-
-        return response;
+       
 
 
 
