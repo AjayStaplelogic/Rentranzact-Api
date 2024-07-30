@@ -90,10 +90,9 @@ async function propertiesList(req, res) {
 
 async function propertyByID(req, res) {
   const { id } = req.params;
+  const {_id} = req.user.data;
 
-
-
-  const data = await getPropertyByID(id);
+  const data = await getPropertyByID(id , _id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }

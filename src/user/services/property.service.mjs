@@ -202,7 +202,7 @@ async function nearbyProperies(body) {
   }
 }
 
-async function getPropertyByID(id) {
+async function getPropertyByID(id , userID) {
   const data = await Property.findById(id);
 
   console.log(data, "----dataa of property")
@@ -223,6 +223,16 @@ async function getPropertyByID(id) {
       role,
     };
   } else {
+
+
+    const favorite = await User.findById(userID).select("favorite")
+
+    if(favorite.favorite.includes(id)) {
+      dataMerge["liked"] = true
+    } else {
+      dataMerge["liked"] = false
+    }
+
     const propertyManager = await User.findById(data.property_manager_id);
 
     const { fullName, picture, verified, role } = propertyManager;
@@ -308,6 +318,8 @@ async function getMyProperties(role, id) {
     data = await Property.find({ renterID: id });
 
   } else if (role === UserRoles.LANDLORD) {
+
+    
 
     data = await Property.aggregate([
       {
