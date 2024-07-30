@@ -2,6 +2,7 @@ import axios from "axios"
 import smileIdentityCore from "smile-identity-core"
 import { IdentificationType } from "../enums/indentificationTypes.enums.mjs";
 import { v4 as uuidv4 } from 'uuid';
+let api_key = "b2e5c184-22eb-43f1-af0e-10c511545587";
 
 const IDApi = smileIdentityCore.IDApi;
 let partner_id = "7023";
