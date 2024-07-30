@@ -209,8 +209,19 @@ async function getPropertyByID(id , userID) {
   const dataMerge = {};
 
   if (data.landlord_id) {
+    const favorite = await User.findById(userID).select("favorite")
+
+ 
     const landlord = await User.findById(data.landlord_id);
     console.log(landlord, "----dataa of landlord")
+
+    console.log(favorite , "===================favroite" , favorite.favorite.includes(id))
+
+    if(favorite.favorite.includes(id)) {
+      dataMerge["liked"] = true
+    } else {
+      dataMerge["liked"] = false
+    }
 
     dataMerge.propertyData = data;
 
