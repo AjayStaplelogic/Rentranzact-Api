@@ -218,11 +218,11 @@ async function getPropertyByID(id, userID) {
 
     if (favorite.favorite.includes(id)) {
 
-      dataMerge.propertyData["liked"] = true
+      dataMerge["liked"] = true
 
     } else {
 
-      dataMerge.propertyData["liked"] = false
+      dataMerge["liked"] = false
 
     }
 
