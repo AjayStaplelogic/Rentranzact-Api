@@ -80,7 +80,6 @@ async function addRentApplicationService(body, user) {
       payload["employerAddress"] = body.employerAddress
     }
 
-
     const kinDetails = {
       first_name: kinFirstName,
       last_name: kinLastName,
@@ -88,7 +87,7 @@ async function addRentApplicationService(body, user) {
       dob: kinDOB
     }
 
-     const verifyStatus = await identityVerifier(identificationType, kinDetails);
+    //  const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
     // console.log(verifyStatus.data, "=====verifyStatus")
 
