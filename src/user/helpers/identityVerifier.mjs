@@ -103,7 +103,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
 
-        if (response?.FullData?.FirstName === first_name && response?.FullData?.MiddleName === middle_name && response?.FullData?.LastName === last_name && parseInt(response?.FullData?.DOB_Y) === year) {
+        if (response?.FullData?.FirstName === first_name && response?.FullData?.MiddleName === middle_name && response?.FullData?.LastName === last_name && response?.FullData?.DOB_Y === parseInt(year)) {
 
             return true
         } else {
