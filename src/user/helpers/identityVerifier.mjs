@@ -17,7 +17,6 @@ let partner_params = {
 
 async function identityVerifier(identificationType, kinDetails) {
 
-
     if (identificationType === IdentificationType.BVN) {
 
         const { first_name, last_name, dob, bvn } = kinDetails;
@@ -28,24 +27,15 @@ async function identityVerifier(identificationType, kinDetails) {
             country: "NG",
             id_type: "NIN_V2",
             id_number: "80621738457",
-            dob: "1994-02-33", // yyyy-mm-dd
+            dob: "1994-02-33", 
             phone_number: "9988666666",
         };
 
-        // Set the options for the job
         let options = {
             signature: true,
         };
 
-        // Submit the job
-        // This method returns a promise
-
-        const response = connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
-
-
-        console.log(response, "-=-=-asjnakjnskjanskjn")
-
-
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
     } else if (identificationType === IdentificationType.BVN) {
 
