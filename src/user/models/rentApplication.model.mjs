@@ -8,17 +8,17 @@ const rentApplicationSchema = new mongoose.Schema(
   {
     nin: {
       type: String,
-      required: true
+      required: false
     },
 
     voter_id: {
       type: String,
-      required: true
+      required: false
     },
 
     bvn: {
       type: String,
-      required: true
+      required: false
     },
 
     propertyID: {
