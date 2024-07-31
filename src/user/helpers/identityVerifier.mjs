@@ -39,6 +39,9 @@ async function identityVerifier(identificationType, kinDetails) {
 
         console.log(response ,"------------responsttttt")
 
+
+        console.log("condition" , response?.FullData?.firstname , first_name , response?.FullData?.middlename , middle_name , response?.FullData?.lastname , last_name , response?.FullData?.dateOfBirth , dob)
+
         if (response?.FullData?.firstname === first_name && response?.FullData?.middlename === middle_name && response?.FullData?.lastname === last_name && response?.FullData?.dateOfBirth === dob) {
 
             return true

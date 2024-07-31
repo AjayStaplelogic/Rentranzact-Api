@@ -96,6 +96,8 @@ async function addRentApplicationService(body, user) {
 
     const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
+
+    console.log(verifyStatus , "-ajdssajlksajdlksajdlkj")
     let data;
 
     if (verifyStatus) {
