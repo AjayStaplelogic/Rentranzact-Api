@@ -104,9 +104,9 @@ async function identityVerifier(identificationType, kinDetails) {
         console.log(response , "-----------respppppppppppppp")
 
 
-        console.log("bugggg", response?.FullData?.FirstName , first_name , response?.FullData?.MiddleName , middle_name , response?.FullData?.LastName , last_name , response?.FullData?.DOB_Y , parseInt(year))
-
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
+
+        console.log("bugggg", response?.FullData?.FirstName , first_name , response?.FullData?.MiddleName , middle_name , response?.FullData?.LastName , last_name , response?.FullData?.DOB_Y , parseInt(year))
 
         if (response?.FullData?.FirstName === first_name && response?.FullData?.MiddleName === middle_name && response?.FullData?.LastName === last_name && response?.FullData?.DOB_Y === parseInt(year)) {
 
