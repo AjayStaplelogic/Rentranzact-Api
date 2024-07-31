@@ -88,6 +88,7 @@ async function addRentApplicationService(body, user) {
     const kinDetails = {
       first_name: kinFirstName,
       last_name: kinLastName,
+      middle_name : kinMiddleName,
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
