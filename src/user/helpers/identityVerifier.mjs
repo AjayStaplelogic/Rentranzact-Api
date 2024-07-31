@@ -35,9 +35,11 @@ async function identityVerifier(identificationType, kinDetails) {
             signature: true,
         };
 
-        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false)
 
-        if (response.FullData.firstname === first_name && response.FullData.middlename === middle_name && response.FullData.lastname === last_name && response.FullData.dateOfBirth === dob) {
+        console.log(response ,"------------responsttttt")
+
+        if (response?.FullData?.firstname === first_name && response?.FullData?.middlename === middle_name && response?.FullData?.lastname === last_name && response?.FullData?.dateOfBirth === dob) {
 
             return true
         } else {
