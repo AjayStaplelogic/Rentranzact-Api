@@ -120,7 +120,7 @@ async function addRentApplicationService(body, user) {
       return {
         data: data,
         message: "Kin details is incorrect",
-        status: true,
+        status: false,
         statusCode: 400,
       };
 
