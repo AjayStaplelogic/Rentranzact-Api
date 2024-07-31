@@ -19,6 +19,7 @@ async function addRentApplicationService(body, user) {
       occupation,
       kinFirstName,
       kinLastName,
+      kinMiddleName,
       kinDOB,
       kinContactNumber,
       kinEmail,
