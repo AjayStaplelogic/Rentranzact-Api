@@ -37,7 +37,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false)
 
-        console.log(response.FullData ,"------------responsttttt")
+        console.log(response?.FullData?.FirstName ,"------------responsttttt")
 
 
 
