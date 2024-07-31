@@ -19,15 +19,15 @@ async function identityVerifier(identificationType, kinDetails) {
 
     if (identificationType === IdentificationType.BVN) {
 
-        const { first_name, last_name, dob, bvn } = kinDetails;
+        const { first_name, last_name, middle_name, dob, bvn } = kinDetails;
 
         let id_info = {
             first_name: "<first name>",
             last_name: "<surname>",
             country: "NG",
-            id_type: "NIN_V2",
-            id_number: "80621738457",
-            dob: "1994-02-33", 
+            id_type: IdentificationType.BVN,
+            id_number: bvn,
+            dob: "1994-02-33",
             phone_number: "9988666666",
         };
 
@@ -37,36 +37,70 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
-    } else if (identificationType === IdentificationType.BVN) {
+        if (response.FullData.firstname === first_name && response.FullData.middlename === middle_name && response.FullData.lastname === last_name && response.FullData.dateOfBirth === dob) {
 
-        const { bvn } = kinDetails;
-
-        apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?bvn=${bvn}`;
-
-        const response = await axios.post(apiUrl, {}, {
-            headers: {
-                'token': token
-            }
-        }).then((res) => res).catch((err) => err.response.data);
-
-        return response;
+            return true
+        } else {
+            return false
+        }
 
 
-    } else if (identificationType === IdentificationType.NIN) {
+    } else if (identificationType === IdentificationType.NIN_V2) {
 
-        const { nin } = kinDetails;
+        const { first_name, last_name, middle_name, dob, nin } = kinDetails;
 
-        apiUrl = `https://api.creditchek.africa/v1/identity/verifyData?nin=${nin}`;
+        let id_info = {
+            first_name: "<first name>",
+            last_name: "<surname>",
+            country: "NG",
+            id_type: IdentificationType.NIN_V2,
+            id_number: nin,
+            dob: "1994-02-33",
+            phone_number: "9988666666",
+        };
 
-        const response = await axios.post(apiUrl, {}, {
-            headers: {
-                'token': token
-            }
-        }).then((res) => res).catch((err) => err.response.data);
+        let options = {
+            signature: true,
+        };
 
-        console.log(response, "====response ===")
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
-        return response;
+        if (response.FullData.firstname === first_name && response.FullData.middlename === middle_name && response.FullData.lastname === last_name && response.FullData.dateOfBirth === dob) {
+
+            return true
+        } else {
+            return false
+        }
+
+
+
+    } else if (identificationType === IdentificationType.VOTER_ID) {
+
+        const { first_name, last_name, middle_name, dob, voter_id } = kinDetails;
+
+        let id_info = {
+            first_name: "<first name>",
+            last_name: "<surname>",
+            country: "NG",
+            id_type: IdentificationType.VOTER_ID,
+            id_number: voter_id,
+            dob: "1994-02-33",
+            phone_number: "9988666666",
+        };
+
+        let options = {
+            signature: true,
+        };
+
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
+
+        if (response.FullData.firstname === first_name && response.FullData.middlename === middle_name && response.FullData.lastname === last_name && response.FullData.dateOfBirth === dob) {
+
+            return true
+        } else {
+            return false
+        }
+
 
     }
 

@@ -20,7 +20,6 @@ async function addRentApplicationService(body, user) {
       kinFirstName,
       kinLastName,
       kinDOB,
-      kinDriverLicence,
       kinContactNumber,
       kinEmail,
       relationshipKin,
@@ -38,9 +37,11 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber,
       identificationType,
-      bvn
+      bvn,
+      nin,
+      voter_id
     } = body;
-   
+
 
     const landlord = await Property.findById(propertyID);
 
@@ -50,8 +51,11 @@ async function addRentApplicationService(body, user) {
       occupation,
       kinFirstName,
       kinLastName,
+      kinMiddleName,
       kinDOB,
-      kinDriverLicence,
+      nin,
+      voter_id,
+      bvn,
       kinContactNumber,
       kinEmail,
       relationshipKin,
@@ -73,9 +77,9 @@ async function addRentApplicationService(body, user) {
       propertyName: landlord.propertyName
     };
 
-    if(employmentStatus !== "unemployed") {
+    if (employmentStatus !== "unemployed") {
 
-      payload["employerName"] =  body.employerName
+      payload["employerName"] = body.employerName
 
       payload["employerAddress"] = body.employerAddress
     }
@@ -84,76 +88,101 @@ async function addRentApplicationService(body, user) {
       first_name: kinFirstName,
       last_name: kinLastName,
       bvn: bvn,
-      dob: kinDOB
+      dob: kinDOB,
+      nin: nin,
+      voter_id: voter_id
     }
 
-    //  const verifyStatus = await identityVerifier(identificationType, kinDetails);
-
-    // console.log(verifyStatus.data, "=====verifyStatus")
+    const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
     let data;
 
-    // if (verifyStatus.data.error) {
-    if (false) {
+    if (verifyStatus) {
       return {
-        data: [],
-        message: "verifyStatus.message",
-        status: false,
+        data: data,
+        message: "Kin details is incorrect",
+        status: true,
         statusCode: 400,
       };
 
-
     } else {
 
-      // if (verifyStatus.data.status) {
-      if (true) {
+      payload[kinIdentityCheck] = true;
 
-        // const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
+      data = new rentApplication(payload);
 
-        // console.log(verifyStatus.data.data.firstName, "-----lowercase")
+      data.save();
 
-        // const firstName = verifyStatus.data.data.firstName.toLowerCase();
+      return {
+        data: data,
+        message: "rent application successfully created",
+        status: true,
+        statusCode: 200,
+      };
 
-        // const lastName = verifyStatus.data.data.lastName.toLowerCase();
-
-
-
-        if (true) {
-          // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
-
-          // console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
-
-          // payload.kinIdentityCheck = verifyStatus.data.status;
-          payload.kinIdentityCheck = true;
-          payload.verifcationType = identificationType;
-
-          data = new rentApplication(payload);
-
-          data.save();
-
-          return {
-            data: data,
-            message: "rent application successfully created",
-            status: true,
-            statusCode: 200,
-          };
-        }
-
-      } else {
-
-        data = new rentApplication(payload);
-
-        data.save();
-
-        return {
-          data: data,
-          message: "rent application successfully created",
-          status: true,
-          statusCode: 200,
-        };
-
-      }
     }
+
+    // // if (verifyStatus.data.error) {
+    // if (false) {
+    //   return {
+    //     data: [],
+    //     message: "verifyStatus.message",
+    //     status: false,
+    //     statusCode: 400,
+    //   };
+
+
+    // } else {
+
+    //   // if (verifyStatus.data.status) {
+    //   if (true) {
+
+    //     // const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
+
+    //     // console.log(verifyStatus.data.data.firstName, "-----lowercase")
+
+    //     // const firstName = verifyStatus.data.data.firstName.toLowerCase();
+
+    //     // const lastName = verifyStatus.data.data.lastName.toLowerCase();
+
+
+
+    //     if (true) {
+    //       // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
+
+    //       // console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
+
+    //       // payload.kinIdentityCheck = verifyStatus.data.status;
+    //       payload.kinIdentityCheck = true;
+    //       payload.verifcationType = identificationType;
+
+    //       data = new rentApplication(payload);
+
+    //       data.save();
+
+    //       return {
+    //         data: data,
+    //         message: "rent application successfully created",
+    //         status: true,
+    //         statusCode: 200,
+    //       };
+    //     }
+
+    //   } else {
+
+    //     data = new rentApplication(payload);
+
+    //     data.save();
+
+    //     return {
+    //       data: data,
+    //       message: "rent application successfully created",
+    //       status: true,
+    //       statusCode: 200,
+    //     };
+
+    //   }
+    // }
 
 
   } catch (error) {
@@ -215,8 +244,8 @@ async function rentApplicationsList(user) {
               $project: {
                 _id: 1,
                 propertyName: 1,
-                address: 1, 
-                images : 1
+                address: 1,
+                images: 1
               }
             }
           ],
@@ -409,7 +438,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
 
 
 async function getRentApplicationByID(id) {
-const data = await rentApplication.findById(id)
+  const data = await rentApplication.findById(id)
 
   return {
     data: data,
@@ -421,4 +450,4 @@ const data = await rentApplication.findById(id)
 
 
 
-export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID , getRentApplicationByID };
+export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID };
