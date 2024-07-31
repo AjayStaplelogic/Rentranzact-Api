@@ -75,7 +75,8 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber,
       landlordID: landlord.landlord_id,
-      propertyName: landlord.propertyName
+      propertyName: landlord.propertyName,
+      verifcationType : identificationType
     };
 
     if (employmentStatus !== "unemployed") {
@@ -104,7 +105,7 @@ async function addRentApplicationService(body, user) {
     if (verifyStatus) {
   
       payload["kinIdentityCheck"] = true;
-
+      
       data = new rentApplication(payload);
 
       data.save();
