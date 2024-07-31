@@ -6,6 +6,21 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 // Define the schema for the User model
 const rentApplicationSchema = new mongoose.Schema(
   {
+    nin: {
+      type: String,
+      required: true
+    },
+
+    voter_id: {
+      type: String,
+      required: true
+    },
+
+    bvn: {
+      type: String,
+      required: true
+    },
+
     propertyID: {
       type: String,
       required: true,
@@ -38,13 +53,10 @@ const rentApplicationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    kinDriverLicence: {
-      type: String,
-      required: false,
-    },
+
     kinDOB: {
-   type : String,
-   required : false
+      type: String,
+      required: false
     },
 
     kinContactNumber: {
@@ -145,15 +157,15 @@ const rentApplicationSchema = new mongoose.Schema(
       required: true
     },
     verifcationType: {
-      type : String,
-      required : true
+      type: String,
+      required: true
     },
-    propertyName : {
-      type : String,
-      required : true
+    propertyName: {
+      type: String,
+      required: true
     }
   },
-  
+
   { timestamps: true }
 );
 

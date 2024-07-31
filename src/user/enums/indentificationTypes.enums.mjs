@@ -1,7 +1,7 @@
 const IdentificationType = {
-    BVN : "bvn",
-    SLIP: "slip",
-    VOTER_ID : "voter_id"
+    BVN : "BVN",
+    NIN_V2: "NIN_V2",
+    VOTER_ID : "VOTER_ID"
   };
   
   export { IdentificationType };
