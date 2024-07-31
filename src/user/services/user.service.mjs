@@ -1,4 +1,5 @@
 import { User } from "../models/user.model.mjs";
+import { Tokens } from "../models/tokens.model.mjs";
 import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import { Referral } from "../models/referrals.model.mjs";
@@ -15,8 +16,9 @@ import { Wallet } from "../models/wallet.model.mjs";
 import fs from "fs";
 import path from "path";
 import { dirname } from 'path';
-
-
+import { generateOTP } from '../helpers/otpGenerator.mjs'
+import { forgot_password_email } from '../emails/onboarding.emails.mjs'
+import { generate_token } from "../helpers/tokens.mjs";
 
 
 async function loginUser(body) {
@@ -164,7 +166,7 @@ async function verifyOtp(body) {
 
   if (user?.otp === otp) {
 
-    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
+    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "" });
 
     return {
       data: user_,
@@ -379,7 +381,52 @@ async function socialSignup(body) {
 
 async function forgotPasswordService(email) {
 
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email, verified: true }).lean().exec();
+
+  if (user) {
+
+    let create_token = await Tokens.findOneAndUpdate({
+      user_id: user._id,
+      type: "reset-password"
+    },
+      {
+        user_id: user._id,
+        type: "reset-password",
+        token: generate_token()
+      },
+      {
+        upsert: true,
+        new: true
+      });
+
+    if (create_token) {
+      forgot_password_email({
+        email: user.email,
+        otp: user.otp,
+        token: create_token.token
+      });
+      return {
+        data: {
+          id: user._id
+        },
+        message: "otp sent successfully",
+        status: true,
+        statusCode: 200,
+      };
+    }
+    return {
+      data: [],
+      message: "Server Error",
+      status: false,
+      statusCode: 500,
+    };
+  }
+  return {
+    data: [],
+    message: "User Not Found",
+    status: false,
+    statusCode: 404,
+  };
 
   if (user.verified) {
     const htmlTemplate = "<h1>Change password</h1>"
@@ -565,7 +612,7 @@ async function deleteAggrementByID(userID, aggrementID, role) {
       const filenameWithExtension = match[1];
       const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
 
-      console.log(filePath , "=====pathid ")
+      console.log(filePath, "=====pathid ")
       fs.unlinkSync(filePath)
       console.log(filenameWithExtension);
     } else {
@@ -590,6 +637,27 @@ async function deleteAggrementByID(userID, aggrementID, role) {
 
 }
 
+async function verifyUserOtp(user_id, otp) {
+  let get_user = await User.findOne({ _id: user_id, otp: otp }).lean().exec();
+  if (get_user) {
+    let update_user = await User.findByIdAndUpdate(get_user._id, { otp: "" });
+    return {
+      data: {
+        id: get_user._id
+      },
+      message: "otp verified successfully",
+      status: true,
+      statusCode: 200,
+    };
+  }
+  return {
+    data: {},
+    message: "otp not matched",
+    status: false,
+    statusCode: 400,
+  };
+}
+
 export {
   loginUser,
   addUser,
@@ -603,5 +671,6 @@ export {
   uploadLeaseAggrementService,
   getLeaseAggrementList,
   getWalletDetails,
-  deleteAggrementByID
+  deleteAggrementByID,
+  verifyUserOtp
 };
