@@ -83,6 +83,8 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const { first_name, last_name, middle_name, dob, voter_id } = kinDetails;
 
+        console.log(first_name, last_name, middle_name, dob, voter_id , "======params coming")
+
         let id_info = {
             first_name: "<first name>",
             last_name: "<surname>",
@@ -101,7 +103,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
 
-        if (response?.FullData?.firstname === first_name && response?.FullData?.middlename === middle_name && response?.FullData?.lastname === last_name && parseInt(response?.FullData?.DOB_Y) === year) {
+        if (response?.FullData?.FirstName === first_name && response?.FullData?.MiddleName === middle_name && response?.FullData?.LastName === last_name && parseInt(response?.FullData?.DOB_Y) === year) {
 
             return true
         } else {
