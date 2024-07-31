@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { wallet,login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements , deleteAggrement } from '../controllers/user.controller.mjs'
+import { wallet,login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements , deleteAggrement, userOtpVerification, resetPassword } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
@@ -47,7 +47,7 @@ router.post('/resendOtp', resendOTP)
 
 router.get("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), myprofile)
 
-router.get("/forgot-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), forgotPassword)
+router.post("/forgot-password", forgotPassword)
 
 router.get("/favorites", authorizer([UserRoles.RENTER]), favourites)
 
@@ -68,5 +68,11 @@ router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 router.delete("/lease-aggerment/:id" , authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), deleteAggrement)
 
 router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , wallet)
+
+router.post("/verify-otp", userOtpVerification)
+
+router.post("/reset-password", resetPassword)
+
+
 
 export default router;

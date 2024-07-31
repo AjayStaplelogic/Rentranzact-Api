@@ -13,10 +13,15 @@ import {
   uploadLeaseAggrementService,
   getLeaseAggrementList,
   getWalletDetails,
-  deleteAggrementByID
+  deleteAggrementByID,
+  verifyUserOtp
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { User } from '../models/user.model.mjs'
+import { Tokens } from '../models/tokens.model.mjs'
+import moment from 'moment';
+import * as bcrypt from "bcrypt";
 
 
 async function login(req, res) {
@@ -96,7 +101,7 @@ async function userVerification(req, res) {
   );
 }
 
-async function favourites(req , res) {
+async function favourites(req, res) {
 
   const id = req.user.data._id;
 
@@ -143,7 +148,7 @@ async function myprofile(req, res) {
 
 async function forgotPassword(req, res) {
 
-  const { email } = req.user.data;
+  const { email } = req.body;
 
   const data = await forgotPasswordService(email);
   sendResponse(
@@ -157,12 +162,12 @@ async function forgotPassword(req, res) {
 
 async function uploadLeaseAggrement(req, res) {
   const role = req.user.data.role;
-    const propertyID = req.body.propertyID;
-  
+  const propertyID = req.body.propertyID;
+
   const userID = req.user.data._id;
- 
+
   const dataUrl = req.documents;
-  const data = await uploadLeaseAggrementService(propertyID,userID, role, dataUrl);
+  const data = await uploadLeaseAggrementService(propertyID, userID, role, dataUrl);
   sendResponse(
     res,
     data.data,
@@ -173,14 +178,12 @@ async function uploadLeaseAggrement(req, res) {
 
 }
 
-
-
 async function getLeaseAggrements(req, res) {
 
-  const {_id, role} = req.user.data;
+  const { _id, role } = req.user.data;
 
 
-  const data = await getLeaseAggrementList(_id , role);
+  const data = await getLeaseAggrementList(_id, role);
   sendResponse(
     res,
     data.data,
@@ -192,7 +195,7 @@ async function getLeaseAggrements(req, res) {
 }
 
 async function wallet(req, res) {
-  const {_id} = req.user.data;
+  const { _id } = req.user.data;
 
 
   const data = await getWalletDetails(_id);
@@ -207,11 +210,11 @@ async function wallet(req, res) {
 }
 
 async function deleteAggrement(req, res) {
-  const {_id , role} = req.user.data;
-  const {id} = req.params;
+  const { _id, role } = req.user.data;
+  const { id } = req.params;
 
 
-  const data = await deleteAggrementByID(_id, id , role);
+  const data = await deleteAggrementByID(_id, id, role);
   sendResponse(
     res,
     data.data,
@@ -222,5 +225,50 @@ async function deleteAggrement(req, res) {
 
 }
 
+async function userOtpVerification(req, res) {
+  let { id, otp } = req.body;
+  const data = await verifyUserOtp(id, otp);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode
+  );
+}
 
-export {deleteAggrement , wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword , favourites  , uploadLeaseAggrement , getLeaseAggrements};
+async function resetPassword(req, res) {
+  try {
+    let { id, token, password } = req.body;
+    let get_user = await User.findOne({ _id: id }).lean().exec();
+    if (get_user) {
+      let get_token = await Tokens.findOne({
+        type: "reset-password",
+        user_id: get_user._id,
+        token: token
+      });
+      if (get_token) {
+        if (moment().diff(get_token.updatedAt, 'minutes') < 5) {     // Token valid for only 5 minutes
+          let hash_password = await bcrypt.hashSync(password, Number(process.env.SALT));
+          let update_user = await User.findByIdAndUpdate(get_user._id,
+            {
+              password: hash_password
+            }
+          );
+          return sendResponse(res, {}, "Password reset successfully", true, 200);
+        }
+        return sendResponse(res, {}, "Token expired", false, 400);
+      }
+      throw "Server Error"
+    }
+    return sendResponse(res, {}, "User not found", false, 404);
+
+  } catch (error) {
+    console.log(error, '======errir')
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+
+}
+
+
+export { deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword };
