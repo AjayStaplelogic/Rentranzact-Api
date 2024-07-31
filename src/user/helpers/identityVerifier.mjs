@@ -2,6 +2,7 @@ import axios from "axios"
 import smileIdentityCore from "smile-identity-core"
 import { IdentificationType } from "../enums/indentificationTypes.enums.mjs";
 import { v4 as uuidv4 } from 'uuid';
+import moment from "moment";
 let api_key = "b2e5c184-22eb-43f1-af0e-10c511545587";
 
 const IDApi = smileIdentityCore.IDApi;
@@ -96,9 +97,11 @@ async function identityVerifier(identificationType, kinDetails) {
             signature: true,
         };
 
-        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false)
 
-        if (response?.FullData?.firstname === first_name && response?.FullData?.middlename === middle_name && response?.FullData?.lastname === last_name && response?.FullData?.dateOfBirth === dob) {
+        const year = moment(dob, "YYYY-MM-DD").format("YYYY");
+
+        if (response?.FullData?.firstname === first_name && response?.FullData?.middlename === middle_name && response?.FullData?.lastname === last_name && parseInt(response?.FullData?.DOB_Y) === year) {
 
             return true
         } else {
