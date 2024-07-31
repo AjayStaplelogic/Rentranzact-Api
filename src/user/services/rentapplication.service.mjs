@@ -99,16 +99,8 @@ async function addRentApplicationService(body, user) {
     let data;
 
     if (verifyStatus) {
-      return {
-        data: data,
-        message: "Kin details is incorrect",
-        status: true,
-        statusCode: 400,
-      };
-
-    } else {
-
-      payload[kinIdentityCheck] = true;
+  
+      payload["kinIdentityCheck"] = true;
 
       data = new rentApplication(payload);
 
@@ -120,6 +112,15 @@ async function addRentApplicationService(body, user) {
         status: true,
         statusCode: 200,
       };
+    } else {
+      return {
+        data: data,
+        message: "Kin details is incorrect",
+        status: true,
+        statusCode: 400,
+      };
+
+     
 
     }
 
