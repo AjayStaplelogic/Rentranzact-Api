@@ -44,6 +44,11 @@ async function getRentApplications(req, res) {
   const id = req.user.data._id;
   const role = req.user.data.role;
   const PropertyID = req.params.id;
+  console.log(PropertyID, '========PropertyID');
+  console.log(id, '========id');
+  console.log(role, '========role');
+
+
 
   const data = await getRentApplicationsByUserID(id, role, PropertyID)
   sendResponse(res, data.data, data.message, data.status, data.statusCode);

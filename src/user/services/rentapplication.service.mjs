@@ -401,6 +401,8 @@ async function updateRentApplications(body, id) {
 
 async function getRentApplicationsByUserID(id, role, PropertyID) {
 
+  console.log(id, '===id', role, '=====role', propertyID, '=====propertyId',UserRoles.LANDLORD )
+
   let data;
   if (role === UserRoles.LANDLORD) {
     data = await rentApplication.aggregate([{
@@ -433,6 +435,8 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         as: "renter_info",
       }
     }])
+
+    console.log(data, '=========data')
   }
   return {
     data: data,
