@@ -40,7 +40,8 @@ async function rentApplicationUpdate(req, res) {
 }
 
 async function getRentApplications(req, res) {
-
+console.log("[Rent Application API]")
+console.log(req.user, '=======req.user')
   const id = req.user.data._id;
   const role = req.user.data.role;
   const PropertyID = req.params.id;
