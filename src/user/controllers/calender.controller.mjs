@@ -96,6 +96,9 @@ async function getCalenderTimeSlots(req, res) {
                 }
             },
             {
+                $match: query2
+            },
+            {
                 $group: {
                     _id: {
                         year: "$year",
