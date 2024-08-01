@@ -440,7 +440,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
   }
   return {
     data: data,
-    message: "Rent application completed successfully!!!!",
+    message: "Rent application completed successfully",
     status: true,
     statusCode: 200,
   };
@@ -452,7 +452,7 @@ async function getRentApplicationByID(id) {
 
   return {
     data: data,
-    message: "rent application completed successfully 2",
+    message: "rent application completed successfully",
     status: true,
     statusCode: 200,
   };
