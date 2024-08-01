@@ -8,7 +8,7 @@ import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
 
 async function createInspection(body, renterID) {
-  const { propertyID, inspectionDate, inspectionTime , id} = body;
+  const { propertyID, inspectionDate, inspectionTime, id } = body;
 
   const property = await Property.findById(propertyID);
 
@@ -157,32 +157,50 @@ async function fetchInspections(userData) {
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID, reason } = body;
 
-  if (InspectionStatus.CANCELED === status) {
-    const data = await Inspection.findByIdAndUpdate(inspectionID, {
-      inspectionStatus: status,
-      canceledID: id,
-      cancelReason: reason,
-    });
+  let update_payload = {
+    inspectionStatus: status
+  };
 
-    return {
-      data: data,
-      message: "inspection cancelled successfully",
-      status: true,
-      statusCode: 200,
-    };
-  } else if (InspectionStatus.COMPLETED === status) {
-    const data = await Inspection.findByIdAndUpdate(inspectionID, {
-      inspectionStatus: status,
-      approverID: id,
-    });
-
-    return {
-      data: data,
-      message: "inspection completed successfully",
-      status: true,
-      statusCode: 200,
-    };
+  if (reason && InspectionStatus.CANCELED === status) {
+    update_payload.canceledID = id;
+    update_payload.cancelReason = reason;
   }
+
+  if (reason && InspectionStatus.ACCEPTED === status) {
+    update_payload.acceptedBy = id;
+  }
+
+  if (reason && InspectionStatus.COMPLETED === status) {
+    update_payload.approverID = id;
+  }
+
+  const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
+
+  // if (InspectionStatus.CANCELED === status) {
+  //   const data = await Inspection.findByIdAndUpdate(inspectionID, {
+  //     inspectionStatus: status,
+  //     canceledID: id,
+  //     cancelReason: reason,
+  //   });
+
+  //   return {
+  //     data: data,
+  //     message: "inspection cancelled successfully",
+  //     status: true,
+  //     statusCode: 200,
+  //   };
+  // } else if (InspectionStatus.COMPLETED === status) {
+  //   const data = await Inspection.findByIdAndUpdate(inspectionID, {
+  //     inspectionStatus: status,
+  //     approverID: id,
+  //   });
+
+  return {
+    data: data,
+    message: "inspection status changed successfully",
+    status: true,
+    statusCode: 200,
+  };
 }
 
 async function inspectionEditService(body) {
@@ -226,7 +244,7 @@ async function getInspectionsByUserID(id, role, PropertyID) {
   }
   return {
     data: data,
-    message: "rent application completed successfully 6",
+    message: "rent application completed successfully",
     status: true,
     statusCode: 200,
   };
@@ -243,10 +261,10 @@ async function searchInspectionService(id, role, text, status) {
       {
         $match: {
           "RenterDetails.id": id,
-          status : InspectionStatus.COMPLETED,
+          status: InspectionStatus.COMPLETED,
           $or: [
             { propertyName: { $regex: regex } },
-            { landlordName: { $regex: regex } }, 
+            { landlordName: { $regex: regex } },
             { addressText: { $regex: regex } },
           ]
         }
@@ -257,7 +275,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully 5",
+      message: "rent application completed successfully",
       status: true,
       statusCode: 200,
     };
@@ -271,10 +289,10 @@ async function searchInspectionService(id, role, text, status) {
       {
         $match: {
           "RenterDetails.id": id,
-          status : InspectionStatus.INITIATED,
+          status: InspectionStatus.INITIATED,
           $or: [
             { propertyName: { $regex: regex } },
-            { landlordName: { $regex: regex } }, 
+            { landlordName: { $regex: regex } },
             { addressText: { $regex: regex } },
           ]
         }
@@ -283,7 +301,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully 4",
+      message: "rent application completed successfully",
       status: true,
       statusCode: 200,
     };
@@ -296,10 +314,10 @@ async function searchInspectionService(id, role, text, status) {
       {
         $match: {
           "RenterDetails.id": id,
-          status : InspectionStatus.INITIATED,
+          status: InspectionStatus.INITIATED,
           $or: [
             { propertyName: { $regex: regex } },
-            { landlordName: { $regex: regex } }, 
+            { landlordName: { $regex: regex } },
             { addressText: { $regex: regex } },
           ]
         }
@@ -310,7 +328,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully 3",
+      message: "rent application completed successfully",
       status: true,
       statusCode: 200,
     };
