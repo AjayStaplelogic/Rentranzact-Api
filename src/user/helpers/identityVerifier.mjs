@@ -108,6 +108,8 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const {FullData} = response;
 
+        console.log(FullData.FirstName , first_name , "-------------------------------------first")
+
         const conditionFirstName = FullData?.FirstName === first_name;
 const conditionLastName = FullData?.LastName === last_name;
 const conditionDOB = FullData?.DOB_Y === Number(year);
