@@ -135,21 +135,11 @@ async function filterProperies(body, id) {
   const { filters } = body;
 
   const data = await Property.find(filters).sort({createdAt : -1})
-
-
-  console.log(data[0] ,"==============property 1st")
-
   const favorite = await User.findById(id).select("favorite")
-
-  console.log(favorite, "---=-=favrotie")
 
   const modifiedProperties = data.map(property => {
 
     const liked = favorite?.favorite.includes(property._id);
-
-
-    console.log(liked, "---likedddddddd")
-
 
     return { ...property.toObject(), liked };
   });
@@ -171,10 +161,14 @@ async function filterProperies(body, id) {
   // });
 }
 
-async function nearbyProperies(body) {
+async function nearbyProperies(body , userID) {
   const { maxDistance, latitude, longitude } = body;
 
-  console.log(maxDistance, latitude, longitude, "=----body");
+
+
+
+
+  
 
   if (maxDistance && latitude && longitude) {
     const data = await Property.find({
@@ -188,16 +182,39 @@ async function nearbyProperies(body) {
       },
     });
 
+    const favorite = await User.findById(userID).select("favorite")
+
+    const modifiedProperties = data.map(property => {
+  
+      const liked = favorite?.favorite.includes(property._id);
+  
+      return { ...property.toObject(), liked };
+    });
+
+
+
+
     return {
-      data: data,
+      data: modifiedProperties,
       message: "Nearby Property listing",
       status: true,
       statusCode: 200,
     };
   } else {
+
     const data = await Property.find().limit(9);
+    const favorite = await User.findById(userID).select("favorite")
+
+    const modifiedProperties = data.map(property => {
+  
+      const liked = favorite?.favorite.includes(property._id);
+  
+      return { ...property.toObject(), liked };
+    });
+
+
     return {
-      data: data,
+      data: modifiedProperties,
       message: "Property listing",
       status: true,
       statusCode: 200,
@@ -276,11 +293,11 @@ async function getPropertyByID(id, userID) {
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
-  const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
+  const {favorite} = await User.findOne({ favorite: { $in: [propertyID] } })
 
-  console.log(isFavorite, "====is Favrotiessss")
+  console.log(favorite, "====is Favrotiessss")
 
-  if (isFavorite) {
+  if (favorite) {
     const data = await User.findByIdAndUpdate(
       renterID,
       { $pull: { favorite: propertyID } },
