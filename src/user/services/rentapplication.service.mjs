@@ -405,7 +405,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
   if (role === UserRoles.LANDLORD) {
     data = await rentApplication.aggregate([{
       $match: {
-        landlordID: id,
+        landlordID: `${id}`,
         propertyID: PropertyID
         // applicationStatus: RentApplicationStatus.PENDING
       }
