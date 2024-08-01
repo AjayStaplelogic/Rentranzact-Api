@@ -70,14 +70,12 @@ async function identityVerifier(identificationType, kinDetails) {
 
         console.log(response?.FullData?.FirstName ,"response?.FullData?.FirstNameresponse?.FullData?.FirstName")
 
-        if (response?.FullData?.FirstName.toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
+        if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.surname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
 
             return true
         } else {
             return false
         }
-
-
 
     } else if (identificationType === IdentificationType.VOTER_ID) {
 
