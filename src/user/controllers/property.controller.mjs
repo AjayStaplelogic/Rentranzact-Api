@@ -77,7 +77,7 @@ async function propertiesList(req, res) {
 
   if (nearByProperty) {
    
-    const data = await nearbyProperies(body);
+    const data = await nearbyProperies(body, id);
    
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
