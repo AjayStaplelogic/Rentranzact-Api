@@ -226,7 +226,7 @@ async function getInspectionsByUserID(id, role, PropertyID) {
   }
   return {
     data: data,
-    message: "rent application completed successfully",
+    message: "rent application completed successfully 6",
     status: true,
     statusCode: 200,
   };
@@ -257,7 +257,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully",
+      message: "rent application completed successfully 5",
       status: true,
       statusCode: 200,
     };
@@ -283,7 +283,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully",
+      message: "rent application completed successfully 4",
       status: true,
       statusCode: 200,
     };
@@ -310,7 +310,7 @@ async function searchInspectionService(id, role, text, status) {
 
     return {
       data: data,
-      message: "rent application completed successfully",
+      message: "rent application completed successfully 3",
       status: true,
       statusCode: 200,
     };

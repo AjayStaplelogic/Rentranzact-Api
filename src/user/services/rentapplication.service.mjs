@@ -452,7 +452,7 @@ async function getRentApplicationByID(id) {
 
   return {
     data: data,
-    message: "rent application completed successfully",
+    message: "rent application completed successfully 2",
     status: true,
     statusCode: 200,
   };
