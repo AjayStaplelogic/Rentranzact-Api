@@ -38,7 +38,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false)
 
-        if (response?.FullData?.FirstName.toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.toLowerCase() === last_name.toLowerCase() && response?.FullData?.DateOfBirth === dob) {
+        if (response?.FullData?.FirstName.trim().toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.trim().toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.trim().toLowerCase() === last_name.toLowerCase() && response?.FullData?.DateOfBirth === dob) {
 
             return true
         } else {
@@ -66,7 +66,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
-        if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.lastname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
+        if (response?.FullData?.FirstName.toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
 
             return true
         } else {
