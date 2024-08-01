@@ -401,7 +401,7 @@ async function updateRentApplications(body, id) {
 
 async function getRentApplicationsByUserID(id, role, PropertyID) {
 
-  console.log(id, '===id', role, '=====role', propertyID, '=====propertyId',UserRoles.LANDLORD )
+  console.log(id, '===id', role, '=====role', PropertyID, '=====propertyId',UserRoles.LANDLORD )
 
   let data;
   if (role === UserRoles.LANDLORD) {
