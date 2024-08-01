@@ -66,6 +66,8 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
+        console.log(response.FullData , "full data")
+
         console.log(response?.FullData?.FirstName ,"response?.FullData?.FirstNameresponse?.FullData?.FirstName")
 
         if (response?.FullData?.FirstName.toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
