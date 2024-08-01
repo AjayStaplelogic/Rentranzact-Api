@@ -26,7 +26,6 @@ async function addRentApplicationService(body, user) {
       relationshipKin,
       name,
       no_of_occupant,
-      checkinDate,
       emailID,
       contactNumber,
       maritialStatus,
@@ -40,7 +39,9 @@ async function addRentApplicationService(body, user) {
       identificationType,
       bvn,
       nin,
-      voter_id
+      voter_id,
+      checkinDate,
+      checkoutDate
     } = body;
 
 
@@ -79,11 +80,19 @@ async function addRentApplicationService(body, user) {
       verifcationType : identificationType
     };
 
+
+
     if (employmentStatus !== "unemployed") {
 
       payload["employerName"] = body.employerName
 
       payload["employerAddress"] = body.employerAddress
+    }
+
+
+    if(checkinDate && checkoutDate) {
+      payload["checkinDate"] = checkinDate
+      payload["checkoutDate"] = checkoutDate
     }
 
     const kinDetails = {
