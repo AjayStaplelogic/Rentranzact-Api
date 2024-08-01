@@ -83,7 +83,7 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const { first_name, last_name, middle_name, dob, voter_id } = kinDetails;
 
-        console.log(first_name, last_name, middle_name, dob, voter_id , "======params coming")
+        console.log(first_name, last_name, middle_name, dob, voter_id, "======params coming")
 
         let id_info = {
             first_name: "<first name>",
@@ -103,45 +103,6 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
 
-
-        //test
-
-        const {FullData} = response;
-
-        console.log(FullData.FirstName , first_name , "-------------------------------------first")
-
-        const conditionFirstName = FullData?.FirstName === first_name;
-const conditionLastName = FullData?.LastName === last_name;
-const conditionDOB = FullData?.DOB_Y === Number(year);
-
-// Evaluate the conditions and use switch case to handle each
-switch (true) {
-  case !conditionFirstName:
-    console.log('First Name condition is not met.');
-    break;
-
-  case !conditionLastName:
-    console.log('Last Name condition is not met.');
-    break;
-
-  case !conditionDOB:
-    console.log('Date of Birth condition is not met.');
-    break;
-
-  default:
-    // If all conditions are met
-    if (conditionFirstName && conditionLastName && conditionDOB) {
-      console.log('All conditions are met.');
-    } else {
-      console.log('Some conditions are not met.');
-    }
-    break;
-}
-
-        //test
-
-      
-      
         if (response?.FullData?.FirstName.trim() === first_name && response?.FullData?.LastName.trim() === last_name && response?.FullData?.DOB_Y === Number(year)) {
 
             return true
@@ -149,9 +110,7 @@ switch (true) {
             return false
         }
 
-
     }
-
 }
 
 export {
