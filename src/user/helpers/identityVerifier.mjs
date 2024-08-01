@@ -98,7 +98,7 @@ async function identityVerifier(identificationType, kinDetails) {
         };
 
 
-        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false);
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => console.log(err,"-errrrrr") & false);
 
         console.log(response ,"==-=-=-=-=-=-=respone in voter id card ")
 
