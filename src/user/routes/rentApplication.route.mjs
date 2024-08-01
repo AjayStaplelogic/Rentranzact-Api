@@ -25,6 +25,6 @@ router.post("/rentApplication/update-status",
   rentApplicationUpdate
 )
 
-router.get("/rentapplications/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getRentApplications)
+router.get("/rent-applications/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getRentApplications)
 
 export default router;
