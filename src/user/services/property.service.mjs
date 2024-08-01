@@ -276,11 +276,11 @@ async function getPropertyByID(id, userID) {
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
-  const isFavorite = await User.findOne({ favorite: { $in: [propertyID] } });
+  const {favorite} = await User.findOne({ favorite: { $in: [propertyID] } });
 
-  console.log(isFavorite, "====is Favrotiessss")
+  console.log(favorite, "====is Favrotiessss")
 
-  if (isFavorite) {
+  if (favorite) {
     const data = await User.findByIdAndUpdate(
       renterID,
       { $pull: { favorite: propertyID } },
