@@ -121,6 +121,11 @@ async function getCalenderTimeSlots(req, res) {
                     },
                     pipeline : [
                         {
+                            $match : {
+                                userID : landlordID
+                            }
+                        },
+                        {
                             $set : {
                                date: {
                                     $dateFromString: {
@@ -185,6 +190,9 @@ async function getCalenderTimeSlots(req, res) {
                                 inspections : "$inspections",
                                 calender_data : "$calender_data"
                             }
+                        },
+                        {
+                            $unset : ["_id"]
                         }
                     ]
                 }
