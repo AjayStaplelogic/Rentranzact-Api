@@ -30,6 +30,7 @@ const inspectionSchema = new mongoose.Schema(
     inspectionStatus: {
       type: String,
       default: "initiated",
+      Enum : ["initiated", "accepted","completed", "canceled" ]
     },
     cancelReason: {
       type: String,
@@ -86,6 +87,10 @@ const inspectionSchema = new mongoose.Schema(
   fullDay: {
     type: Boolean,
     default : false
+},
+acceptedBy : {
+  type : mongoose.Types.ObjectId,
+  ref : "users"
 }
 
 
