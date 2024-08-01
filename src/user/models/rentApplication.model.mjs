@@ -88,6 +88,10 @@ const rentApplicationSchema = new mongoose.Schema(
       required: true,
     },
 
+    checkoutDate: {
+      type: String,
+      required: false,
+    },
     emailID: {
       type: String,
       required: true,
