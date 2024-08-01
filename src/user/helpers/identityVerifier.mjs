@@ -142,7 +142,7 @@ switch (true) {
 
       
       
-        if (response?.FullData?.FirstName === first_name && response?.FullData?.LastName === last_name && response?.FullData?.DOB_Y === Number(year)) {
+        if (response?.FullData?.FirstName.trim() === first_name && response?.FullData?.LastName.trim() === last_name && response?.FullData?.DOB_Y === Number(year)) {
 
             return true
         } else {
