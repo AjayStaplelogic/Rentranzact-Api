@@ -97,7 +97,10 @@ async function identityVerifier(identificationType, kinDetails) {
             signature: true,
         };
 
+
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false);
+
+        console.log(response ,"==-=-=-=-=-=-=respone in voter id card ")
 
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
 
