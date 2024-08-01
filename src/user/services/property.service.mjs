@@ -134,7 +134,7 @@ async function searchInProperty(body) {
 async function filterProperies(body, id) {
   const { filters } = body;
 
-  const data = await Property.find(filters).sort()
+  const data = await Property.find(filters).sort({createdAt : 1})
 
   const favorite = await User.findById(id).select("favorite")
 
