@@ -1,6 +1,6 @@
 import express from 'express'
 const router = express.Router();
-import { wallet,login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements , deleteAggrement, userOtpVerification, resetPassword } from '../controllers/user.controller.mjs'
+import { wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, deleteAggrement, userOtpVerification, resetPassword } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
 
         const ext = path.extname(file.originalname); // Get the file extension
-        const randomFileName = req.user.data._id +  req.user.data.role + ext;
+        const randomFileName = req.user.data._id + req.user.data.role + ext;
         cb(null, randomFileName);
     },
 });
@@ -54,8 +54,8 @@ router.get("/favorites", authorizer([UserRoles.RENTER]), favourites)
 router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), upload.single('document'), (req, res) => {
 
     const fileName = req.user.data._id;
-    
-    const relativePath = path.join(hostUrl,"property" ,"LeaseAggrements", fileName + req.user.data.role + ".pdf")
+
+    const relativePath = path.join(hostUrl, "property", "LeaseAggrements", fileName + req.user.data.role + ".pdf")
 
     console.log(relativePath, "===relative path")
 
@@ -65,13 +65,13 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
 router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getLeaseAggrements)
 
-router.delete("/lease-aggerment/:id" , authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), deleteAggrement)
+router.delete("/lease-aggerment/:id", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), deleteAggrement)
 
-router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , wallet)
+router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), wallet)
 
 router.post("/verify-otp", userOtpVerification)
 
-router.post("/reset-password", resetPassword)
+router.post("/reset-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), resetPassword)
 
 
 

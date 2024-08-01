@@ -239,27 +239,16 @@ async function userOtpVerification(req, res) {
 
 async function resetPassword(req, res) {
   try {
-    let { id, token, password } = req.body;
-    let get_user = await User.findOne({ _id: id }).lean().exec();
+    let { password } = req.body;
+    let get_user = await User.findOne({ _id: req.user.data._id }).lean().exec();
     if (get_user) {
-      let get_token = await Tokens.findOne({
-        type: "reset-password",
-        user_id: get_user._id,
-        token: token
-      });
-      if (get_token) {
-        if (moment().diff(get_token.updatedAt, 'minutes') < 5) {     // Token valid for only 5 minutes
-          let hash_password = await bcrypt.hashSync(password, Number(process.env.SALT));
-          let update_user = await User.findByIdAndUpdate(get_user._id,
-            {
-              password: hash_password
-            }
-          );
-          return sendResponse(res, {}, "Password reset successfully", true, 200);
+      let hash_password = bcrypt.hashSync(password, Number(process.env.SALT));
+      let update_user = await User.findByIdAndUpdate(get_user._id,
+        {
+          password: hash_password
         }
-        return sendResponse(res, {}, "Token expired", false, 400);
-      }
-      throw "Server Error"
+      );
+      return sendResponse(res, {}, "Password reset successfully", true, 200);
     }
     return sendResponse(res, {}, "User not found", false, 404);
 

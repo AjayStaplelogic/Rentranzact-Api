@@ -381,33 +381,34 @@ async function socialSignup(body) {
 
 async function forgotPasswordService(email) {
 
-  const user = await User.findOne({ email: email, verified: true }).lean().exec();
+  const user = await User.findOne({ email: email }).lean().exec();
 
   if (user) {
 
-    let create_token = await Tokens.findOneAndUpdate({
-      user_id: user._id,
-      type: "reset-password"
-    },
-      {
-        user_id: user._id,
-        type: "reset-password",
-        token: generate_token()
-      },
-      {
-        upsert: true,
-        new: true
-      });
-
-    if (create_token) {
+    // let create_token = await Tokens.findOneAndUpdate({
+    //   user_id: user._id,
+    //   type: "reset-password"
+    // },
+    //   {
+    //     user_id: user._id,
+    //     type: "reset-password",
+    //     token: generate_token()
+    //   },
+    //   {
+    //     upsert: true,
+    //     new: true
+    //   });
+    let otp = generateOTP();
+    let update_user = await User.findByIdAndUpdate(user._id, {otp : otp}, {new : true});
+    if (update_user) {
       forgot_password_email({
-        email: user.email,
-        otp: user.otp,
-        token: create_token.token
+        email: update_user.email,
+        otp: update_user.otp,
+        user_id : update_user._id
       });
       return {
         data: {
-          id: user._id
+          id: update_user._id
         },
         message: "otp sent successfully",
         status: true,
@@ -427,39 +428,6 @@ async function forgotPasswordService(email) {
     status: false,
     statusCode: 404,
   };
-
-  if (user.verified) {
-    const htmlTemplate = "<h1>Change password</h1>"
-
-    const resendOTP = sendMail(email, "OTP Verification", htmlTemplate);
-
-  }
-
-  // if (user?.otp === otp) {
-
-  //   const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true });
-
-  //   return {
-  //     data: user_,
-  //     message: "otp verified successfully",
-  //     status: true,
-  //     statusCode: 200,
-  //     accessToken: await accessTokenGenerator(user),
-  //   };
-  // } else {
-  //   return {
-  //     data: [],
-  //     message: "incorrect otp",
-  //     status: false,
-  //     statusCode: 400,
-  //   };
-  // }
-
-
-
-
-
-
 }
 
 async function favouritesProperties(id) {
@@ -643,7 +611,8 @@ async function verifyUserOtp(user_id, otp) {
     let update_user = await User.findByIdAndUpdate(get_user._id, { otp: "" });
     return {
       data: {
-        id: get_user._id
+        id: get_user._id,
+        accessToken : await accessTokenGenerator(get_user),
       },
       message: "otp verified successfully",
       status: true,
