@@ -136,6 +136,9 @@ async function filterProperies(body, id) {
 
   const data = await Property.find(filters).sort({createdAt : -1})
 
+
+  console.log(data[0] ,"==============property 1st")
+
   const favorite = await User.findById(id).select("favorite")
 
   console.log(favorite, "---=-=favrotie")
