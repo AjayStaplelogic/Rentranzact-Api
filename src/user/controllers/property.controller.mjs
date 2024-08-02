@@ -110,9 +110,10 @@ async function addFavorite(req, res) {
 
 async function searchPropertyByKeywords(req, res) {
   const { search } = req.query;
+  const { _id } = req.user.data;
 
 
-  const data = await searchPropertyByString(search);
+  const data = await searchPropertyByString(search , _id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

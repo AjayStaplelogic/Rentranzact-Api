@@ -331,7 +331,7 @@ async function addFavoriteProperties(propertyID, renterID) {
   }
 }
 
-async function searchPropertyByString(search) {
+async function searchPropertyByString(search, userID) {
   const query = {
     $or: [
       { propertyName: { $regex: new RegExp(search, "i") } }, // Case-insensitive regex search for name
@@ -339,13 +339,27 @@ async function searchPropertyByString(search) {
     ],
   };
 
-  // Execute the query
+
   const results = await Property.find(query);
 
-  console.log(results);
+  const favorite = await User.findById(userID).select("favorite")
+
+  const modifiedProperties = results?.map(property => {
+
+    console.log(property , "===========propertyyyyy") 
+
+    const liked = favorite?.favorite.includes(property._id);
+
+    console.log(property._id , "===========propertyyyyy id")
+
+    return { ...property.toObject(), liked };
+  });
+
+
+
 
   return {
-    data: results,
+    data: modifiedProperties,
     message: "Search found",
     status: true,
     statusCode: 200,
