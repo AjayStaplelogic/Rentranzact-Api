@@ -297,9 +297,12 @@ async function getPropertyByID(id, userID) {
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
-  const favorite = await User.findOne({ favorite: { $in: [propertyID]} })
+  const favorite = await User.findOne({ favorite: { $in: [propertyID]} });
+  
 
-  console.log(favorite, "====is Favrotiessss")
+  const favorite___ = await User.findOne({ favorite: { $in: [propertyID]} }).exists();
+
+  console.log(favorite, "=============================================is Favrotiessss" , favorite___)
 
   if (favorite) {
     const data = await User.findByIdAndUpdate(
@@ -425,7 +428,8 @@ async function getMyProperties(role, id) {
             {
               $match: {
                 $and: [
-                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } }
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
+                  { inspectionStatus: { $eq: "initiated" } },
                 ]
               }
             },
