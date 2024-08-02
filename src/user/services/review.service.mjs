@@ -17,7 +17,7 @@ export const calculate_avg_rating = async(options)=>{
             $match : query
         },
         {
-            $addFiels : {
+            $addFields : {
                 review_count : {
                     $cond : {
                         if : {
