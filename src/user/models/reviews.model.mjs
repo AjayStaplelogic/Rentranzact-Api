@@ -31,29 +31,37 @@ const reviewSchema = new mongoose.Schema({
         type: String
     },
     answer1: {
-        type: String,
-        enum: ["good", "very-good", "best", "bad"]
+        type : Number,
+        min : 0,
+        max : 4,
+        default : 0
     },
     question2: {
         type: String
     },
     answer2: {
-        type: String,
-        enum: ["good", "very-good", "best", "bad"]
+        type : Number,
+        min : 0,
+        max : 4,
+        default : 0
     },
     question3: {
         type: String
     },
     answer3: {
-        type: String,
-        enum: ["good", "very-good", "best", "bad"]
+        type : Number,
+        min : 0,
+        max : 4,
+        default : 0
     },
     question4: {
         type: String
     },
     answer4: {
-        type: String,
-        enum: ["good", "very-good", "best", "bad"]
+        type : Number,
+        min : 0,
+        max : 4,
+        default : 0
     },
     isDeleted : {
         type : Boolean,
@@ -62,6 +70,17 @@ const reviewSchema = new mongoose.Schema({
     updated_by : {
         type : mongoose.Types.ObjectId,
         ref : "users"
+    },
+    status  : {
+        type : String,
+        enum : ["pending","accepted", "rejected"],
+        default : "pending"
+    },
+    accepted_at : {
+        type : Date
+    },
+    rejected_at : {
+        type : Date
     }
 }, {
     timestamps: true,

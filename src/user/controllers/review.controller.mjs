@@ -49,7 +49,7 @@ export const addUpdateReview = async (req, res) => {
 export const getAllReviews = async (req, res) => {
     try {
         console.log("[Review Listing]")
-        let { type, user_id, property_id, search, rating, sortBy } = req.query;
+        let { type, user_id, property_id, search, rating, status, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = { isDeleted: false };
@@ -58,6 +58,7 @@ export const getAllReviews = async (req, res) => {
         if (user_id) { query.user_id = new mongoose.Types.ObjectId(user_id) };
         if (property_id) { query.property_id = new mongoose.Types.ObjectId(property_id) };
         if (rating) { query.rating = Number(rating) }
+        if(status){query.status = status};
         let skip = Number(page - 1) * count;
         if (search) {
             query2.$or = [
@@ -118,6 +119,7 @@ export const getAllReviews = async (req, res) => {
                     user_image: "$user_details.picture",
                     property_name: "$property_details.propertyName",
                     property_images: "$property_details.images",
+                    status: "$status",
                 }
             },
             {
@@ -152,6 +154,28 @@ export const getAllReviews = async (req, res) => {
         ]
         let get_reviews = await Reviews.aggregate(pipeline);
         return sendResponse(res, get_reviews, "success", true, 200);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const getReviewById = async () => {
+    try {
+        let { id } = req.query;
+        if (!id) {
+            return sendResponse(res, {}, "Id reqired", false, 400);
+        }
+
+        let get_review = await Reviews.findOne({ _id: id, isDeleted: false })
+            .populate('user_id')
+            .populate('property_id')
+            .lean().exec();
+            
+        if (get_review) {
+            return sendResponse(res, get_review, "success", true, 200);
+        }
+        return sendResponse(res, {}, "Invalid Id", false, 400);
+
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
