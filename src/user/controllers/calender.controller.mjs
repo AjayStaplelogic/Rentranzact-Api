@@ -205,43 +205,43 @@ async function getCalenderTimeSlots(req, res) {
         ]
         let inspections = await Inspection.aggregate(pipeline);
 
-        let calender_pipeline = [
-            {
-                $match : {
-                    userID : landlordID
-                }
-            },
-            {
-                $set : {
-                   date: {
-                        $dateFromString: {
-                           dateString: "$date",
-                        }
-                     }
-                }
-            },
-            {
-                $addFields: {
-                    year: { $year: "$date" },
-                    month: { $month: "$date" },
-                    day: { $dayOfMonth: "$date" },
-                }
-            },
-            {
-                $match: query2
-            },
-            {
-                $project : {
-                    inspectionTime : "$time",
-                    id : "$id",
-                    fullDay : "$fullDay",
-                }
-            }
-        ];
+        // let calender_pipeline = [
+        //     {
+        //         $match : {
+        //             userID : landlordID
+        //         }
+        //     },
+        //     {
+        //         $set : {
+        //            date: {
+        //                 $dateFromString: {
+        //                    dateString: "$date",
+        //                 }
+        //              }
+        //         }
+        //     },
+        //     {
+        //         $addFields: {
+        //             year: { $year: "$date" },
+        //             month: { $month: "$date" },
+        //             day: { $dayOfMonth: "$date" },
+        //         }
+        //     },
+        //     {
+        //         $match: query2
+        //     },
+        //     {
+        //         $project : {
+        //             inspectionTime : "$time",
+        //             id : "$id",
+        //             fullDay : "$fullDay",
+        //         }
+        //     }
+        // ];
 
-        let calender_data = await Calender.aggregate(calender_pipeline);
+        // let calender_data = await Calender.aggregate(calender_pipeline);
 
-        inspections.data[0].calender_data = calender_data;
+        // inspections.data[0].calender_data = calender_data;
 
         sendResponse(res, inspections, "success", true, 200);
 
