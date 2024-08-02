@@ -9,6 +9,7 @@ router.post('/review', authorizer([UserRoles.RENTER]), reviewController.addUpdat
 router.get('/reviews', reviewController.getAllReviews);
 router.get('/review', reviewController.getReviewById);
 router.put('/review/change-status', reviewController.changeReviewStatus);
+router.delete('/review', reviewController.deleteReview);
 
 
 export default router;

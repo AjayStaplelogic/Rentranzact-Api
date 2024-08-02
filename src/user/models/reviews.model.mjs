@@ -17,6 +17,11 @@ const reviewSchema = new mongoose.Schema({
         ref: "properties",
         index : true
     },
+    landloard_id: {           // Review given by
+        type: mongoose.Types.ObjectId,
+        ref: "users",
+        index : true,
+    },
     rating: {
         type: Number,
         default: 0,

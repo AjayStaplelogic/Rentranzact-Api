@@ -20,6 +20,12 @@ export const addUpdateReview = async (req, res) => {
             if (!property_id) {
                 return sendResponse(res, {}, "Property Id reqired", false, 400);
             }
+
+            let get_property = await Property.findById(property_id);
+            if (!get_property) {
+                return sendResponse(res, {}, "Invalid Property Id", false, 400);
+            }
+            req.body.landloard_id = get_property.landlord_id;
             query.property_id = property_id;
         };
 
@@ -27,17 +33,7 @@ export const addUpdateReview = async (req, res) => {
         req.body.updated_by = req.user.data._id;
         let update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
         if (update_review) {
-            // let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
-            // if (update_review.type == "property" && avg_rating.avg_rating > 0) {
-            //     let update_payload = {
-            //         avg_rating: avg_rating.avg_rating,
-            //         total_reviews: avg_rating.total_reviews
-            //     }
-
-            //     let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
-
             return sendResponse(res, {}, "success", true, 200);
-            // }
         }
         return sendResponse(res, {}, "success", true, 200);
 
@@ -49,7 +45,7 @@ export const addUpdateReview = async (req, res) => {
 export const getAllReviews = async (req, res) => {
     try {
         console.log("[Review Listing]")
-        let { type, user_id, property_id, search, rating, status, sortBy } = req.query;
+        let { type, user_id, property_id, landloard_id, search, rating, status, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = { isDeleted: false };
@@ -57,6 +53,7 @@ export const getAllReviews = async (req, res) => {
         if (type) { query.type = type };
         if (user_id) { query.user_id = new mongoose.Types.ObjectId(user_id) };
         if (property_id) { query.property_id = new mongoose.Types.ObjectId(property_id) };
+        if (landloard_id) { query.landloard_id = new mongoose.Types.ObjectId(landloard_id) };
         if (rating) { query.rating = Number(rating) }
         if (status) { query.status = status };
         let skip = Number(page - 1) * count;
@@ -65,6 +62,7 @@ export const getAllReviews = async (req, res) => {
                 { user_name: { $regex: search, $options: 'i' } },
                 { property_name: { $regex: search, $options: 'i' } },
                 { review: { $regex: search, $options: 'i' } },
+                { landloard_name: { $regex: search, $options: 'i' } }
             ]
         }
         let field = "rating";
@@ -88,6 +86,12 @@ export const getAllReviews = async (req, res) => {
                 }
             },
             {
+                $unwind: {
+                    path: "$user_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $lookup: {
                     from: "properties",
                     localField: "property_id",
@@ -97,13 +101,21 @@ export const getAllReviews = async (req, res) => {
             },
             {
                 $unwind: {
-                    path: "$user_details",
+                    path: "$property_details",
                     preserveNullAndEmptyArrays: true
                 }
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "landloard_id",
+                    foreignField: "_id",
+                    as: "landloard_details"
+                }
+            },
+            {
                 $unwind: {
-                    path: "$property_details",
+                    path: "$landloard_details",
                     preserveNullAndEmptyArrays: true
                 }
             },
@@ -120,6 +132,9 @@ export const getAllReviews = async (req, res) => {
                     property_name: "$property_details.propertyName",
                     property_images: "$property_details.images",
                     status: "$status",
+                    landloard_id: "$landloard_id",
+                    landloard_name: "$landloard_details.fullName",
+                    landloard_image: "$landloard_details.picture",
                 }
             },
             {
@@ -215,6 +230,33 @@ export const changeReviewStatus = async (req, res) => {
             if (update_review.type == "property" && avg_rating.avg_rating > 0) {
                 let update_payload = {
                     avg_rating: avg_rating.avg_rating,
+                    total_reviews: avg_rating.total_reviews
+                }
+
+                let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
+            }
+            return sendResponse(res, {}, "success", true, 200);
+        }
+        return sendResponse(res, {}, "Invalid Id", false, 400);
+
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const deleteReview = async (req, res) => {
+    try {
+        let { id } = req.query;
+        if (!id) {
+            return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        let update_review = await Reviews.findByIdAndDelete(id);
+        if (update_review) {
+            let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
+            if (update_review.type == "property" && avg_rating) {
+                let update_payload = {
+                    avg_rating: avg_rating.avg_rating ? avg_rating.avg_rating : 0,
                     total_reviews: avg_rating.total_reviews
                 }
 
