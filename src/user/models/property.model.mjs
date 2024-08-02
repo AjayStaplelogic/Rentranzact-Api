@@ -208,6 +208,18 @@ const propertySchema = new mongoose.Schema(
     postedByAdmin: {
       type: Boolean,
       default: false
+    },
+    avg_rating : {
+      type : Number,
+      default : 0,
+      min : 0,
+      max : 5
+    },
+    total_reviews : {
+      type : Number,
+      default : 0,
+      min : 0,
+      max : 5
     }
   },
   { timestamps: true }

@@ -2,6 +2,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addToCalender, getToCalender, getRenterCalender, getTimeSlotByDate } from "../services/calender.service.mjs";
 import {Inspection } from "../models/inspection.model.mjs";
+import { Calender } from "../models/calender.model.mjs";
 
 async function calender(req, res) {
 
@@ -114,64 +115,59 @@ async function getCalenderTimeSlots(req, res) {
                     },
                 }
             },
-            {
-                $lookup : {
-                    from : "calenders",
-                    let : {
-                        year : Number(year),
-                        month : Number(month),
-                        day : Number(day)
-                    },
-                    pipeline : [
-                        {
-                            $match : {
-                                userID : landlordID
-                            }
-                        },
-                        {
-                            $set : {
-                               date: {
-                                    $dateFromString: {
-                                       dateString: "$date",
-                                    }
-                                 }
-                            }
-                        },
-                        {
-                            $addFields: {
-                                year: { $year: "$date" },
-                                month: { $month: "$date" },
-                                day: { $dayOfMonth: "$date" },
-                            }
-                        },
-                        {
-                            $match : {
-                                $expr : {
-                                    $and : [
-                                        {$eq : ["$year", "$$year"]},
-                                        {$eq : ["$month", "$$month"]},
-                                        {$eq : ["$day", "$$day"]},
-                                    ]
-                                }
-                            }
-                        },
-                        {
-                            $project : {
-                                inspectionTime : "$time",
-                                id : "$id",
-                                fullDay : "$fullDay",
-                            }
-                        }
-                    ],
-                    as : "calender_data"
-                }
-            },
-            {
-                $skip : Number(skip)
-            },
-            {
-                $limit : Number(count)
-            },
+            // {
+            //     $lookup : {
+            //         from : "calenders",
+            //         let : {
+            //             year : Number(year),
+            //             month : Number(month),
+            //             day : Number(day)
+            //         },
+            //         pipeline : [
+            //             {
+            //                 $match : {
+            //                     userID : landlordID
+            //                 }
+            //             },
+            //             {
+            //                 $set : {
+            //                    date: {
+            //                         $dateFromString: {
+            //                            dateString: "$date",
+            //                         }
+            //                      }
+            //                 }
+            //             },
+            //             {
+            //                 $addFields: {
+            //                     year: { $year: "$date" },
+            //                     month: { $month: "$date" },
+            //                     day: { $dayOfMonth: "$date" },
+            //                 }
+            //             },
+            //             {
+            //                 $match : {
+            //                     $expr : {
+            //                         $and : [
+            //                             {$eq : ["$year", "$$year"]},
+            //                             {$eq : ["$month", "$$month"]},
+            //                             {$eq : ["$day", "$$day"]},
+            //                         ]
+            //                     }
+            //                 }
+            //             },
+            //             {
+            //                 $project : {
+            //                     inspectionTime : "$time",
+            //                     id : "$id",
+            //                     fullDay : "$fullDay",
+            //                 }
+            //             }
+            //         ],
+            //         as : "calender_data"
+            //     }
+            // },
+
             {
                 $facet : {
                     pagination : [
@@ -191,17 +187,61 @@ async function getCalenderTimeSlots(req, res) {
                                 month : "$_id.month",
                                 day : "$_id.day",
                                 inspections : "$inspections",
-                                calender_data : "$calender_data"
+                                // calender_data : "$calender_data"
                             }
                         },
                         {
                             $unset : ["_id"]
-                        }
+                        },
+                        {
+                            $skip : Number(skip)
+                        },
+                        {
+                            $limit : Number(count)
+                        },
                     ]
                 }
             }
         ]
         let inspections = await Inspection.aggregate(pipeline);
+
+        // let calender_pipeline = [
+        //     {
+        //         $match : {
+        //             userID : landlordID
+        //         }
+        //     },
+        //     {
+        //         $set : {
+        //            date: {
+        //                 $dateFromString: {
+        //                    dateString: "$date",
+        //                 }
+        //              }
+        //         }
+        //     },
+        //     {
+        //         $addFields: {
+        //             year: { $year: "$date" },
+        //             month: { $month: "$date" },
+        //             day: { $dayOfMonth: "$date" },
+        //         }
+        //     },
+        //     {
+        //         $match: query2
+        //     },
+        //     {
+        //         $project : {
+        //             inspectionTime : "$time",
+        //             id : "$id",
+        //             fullDay : "$fullDay",
+        //         }
+        //     }
+        // ];
+
+        // let calender_data = await Calender.aggregate(calender_pipeline);
+
+        // inspections.data[0].calender_data = calender_data;
 
         sendResponse(res, inspections, "success", true, 200);
 
@@ -211,4 +251,102 @@ async function getCalenderTimeSlots(req, res) {
     }
 }
 
-export { calender, getCalender, getTimeSlot, getCalenderTimeSlots }
+async function getCalenderBlockedSlots(req, res) {
+    try {
+        console.log("[Calender Blocked Time Slot]")
+        let {  userId, day, month, year } = req.query;
+        let page = Number(req.query.page || 1);
+        let count = Number(req.query.count || 20);
+        let query = {};
+        let query2 = {};
+        if (userId) { query.userId = userId };
+        if (year) { query2.year = Number(year) };
+        if (month) { query2.month = Number(month) };
+        if (day) { query2.day = Number(day) };
+        let skip = Number(page - 1) * count;
+        let pipeline = [
+            {
+                $match : {
+                    userID : landlordID
+                }
+            },
+            {
+                $set : {
+                   date: {
+                        $dateFromString: {
+                           dateString: "$date",
+                        }
+                     }
+                }
+            },
+            {
+                $addFields: {
+                    year: { $year: "$date" },
+                    month: { $month: "$date" },
+                    day: { $dayOfMonth: "$date" },
+                }
+            },
+            {
+                $match: query2
+            },
+            {
+                $group: {
+                    _id: {
+                        year: "$year",
+                        month: "$month",
+                        day: "$day",
+                    },
+                    blocked_dates: {
+                        $push: {
+                            inspectionTime: "$time",
+                            id : "$id",
+                            fullDay : "$fullDay",
+                        }
+                    },
+                }
+            },
+            {
+                $facet : {
+                    pagination : [
+                        {
+                            $count : "total"
+                        },
+                        {
+                            $addFields : {
+                                page : Number(page)
+                            }
+                        }
+                    ],
+                    data : [
+                        {
+                            $project : {
+                                year : "$_id.year",
+                                month : "$_id.month",
+                                day : "$_id.day",
+                                blocked_dates : "$blocked_dates",
+                            }
+                        },
+                        {
+                            $unset : ["_id"]
+                        },
+                        {
+                            $skip : Number(skip)
+                        },
+                        {
+                            $limit : Number(count)
+                        },
+                    ]
+                }
+            }
+        ];
+
+        let calender_data = await Calender.aggregate(pipeline);
+        sendResponse(res, calender_data, "success", true, 200);
+
+    } catch (error) {
+        sendResponse(res, {}, `${error}`, false, 500);
+
+    }
+}
+
+export { calender, getCalender, getTimeSlot, getCalenderTimeSlots , getCalenderBlockedSlots }

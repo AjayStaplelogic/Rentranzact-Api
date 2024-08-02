@@ -19,6 +19,7 @@ import rentingHistoryRoutes from "./user/routes/rentingHistory.route.mjs";
 import maintenanceRoutes from "./user/routes/maintenance.route.mjs"
 import dummyRoutes from "./user/routes/dummy.route.mjs"
 import calenderRoutes from "./user/routes/calender.route.mjs"
+import reviewRoutes from "./user/routes/review.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -81,7 +82,7 @@ app.use("/api", rentingHistoryRoutes)
 app.use("/api", maintenanceRoutes)
 app.use("/api" , calenderRoutes)
 app.use("/api/dummy" , dummyRoutes)
-
+app.use("/api", reviewRoutes)
 
 
 //admin
