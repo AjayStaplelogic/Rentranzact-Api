@@ -9,8 +9,8 @@ services:
     volumes:
       - /home/rocky/data/mongo_data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: appuser
-      MONGO_INITDB_ROOT_PASSWORD: appsuer29292aakdnn23
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongoadmin20241506
   app:
     build:
       context: .
