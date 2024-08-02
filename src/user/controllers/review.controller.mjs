@@ -74,7 +74,7 @@ export const getAllReviews = async (req, res) => {
             field = sortBy.split(' ')[0];
             order = sortBy.split(' ')[1];
         }
-        sort_query[field] = order;
+        sort_query[field] = order=="desc" ? -1 : 1;
         let pipeline = [
             {
                 $match: query
@@ -97,20 +97,20 @@ export const getAllReviews = async (req, res) => {
             },
             {
                 $unwind: {
-                    path: "user_details",
+                    path: "$user_details",
                     preserveNullAndEmptyArrays: true
                 }
             },
             {
                 $unwind: {
-                    path: "property_details",
+                    path: "$property_details",
                     preserveNullAndEmptyArrays: true
                 }
             },
             {
                 $project: {
                     type: "$type",
-                    userd_id: "$userd_id",
+                    user_id: "$user_id",
                     property_id: "$property_id",
                     rating: "$rating",
                     review: "$review",
@@ -159,11 +159,11 @@ export const getAllReviews = async (req, res) => {
     }
 }
 
-export const getReviewById = async () => {
+export const getReviewById = async (req, res) => {
     try {
         let { id } = req.query;
         if (!id) {
-            return sendResponse(res, {}, "Id reqired", false, 400);
+            return sendResponse(res, {}, "Id required", false, 400);
         }
 
         let get_review = await Reviews.findOne({ _id: id, isDeleted: false })
@@ -173,6 +173,45 @@ export const getReviewById = async () => {
             
         if (get_review) {
             return sendResponse(res, get_review, "success", true, 200);
+        }
+        return sendResponse(res, {}, "Invalid Id", false, 400);
+
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const changeReviewStatus = async (req, res) => {
+    try {
+        let { id, status } = req.body;
+        if (!id) {
+            return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        if (!status) {
+            return sendResponse(res, {}, "Status reqired", false, 400);
+        }
+
+        if(!["accepted", "rejected"].includes(status)){
+            return sendResponse(res, {}, "Invalid status", false, 400);
+        }
+
+        let update_payload = {
+            status : status
+        };
+
+        if(status == "accepted"){
+            update_payload.accepted_at = new Date();
+        }
+
+        if(status == "rejected"){
+            update_payload.rejected_at = new Date();
+        }
+
+        let update_review = await Reviews.findOneAndUpdate({ _id: id, isDeleted: false }, update_payload, {new : true});
+            
+        if (update_review) {
+            return sendResponse(res, {}, "success", true, 200);
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);
 
