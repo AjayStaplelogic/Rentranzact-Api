@@ -57,7 +57,10 @@ const userSchema = new mongoose.Schema(
       required: true,
     },
 
-    favorite: [{ type: mongoose.Schema.Types.ObjectId, ref: "properties" }],
+    favorite: {
+      type : Array,
+      default : []
+    },
 
     walletPoints :{
       type: Number,
