@@ -17,10 +17,14 @@ export const addUpdateReview = async (req, res) => {
         }
         if (type == "property") {
             query.type == "property";
+            if (!property_id) {
+                return sendResponse(res, {}, "Property Id reqired", false, 400);
+            }
             query.property_id = property_id;
         };
 
         req.body.user_id = req.user.data._id;
+        req.body.updated_by = req.user.data._id;
         let update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
         if (update_review) {
             let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
@@ -65,7 +69,7 @@ export const getAllReviews = async (req, res) => {
         let field = "rating";
         let order = "desc";
         let sort_query = {};
-        if(sortBy){
+        if (sortBy) {
             field = sortBy.split(' ')[0];
             order = sortBy.split(' ')[1];
         }
@@ -133,7 +137,7 @@ export const getAllReviews = async (req, res) => {
                     ],
                     data: [
                         {
-                            $sort : sort_query
+                            $sort: sort_query
                         },
                         {
                             $skip: Number(skip)
