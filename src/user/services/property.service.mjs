@@ -137,9 +137,13 @@ async function filterProperies(body, id) {
   const data = await Property.find(filters).sort({createdAt : -1})
   const favorite = await User.findById(id).select("favorite")
 
-  const modifiedProperties = data.map(property => {
+  const modifiedProperties = data?.map(property => {
+
+    console.log(property , "===========propertyyyyy") 
 
     const liked = favorite?.favorite.includes(property._id);
+
+    console.log(property._id , "===========propertyyyyy id")
 
     return { ...property.toObject(), liked };
   });
@@ -293,7 +297,7 @@ async function getPropertyByID(id, userID) {
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
-  const favorite = await User.findOne({ favorite: { $in: [propertyID] } })
+  const favorite = await User.findOne({ favorite: { $in: [propertyID]} })
 
   console.log(favorite, "====is Favrotiessss")
 
