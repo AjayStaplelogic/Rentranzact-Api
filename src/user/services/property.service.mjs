@@ -295,7 +295,7 @@ async function getPropertyByID(id, userID) {
 async function addFavoriteProperties(propertyID, renterID) {
   const favorite = await User.findOne({ favorite: { $in: [propertyID] } })
 
-  console.log(favorite.favorite, "====is Favrotiessss")
+  console.log(favorite, "====is Favrotiessss")
 
   if (favorite) {
     const data = await User.findByIdAndUpdate(
