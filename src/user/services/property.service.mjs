@@ -428,7 +428,8 @@ async function getMyProperties(role, id) {
             {
               $match: {
                 $and: [
-                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } }
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
+                  { inspectionStatus: { $eq: "initated" } },
                 ]
               }
             },
