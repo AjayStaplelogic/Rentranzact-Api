@@ -8,6 +8,9 @@ services:
       - "27017:27017"
     volumes:
       - /home/rocky/data/mongo_data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: appuser
+      MONGO_INITDB_ROOT_PASSWORD: appsuer29292aakdnn23
   app:
     build:
       context: .
