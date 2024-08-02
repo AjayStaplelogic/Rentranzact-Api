@@ -7,7 +7,7 @@ import authorizer from '../middleware/authorizer.middleware.mjs';
 
 router.post('/review', authorizer([UserRoles.RENTER]), reviewController.addUpdateReview);
 router.get('/reviews', reviewController.getAllReviews);
-
+router.get('/review', reviewController.getReviewById);
 
 export default router;
 
