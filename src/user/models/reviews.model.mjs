@@ -7,7 +7,7 @@ const reviewSchema = new mongoose.Schema({
         required: true,
         index : true
     },
-    userd_id: {           // Review given by
+    user_id: {           // Review given by
         type: mongoose.Types.ObjectId,
         ref: "users",
         index : true,
