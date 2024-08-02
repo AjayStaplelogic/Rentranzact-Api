@@ -19,6 +19,7 @@ import { dirname } from 'path';
 import { generateOTP } from '../helpers/otpGenerator.mjs'
 import { forgot_password_email } from '../emails/onboarding.emails.mjs'
 import { generate_token } from "../helpers/tokens.mjs";
+import { ObjectId } from 'bson';
 
 
 async function loginUser(body) {
@@ -433,10 +434,14 @@ async function forgotPasswordService(email) {
 async function favouritesProperties(id) {
 
   const { favorite } = await User.findById(id).select("favorite")
+
+  const data_= favorite?.map((i) => {
+    return new ObjectId(i)
+  })
   const data = await Property.aggregate([
     {
       $match: {
-        _id: { $in: favorite }
+        _id: { $in: data_ }
       }
     }])
 
