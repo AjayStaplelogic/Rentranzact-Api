@@ -2,7 +2,10 @@ import { Reviews } from "../models/reviews.model.mjs";
 
 export const calculate_avg_rating = async(options)=>{
     let {type, property_id} = options;
-    let query = {isDeleted : false};
+    let query = {
+        isDeleted : false,
+        status : "accepted"
+    };
     let group_by = {}
     if(type == "property"){
         query.type == "property";

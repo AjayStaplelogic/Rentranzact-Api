@@ -27,17 +27,17 @@ export const addUpdateReview = async (req, res) => {
         req.body.updated_by = req.user.data._id;
         let update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
         if (update_review) {
-            let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
-            if (update_review.type == "property" && avg_rating.avg_rating > 0) {
-                let update_payload = {
-                    avg_rating: avg_rating.avg_rating,
-                    total_reviews: avg_rating.total_reviews
-                }
+            // let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
+            // if (update_review.type == "property" && avg_rating.avg_rating > 0) {
+            //     let update_payload = {
+            //         avg_rating: avg_rating.avg_rating,
+            //         total_reviews: avg_rating.total_reviews
+            //     }
 
-                let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
+            //     let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
 
-                return sendResponse(res, {}, "success", true, 200);
-            }
+            return sendResponse(res, {}, "success", true, 200);
+            // }
         }
         return sendResponse(res, {}, "success", true, 200);
 
@@ -58,7 +58,7 @@ export const getAllReviews = async (req, res) => {
         if (user_id) { query.user_id = new mongoose.Types.ObjectId(user_id) };
         if (property_id) { query.property_id = new mongoose.Types.ObjectId(property_id) };
         if (rating) { query.rating = Number(rating) }
-        if(status){query.status = status};
+        if (status) { query.status = status };
         let skip = Number(page - 1) * count;
         if (search) {
             query2.$or = [
@@ -74,7 +74,7 @@ export const getAllReviews = async (req, res) => {
             field = sortBy.split(' ')[0];
             order = sortBy.split(' ')[1];
         }
-        sort_query[field] = order=="desc" ? -1 : 1;
+        sort_query[field] = order == "desc" ? -1 : 1;
         let pipeline = [
             {
                 $match: query
@@ -82,7 +82,7 @@ export const getAllReviews = async (req, res) => {
             {
                 $lookup: {
                     from: "users",
-                    localField: "userd_id",
+                    localField: "user_id",
                     foreignField: "_id",
                     as: "user_details"
                 }
@@ -170,7 +170,7 @@ export const getReviewById = async (req, res) => {
             .populate('user_id')
             .populate('property_id')
             .lean().exec();
-            
+
         if (get_review) {
             return sendResponse(res, get_review, "success", true, 200);
         }
@@ -192,25 +192,34 @@ export const changeReviewStatus = async (req, res) => {
             return sendResponse(res, {}, "Status reqired", false, 400);
         }
 
-        if(!["accepted", "rejected"].includes(status)){
+        if (!["accepted", "rejected"].includes(status)) {
             return sendResponse(res, {}, "Invalid status", false, 400);
         }
 
         let update_payload = {
-            status : status
+            status: status
         };
 
-        if(status == "accepted"){
+        if (status == "accepted") {
             update_payload.accepted_at = new Date();
         }
 
-        if(status == "rejected"){
+        if (status == "rejected") {
             update_payload.rejected_at = new Date();
         }
 
-        let update_review = await Reviews.findOneAndUpdate({ _id: id, isDeleted: false }, update_payload, {new : true});
-            
+        let update_review = await Reviews.findOneAndUpdate({ _id: id, isDeleted: false }, update_payload, { new: true });
+
         if (update_review) {
+            let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
+            if (update_review.type == "property" && avg_rating.avg_rating > 0) {
+                let update_payload = {
+                    avg_rating: avg_rating.avg_rating,
+                    total_reviews: avg_rating.total_reviews
+                }
+
+                let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
+            }
             return sendResponse(res, {}, "success", true, 200);
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);
