@@ -118,9 +118,9 @@ async function getCalenderTimeSlots(req, res) {
                 $lookup : {
                     from : "calenders",
                     let : {
-                        year : year,
-                        month : month,
-                        day :day
+                        year : Number(year),
+                        month : Number(month),
+                        day : Number(day)
                     },
                     pipeline : [
                         {
