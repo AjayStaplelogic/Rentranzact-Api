@@ -254,21 +254,19 @@ async function getCalenderTimeSlots(req, res) {
 async function getCalenderBlockedSlots(req, res) {
     try {
         console.log("[Calender Blocked Time Slot]")
-        let {  userId, day, month, year } = req.query;
+        let {  userID, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
         let query2 = {};
-        if (userId) { query.userId = userId };
+        if (userID) { query.userID = userID };
         if (year) { query2.year = Number(year) };
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
         let pipeline = [
             {
-                $match : {
-                    userID : landlordID
-                }
+                $match :query
             },
             {
                 $set : {
