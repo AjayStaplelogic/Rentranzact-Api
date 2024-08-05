@@ -286,7 +286,8 @@ async function rentApplicationsList(user, req) {
           {
             $project: {
               _id: 1,
-              propertyName: 1
+              propertyName: 1,
+              images : 1
             }
           }
         ],
