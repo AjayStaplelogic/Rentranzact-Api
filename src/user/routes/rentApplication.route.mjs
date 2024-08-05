@@ -1,6 +1,6 @@
 import express from "express";
 const router = express.Router();
-import { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications, rentApplicationsByID } from "../controllers/rentApplication.controller.mjs";
+import { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications, rentApplicationsByID, editRentApplication } from "../controllers/rentApplication.controller.mjs";
 import multer from "multer";
 import { generateRandomFileName } from "../helpers/randomNameGenerator.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
@@ -26,5 +26,7 @@ router.post("/rentApplication/update-status",
 )
 
 router.get("/rent-applications/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getRentApplications)
+
+router.put("/rentApplication",authorizer([UserRoles.RENTER]),editRentApplication)
 
 export default router;
