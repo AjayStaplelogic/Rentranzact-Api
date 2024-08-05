@@ -224,7 +224,7 @@ async function rentApplicationsList(user, req) {
     query.applicationStatus = applicationStatus;
   }
   
-  let field = "rating";
+  let field = "updatedAt";
   let order = "desc";
   let sort_query = {};
   if (sortBy) {
@@ -270,7 +270,8 @@ async function rentApplicationsList(user, req) {
         as: "renter_info",
 
       }
-    }, {
+    }, 
+    {
       $lookup: {
         from: "properties",
         let: { propertyID: { $toObjectId: "$propertyID" } },
