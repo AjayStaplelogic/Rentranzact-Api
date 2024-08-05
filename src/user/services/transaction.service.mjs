@@ -9,7 +9,7 @@ async function getMyTransaction(userID, role, req) {
       {landlord : {$regex: search, $options : "i"}},
     ]
   }
-  
+
   if (role === UserRoles.RENTER) {
     query.renterID = userID;
   }else if(role === UserRoles.LANDLORD){
@@ -42,10 +42,6 @@ async function getMyTransaction(userID, role, req) {
           as: "landlordDetails",
         }
       },
-      {
-        $match : query2
-      }
-      
     ])
 
     return {
