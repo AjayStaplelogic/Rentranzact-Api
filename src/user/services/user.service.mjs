@@ -23,7 +23,7 @@ import { ObjectId } from 'bson';
 
 
 async function loginUser(body) {
-  const { email, password } = body;
+  const { email, password ,fcmToken } = body;
 
   const user = await User.findOne({ email: email });
 
@@ -41,6 +41,11 @@ async function loginUser(body) {
 
     if (isPasswordValid) {
       if (user.verified) {
+
+        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+
+        
+
         const accessToken = await accessTokenGenerator(user);
         return {
           data: user,

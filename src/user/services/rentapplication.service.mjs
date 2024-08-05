@@ -7,6 +7,7 @@ import { identityVerifier } from "../helpers/identityVerifier.mjs";
 import moment from "moment";
 import { Notification } from "../models/notification.model.mjs";
 import { User } from "../models/user.model.mjs";
+import sendNotification from "../helpers/sendNotification.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -77,7 +78,7 @@ async function addRentApplicationService(body, user) {
       permanentContactNumber,
       landlordID: landlord.landlord_id,
       propertyName: landlord.propertyName,
-      verifcationType : identificationType
+      verifcationType: identificationType
     };
 
 
@@ -90,7 +91,7 @@ async function addRentApplicationService(body, user) {
     }
 
 
-    if(checkinDate && checkoutDate) {
+    if (checkinDate && checkoutDate) {
       payload["checkinDate"] = checkinDate
       payload["checkoutDate"] = checkoutDate
     }
@@ -98,7 +99,7 @@ async function addRentApplicationService(body, user) {
     const kinDetails = {
       first_name: kinFirstName,
       last_name: kinLastName,
-      middle_name : kinMiddleName,
+      middle_name: kinMiddleName,
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
@@ -108,13 +109,13 @@ async function addRentApplicationService(body, user) {
     const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
 
-    console.log(verifyStatus , "-ajdssajlksajdlksajdlkj")
+    console.log(verifyStatus, "-ajdssajlksajdlksajdlkj")
     let data;
 
     if (verifyStatus) {
-  
+
       payload["kinIdentityCheck"] = true;
-      
+
       data = new rentApplication(payload);
 
       data.save();
@@ -133,7 +134,7 @@ async function addRentApplicationService(body, user) {
         statusCode: 400,
       };
 
-     
+
 
     }
 
@@ -376,14 +377,17 @@ async function updateRentApplications(body, id) {
 
     console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: `Your rent is due to ${landlordDetails.fullName}`, notificationBody: `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}}` })
+    let title = `Your rent is due to ${landlordDetails.fullName}`;
+    let body = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
+
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: body })
+
+    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "type": "payRent" }
+
+    const data_ = await sendNotification(data, "single", title, body, metadata)
 
     await newNotification.save()
-    // const data2 = await Property.findByIdAndUpdate(data.propertyID, {
-    //   rented: true,
-    //   renterID: data.renterID
-    // })
 
     return {
       data: data,

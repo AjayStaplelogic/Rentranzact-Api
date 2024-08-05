@@ -28,10 +28,14 @@ import propertyRoutes from "./admin/routes/properties.route.mjs"
 import roleRoutes from "./admin/routes/role.route.mjs"
 import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
-
 import { fileURLToPath } from "url";
 import path from "path";
 
+import admin from 'firebase-admin'
+import serviceAccount from "./user/helpers/serviceAccount.js";
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const app = express();
 
@@ -137,3 +141,6 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+
+export default admin;
