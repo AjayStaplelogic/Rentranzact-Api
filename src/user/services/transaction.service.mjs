@@ -136,7 +136,7 @@ async function transactionByIdService(id) {
   ])
 
   return {
-    data: data,
+    data: data[0],
     message: "successfully fetched my transactions",
     status: true,
     statusCode: 200,
