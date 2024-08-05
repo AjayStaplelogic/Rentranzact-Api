@@ -133,6 +133,34 @@ async function transactionByIdService(id) {
         preserveNullAndEmptyArrays: true
       }
     },
+    {
+      $project : {
+        type : "$type",
+        propertyID : "$propertyID",
+        renterID : "$renterID",
+        landlordID : "$landlordID",
+        status : "$status",
+        amount : "$amount",
+        date : "$date",
+        createdAt : "$createdAt",
+        updatedAt : "$updatedAt",
+        renter_details : {
+          _id : "$renter_details._id",
+          fullName : "$renter_details.fullName",
+          picture : "$renter_details.picture"
+        },
+        property_details : {
+          _id : "$property_details._id",
+          propertyName : "$property_details.propertyName",
+          images : "$property_details.images"
+        },
+        landlord_details : {
+          _id : "$landlord_details._id",
+          fullName : "$landlord_details.fullName",
+          picture : "$landlord_details.picture"
+        }
+      }
+    }
   ])
 
   return {
