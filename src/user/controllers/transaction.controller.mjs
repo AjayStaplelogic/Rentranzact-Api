@@ -12,7 +12,7 @@ async function myTransaction(req, res) {
 
 
 
-  const data = await getMyTransaction(userID, role);
+  const data = await getMyTransaction(userID, role, req);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
