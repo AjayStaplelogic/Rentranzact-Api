@@ -220,10 +220,10 @@ async function rentApplicationsList(user, req) {
     query.landlordID = req?.user?.data?._id;
   }
 
-  if(applicationStatus){
+  if (applicationStatus) {
     query.applicationStatus = applicationStatus;
   }
-  
+
   let field = "updatedAt";
   let order = "desc";
   let sort_query = {};
@@ -270,7 +270,7 @@ async function rentApplicationsList(user, req) {
         as: "renter_info",
 
       }
-    }, 
+    },
     {
       $lookup: {
         from: "properties",
@@ -329,7 +329,7 @@ async function rentApplicationsList(user, req) {
     message: "rent application fetched successfully",
     status: true,
     statusCode: 200,
-    pagination : data[0]?.pagination
+    pagination: data[0]?.pagination
   };
 
   if (user?.role === UserRoles.RENTER) {
@@ -526,13 +526,21 @@ async function updateRentApplications(body, id) {
       status: true,
       statusCode: 200,
     };
+  } else if (RentApplicationStatus.WITHDRAW === status) {
+    const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
+      applicationStatus: status,
+    });
+
+    return {
+      data: data,
+      message: "rent application canceled successfully",
+      status: true,
+      statusCode: 200,
+    };
   }
 }
 
 async function getRentApplicationsByUserID(id, role, PropertyID) {
-
-  console.log(id, '===id', role, '=====role', PropertyID, '=====propertyId', UserRoles.LANDLORD)
-
   let data;
   if (role === UserRoles.LANDLORD) {
     data = await rentApplication.aggregate([{
@@ -565,8 +573,6 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         as: "renter_info",
       }
     }])
-
-    console.log(data, '=========data')
   }
   return {
     data: data,
