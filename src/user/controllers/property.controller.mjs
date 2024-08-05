@@ -121,10 +121,11 @@ async function searchPropertyByKeywords(req, res) {
 
 
 async function myProperties (req, res) {
+  console.log(`[My Properties API]`)
   const {role , _id} = req.user.data;
 
 
-  const data = await getMyProperties(role, _id);
+  const data = await getMyProperties(role, _id, req);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode); 
 
