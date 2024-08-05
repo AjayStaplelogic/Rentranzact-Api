@@ -105,7 +105,7 @@ async function favourites(req, res) {
 
   const id = req.user.data._id;
 
-  const data = await favouritesProperties(id);
+  const data = await favouritesProperties(id, req);
 
   sendResponse(
     res,

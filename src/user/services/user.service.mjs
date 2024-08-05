@@ -400,12 +400,12 @@ async function forgotPasswordService(email) {
     //     new: true
     //   });
     let otp = generateOTP();
-    let update_user = await User.findByIdAndUpdate(user._id, {otp : otp}, {new : true});
+    let update_user = await User.findByIdAndUpdate(user._id, { otp: otp }, { new: true });
     if (update_user) {
       forgot_password_email({
         email: update_user.email,
         otp: update_user.otp,
-        user_id : update_user._id
+        user_id: update_user._id
       });
       return {
         data: {
@@ -431,18 +431,26 @@ async function forgotPasswordService(email) {
   };
 }
 
-async function favouritesProperties(id) {
+async function favouritesProperties(id, req) {
+
+  let { search } = req.query;
+  let query = {};
 
   const { favorite } = await User.findById(id).select("favorite")
 
-  const data_= favorite?.map((i) => {
+  const data_ = favorite?.map((i) => {
     return new ObjectId(i)
   })
+
+  query._id = { $in: data_ }
+  if (search) {
+    query.$or = [
+      { propertyName: { $regex: search, $options: "i" } },
+    ]
+  }
   const data = await Property.aggregate([
     {
-      $match: {
-        _id: { $in: data_ }
-      }
+      $match: query
     }])
 
   return {
@@ -617,7 +625,7 @@ async function verifyUserOtp(user_id, otp) {
     return {
       data: {
         id: get_user._id,
-        accessToken : await accessTokenGenerator(get_user),
+        accessToken: await accessTokenGenerator(get_user),
       },
       message: "otp verified successfully",
       status: true,
