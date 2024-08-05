@@ -134,16 +134,16 @@ async function searchInProperty(body) {
 async function filterProperies(body, id) {
   const { filters } = body;
 
-  const data = await Property.find(filters).sort({createdAt : -1})
+  const data = await Property.find(filters).sort({ createdAt: -1 })
   const favorite = await User.findById(id).select("favorite")
 
   const modifiedProperties = data?.map(property => {
 
-    console.log(property , "===========propertyyyyy") 
+    console.log(property, "===========propertyyyyy")
 
     const liked = favorite?.favorite.includes(property._id);
 
-    console.log(property._id , "===========propertyyyyy id")
+    console.log(property._id, "===========propertyyyyy id")
 
     return { ...property.toObject(), liked };
   });
@@ -165,14 +165,14 @@ async function filterProperies(body, id) {
   // });
 }
 
-async function nearbyProperies(body , userID) {
+async function nearbyProperies(body, userID) {
   const { maxDistance, latitude, longitude } = body;
 
 
 
 
 
-  
+
 
   if (maxDistance && latitude && longitude) {
     const data = await Property.find({
@@ -189,9 +189,9 @@ async function nearbyProperies(body , userID) {
     const favorite = await User.findById(userID).select("favorite")
 
     const modifiedProperties = data.map(property => {
-  
+
       const liked = favorite?.favorite.includes(property._id);
-  
+
       return { ...property.toObject(), liked };
     });
 
@@ -210,9 +210,9 @@ async function nearbyProperies(body , userID) {
     const favorite = await User.findById(userID).select("favorite")
 
     const modifiedProperties = data.map(property => {
-  
+
       const liked = favorite?.favorite.includes(property._id);
-  
+
       return { ...property.toObject(), liked };
     });
 
@@ -298,14 +298,14 @@ async function getPropertyByID(id, userID) {
 
 async function addFavoriteProperties(propertyID, renterID) {
 
-  console.log(propertyID , renterID , "===== propety ID renter ID")
+  console.log(propertyID, renterID, "===== propety ID renter ID")
   const favorite = await User.findOne({ _id: renterID, favorite: propertyID });
- 
+
   const isFavorite = favorite !== null;
 
 
-     if (isFavorite) {
-    const data  = await User.findByIdAndUpdate(
+  if (isFavorite) {
+    const data = await User.findByIdAndUpdate(
       renterID,
       { $pull: { favorite: propertyID } },
       { new: true }
@@ -317,7 +317,7 @@ async function addFavoriteProperties(propertyID, renterID) {
       status: true,
       statusCode: 200,
     };
-  } else {  
+  } else {
 
     const data = await User.findByIdAndUpdate(
       renterID,
@@ -349,11 +349,11 @@ async function searchPropertyByString(search, userID) {
 
   const modifiedProperties = results?.map(property => {
 
-    console.log(property , "===========propertyyyyy") 
+    console.log(property, "===========propertyyyyy")
 
     const liked = favorite?.favorite.includes(property._id);
 
-    console.log(property._id , "===========propertyyyyy id")
+    console.log(property._id, "===========propertyyyyy id")
 
     return { ...property.toObject(), liked };
   });
@@ -369,8 +369,32 @@ async function searchPropertyByString(search, userID) {
   };
 }
 
-async function getMyProperties(role, id) {
+async function getMyProperties(role, id, req) {
 
+  let { rented, city, type, search } = req.query;
+  let query = {}
+
+  if (rented) {
+    query["rented"] = rented === "true" ? true : false;
+  }
+
+  if (city) {
+    query["city"] = city;
+  }
+  if (type) {
+    query["type"] = type;
+  }
+  if (search) {
+    query = {
+      $or: [
+        { propertyName: { $regex: search, $options: "i" } },
+      ],
+    };
+  }
+
+  if(req?.user?.data?.role== UserRoles.LANDLORD){
+    query["landlord_id"] = id;
+  }
 
   let data;
   if (role === UserRoles.RENTER) {
@@ -380,13 +404,9 @@ async function getMyProperties(role, id) {
   } else if (role === UserRoles.LANDLORD) {
 
 
-
     data = await Property.aggregate([
       {
-        $match: {
-          landlord_id: id,
-
-        }
+        $match: query
       },
       {
         $lookup: {
@@ -455,17 +475,14 @@ async function getMyProperties(role, id) {
           propertyName: 1,
           rent: 1,
           rentType: 1,
-          images: 1
+          images: 1, 
+          rented: "$rented",
+          city : "$city",
+          type : "$type",
+
         }
       }
     ]);
-
-
-    console.log(data, "====dat=aa=a==a=a=")
-
-
-
-
   } else if (role === UserRoles.PROPERTY_MANAGER) {
     data = await Property.find({ property_manager_id: id });
 
