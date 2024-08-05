@@ -2,7 +2,7 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID } from "../services/rentapplication.service.mjs"
 
 async function addRentApplication(req, res) {
-  
+
   const body = req.body;
   const user = req.user.data;
 
@@ -40,20 +40,13 @@ async function rentApplicationUpdate(req, res) {
 }
 
 async function getRentApplications(req, res) {
-console.log("[Rent Application API]")
-console.log(req.user, '=======req.user')
+  console.log("[Rent Application API]")
   const id = req.user.data._id;
   const role = req.user.data.role;
   const PropertyID = req.params.id;
-  console.log(PropertyID, '========PropertyID');
-  console.log(id, '========id');
-  console.log(role, '========role');
-
-
-
   const data = await getRentApplicationsByUserID(id, role, PropertyID)
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 }
 
-export { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications , rentApplicationsByID};
+export { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications, rentApplicationsByID };

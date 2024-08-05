@@ -1,7 +1,6 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getMyTransaction , transactionByIdService} from "../services/transaction.service.mjs";
-
 async function myTransaction(req, res) {
   const { body } = req;
 
@@ -21,7 +20,7 @@ async function transactionById(req, res) {
 
   const {id} = req.params;
 
-  const data = await transactionByIdService(userID, role);
+  const data = await transactionByIdService(id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
