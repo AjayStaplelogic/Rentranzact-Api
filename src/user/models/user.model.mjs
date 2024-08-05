@@ -61,6 +61,10 @@ const userSchema = new mongoose.Schema(
       type : Array,
       default : []
     },
+    fcmToken : {
+      type : String,
+      required : false
+    },
 
     walletPoints :{
       type: Number,

@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon --env-file=.dev_env ./src/server.js",
-    "prod": "node --env-file=.prod_env ./src/server.js",
+    "prod": "nodemon --env-file=.prod_env ./src/server.js",
     "create-doc": "apidoc -i src -o apidoc"
   },
   "type": "module",
@@ -21,6 +21,8 @@
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "express": "^4.19.2",
+    "firebase": "^10.12.5",
+    "firebase-admin": "^12.3.0",
     "google-auth-library": "^9.10.0",
     "http": "^0.0.1-security",
     "joi": "^17.13.1",

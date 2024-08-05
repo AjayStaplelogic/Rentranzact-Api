@@ -6,6 +6,7 @@ import { address, pagination } from "./common.validation.mjs";
 export const userLogin = Joi.object().keys({
   email: Joi.string().required().error(new Error("email is required")),
   password: Joi.string().required().error(new Error("password is required")),
+  fcmToken : Joi.string().optional()
 });
 
 
