@@ -15,8 +15,8 @@ async function addRentApplication(req, res) {
 async function rentApplications(req, res) {
 
   const userData = req.user.data;
-  const data = await rentApplicationsList(userData);
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  const data = await rentApplicationsList(userData, req);
+  sendResponse(res, data.data, data.message, data.status, data.statusCode, [], data.pagination);
 }
 
 
