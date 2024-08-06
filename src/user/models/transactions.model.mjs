@@ -50,6 +50,9 @@ const transactionSchema = new mongoose.Schema(
     landlord: {
       type: String,
       required: false
+    },
+    payment_mode: {
+      type: String,
     }
   },
   { timestamps: true }

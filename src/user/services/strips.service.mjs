@@ -73,7 +73,7 @@ async function addStripeTransaction(body) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT" })
+    const data = new Transaction({ renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT", payment_mode : "stripe" })
 
 
 
@@ -120,7 +120,7 @@ async function rechargeWallet(body) {
     const data = new Wallet(payload)
     data.save()
 
-    const data_ = new Transaction({ renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT" })
+    const data_ = new Transaction({ renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
 
     data_.save()
 
