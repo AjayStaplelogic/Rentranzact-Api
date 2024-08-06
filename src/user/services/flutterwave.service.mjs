@@ -8,7 +8,9 @@ async function addFlutterwaveTransaction(body) {
 
     const { status, amount, createdAt, id, meta_data } = body;
 
+
     const { wallet, propertyID , userID} = meta_data;
+    console.log(meta_data , "=====meta data")
     if (wallet) {
 
     } else {
