@@ -10,7 +10,8 @@ async function addFlutterwaveTransaction(body) {
         intentID : id,
         status: status,
         amount: amount,
-        date: createdAt
+        date: createdAt,
+        payment_mode: "flutterwave"
     }
 
     const data = new Transaction(changePayload)
