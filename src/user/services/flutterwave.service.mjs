@@ -9,28 +9,33 @@ async function addFlutterwaveTransaction(body) {
 
     const { status, amount, createdAt, id, meta_data } = body;
 
+    const momentObject = moment(createdAt);
 
-    const { wallet, propertyID , userID} = meta_data;
-    console.log(meta_data , "=====meta data")
+    // Get the timestamp (milliseconds since the Unix epoch)
+    const create = momentObject.valueOf();
+
+
+    const { wallet, propertyID, userID } = meta_data;
+    console.log(meta_data, "=====meta data")
     if (wallet) {
 
     } else {
 
-       
+
         const propertyDetails = await Property.findById(propertyID);
 
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
-            const originalDate = moment.unix(createdAt);
+            const originalDate = moment.unix(create);
 
             const oneMonthLater = originalDate.add(1, 'months');
 
             const timestampOneMonthLater = oneMonthLater.unix();
 
-            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: createdAt, rent_period_end: timestampOneMonthLater })
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: create, rent_period_end: timestampOneMonthLater })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: createdAt, propertyID: propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: create, propertyID: propertyID, renterActive: true })
 
             addRenterHistory.save()
 
@@ -38,16 +43,16 @@ async function addFlutterwaveTransaction(body) {
 
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
-            const originalDate = moment.unix(createdAt);
+            const originalDate = moment.unix(create);
 
             // Add one year to the original date
             const oneQuaterLater = originalDate.add(3, 'months');
 
             // Get the Unix timestamp of one year later
             const timestampOneQuaterLater = oneQuaterLater.unix();
-            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: createdAt, rent_period_end: timestampOneQuaterLater })
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: create, rent_period_end: timestampOneQuaterLater })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: createdAt, propertyID: propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: create, propertyID: propertyID, renterActive: true })
 
 
             console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
@@ -57,7 +62,7 @@ async function addFlutterwaveTransaction(body) {
 
         } else if (propertyDetails.rentType === RentType.YEARLY) {
             // Convert timestamp to a Moment.js object
-            const originalDate = moment.unix(createdAt);
+            const originalDate = moment.unix(create);
 
             // Add one year to the original date
             const oneYearLater = originalDate.add(1, 'yearly');
@@ -66,9 +71,9 @@ async function addFlutterwaveTransaction(body) {
             const timestampOneYearLater = oneYearLater.unix();
 
             console.log(timestampOneYearLater, "-----timestampOneYearLater")
-            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: createdAt, rent_period_end: timestampOneYearLater })
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: create, rent_period_end: timestampOneYearLater })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: createdAt, propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: create, propertyID, renterActive: true })
             addRenterHistory.save()
         }
 
@@ -78,7 +83,7 @@ async function addFlutterwaveTransaction(body) {
             intentID: id,
             status: status,
             amount: amount,
-            date: createdAt,
+            date: create,
             payment_mode: "flutterwave"
         }
 
