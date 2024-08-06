@@ -70,9 +70,20 @@ async function createInspection(body, renterID) {
   };
 }
 
-async function fetchInspections(userData) {
+async function fetchInspections(userData, req) {
+  let { search } = req.query;
   if (userData.role === UserRoles.LANDLORD) {
-    const data = await Inspection.find({ landlordID: userData?._id });
+    let query = {
+      landlordID: userData?._id
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
+    const data = await Inspection.find(query);
 
     return {
       data: data,
@@ -81,7 +92,17 @@ async function fetchInspections(userData) {
       statusCode: 200,
     };
   } else if (userData.role === UserRoles.PROPERTY_MANAGER) {
-    const data = await Inspection.find({ propertyID: userData?._id });
+    let query = {
+      propertyID: userData?._id
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
+    const data = await Inspection.find(query);
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -93,13 +114,21 @@ async function fetchInspections(userData) {
       "RenterDetails.id": userData?._id,
     });
 
-    // Import ObjectId from MongoDB driver
+    let query = {
+      "RenterDetails.id": userData?._id,
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
 
+    // Import ObjectId from MongoDB driver
     const data = await Inspection.aggregate([
       {
-        $match: {
-          "RenterDetails.id": userData?._id,
-        },
+        $match: query
       },
       {
         $lookup: {
