@@ -4,7 +4,7 @@ const router = express.Router();
 
 
 
-router.get('/transaction', getTransaction);
+router.get('/transactions', getTransaction);
 
 
 export default router;
