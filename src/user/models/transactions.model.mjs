@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 const transactionSchema = new mongoose.Schema(
   {
 
+    wallet : {
+      type : Boolean,
+      required: false
+    },
+
     type : {
       type: String,
       required : true
