@@ -6,24 +6,21 @@ import moment from "moment";
 
 async function addFlutterwaveTransaction(body) {
 
-
     const { status, amount, createdAt, id, meta_data } = body;
 
     const momentObject = moment(createdAt);
-
     // Get the timestamp (milliseconds since the Unix epoch)
     const create = momentObject.valueOf();
 
-
     const { wallet, propertyID, userID } = meta_data;
+
     console.log(meta_data, "=====meta data")
+
     if (wallet) {
 
     } else {
 
-
         const propertyDetails = await Property.findById(propertyID);
-
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
