@@ -28,8 +28,9 @@ const maintenanceSchema = new mongoose.Schema(
             required: false,
         },
         status : {
-            type : Boolean,
-            default : false
+            type : String,
+            default : "pending",
+            enum : ["pending", "resolved", "remarked"]
         },
         resolvedOn : {
             type: String,
