@@ -2,9 +2,12 @@ import { Transaction } from "../models/transactions.model.mjs";
 
 async function addFlutterwaveTransaction(body) {
 
-    const { status, amount, createdAt } = body;
+    const { status, amount, createdAt , id} = body;
 
     const changePayload = {
+        wallet : false,
+        type : "Debit",
+        intentID : id,
         status: status,
         amount: amount,
         date: createdAt
