@@ -3,6 +3,7 @@ import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import moment from "moment";
+import { User } from "../models/user.model.mjs";
 
 async function addFlutterwaveTransaction(body) {
 
@@ -14,6 +15,8 @@ async function addFlutterwaveTransaction(body) {
 
     const { wallet, propertyID, userID } = meta_data;
 
+    const renterDetails = await User.findById(userID)
+
     console.log(meta_data, "=====meta data")
 
     if (wallet) {
@@ -21,6 +24,8 @@ async function addFlutterwaveTransaction(body) {
     } else {
 
         const propertyDetails = await Property.findById(propertyID);
+
+        const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
@@ -81,7 +86,16 @@ async function addFlutterwaveTransaction(body) {
             status: status,
             amount: amount,
             date: create,
-            payment_mode: "flutterwave"
+            payment_mode: "flutterwave",
+            propertyID : propertyID,
+            renterID : userID,
+            landlordID : propertyDetails.landlord_id,
+            renter : renterDetails.fullName,
+            property : propertyDetails.name,
+            landlord : landlordDetails.fullName,
+            payment_mode : "flutterwave"
+
+
         }
 
         const data = new Transaction(changePayload)
