@@ -1,7 +1,7 @@
 import { RentType } from "../enums/property.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
-
+import moment from "moment";
 
 async function addFlutterwaveTransaction(body) {
 
