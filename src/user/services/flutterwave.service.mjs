@@ -6,11 +6,12 @@ async function addFlutterwaveTransaction(body) {
 
     const { status, amount, createdAt, id, meta_data } = body;
 
-    if (meta_data.wallet) {
+    const { wallet, propertyID } = meta_data;
+    if (wallet) {
 
     } else {
 
-        const { userID, propertyID } = meta_data;
+       
         const propertyDetails = await Property.findById(propertyID);
 
 
