@@ -1,6 +1,7 @@
 import { RentType } from "../enums/property.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
+import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import moment from "moment";
 
 async function addFlutterwaveTransaction(body) {
@@ -67,7 +68,7 @@ async function addFlutterwaveTransaction(body) {
             console.log(timestampOneYearLater, "-----timestampOneYearLater")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: createdAt, rent_period_end: timestampOneYearLater })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: createdAt, propertyID: propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: createdAt, propertyID, renterActive: true })
             addRenterHistory.save()
         }
 
