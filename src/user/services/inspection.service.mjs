@@ -233,19 +233,38 @@ async function updateInspectionStatus(body, id) {
 }
 
 async function inspectionEditService(body) {
-  const { inspectionID, inspectionTime, inspectionDate, message } = body;
+  const { inspectionID, inspectionTime, inspectionDate, message, id } = body;
+  let payload = {};
+  if (inspectionTime) {
+    payload.inspectionTime = inspectionTime;
+  }
 
-  const data = await Inspection.findByIdAndUpdate(inspectionID, {
-    inspectionTime: inspectionTime,
-    inspectionDate: inspectionDate,
-    message: message,
-  });
+  if (inspectionDate) {
+    payload.inspectionDate = inspectionDate;
+  }
+
+  if (message) {
+    payload.message = message;
+  }
+  if (id) {
+    payload.id = id;
+  }
+  const data = await Inspection.findByIdAndUpdate(inspectionID, payload, { new: true });
+
+  if (data) {
+    return {
+      data: data,
+      message: "inspection updated successfully",
+      status: true,
+      statusCode: 200,
+    };
+  }
 
   return {
-    data: data,
-    message: "inspection updated successfully",
-    status: true,
-    statusCode: 200,
+    data: {},
+    message: "Invalid Id",
+    status: false,
+    statusCode: 400,
   };
 }
 
