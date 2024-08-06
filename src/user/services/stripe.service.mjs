@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { User } from "../models/user.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -62,5 +63,22 @@ async function addToWallet(body, userID) {
     };
 }
 
+async function payViaWallet(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints) {
+    if(amount > walletPoints) {
 
-export { payRentService, addToWallet };
+        return {
+            data: [],
+            message: "Insufficient Amount in wallet",
+            status: false,
+            statusCode: 400,
+        };
+
+    } else {
+
+        const data = await User.findByIdAndUpdate(userID , { $inc: { walletPoints : -amount }});
+        const data1 = await User.findByIdAndUpdate(landlordID , {$inc : {walletPoints : amount}})
+
+    }
+}
+
+export { payRentService, addToWallet , payViaWallet };
