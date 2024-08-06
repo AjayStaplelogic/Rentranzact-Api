@@ -107,10 +107,10 @@ async function addFlutterwaveTransaction(body) {
 
 
     return {
-        data: data,
+        data: [],
         message: "dashboard stats",
         status: true,
-        statusCode: 201,
+        statusCode: 200,
     };
 
 }
