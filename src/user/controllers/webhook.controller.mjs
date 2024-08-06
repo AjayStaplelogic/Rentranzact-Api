@@ -7,7 +7,7 @@ const secretKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjE5MjgwMSwiZW52
     if (signature === req.headers['x-verifyme-signatue']) {
         // Source of the webhook is verified , Add logic here
 
-        console.log(res, "============res in signature")
+        // console.log(res, "============res in signature")
 
     }
 

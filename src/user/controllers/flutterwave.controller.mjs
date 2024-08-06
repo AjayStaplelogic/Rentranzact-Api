@@ -7,7 +7,7 @@ async function flutterwave(req, res) {
 
 
 
-  console.log(req.body, "=========boddyyyy")
+  // console.log(req.body, "=========boddyyyy")
 
  const data = await addFlutterwaveTransaction(body)
 

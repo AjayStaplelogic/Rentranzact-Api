@@ -20,7 +20,7 @@ async function addPropertyService(
   //const propertyPostedBy = await User.findOne({ email: "propertymanager@gmail.com", role: UserRoles.PROPERTY_MANAGER });
   // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
 
-  console.log(propertyPostedBy, "-----property posedted by ")
+  // console.log(propertyPostedBy, "-----property posedted by ")
 
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
@@ -28,7 +28,7 @@ async function addPropertyService(
   let arr = JSON.parse("[" + trimmedStr + "]");
 
   if (propertyPostedBy) {
-    console.log("property [posedted by true")
+    // console.log("property [posedted by true")
     const Property_ = {
       propertyID: PropertyID,
       images: images,
@@ -126,7 +126,7 @@ async function searchInProperty(body) {
       statusCode: 200,
     };
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     // res.status(500).send("Error searching for properties: " + error.message);
   }
 }
@@ -139,11 +139,11 @@ async function filterProperies(body, id) {
 
   const modifiedProperties = data?.map(property => {
 
-    console.log(property, "===========propertyyyyy")
+    // console.log(property, "===========propertyyyyy")
 
     const liked = favorite?.favorite.includes(property._id);
 
-    console.log(property._id, "===========propertyyyyy id")
+    // console.log(property._id, "===========propertyyyyy id")
 
     return { ...property.toObject(), liked };
   });
@@ -229,7 +229,7 @@ async function nearbyProperies(body, userID) {
 async function getPropertyByID(id, userID) {
   const data = await Property.findById(id);
 
-  console.log(data, "----dataa of property")
+  // console.log(data, "----dataa of property")
   const dataMerge = {};
 
   if (data.landlord_id) {
@@ -250,7 +250,7 @@ async function getPropertyByID(id, userID) {
 
     }
 
-    console.log(dataMerge.propertyData, "==final ")
+    // console.log(dataMerge.propertyData, "==final ")
     const { fullName, picture, verified, role } = landlord;
 
     dataMerge.landlord = {
@@ -264,7 +264,7 @@ async function getPropertyByID(id, userID) {
 
     const favorite = await User.findById(userID).select("favorite")
 
-    console.log(favorite, "===================favroite", favorite.favorite.includes(id))
+    // console.log(favorite, "===================favroite", favorite.favorite.includes(id))
 
     if (favorite.favorite.includes(id)) {
       dataMerge["liked"] = true
@@ -272,7 +272,7 @@ async function getPropertyByID(id, userID) {
       dataMerge["liked"] = false
     }
 
-    console.log(dataMerge, "----datam,ergherbrrbkjrbkjhrkjh")
+    // console.log(dataMerge, "----datam,ergherbrrbkjrbkjhrkjh")
 
 
 
@@ -298,7 +298,7 @@ async function getPropertyByID(id, userID) {
 
 async function addFavoriteProperties(propertyID, renterID) {
 
-  console.log(propertyID, renterID, "===== propety ID renter ID")
+  // console.log(propertyID, renterID, "===== propety ID renter ID")
   const favorite = await User.findOne({ _id: renterID, favorite: propertyID });
 
   const isFavorite = favorite !== null;
@@ -324,7 +324,7 @@ async function addFavoriteProperties(propertyID, renterID) {
       { $push: { favorite: propertyID } },
       { new: true }
     );
-    console.log(data, "")
+    // console.log(data, "")
     return {
       data: data,
       message: "Property favorite successfully",
@@ -349,11 +349,11 @@ async function searchPropertyByString(search, userID) {
 
   const modifiedProperties = results?.map(property => {
 
-    console.log(property, "===========propertyyyyy")
+    // console.log(property, "===========propertyyyyy")
 
     const liked = favorite?.favorite.includes(property._id);
 
-    console.log(property._id, "===========propertyyyyy id")
+    // console.log(property._id, "===========propertyyyyy id")
 
     return { ...property.toObject(), liked };
   });

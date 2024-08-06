@@ -34,7 +34,7 @@ async function getMaintenanceRenter(req, res) {
 
   }
 
-  console.log(`[Maintenance]:[Not Matched Any Request]`)
+  // console.log(`[Maintenance]:[Not Matched Any Request]`)
 }
 
 async function resolveMaintenance(req, res) {

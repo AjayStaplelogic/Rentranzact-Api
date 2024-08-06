@@ -57,7 +57,7 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
     const relativePath = path.join(hostUrl, "property", "LeaseAggrements", fileName + req.user.data.role + ".pdf")
 
-    console.log(relativePath, "===relative path")
+    // console.log(relativePath, "===relative path")
 
     req.documents = relativePath;
     uploadLeaseAggrement(req, res);

@@ -42,7 +42,7 @@ async function rentApplicationUpdate(req, res) {
 }
 
 async function getRentApplications(req, res) {
-  console.log("[Rent Application API]")
+  // console.log("[Rent Application API]")
   const id = req.user.data._id;
   const role = req.user.data.role;
   const PropertyID = req.params.id;
@@ -89,7 +89,7 @@ async function editRentApplication(req, res) {
         }
 
         const verifyStatus = await identityVerifier(req.body.identificationType, kinDetails);
-        console.log(verifyStatus, '=====verifyStatus')
+        // console.log(verifyStatus, '=====verifyStatus')
         if (!verifyStatus) {
           return sendResponse(res, {}, "Kin details is incorrect", false, 400);
         }

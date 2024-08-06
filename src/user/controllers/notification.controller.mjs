@@ -4,7 +4,7 @@ import { getNotificationService } from "../services/notification.service.mjs";
 
 async function getNotification(req, res) {
 
-  console.log(req.user, "-----user")
+  // console.log(req.user, "-----user")
 
   const userID = req.user.data._id;
 

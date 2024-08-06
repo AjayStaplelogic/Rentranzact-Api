@@ -116,7 +116,7 @@ async function getPropertyByID(id) {
   ])
 
 
-  console.log(data,"=====data by id")
+  // console.log(data,"=====data by id")
   return {
     data: data,
     message: `successfully fetched  list`,

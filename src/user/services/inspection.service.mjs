@@ -33,7 +33,7 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
-  console.log(property, "==========property")
+  // console.log(property, "==========property")
 
   payload.propertyName = property.propertyName;
 
@@ -51,12 +51,12 @@ async function createInspection(body, renterID) {
 
   payload.id = id;
 
-  console.log(payload, "----------BODY")
+  // console.log(payload, "----------BODY")
 
   const data = new Inspection(payload);
   data.save();
 
-  console.log(data, "====+++++++data ")
+  // console.log(data, "====+++++++data ")
 
 
 
@@ -319,7 +319,7 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    console.log(data, "==d=dyaaaadtaa ")
+    // console.log(data, "==d=dyaaaadtaa ")
 
     return {
       data: data,
@@ -372,7 +372,7 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    console.log(data, "==d=dyaaaadtaa ")
+    // console.log(data, "==d=dyaaaadtaa ")
 
     return {
       data: data,
