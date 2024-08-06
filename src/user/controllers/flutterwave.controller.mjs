@@ -3,10 +3,7 @@ import { addFlutterwaveTransaction } from "../services/flutterwave.service.mjs";
 
 async function flutterwave(req, res) {
   const { body } = req;
-
-
-
-
+  
   console.log(req.body, "=========boddyyyy")
 
  const data = await addFlutterwaveTransaction(body)

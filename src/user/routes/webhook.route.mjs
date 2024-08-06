@@ -5,7 +5,7 @@ import { stripe } from '../controllers/stripes.controller.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 
-router.post('/flutterwave' ,authorizer([UserRoles.RENTER]) ,flutterwave);
+router.post('/flutterwave'  ,flutterwave);
 router.post('/stripe' , stripe)
 
 
