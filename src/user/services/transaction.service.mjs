@@ -158,7 +158,9 @@ async function transactionByIdService(id) {
           _id : "$landlord_details._id",
           fullName : "$landlord_details.fullName",
           picture : "$landlord_details.picture"
-        }
+        },
+        payment_mode : "$payment_mode",
+        intentID : "$intentID",
       }
     }
   ])
