@@ -8,6 +8,7 @@ import moment from "moment";
 import { Notification } from "../models/notification.model.mjs";
 import { User } from "../models/user.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
+import notificationType from "../constants/index.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -383,7 +384,7 @@ async function updateRentApplications(body, id) {
 
     const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: body })
 
-    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "type": "payRent" }
+    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "type": notificationType.payRent }
 
     const data_ = await sendNotification(data, "single", title, body, metadata)
 
