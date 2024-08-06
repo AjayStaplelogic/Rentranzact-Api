@@ -220,7 +220,7 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      console.log(user, "0-----user");
+      // console.log(user, "0-----user");
 
       if (user) {
         return {
@@ -305,7 +305,7 @@ async function socialSignup(body) {
       }
     }
   } else {
-    console.log("login with apple");
+    // console.log("login with apple");
 
     const { id_token, nonce, email, socialPlatform, name } = body;
 
@@ -563,7 +563,7 @@ async function getWalletDetails(id) {
     }
   ]);
 
-  console.log(results, "==-=-=-=-=-resultsss")
+  // console.log(results, "==-=-=-=-=-resultsss")
 
 
   const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
@@ -591,18 +591,18 @@ async function deleteAggrementByID(userID, aggrementID, role) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
 
-    console.log(data, "===data aaaaaaa")
+    // console.log(data, "===data aaaaaaa")
     const match = data.url.match(regex);
 
     if (match) {
       const filenameWithExtension = match[1];
       const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
 
-      console.log(filePath, "=====pathid ")
+      // console.log(filePath, "=====pathid ")
       fs.unlinkSync(filePath)
-      console.log(filenameWithExtension);
+      // console.log(filenameWithExtension);
     } else {
-      console.log('Filename not found in URL');
+      // console.log('Filename not found in URL');
     }
 
     return {

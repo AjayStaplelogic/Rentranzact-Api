@@ -50,7 +50,7 @@ async function getTimeSlot(req, res) {
 
     if (role === UserRoles.RENTER) {
 
-        console.log("======user id", _id, "------------- date", date)
+        // console.log("======user id", _id, "------------- date", date)
 
         const data = await getTimeSlotByDate(date, _id);
 
@@ -62,7 +62,7 @@ async function getTimeSlot(req, res) {
 
 async function getCalenderTimeSlots(req, res) {
     try {
-        console.log("[Calender Time Slot]")
+        // console.log("[Calender Time Slot]")
         let { renterID, propertyID, landlordID, property_manager_id, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -253,7 +253,7 @@ async function getCalenderTimeSlots(req, res) {
 
 async function getCalenderBlockedSlots(req, res) {
     try {
-        console.log("[Calender Blocked Time Slot]")
+        // console.log("[Calender Blocked Time Slot]")
         let {  userID, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);

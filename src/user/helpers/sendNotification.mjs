@@ -13,10 +13,10 @@ async function sendNotification(user, type, title, body, metadata) {
   if (type === "single") {
     admin.messaging().send(message)
       .then((response) => {
-        console.log('Notification sent:', response);
+        // console.log('Notification sent:', response);
       })
       .catch((error) => {
-        console.error('Error sending notification:', error);
+        // console.error('Error sending notification:', error);
       });
   } else if (type === "multiple") {
 

@@ -44,7 +44,7 @@ export const addUpdateReview = async (req, res) => {
 
 export const getAllReviews = async (req, res) => {
     try {
-        console.log("[Review Listing]")
+        // console.log("[Review Listing]")
         let { type, user_id, property_id, landloard_id, search, rating, status, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);

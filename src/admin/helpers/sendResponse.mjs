@@ -1,5 +1,5 @@
 function sendResponse(res, data, message, status, code, accessToken, additionalData) {
-  console.log(additionalData, "===additionl")
+  // console.log(additionalData, "===additionl")
   let responseObject;
   let additionalResponse;
   if (accessToken) {

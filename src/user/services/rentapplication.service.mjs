@@ -110,7 +110,7 @@ async function addRentApplicationService(body, user) {
     const verifyStatus = await identityVerifier(identificationType, kinDetails);
 
 
-    console.log(verifyStatus, "-ajdssajlksajdlksajdlkj")
+    // console.log(verifyStatus, "-ajdssajlksajdlksajdlkj")
     let data;
 
     if (verifyStatus) {
@@ -327,7 +327,7 @@ async function rentApplicationsList(user, req) {
     }
   ]
   let data = await rentApplication.aggregate(pipeline);
-  console.log(data, '===data')
+  // console.log(data, '===data')
   return {
     data: data[0]?.data,
     message: "rent application fetched successfully",
@@ -408,7 +408,7 @@ async function rentApplicationsList(user, req) {
   else if (user?.role === UserRoles.LANDLORD) {
 
 
-    console.log(user, "==============useerrrrrr")
+    // console.log(user, "==============useerrrrrr")
 
     data = await rentApplication.aggregate([
       {
@@ -464,7 +464,7 @@ async function rentApplicationsList(user, req) {
       }
     ]);
 
-    console.log(data, "==============data")
+    // console.log(data, "==============data")
 
     return {
       data: data,
@@ -473,10 +473,10 @@ async function rentApplicationsList(user, req) {
       statusCode: 200,
     };
 
-    console.log(data, "-------sajksjaksj")
+    // console.log(data, "-------sajksjaksj")
 
   } else {
-    console.log('Else Part')
+    // console.log('Else Part')
   }
 
 
@@ -499,7 +499,7 @@ async function updateRentApplications(body, id) {
 
     let currentDate = moment().format('Do MMM YYYY');
 
-    console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
+    // console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
 
     let title = `Your rent is due to ${landlordDetails.fullName}`;
     let body = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
@@ -525,7 +525,7 @@ async function updateRentApplications(body, id) {
       cancelReason: reason
     });
 
-    console.log(data)
+    // console.log(data)
 
     return {
       data: data,
