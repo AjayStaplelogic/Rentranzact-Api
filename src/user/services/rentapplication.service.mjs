@@ -509,7 +509,10 @@ async function updateRentApplications(body, id) {
 
     const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "type": notificationType.payRent }
 
-    const data_ = await sendNotification(data, "single", title, body, metadata)
+    const renterDetails = await User.findById(data.renterID);
+    if(renterDetails && renterDetails.fcmToken){
+      const data_ = await sendNotification(renterDetails, "single", title, body, metadata)
+    }
 
     await newNotification.save()
 
