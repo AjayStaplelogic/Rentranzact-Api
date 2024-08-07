@@ -223,7 +223,7 @@ async function rentApplicationsList(user, req) {
   }
 
   if (applicationStatus) {
-    query.applicationStatus = applicationStatus;
+    query.applicationStatus = {$in : applicationStatus.split(',')};
   }
 
   let field = "updatedAt";
