@@ -63,7 +63,7 @@ const userSchema = new mongoose.Schema(
     },
     fcmToken : {
       type : String,
-      required : false
+      default : ""
     },
 
     walletPoints :{

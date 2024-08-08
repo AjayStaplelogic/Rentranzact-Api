@@ -42,7 +42,8 @@ async function loginUser(body) {
     if (isPasswordValid) {
       if (user.verified) {
 
-        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken}).then((Res) => console.log(Res , "0000res")).catch((err) => console.log(err, "00000000err"))
+        
 
         
 
@@ -166,13 +167,14 @@ async function applyReferralCode(code, userID) {
 }
 
 async function verifyOtp(body) {
-  const { otp, id } = body;
+  const { otp, id , fcmToken} = body;
 
   const user = await User.findById(id);
 
   if (user?.otp === otp) {
 
-    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "" });
+    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "" , fcmToken : fcmToken});
+     
 
     return {
       data: user_,
