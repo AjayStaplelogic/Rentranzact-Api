@@ -56,6 +56,14 @@ async function loginUser(body) {
           accessToken: accessToken,
         };
       } else {
+
+        let otp = generateOTP();
+        let update_user = await User.findByIdAndUpdate(user._id, { otp: otp }, { new: true });
+        if (update_user) {
+          const htmlTemplate = html(update_user.otp);
+          sendMail(update_user.email, "OTP Verification", htmlTemplate);
+        }
+
         return {
           data: [],
           message: "please verify email id",
