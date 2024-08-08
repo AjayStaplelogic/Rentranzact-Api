@@ -7,53 +7,53 @@ const connected_users = [];
 
 const io = new Server()
 // io.origins("*")
-io.use(async (socket, next) => {
-    console.log(`[Socket Handshake]`)
-    console.log(socket.handshake)
-    if (!socket?.handshake?.headers["authorization"]) {
-        return next(new Error('No headers provided'));
-    }
-    if (socket?.handshake?.headers["authorization"]) {
-        let token_arr = socket?.handshake?.headers["authorization"].split(' ');
-        if (token_arr.length < 2) {
-            return next(new Error("Invalid authorization header"));
-        }
-        if (token_arr[0] == "Bearer" && token_arr[1]) {
-            try {
-                if (token_arr[1] == process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
-                    if (socket?.handshake?.headers["admin_id"]) {
-                        socket["is_admin"] = true;
-                        socket["admin_id"] = socket?.handshake?.headers["admin_id"]
-                        return next();
-                    }
+// io.use(async (socket, next) => {
+//     console.log(`[Socket Handshake]`)
+//     console.log(socket.handshake)
+//     if (!socket?.handshake?.headers["authorization"]) {
+//         return next(new Error('No headers provided'));
+//     }
+//     if (socket?.handshake?.headers["authorization"]) {
+//         let token_arr = socket?.handshake?.headers["authorization"].split(' ');
+//         if (token_arr.length < 2) {
+//             return next(new Error("Invalid authorization header"));
+//         }
+//         if (token_arr[0] == "Bearer" && token_arr[1]) {
+//             try {
+//                 if (token_arr[1] == process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
+//                     if (socket?.handshake?.headers["admin_id"]) {
+//                         socket["is_admin"] = true;
+//                         socket["admin_id"] = socket?.handshake?.headers["admin_id"]
+//                         return next();
+//                     }
 
-                    return next(new Error("Admin Id required"));
+//                     return next(new Error("Admin Id required"));
 
-                }
+//                 }
 
-                const decoded = jwt.verify(token_arr[1], process.env.JWT_ACCESS_TOKEN_SECRET);
-                if (decoded.data && decoded.data._id) {
-                    let get_user = await User.findById(decoded.data._id).lean().exec();
-                    if (get_user) {
-                        socket["user_id"] = get_user._id;
-                        socket["fullName"] = get_user.fullName;
-                        socket["email"] = get_user.email;
-                        socket["role"] = get_user.role;
-                        socket["is_admin"] = false;
-                        return next()
-                    }
-                    return next(new Error("Invalid authentication"))
-                }
-                return next(new Error("Invalid authentication"))
+//                 const decoded = jwt.verify(token_arr[1], process.env.JWT_ACCESS_TOKEN_SECRET);
+//                 if (decoded.data && decoded.data._id) {
+//                     let get_user = await User.findById(decoded.data._id).lean().exec();
+//                     if (get_user) {
+//                         socket["user_id"] = get_user._id;
+//                         socket["fullName"] = get_user.fullName;
+//                         socket["email"] = get_user.email;
+//                         socket["role"] = get_user.role;
+//                         socket["is_admin"] = false;
+//                         return next()
+//                     }
+//                     return next(new Error("Invalid authentication"))
+//                 }
+//                 return next(new Error("Invalid authentication"))
 
-            } catch (error) {
-                return next(new Error(error.message))
-            }
-        }
-        return next(new Error("Invalid authorization type"));
-    }
-    next()
-});
+//             } catch (error) {
+//                 return next(new Error(error.message))
+//             }
+//         }
+//         return next(new Error("Invalid authorization type"));
+//     }
+//     next()
+// });
 
 io.on('connection', (socket) => {
     console.log(`[socket connected][socket Id] : ${socket.id}`)
@@ -192,7 +192,18 @@ io.on('connection', (socket) => {
             }
         })
     });
+
+    
 })
+
+// console.log(io)
+
+io.on("connection_error", (err) => {
+    console.log(err.req);      // the request object
+    console.log(err.code);     // the error code, for example 1
+    console.log(err.message);  // the error message, for example "Session ID unknown"
+    console.log(err.context);  // some additional error context
+  });
 
 io.on("close", (socket) => {
     console.log(`[socket closed] : ${socket.id}`);
