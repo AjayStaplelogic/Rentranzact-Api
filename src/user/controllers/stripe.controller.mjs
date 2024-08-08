@@ -1,7 +1,7 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
-import { payRentService, addToWallet ,payViaWallet } from "../services/stripe.service.mjs"
+import { payRentService, addToWallet ,payViaWalletService } from "../services/stripe.service.mjs"
 
 async function payRent(req, res) {
   const { body } = req;
@@ -18,20 +18,7 @@ async function payRent(req, res) {
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
-  } else if (body.payViaWallet) {
-    const propertyID = body.propertyID;
-    const userID = req.user.data._id;
-    const propertyDetails = await Property.findById(propertyID);
-    const amount = propertyDetails.rent;
-    const landlordID = propertyDetails.landlord_id;
-    const renterDetails = await User.findById(userID);
-    const walletPoints = renterDetails.walletPoints;
-
-    const data = await payViaWallet(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints);
-
-    sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
-  } else {
+  }  else {
     const userID = req.user.data._id;
     const data = await payRentService(body, userID);
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
@@ -43,5 +30,22 @@ async function payRent(req, res) {
 
 
 }
+async function payViaWallet(req, res) {
 
-export { payRent };
+  const {propertyID  } = req.body;
+      const userID = req.user.data._id;
+    const propertyDetails = await Property.findById(propertyID);
+    const amount = propertyDetails.rent;
+    const landlordID = propertyDetails.landlord_id;
+    const renterDetails = await User.findById(userID);
+    const walletPoints = renterDetails.walletPoints;
+
+    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints);
+
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+
+}
+
+
+export { payRent , payViaWallet };
