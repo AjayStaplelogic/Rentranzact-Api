@@ -6,6 +6,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import ObjectID from "bson-objectid";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
+import sendNotification from "../helpers/sendNotification.mjs";
 
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id } = body;
@@ -185,6 +186,15 @@ async function fetchInspections(userData, req) {
 
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID, reason } = body;
+  const renterDetails = await User.findById(id);
+  const inspectionDetails = await Inspection.findById(inspectionID);
+  
+  let title = "Inspection Update";
+  let notificationBody = "";
+
+  const metadata = {
+    redirectTo : "inspection list"
+  }
 
   let update_payload = {
     inspectionStatus: status
@@ -193,10 +203,12 @@ async function updateInspectionStatus(body, id) {
   if (reason && InspectionStatus.CANCELED === status) {
     update_payload.canceledID = id;
     update_payload.cancelReason = reason;
+    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is canceled by ${inspectionDetails.landlordName}`
   }
 
   if (reason && InspectionStatus.ACCEPTED === status) {
     update_payload.acceptedBy = id;
+    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
   }
 
   if (reason && InspectionStatus.COMPLETED === status) {
@@ -205,25 +217,8 @@ async function updateInspectionStatus(body, id) {
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
 
-  // if (InspectionStatus.CANCELED === status) {
-  //   const data = await Inspection.findByIdAndUpdate(inspectionID, {
-  //     inspectionStatus: status,
-  //     canceledID: id,
-  //     cancelReason: reason,
-  //   });
-
-  //   return {
-  //     data: data,
-  //     message: "inspection cancelled successfully",
-  //     status: true,
-  //     statusCode: 200,
-  //   };
-  // } else if (InspectionStatus.COMPLETED === status) {
-  //   const data = await Inspection.findByIdAndUpdate(inspectionID, {
-  //     inspectionStatus: status,
-  //     approverID: id,
-  //   });
-
+  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata)
+     
   return {
     data: data,
     message: "inspection status changed successfully",
