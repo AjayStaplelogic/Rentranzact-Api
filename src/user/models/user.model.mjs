@@ -69,6 +69,9 @@ const userSchema = new mongoose.Schema(
     walletPoints :{
       type: Number,
       default : 0
+    },
+    kinDetails : {
+      type: Object
     }
   },
   { timestamps: true }
