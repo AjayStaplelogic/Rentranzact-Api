@@ -121,6 +121,20 @@ async function addRentApplicationService(body, user) {
 
       data.save();
 
+      const metadata = {
+        redirectTo: "rentApplication"
+      }
+
+      let notificationTitle = "Rent Application Update"
+
+      const renterDetails = await User.findById(renterID);
+
+      const landlordDetails = await User.findById(landlord.landlord_id)
+
+      let notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`
+
+      const data_ = await sendNotification(landlordDetails, "single", notificationTitle, notificationBody, metadata, UserRoles.LANDLORD)
+
       return {
         data: data,
         message: "rent application successfully created",
@@ -138,69 +152,6 @@ async function addRentApplicationService(body, user) {
 
 
     }
-
-    // // if (verifyStatus.data.error) {
-    // if (false) {
-    //   return {
-    //     data: [],
-    //     message: "verifyStatus.message",
-    //     status: false,
-    //     statusCode: 400,
-    //   };
-
-
-    // } else {
-
-    //   // if (verifyStatus.data.status) {
-    //   if (true) {
-
-    //     // const formattedDate = moment(kinDOB, "DD-MM-YYYY").format("DD-MMM-YYYY");
-
-    //     // console.log(verifyStatus.data.data.firstName, "-----lowercase")
-
-    //     // const firstName = verifyStatus.data.data.firstName.toLowerCase();
-
-    //     // const lastName = verifyStatus.data.data.lastName.toLowerCase();
-
-
-
-    //     if (true) {
-    //       // if (verifyStatus.data.data.dateOfBirth === formattedDate && firstName === kinFirstName.toLowerCase() && lastName === kinLastName.toLowerCase()) {
-
-    //       // console.log(verifyStatus.data.status, "=====+++++++++ verification Status")
-
-    //       // payload.kinIdentityCheck = verifyStatus.data.status;
-    //       payload.kinIdentityCheck = true;
-    //       payload.verifcationType = identificationType;
-
-    //       data = new rentApplication(payload);
-
-    //       data.save();
-
-    //       return {
-    //         data: data,
-    //         message: "rent application successfully created",
-    //         status: true,
-    //         statusCode: 200,
-    //       };
-    //     }
-
-    //   } else {
-
-    //     data = new rentApplication(payload);
-
-    //     data.save();
-
-    //     return {
-    //       data: data,
-    //       message: "rent application successfully created",
-    //       status: true,
-    //       statusCode: 200,
-    //     };
-
-    //   }
-    // }
-
 
   } catch (error) {
     console.log(error);
@@ -223,7 +174,7 @@ async function rentApplicationsList(user, req) {
   }
 
   if (applicationStatus) {
-    query.applicationStatus = {$in : applicationStatus.split(',')};
+    query.applicationStatus = { $in: applicationStatus.split(',') };
   }
 
   let field = "updatedAt";
@@ -289,8 +240,8 @@ async function rentApplicationsList(user, req) {
             $project: {
               _id: 1,
               propertyName: 1,
-              images : "$images",
-              address : "$address"
+              images: "$images",
+              address: "$address"
             }
           }
         ],
@@ -510,9 +461,9 @@ async function updateRentApplications(body, id) {
     const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent" }
 
     const renterDetails = await User.findById(data.renterID);
-    if(renterDetails && renterDetails.fcmToken){
-      const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata , UserRoles.RENTER)
-       
+    if (renterDetails && renterDetails.fcmToken) {
+      const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
+
     }
 
     await newNotification.save()
