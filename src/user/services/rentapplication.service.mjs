@@ -115,6 +115,13 @@ async function addRentApplicationService(body, user) {
 
     if (verifyStatus) {
 
+      //add kin details to the user
+  
+      // await User.findByIdAndUpdate()
+      
+
+
+
       payload["kinIdentityCheck"] = true;
 
       data = new rentApplication(payload);
