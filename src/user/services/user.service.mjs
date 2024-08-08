@@ -195,7 +195,7 @@ async function verifyOtp(body) {
 
 async function socialSignup(body) {
 
-  const { socialPlatform, email, email_verified, name, picture, exp } = body;
+  const { socialPlatform, email, email_verified, name, picture, exp , fcmToken} = body;
 
 
 
@@ -222,6 +222,8 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
+      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
+
       // console.log(user, "0-----user");
 
       if (user) {
@@ -240,6 +242,7 @@ async function socialSignup(body) {
           verified: email_verified,
           picture: picture,
           socialPlatform: socialPlatform,
+          fcmToken : fcmToken
         };
 
         const newUser = new User(userPayload);
@@ -276,6 +279,8 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
+      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
+
       if (user) {
         return {
           data: user,
@@ -292,6 +297,7 @@ async function socialSignup(body) {
           verified: email_verified,
           picture: picture?.data?.url,
           socialPlatform: socialPlatform,
+          fcmToken : fcmToken
         };
 
         const newUser = new User(userPayload);
@@ -336,6 +342,7 @@ async function socialSignup(body) {
         email: email,
         socialPlatform: socialPlatform,
       });
+      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
 
       if (user) {
         return {
@@ -353,6 +360,7 @@ async function socialSignup(body) {
           verified: email_verified,
           picture: picture?.data?.url,
           socialPlatform: socialPlatform,
+          fcmToken: fcmToken
         };
 
         const newUser = new User(userPayload);
