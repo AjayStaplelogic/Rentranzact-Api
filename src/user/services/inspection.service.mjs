@@ -231,6 +231,7 @@ async function updateInspectionStatus(body, id) {
 
   if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
+    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is completed by ${inspectionDetails.landlordName}`
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
