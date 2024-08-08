@@ -1,7 +1,8 @@
 import admin from "../../server.js";
-async function sendNotification(user, type, title, body, metadata) {
+async function sendNotification(user, type, title, body, metadata, role) {
 
   const message = {
+    topic : role,
     notification: {
       title: title.toString(),
       body: body.toString()
