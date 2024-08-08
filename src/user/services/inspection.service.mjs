@@ -217,7 +217,7 @@ async function updateInspectionStatus(body, id) {
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
 
-  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata)
+  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata , UserRoles.RENTER)
      
   return {
     data: data,

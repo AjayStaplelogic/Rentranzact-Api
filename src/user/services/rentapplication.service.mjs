@@ -511,7 +511,7 @@ async function updateRentApplications(body, id) {
 
     const renterDetails = await User.findById(data.renterID);
     if(renterDetails && renterDetails.fcmToken){
-      const data_ = await sendNotification(renterDetails, "single", title, body, metadata)
+      const data_ = await sendNotification(renterDetails, "single", title, body, metadata , UserRoles.RENTER) 
     }
 
     await newNotification.save()
