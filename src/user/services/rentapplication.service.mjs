@@ -9,6 +9,7 @@ import { Notification } from "../models/notification.model.mjs";
 import { User } from "../models/user.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import notificationType from "../constants/index.mjs";
+import assert from "assert";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -97,6 +98,8 @@ async function addRentApplicationService(body, user) {
       payload["checkoutDate"] = checkoutDate
     }
 
+
+
     const kinDetails = {
       first_name: kinFirstName,
       last_name: kinLastName,
@@ -107,18 +110,49 @@ async function addRentApplicationService(body, user) {
       voter_id: voter_id
     }
 
-    const verifyStatus = await identityVerifier(identificationType, kinDetails);
+    const renterDetails = await User.findById(renterID);
+
+    function kinDetailsSame(kinDetails1, kinDetails2) {
+      try {
+        // Use deepEqual to compare the objects
+        assert.deepStrictEqual(kinDetails1, kinDetails2);
+        return true;
+      } catch (error) {
+        return false;
+      }
+    }
+
+    let isKinSame = kinDetailsSame(kinDetails, renterDetails.kinDetails)
+
+    let verifyStatus;
+
+    if (isKinSame) {
+      
+      verifyStatus = true
+    } else {
+
+      console.log("hitting smile api")
+      verifyStatus = await identityVerifier(identificationType, kinDetails);
+    }
+
+
 
 
     // console.log(verifyStatus, "-ajdssajlksajdlksajdlkj")
     let data;
 
+
+
+
+
+
+
     if (verifyStatus) {
 
       //add kin details to the user
-  
-      // await User.findByIdAndUpdate()
-      
+
+      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails })
+
 
 
 
