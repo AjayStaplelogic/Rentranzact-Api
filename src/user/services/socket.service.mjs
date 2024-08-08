@@ -8,6 +8,7 @@ const connected_users = [];
 const io = new Server()
 // io.origins("*")
 io.use(async (socket, next) => {
+    console.log(`[Socket Handshake]`)
     console.log(socket.handshake)
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
