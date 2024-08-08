@@ -144,7 +144,11 @@ app.use((err, req, res, next) => {
 // Start the server
 
 const server = http.createServer(app);
-io.attach(server);
+io.attach(server, {
+  cors: {
+    origin: "*"
+  }
+});
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
