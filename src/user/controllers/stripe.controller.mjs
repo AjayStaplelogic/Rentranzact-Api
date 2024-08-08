@@ -6,12 +6,12 @@ import { payRentService, addToWallet ,payViaWallet } from "../services/stripe.se
 async function payRent(req, res) {
   const { body } = req;
 
-  console.log(body, "====bdoduy")
+  // console.log(body, "====bdoduy")
 
 
   if (body.wallet) {
 
-    console.log("came in walle t trueeeeeeeee e  e e e")
+    // console.log("came in walle t trueeeeeeeee e  e e e")
 
     const userID = req.user.data._id;
     const data = await addToWallet(body, userID);

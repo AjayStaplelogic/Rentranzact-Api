@@ -4,6 +4,14 @@ import { addFlutterwaveTransaction , addToWallet } from "../services/flutterwave
 async function flutterwave(req, res) {
   const { body } = req;
 
+
+
+
+
+
+  console.log(req.body, "=========boddyyyy")
+
+
   const {wallet } = body;
 
   if(wallet) {

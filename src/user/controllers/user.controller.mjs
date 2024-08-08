@@ -134,7 +134,7 @@ async function socialLogin(req, res) {
 }
 
 async function myprofile(req, res) {
-  console.log(req.user.data, "====user")
+  // console.log(req.user.data, "====user")
   const { _id, role } = req.user.data;
   const data = await myProfileDetails(_id, role);
   sendResponse(
@@ -253,7 +253,7 @@ async function resetPassword(req, res) {
     return sendResponse(res, {}, "User not found", false, 404);
 
   } catch (error) {
-    console.log(error, '======errir')
+    // console.log(error, '======errir')
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 

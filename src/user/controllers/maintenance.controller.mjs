@@ -21,18 +21,20 @@ async function getMaintenanceRenter(req, res) {
 
   if (req?.user?.data?.role === UserRoles.RENTER) {
 
-    const data = await getMaintenanceRequestsRenter(id);
+    const data = await getMaintenanceRequestsRenter(id, req);
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
   } else if (req?.user?.data?.role === UserRoles.LANDLORD) {
 
-    const data = await getMaintenanceRequestsLandlord(id);
+    const data = await getMaintenanceRequestsLandlord(id, req);
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
   }
+
+  // console.log(`[Maintenance]:[Not Matched Any Request]`)
 }
 
 async function resolveMaintenance(req, res) {
