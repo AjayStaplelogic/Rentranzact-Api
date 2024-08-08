@@ -20,7 +20,7 @@ async function createInspection(body, renterID) {
 
   const landlordDetails = await User.findById(property.landlord_id)
 
-  const { fullName, picture, phone, countryCode } = renterDetails;
+  const { fullName, picture, phone, countryCode , email} = renterDetails;
 
 
   const payload = {
@@ -35,6 +35,7 @@ async function createInspection(body, renterID) {
     picture: picture,
     countryCode: countryCode,
     phone: phone,
+    email : email
   };
 
   // console.log(property, "==========property")
@@ -231,7 +232,7 @@ async function updateInspectionStatus(body, id) {
 
   if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
-    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is completed by ${inspectionDetails.landlordName}`
+    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
