@@ -2,7 +2,6 @@ import admin from "../../server.js";
 async function sendNotification(user, type, title, body, metadata, role) {
 
   const message = {
-    topic : role,
     notification: {
       title: title.toString(),
       body: body.toString()
@@ -13,9 +12,12 @@ async function sendNotification(user, type, title, body, metadata, role) {
 
   console.log(user.fcmToken ," ===============fcm token")
 
+
+  console
+
   if (type === "single") {
 
-    admin.messaging().subscribeToTopic(message.token , message.topic)
+    admin.messaging().subscribeToTopic(message.token , role)
     .then((response) => {
       console.log("=====subscribe to topic" , response)
     })
@@ -26,10 +28,10 @@ async function sendNotification(user, type, title, body, metadata, role) {
 
     admin.messaging().send(message)
       .then((response) => {
-        // console.log('Notification sent:', response);
+         console.log('Notification sent:', response);
       })
       .catch((error) => {
-        // console.error('Error sending notification:', error);
+        console.error('Error sending notification:', error);
       });
   } else if (type === "multiple") {
 
