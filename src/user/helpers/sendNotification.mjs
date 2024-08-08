@@ -11,14 +11,16 @@ async function sendNotification(user, type, title, body, metadata, role) {
     token : user?.fcmToken
   };
 
+  console.log(user.fcmToken ," ===============fcm token")
+
   if (type === "single") {
 
     admin.messaging().subscribeToTopic(message.token , message.topic)
     .then((response) => {
-      // console.log('Notification sent:', response);
+      console.log("=====subscribe to topic" , response)
     })
     .catch((error) => {
-      // console.error('Error sending notification:', error);
+      console.log('error -----------------------' , error)
     });
 
 
