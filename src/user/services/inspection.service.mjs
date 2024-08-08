@@ -11,6 +11,9 @@ import sendNotification from "../helpers/sendNotification.mjs";
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id } = body;
 
+  let title;
+  let notificationBody;
+
   const property = await Property.findById(propertyID);
 
   const renterDetails = await User.findById(renterID);
@@ -59,7 +62,16 @@ async function createInspection(body, renterID) {
 
   // console.log(data, "====+++++++data ")
 
+  
+  const metadata = {
+    redirectTo: "inspection"
+  }
 
+  title = "Inspection Update"
+
+  notificationBody = `${renterDetails.fullName} applied inspection for ${property.propertyName}`
+  
+  const data_ = await sendNotification(landlordDetails, "single", title, notificationBody, metadata, UserRoles.LANDLORD)
 
 
 
