@@ -31,9 +31,12 @@ import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
 import { fileURLToPath } from "url";
 import path from "path";
+import http from "http";
 
 import admin from 'firebase-admin'
 import serviceAccount from "./user/helpers/serviceAccount.js";
+
+import io from "./user/services/socket.service.mjs"
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
@@ -133,13 +136,18 @@ app.get("/api/health", async (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
+  console.log(`[Server] : ${err}`)
   console.error(err.stack);
   res.status(500).json({ message: "Internal Server Error" });
 });
 
 // Start the server
+
+const server = http.createServer(app);
+io.attach(server);
+
 const PORT = process.env.PORT;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
 
