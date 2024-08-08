@@ -52,8 +52,8 @@ app.use(bodyParser.json());
 
 const corsOptions = {
   origin: "*", // Allows requests from any origin
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  allowedHeaders: "Content-Type,Authorization",
+  // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  // allowedHeaders: "Content-Type,Authorization",
 };
 
 
@@ -144,11 +144,7 @@ app.use((err, req, res, next) => {
 // Start the server
 
 const server = http.createServer(app);
-io.attach(server, {
-  cors: {
-    origin: "*"
-  }
-});
+io.attach(server);
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
