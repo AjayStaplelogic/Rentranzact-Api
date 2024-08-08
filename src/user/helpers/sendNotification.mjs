@@ -1,6 +1,7 @@
 import admin from "../../server.js";
 async function sendNotification(user, type, title, body, metadata, role) {
 
+  console.log(body, "----body in sendNotification")
   const message = {
     notification: {
       title: title.toString(),
@@ -12,8 +13,6 @@ async function sendNotification(user, type, title, body, metadata, role) {
 
   console.log(user.fcmToken ," ===============fcm token")
 
-
-  console
 
   if (type === "single") {
 

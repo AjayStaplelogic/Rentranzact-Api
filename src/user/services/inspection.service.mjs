@@ -186,41 +186,48 @@ async function fetchInspections(userData, req) {
 
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID, reason } = body;
-  
+
   const inspectionDetails = await Inspection.findById(inspectionID);
 
   const renterDetails = await User.findById(inspectionDetails.RenterDetails.id);
-  
+
   let title = "Inspection Update";
-  let notificationBody = "";
+  let notificationBody;
 
   const metadata = {
-    redirectTo : "inspection list"
+    redirectTo: "inspection"
   }
 
   let update_payload = {
     inspectionStatus: status
   };
 
-  if (reason && InspectionStatus.CANCELED === status) {
+  if (InspectionStatus.CANCELED === status) {
     update_payload.canceledID = id;
-    update_payload.cancelReason = reason;
+    if (reason) {
+      update_payload.cancelReason = reason;
+    }
     notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is canceled by ${inspectionDetails.landlordName}`
+
+    console.log(notificationBody, "---notification body in condition")
   }
 
-  if (reason && InspectionStatus.ACCEPTED === status) {
+  if (InspectionStatus.ACCEPTED === status) {
     update_payload.acceptedBy = id;
     notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
   }
 
-  if (reason && InspectionStatus.COMPLETED === status) {
+  if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
 
-  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata , UserRoles.RENTER)
-     
+
+  console.log(notificationBody, "----notificationBody")
+
+  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
+
   return {
     data: data,
     message: "inspection status changed successfully",

@@ -502,16 +502,17 @@ async function updateRentApplications(body, id) {
     // console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
 
     let title = `Your rent is due to ${landlordDetails.fullName}`;
-    let body = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+    let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: body })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody })
 
-    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "type": notificationType.payRent }
+    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent" }
 
     const renterDetails = await User.findById(data.renterID);
     if(renterDetails && renterDetails.fcmToken){
-      const data_ = await sendNotification(renterDetails, "single", title, body, metadata , UserRoles.RENTER) 
+      const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata , UserRoles.RENTER)
+       
     }
 
     await newNotification.save()
