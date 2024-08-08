@@ -38,7 +38,7 @@ async function addToWallet(body, userID) {
     const { amount, wallet  } = body;
 
 
-    console.log(amount, wallet  , "=======amopunt wallet ")
+    // console.log(amount, wallet  , "=======amopunt wallet ")
 
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -53,7 +53,7 @@ async function addToWallet(body, userID) {
     })
 
 
-    console.log(paymentIntent , "=====PAYMENT INTENT  ")
+    // console.log(paymentIntent , "=====PAYMENT INTENT  ")
 
     return {
         data: { client_secret: paymentIntent.client_secret },

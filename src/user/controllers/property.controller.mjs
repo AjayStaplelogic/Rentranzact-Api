@@ -14,7 +14,7 @@ import {
 async function addProperty(req, res) {
   const { body } = req;
 
-  console.log(body , "body in add propertyyyyyy")
+  // console.log(body , "body in add propertyyyyyy")
 
 
   const id = req.user.data._id;
@@ -32,7 +32,7 @@ async function addProperty(req, res) {
   
 
   if (images.length > 0) {
-    console.log("Images uploaded:");
+    // console.log("Images uploaded:");
 
     images.forEach((image) => {
   
@@ -40,7 +40,7 @@ async function addProperty(req, res) {
   }
 
   if (documents.length > 0) {
-    console.log("Documents uploaded:");
+    // console.log("Documents uploaded:");
     documents.forEach((document) => {
      
     });
@@ -100,7 +100,7 @@ async function propertyByID(req, res) {
 async function addFavorite(req, res) {
   const { id } = req.params;
 
-  console.log(id, "this is property which liked or dislikeddddd")
+  // console.log(id, "this is property which liked or dislikeddddd")
   const { _id } = req.user.data;
 
   const data = await addFavoriteProperties(id, _id);
@@ -121,7 +121,7 @@ async function searchPropertyByKeywords(req, res) {
 
 
 async function myProperties (req, res) {
-  console.log(`[My Properties API]`)
+  // console.log(`[My Properties API]`)
   const {role , _id} = req.user.data;
 
 

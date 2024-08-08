@@ -33,7 +33,7 @@ async function createInspection(body, renterID) {
     phone: phone,
   };
 
-  console.log(property, "==========property")
+  // console.log(property, "==========property")
 
   payload.propertyName = property.propertyName;
 
@@ -51,12 +51,12 @@ async function createInspection(body, renterID) {
 
   payload.id = id;
 
-  console.log(payload, "----------BODY")
+  // console.log(payload, "----------BODY")
 
   const data = new Inspection(payload);
   data.save();
 
-  console.log(data, "====+++++++data ")
+  // console.log(data, "====+++++++data ")
 
 
 
@@ -70,9 +70,20 @@ async function createInspection(body, renterID) {
   };
 }
 
-async function fetchInspections(userData) {
+async function fetchInspections(userData, req) {
+  let { search } = req.query;
   if (userData.role === UserRoles.LANDLORD) {
-    const data = await Inspection.find({ landlordID: userData?._id });
+    let query = {
+      landlordID: userData?._id
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
+    const data = await Inspection.find(query);
 
     return {
       data: data,
@@ -81,7 +92,17 @@ async function fetchInspections(userData) {
       statusCode: 200,
     };
   } else if (userData.role === UserRoles.PROPERTY_MANAGER) {
-    const data = await Inspection.find({ propertyID: userData?._id });
+    let query = {
+      propertyID: userData?._id
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
+    const data = await Inspection.find(query);
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -93,13 +114,21 @@ async function fetchInspections(userData) {
       "RenterDetails.id": userData?._id,
     });
 
-    // Import ObjectId from MongoDB driver
+    let query = {
+      "RenterDetails.id": userData?._id,
+    }
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: "i" } },
+        { "RenterDetails.fullName": { $regex: search, $options: "i" } },
+        { landlordName: { $regex: search, $options: "i" } },
+      ]
+    }
 
+    // Import ObjectId from MongoDB driver
     const data = await Inspection.aggregate([
       {
-        $match: {
-          "RenterDetails.id": userData?._id,
-        },
+        $match: query
       },
       {
         $lookup: {
@@ -204,19 +233,38 @@ async function updateInspectionStatus(body, id) {
 }
 
 async function inspectionEditService(body) {
-  const { inspectionID, inspectionTime, inspectionDate, message } = body;
+  const { inspectionID, inspectionTime, inspectionDate, message, id } = body;
+  let payload = {};
+  if (inspectionTime) {
+    payload.inspectionTime = inspectionTime;
+  }
 
-  const data = await Inspection.findByIdAndUpdate(inspectionID, {
-    inspectionTime: inspectionTime,
-    inspectionDate: inspectionDate,
-    message: message,
-  });
+  if (inspectionDate) {
+    payload.inspectionDate = inspectionDate;
+  }
+
+  if (message) {
+    payload.message = message;
+  }
+  if (id) {
+    payload.id = id;
+  }
+  const data = await Inspection.findByIdAndUpdate(inspectionID, payload, { new: true });
+
+  if (data) {
+    return {
+      data: data,
+      message: "inspection updated successfully",
+      status: true,
+      statusCode: 200,
+    };
+  }
 
   return {
-    data: data,
-    message: "inspection updated successfully",
-    status: true,
-    statusCode: 200,
+    data: {},
+    message: "Invalid Id",
+    status: false,
+    statusCode: 400,
   };
 }
 
@@ -271,7 +319,7 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    console.log(data, "==d=dyaaaadtaa ")
+    // console.log(data, "==d=dyaaaadtaa ")
 
     return {
       data: data,
@@ -324,7 +372,7 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    console.log(data, "==d=dyaaaadtaa ")
+    // console.log(data, "==d=dyaaaadtaa ")
 
     return {
       data: data,
