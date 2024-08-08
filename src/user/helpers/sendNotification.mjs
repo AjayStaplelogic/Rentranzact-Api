@@ -12,6 +12,16 @@ async function sendNotification(user, type, title, body, metadata, role) {
   };
 
   if (type === "single") {
+
+    admin.messaging().subscribeToTopic(message.token , message.topic)
+    .then((response) => {
+      // console.log('Notification sent:', response);
+    })
+    .catch((error) => {
+      // console.error('Error sending notification:', error);
+    });
+
+
     admin.messaging().send(message)
       .then((response) => {
         // console.log('Notification sent:', response);
