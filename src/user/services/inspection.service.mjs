@@ -186,8 +186,10 @@ async function fetchInspections(userData, req) {
 
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID, reason } = body;
-  const renterDetails = await User.findById(id);
+  
   const inspectionDetails = await Inspection.findById(inspectionID);
+
+  const renterDetails = await User.findById(inspectionDetails.RenterDetails.id);
   
   let title = "Inspection Update";
   let notificationBody = "";
