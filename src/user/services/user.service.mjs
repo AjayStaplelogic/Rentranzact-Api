@@ -65,7 +65,7 @@ async function loginUser(body) {
         }
 
         return {
-          data: [],
+          data:  { id: update_user?._id},
           message: "please verify email id",
           status: true,
           statusCode: 401,
