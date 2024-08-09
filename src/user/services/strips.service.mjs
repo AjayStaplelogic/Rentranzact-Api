@@ -6,6 +6,7 @@ import moment from "moment";
 import { User } from "../models/user.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -96,16 +97,33 @@ async function rechargeWallet(body) {
 
     const { userID } = body.data.object.metadata;
 
+    const userDetail = await User.findById(userID);
+
     const { amount, status, created, id } = body.data.object;
 
-    const payload = {
-        amount,
-        status,
-        createdAt: created,
-        type: "CREDIT",
-        userID,
-        intentID: id
+    if(userDetail.role === UserRoles.RENTER) {
+        const payload = {
+            amount,
+            status,
+            createdAt: created,
+            type: "CREDIT",
+            userID,
+            intentID: id
+        }
+
+    } else if (userDetail.role === UserRoles.LANDLORD) {
+
+        const payload = {
+            amount,
+            status,
+            createdAt: created,
+            type: "CREDIT",
+            landlordID : userID,
+            intentID: id
+        }
     }
+
+   
 
     if (status === "succeeded") {
 
