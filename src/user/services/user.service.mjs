@@ -230,7 +230,7 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
+      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
 
       // console.log(user, "0-----user");
 
