@@ -171,7 +171,7 @@ router.get(
 
 router.get("/my-properties", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), myProperties)
 
-router.get("/leave-property/:id" , authorizer([UserRoles.RENTER]) , leaveProperty)
+router.post("/leave-property/:id" , authorizer([UserRoles.RENTER]) , leaveProperty)
 
 router.get("/properties", getAllProperties)
 
