@@ -7,10 +7,12 @@ import { User } from "../models/user.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { rentApplication } from "../models/rentApplication.model.mjs";
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-async function addStripeTransaction(body) {
+async function addStripeTransaction(body , renterApplicationID) {
 
     console.log(body , "----bodddyyyy")
 
@@ -78,7 +80,7 @@ async function addStripeTransaction(body) {
 
     const data = new Transaction({wallet : false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT", payment_mode : "stripe" })
 
-
+    await rentApplication.findByIdAndUpdate(renterApplicationID,{ "applicationStatus" : RentApplicationStatus.COMPLETED })
 
     data.save()
 
@@ -112,6 +114,10 @@ async function rechargeWallet(body) {
             userID,
             intentID: id
         }
+
+        const data_ = new Transaction({wallet : true ,renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
+    
+        data_.save()
         if (status === "succeeded") {
 
             const data__ = await User.findByIdAndUpdate(
@@ -132,6 +138,10 @@ async function rechargeWallet(body) {
             landlordID : userID,
             intentID: id
         }
+        const data = new Wallet(payload)
+        data.save()
+    
+        
 
     }
 
@@ -139,12 +149,7 @@ async function rechargeWallet(body) {
 
     
 
-    const data = new Wallet(payload)
-    data.save()
-
-    const data_ = new Transaction({wallet : true ,renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
-
-    data_.save()
+   
 
 
 
