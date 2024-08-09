@@ -9,7 +9,7 @@ async function payRent(req, res) {
   console.log(body, "====bdoduy")
 
 
-  if (body.wallet) {
+  if (body.wallet === "true") {
 
     // console.log("came in walle t trueeeeeeeee e  e e e")
 

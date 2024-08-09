@@ -13,7 +13,7 @@ async function stripe(req, res) {
 
         console.log(typeof wallet , "-----wallet ")
 
-        if (wallet) {
+        if (wallet === "true") {
 
             const data = await rechargeWallet(body);
 
