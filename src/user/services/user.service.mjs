@@ -230,11 +230,12 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+     
 
       // console.log(user, "0-----user");
 
       if (user) {
+        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
         return {
           data: user,
           message: "login successfully",
@@ -254,7 +255,9 @@ async function socialSignup(body) {
         };
 
         const newUser = new User(userPayload);
+       
         newUser.save();
+        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
 
         return {
           data: newUser,
@@ -287,9 +290,10 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+      
 
       if (user) {
+        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
         return {
           data: user,
           message: "login successfully",
@@ -309,7 +313,10 @@ async function socialSignup(body) {
         };
 
         const newUser = new User(userPayload);
+
+       
         newUser.save();
+        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
 
         return {
           data: newUser,
@@ -350,9 +357,10 @@ async function socialSignup(body) {
         email: email,
         socialPlatform: socialPlatform,
       });
-      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+   
 
       if (user) {
+        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
         return {
           data: user,
           message: "login successfully",
@@ -372,7 +380,10 @@ async function socialSignup(body) {
         };
 
         const newUser = new User(userPayload);
+       
         newUser.save();
+
+        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
 
         return {
           data: newUser,
