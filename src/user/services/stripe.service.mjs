@@ -13,6 +13,8 @@ async function payRentService(body, userID) {
 
     const { amount, propertyID, wallet } = body;
 
+    console.log(typeof wallet , "--------wallet typeof ")
+
     const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
         currency: 'ngn',
