@@ -6,7 +6,7 @@ import { payRentService, addToWallet ,payViaWalletService } from "../services/st
 async function payRent(req, res) {
   const { body } = req;
 
-  // console.log(body, "====bdoduy")
+  console.log(body, "====bdoduy")
 
 
   if (body.wallet) {
