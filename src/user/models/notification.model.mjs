@@ -27,6 +27,10 @@ const notificationSchema = new mongoose.Schema(
         amount : {
             type: Number,
             required: false
+        },
+        renterApplicationID: {
+            type : String,
+            required : false
         }
     },
     { timestamps: true }

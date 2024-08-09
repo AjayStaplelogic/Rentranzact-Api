@@ -6,7 +6,7 @@ async function stripe(req, res) {
 
     if (body.type === "payment_intent.succeeded") {
 
-        const { wallet } = body.data.object.metadata;
+        const { wallet , renterApplicationID} = body.data.object.metadata;
 
 
         console.log(body.data.object.metadata , "=============meta data ")
@@ -22,7 +22,7 @@ async function stripe(req, res) {
            
         } else {
 
-            const data = await addStripeTransaction(body);
+            const data = await addStripeTransaction(body , renterApplicationID);
 
             sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

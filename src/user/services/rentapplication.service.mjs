@@ -499,9 +499,9 @@ async function updateRentApplications(body, id) {
     let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody , renterApplicationID :rentApplicationID })
 
-    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent" }
+    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent" , "rentApplication" : rentApplicationID }
 
     const renterDetails = await User.findById(data.renterID);
     if (renterDetails && renterDetails.fcmToken) {
