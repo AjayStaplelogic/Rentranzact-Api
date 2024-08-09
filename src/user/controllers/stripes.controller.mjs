@@ -11,7 +11,7 @@ async function stripe(req, res) {
 
         console.log(body.data.object.metadata , "=============meta data ")
 
-        console.log(wallet , "-----wallet ")
+        console.log(typeof wallet , "-----wallet ")
 
         if (wallet) {
 
