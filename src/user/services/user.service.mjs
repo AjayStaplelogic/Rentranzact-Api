@@ -287,7 +287,7 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
+      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
 
       if (user) {
         return {
@@ -350,7 +350,7 @@ async function socialSignup(body) {
         email: email,
         socialPlatform: socialPlatform,
       });
-      await User.findByIdAndUpdate(user.__id, {fcmToken : fcmToken})
+      await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
 
       if (user) {
         return {
