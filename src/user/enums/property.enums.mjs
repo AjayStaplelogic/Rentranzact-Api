@@ -23,6 +23,13 @@ const FurnishingType = {
     FULLY_FURNISHED : "fully furnished"
 }
 
+const RentBreakDownPer = {
+  AGENCY_FEE : 10,
+  AGENT_FEE_PERCENT : 7,
+  RTZ_FEE_PERCENT : 3,
+  LEGAL_FEE_PERCENT : 5,
+  CAUTION_FEE_PERCENT : 10, 
+}
   
 
-export { PropertiesCategories , PropertiesStatus  , RentType , Type , FurnishingType};
+export { PropertiesCategories , PropertiesStatus  , RentType , Type , FurnishingType,RentBreakDownPer};
