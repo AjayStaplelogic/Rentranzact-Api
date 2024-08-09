@@ -59,7 +59,7 @@ async function loginUser(body) {
         return {
           data: [],
           message: "please verify email id",
-          status: true,
+          status: false,
           statusCode: 401,
         };
       }
