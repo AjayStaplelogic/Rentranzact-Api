@@ -8,7 +8,8 @@ import {
   getPropertyByID,
   addFavoriteProperties,
   searchPropertyByString,
-  getMyProperties
+  getMyProperties,
+  leavePropertyService
 } from "../services/property.service.mjs";
 
 async function addProperty(req, res) {
@@ -131,6 +132,18 @@ async function myProperties (req, res) {
 
 }
 
+async function leaveProperty(req, res) {
+
+  const userID = req.user.data._id;
+
+  const propertyID = req.params.id;
+
+
+  const data = await leavePropertyService(userID, propertyID)
+  
+  sendResponse(res, data.data, data.message, data.status, data.statusCode); 
+}
+
 export {
   addProperty,
   searchProperty,
@@ -138,5 +151,6 @@ export {
   propertyByID,
   addFavorite,
   searchPropertyByKeywords,
-  myProperties
+  myProperties,
+  leaveProperty
 };

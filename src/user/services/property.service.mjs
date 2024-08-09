@@ -497,6 +497,22 @@ async function getMyProperties(role, id, req) {
 
 }
 
+
+async function leavePropertyService(userID , propertyID) {
+
+  console.log(propertyID,"--=-=-=-=")
+
+  const data = await Property.findByIdAndUpdate(propertyID , {renterID : "" , rented : false, rent_period_start : "", rent_period_end : ""})
+
+  return {
+    data: data,
+    message: "left property",
+    status: true,
+    statusCode: 200,
+  };
+
+}
+
 export {
   getMyProperties,
   addPropertyService,
@@ -506,4 +522,5 @@ export {
   getPropertyByID,
   addFavoriteProperties,
   searchPropertyByString,
+  leavePropertyService
 };

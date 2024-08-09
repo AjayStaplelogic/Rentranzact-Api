@@ -10,7 +10,8 @@ import {
   propertyByID,
   addFavorite,
   searchPropertyByKeywords,
-  myProperties
+  myProperties,
+  leaveProperty
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -94,7 +95,7 @@ const hostUrl = process.env.HOST_URL;
 router.post("/property/search", searchProperty);
 
 router.post("/property/list", authorizer([UserRoles.RENTER]), propertiesList);
-router.get("/property/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]), propertyByID);
+router.get("/property/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), propertyByID);
 router.get(
   "/property/favorite/:id",
   authorizer([UserRoles.RENTER]),
@@ -168,6 +169,10 @@ router.get(
 );
 
 router.get("/my-properties", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), myProperties)
+
+router.get("/leave-property/:id" , authorizer([UserRoles.RENTER]) , leaveProperty)
+
+
 
 export default router;
 

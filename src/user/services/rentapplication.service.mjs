@@ -151,6 +151,8 @@ async function addRentApplicationService(body, user) {
 
       //add kin details to the user
 
+      kinDetails["identificationType"] = identificationType;
+
       await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails })
 
 
