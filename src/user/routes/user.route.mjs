@@ -1,12 +1,13 @@
 import express from 'express'
 const router = express.Router();
-import { wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, deleteAggrement, userOtpVerification, resetPassword } from '../controllers/user.controller.mjs'
+import { wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, deleteAggrement, userOtpVerification, resetPassword, editMyProfile } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
 import authorizer from '../middleware/authorizer.middleware.mjs';
 import multer from 'multer';
 import path from "path"
 import fs from "fs";
+
 
 const baseUploadPath = "uploads/";
 
@@ -73,6 +74,7 @@ router.post("/verify-otp", userOtpVerification)
 
 router.post("/reset-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), resetPassword)
 
+router.put("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), editMyProfile)
 
 
 export default router;

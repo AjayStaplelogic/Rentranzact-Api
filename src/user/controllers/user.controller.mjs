@@ -259,5 +259,31 @@ async function resetPassword(req, res) {
 
 }
 
+async function editMyProfile(req, res) {
+  try {
+      let id = req.user.data._id;
+      delete req.body.email;
+      delete req.body.password;
+      delete req.body.otp;
+      delete req.body.role;
+      let update_user = await User.findByIdAndUpdate(id,
+        req.body,
+        {new : true}
+      );
 
-export { deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword };
+      if(update_user){
+        delete update_user.email;
+        delete update_user.password;
+        delete update_user.otp;
+        return sendResponse(res, update_user, "Profile updated successfully", true, 200);
+
+      }
+
+    return sendResponse(res, {}, "User not found", false, 404);
+  } catch (error) {
+    // console.log(error, '======errir')
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+}
+
+export { deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile };
