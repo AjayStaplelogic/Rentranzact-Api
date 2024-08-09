@@ -12,6 +12,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function addStripeTransaction(body) {
 
+    console.log(body , "----bodddyyyy")
+
     const { userID, propertyID } = body.data.object.metadata;
 
     const { amount, status, created, id } = body.data.object;
@@ -110,6 +112,15 @@ async function rechargeWallet(body) {
             userID,
             intentID: id
         }
+        if (status === "succeeded") {
+
+            const data__ = await User.findByIdAndUpdate(
+                userID,
+                { $inc: { walletPoints: amount } },
+                { new: true }
+            );
+    
+        }
 
     } else if (userDetail.role === UserRoles.LANDLORD) {
 
@@ -121,19 +132,12 @@ async function rechargeWallet(body) {
             landlordID : userID,
             intentID: id
         }
+
     }
 
    
 
-    if (status === "succeeded") {
-
-        const data__ = await User.findByIdAndUpdate(
-            userID,
-            { $inc: { walletPoints: amount } },
-            { new: true }
-        );
-
-    }
+    
 
     const data = new Wallet(payload)
     data.save()

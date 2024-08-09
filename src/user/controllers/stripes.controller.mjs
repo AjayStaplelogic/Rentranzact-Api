@@ -8,6 +8,11 @@ async function stripe(req, res) {
 
         const { wallet } = body.data.object.metadata;
 
+
+        console.log(body.data.object.metadata , "=============meta data ")
+
+        console.log(wallet , "-----wallet ")
+
         if (wallet) {
 
             const data = await rechargeWallet(body);
