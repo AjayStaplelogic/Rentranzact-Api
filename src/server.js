@@ -20,6 +20,7 @@ import maintenanceRoutes from "./user/routes/maintenance.route.mjs"
 import dummyRoutes from "./user/routes/dummy.route.mjs"
 import calenderRoutes from "./user/routes/calender.route.mjs"
 import reviewRoutes from "./user/routes/review.route.mjs"
+import uploadRoutes from "./user/routes/upload.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -44,7 +45,6 @@ admin.initializeApp({
 const app = express();
 
 app.use(express.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Parse JSON bodies (if applicable)
@@ -52,21 +52,24 @@ app.use(bodyParser.json());
 
 const corsOptions = {
   origin: "*", // Allows requests from any origin
-  // methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   // allowedHeaders: "Content-Type,Authorization",
 };
 
+app.use(cors());
 
-app.use(cors(corsOptions));
+
+// app.use(cors(corsOptions));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Define the directory for static files
 app.use("/property", express.static(path.join(__dirname, "../uploads")));
 
-app.use(express.static(path.join(__dirname,"../apidoc")))
+app.use(express.static(path.join(__dirname, "../apidoc")))
 
 app.use("/ids", express.static(path.join(__dirname, "../uploads/RentApplicationDocs")))
+app.use(express.static(path.join(__dirname, "../uploads")))
 
 connectToMongoDB();
 
@@ -87,18 +90,21 @@ app.use("/api", notificationRoutes)
 app.use("/api", transactionRoutes)
 app.use("/api", rentingHistoryRoutes)
 app.use("/api", maintenanceRoutes)
-app.use("/api" , calenderRoutes)
-app.use("/api/dummy" , dummyRoutes)
+app.use("/api", calenderRoutes)
+app.use("/api/dummy", dummyRoutes)
 app.use("/api", reviewRoutes)
+app.use("/api", uploadRoutes)
+
+
 
 
 //admin
-app.use("/api/admin" , adminRoutes)
-app.use("/api/admin" , adminDashboardRoutes)
-app.use("/api/admin" , manageuserRoutes)
-app.use("/api/admin" , propertyRoutes)
-app.use("/api/admin" , roleRoutes)
-app.use("/api/admin" , employeeRoutes)
+app.use("/api/admin", adminRoutes)
+app.use("/api/admin", adminDashboardRoutes)
+app.use("/api/admin", manageuserRoutes)
+app.use("/api/admin", propertyRoutes)
+app.use("/api/admin", roleRoutes)
+app.use("/api/admin", employeeRoutes)
 app.use("/api/admin", transactionAdminRoutes)
 
 
@@ -144,7 +150,12 @@ app.use((err, req, res, next) => {
 // Start the server
 
 const server = http.createServer(app);
-io.attach(server);
+io.attach(server, {
+  rejectUnauthorized: false,
+  cors: {
+    origin: '*',
+  }
+});
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
