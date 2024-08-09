@@ -116,25 +116,6 @@ async function getAllInspections (req, res){
               $match: query
           },
           {
-            $set : {
-              propertyID : {$toObjectId : "$propertyID"},
-            }
-          },
-          {
-            $lookup: {
-                from: "properties",
-                localField: "propertyID",
-                foreignField: "_id",
-                as: "property_details"
-            }
-        },
-        {
-            $unwind: {
-                path: "$property_details",
-                preserveNullAndEmptyArrays: true
-            }
-        },
-          {
               $project: {
                   RenterDetails : "$RenterDetails",
                   inspectionTime : "$inspectionTime",
