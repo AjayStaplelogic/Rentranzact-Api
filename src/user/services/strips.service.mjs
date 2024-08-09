@@ -102,9 +102,10 @@ async function rechargeWallet(body) {
     const userDetail = await User.findById(userID);
 
     const { amount, status, created, id } = body.data.object;
+    let payload = {}
 
     if(userDetail.role === UserRoles.RENTER) {
-        const payload = {
+        payload = {
             amount,
             status,
             createdAt: created,
@@ -123,8 +124,7 @@ async function rechargeWallet(body) {
         }
 
     } else if (userDetail.role === UserRoles.LANDLORD) {
-
-        const payload = {
+        payload = {
             amount,
             status,
             createdAt: created,
@@ -132,23 +132,13 @@ async function rechargeWallet(body) {
             landlordID : userID,
             intentID: id
         }
-
     }
-
-   
-
-    
 
     const data = new Wallet(payload)
     data.save()
 
     const data_ = new Transaction({wallet : true ,renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
-
     data_.save()
-
-
-
-
     return {
 
         data: [],
@@ -157,9 +147,6 @@ async function rechargeWallet(body) {
         statusCode: 200,
 
     }
-
-
-
 }
 
 export { addStripeTransaction, rechargeWallet };
