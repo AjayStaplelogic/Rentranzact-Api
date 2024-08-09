@@ -7,7 +7,7 @@ export const uploadSingleImage = (req, res) => {
         console.log(req.file, '====req.files');
         if (req.file) {
             let resObj = { ...req.file }
-            resObj.fullPath = `${process.env.HOST_URL}${req.file.path}`;
+            resObj.fullPath = `${process.env.HOST_URL}/images/${req.file.filename}`;
             return sendResponse(res, resObj, "success", true, 200);
 
         }
