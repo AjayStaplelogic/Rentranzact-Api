@@ -127,7 +127,7 @@ async function addRentApplicationService(body, user) {
     let verifyStatus;
 
     if (isKinSame) {
-      
+
       verifyStatus = true
     } else {
 
@@ -499,9 +499,9 @@ async function updateRentApplications(body, id) {
     let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody , renterApplicationID :rentApplicationID })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID })
 
-    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent" , "rentApplication" : rentApplicationID }
+    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
 
     const renterDetails = await User.findById(data.renterID);
     if (renterDetails && renterDetails.fcmToken) {
@@ -589,14 +589,51 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
 
 
 async function getRentApplicationByID(id) {
-  const data = await rentApplication.findById(id)
+  try {
+    const data = await rentApplication.findById(id).lean().exec();
+    if (data) {
+      if (data.renterID) {
+        data.renter_info = await User.findById(data.renterID, {
+          fullName: 1,
+          phone: 1,
+          countryCode: 1,
+          picture: 1,
+        });
+      }
 
-  return {
-    data: data,
-    message: "rent application completed successfully",
-    status: true,
-    statusCode: 200,
-  };
+      if (data.landlordID) {
+        data.landlord_info = await User.findById(data.landlordID, {
+          fullName: 1,
+          phone: 1,
+          countryCode: 1,
+          picture: 1,
+        });
+      }
+
+      if (data.propertyID) {
+        data.property_info = await Property.findById(data.propertyID, {
+          propertyName: 1,
+          images: 1,
+          address: 1,
+        });
+      }
+    }
+
+    console.log(data)
+    return {
+      data: data,
+      message: "rent application completed successfully",
+      status: true,
+      statusCode: 200,
+    };
+  } catch (error) {
+    return {
+      data: {},
+      message: `${error}`,
+      status: false,
+      statusCode: 500,
+    };
+  }
 }
 
 

@@ -24,7 +24,7 @@ async function rentApplications(req, res) {
 
 
 async function rentApplicationsByID(req, res) {
-
+  console.log(`[Rent Application By Id API]`)
   const id = req.params.id;
   const data = await getRentApplicationByID(id);
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
