@@ -225,7 +225,7 @@ const propertySchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-propertySchema.index({ "address.coordinates": "2dsphere" });
+propertySchema.index({ "address": "2dsphere" });
 const Property = mongoose.model("properties", propertySchema);
 
 export { Property };

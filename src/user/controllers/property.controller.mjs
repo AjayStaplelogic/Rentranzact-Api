@@ -148,17 +148,21 @@ async function leaveProperty(req, res) {
 
 async function getAllProperties(req, res) {
   try {
-    let { category, type, min_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy } = req.query;
+    let { category, type, min_availability, max_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
     let query2 = {};
     if (category) { query.category = { $in: category.split(",") } };
     if (type) { query.type = { $in: type.split(",") } };
-    if (Number(min_availability) > 0) {
-      query.availability = { $lt: Number(min_availability) }
-    } else if (min_availability == "0") {
+    if (Number(max_availability) > 0) {
+      query.availability = { $lt: Number(max_availability) }
+    } else if (max_availability == "0") {
       query.availability = { $lte: 0 }
+    }
+
+    if(Number(min_availability) > 0){
+      query.availability = { $gt: Number(min_availability) }
     }
 
     if (!radius) {
@@ -176,8 +180,8 @@ async function getAllProperties(req, res) {
       query.number_of_rooms = { $lt: Number(max_rooms) }
     }
 
-    if (furnishingType) { query.furnishingType = furnishingType; };
-    if (communityType) { query.communityType = communityType; };
+    if (furnishingType) { query.furnishingType = { $in: furnishingType.split(",") }; };
+    if (communityType) { query.communityType = { $in: communityType.split(",") }; };
     if (city) { query.city = city; };
 
     let skip = Number(page - 1) * count;
@@ -227,7 +231,7 @@ async function getAllProperties(req, res) {
           updatedAt: "$updatedAt",
           availability: "$availability",
           landmark: "$landmark",
-          dist  : "$dist",
+          // dist  : "$dist",
         }
       },
       {
@@ -266,9 +270,9 @@ async function getAllProperties(req, res) {
       pipeline.unshift({
         $geoNear: {
           near: { type: "Point", coordinates: [Number(longitude), Number(latitude)] },
+          distanceMultiplier: 1 / 1609.34,
           distanceField: "dist.calculated",
           maxDistance: Number(radius) * 1609.34,    // Converting in miles
-          spherical: true,
         }
       })
     }
