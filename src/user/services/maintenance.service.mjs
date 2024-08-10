@@ -5,6 +5,8 @@ import * as ManinenanceEnums from "../enums/maintenance.enums.mjs"
 
 async function addMaintenanceRequests(body) {
 
+    console.log(body,"------------bodyyy")
+
     const { landlord_id } = await Property.findById(body.propertyID).select("landlord_id")
 
 
