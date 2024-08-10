@@ -111,7 +111,10 @@ async function addRentApplicationService(body, user) {
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
-      voter_id: voter_id
+      voter_id: voter_id,
+      kinContactNumber : kinContactNumber ,
+      kinEmail: kinEmail,
+      relationshipKin : relationshipKin
     }
 
     const renterDetails = await User.findById(renterID);
