@@ -87,10 +87,14 @@ async function addPropertyService(
 }
 
 async function searchInProperty(body) {
-  const { longitude, latitude, type, budget, maxDistance } = body;
+  let { longitude, latitude, type, budget, maxDistance } = body;
 
   if (!longitude || !latitude) {
     return "Longitude and latitude are required";
+  }
+
+  if(!maxDistance){ 
+    maxDistance = 500
   }
 
   try {
@@ -98,7 +102,7 @@ async function searchInProperty(body) {
       "address.coordinates": {
         $geoWithin: {
           $centerSphere: [
-            [parseFloat(longitude), parseFloat(latitude)],
+            [Number(longitude), Number(latitude)],
             maxDistance / 3963.2, // Convert distance to radians (Earth's radius in miles)
           ],
         },
@@ -127,7 +131,7 @@ async function searchInProperty(body) {
       statusCode: 200,
     };
   } catch (error) {
-    // console.log(error);
+    console.log(error);
     // res.status(500).send("Error searching for properties: " + error.message);
   }
 }

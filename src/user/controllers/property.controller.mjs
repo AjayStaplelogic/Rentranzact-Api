@@ -67,7 +67,7 @@ async function searchProperty(req, res) {
   const { body } = req;
 
   const data = await searchInProperty(body);
-
+  console.log(data, '=======data')
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
@@ -148,20 +148,22 @@ async function leaveProperty(req, res) {
 
 async function getAllProperties(req, res) {
   try {
-    let { category, type, min_availability, min_rent, max_rent, min_rooms, max_rooms, search, furnishingType, communityType, city, sortBy } = req.query;
+    let { category, type, min_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
     let query2 = {};
     if (category) { query.category = { $in: category.split(",") } };
     if (type) { query.type = { $in: type.split(",") } };
-    console.log(min_availability, '===min_availability')
     if (Number(min_availability) > 0) {
       query.availability = { $lt: Number(min_availability) }
     } else if (min_availability == "0") {
       query.availability = { $lte: 0 }
     }
 
+    if (!radius) {
+      radius = 1000;    // 1000 miles
+    }
     if (min_rent && max_rent) {
       query.rent = { $gte: Number(min_rent), $lte: Number(max_rent) }
     }
@@ -176,7 +178,7 @@ async function getAllProperties(req, res) {
 
     if (furnishingType) { query.furnishingType = furnishingType; };
     if (communityType) { query.communityType = communityType; };
-    if(city){ query.city = city; };
+    if (city) { query.city = city; };
 
     let skip = Number(page - 1) * count;
     if (search) {
@@ -224,7 +226,8 @@ async function getAllProperties(req, res) {
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
           availability: "$availability",
-          landmark : "$landmark"
+          landmark: "$landmark",
+          dist  : "$dist",
         }
       },
       {
@@ -258,6 +261,18 @@ async function getAllProperties(req, res) {
       }
 
     ]
+
+    if (longitude && longitude) {
+      pipeline.unshift({
+        $geoNear: {
+          near: { type: "Point", coordinates: [Number(longitude), Number(latitude)] },
+          distanceField: "dist.calculated",
+          maxDistance: Number(radius) * 1609.34,    // Converting in miles
+          spherical: true,
+        }
+      })
+    }
+    console.log(pipeline, '====pipeline')
     let get_properties = await Property.aggregate(pipeline);
     return sendResponse(res, get_properties, "success", true, 200);
   } catch (error) {
