@@ -72,6 +72,22 @@ const userSchema = new mongoose.Schema(
     },
     kinDetails : {
       type: Object
+    },
+    age : {
+      type : Number,
+      required : false
+    },
+    maritialStatus : {
+      type : String,
+      required : false
+    },
+    permanentAddress : {
+      type : Object,
+      required : false
+    },
+    employmentDetails : {
+      type : Object,
+      required : false
     }
   },
   { timestamps: true }

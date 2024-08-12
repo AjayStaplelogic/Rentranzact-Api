@@ -46,7 +46,9 @@ async function addRentApplicationService(body, user) {
       checkinDate,
       checkoutDate,
       previousLandlordAddress,
-      previousLandlordName
+      previousLandlordName,
+      employerName,
+      employerAddress
     } = body;
 
 
@@ -84,7 +86,11 @@ async function addRentApplicationService(body, user) {
       propertyName: landlord.propertyName,
       verifcationType: identificationType,
       previousLandlordAddress : previousLandlordAddress,
-      previousLandlordName : previousLandlordName
+      previousLandlordName : previousLandlordName,
+      employmentStatus: employmentStatus,
+      employerName: employerName,
+      employerAddress: employerAddress,
+      occupation: occupation
     };
 
 
@@ -160,9 +166,23 @@ async function addRentApplicationService(body, user) {
 
       kinDetails["identificationType"] = identificationType;
 
-      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails })
+      const permanentAddress = {
+        permanentAddress,
+        permanentCity,
+        permanentState,
+        permanentZipcode,
+        permanentContactNumber,
+      }
 
+      const employmentDetails = {
+        employmentStatus,
+        employerName,
+        employerAddress,
+        occupation
+      }
 
+      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails , age : age, maritialStatus: maritialStatus , permanentAddress : permanentAddress , employmentDetails : employmentDetails})
+      
 
 
       payload["kinIdentityCheck"] = true;
