@@ -20,6 +20,8 @@ async function addStripeTransaction(body , renterApplicationID) {
     console.log("metadata ",body.data.object.metadata)
 
     const { userID, propertyID , notificationID } = body.data.object.metadata;
+    await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err ,"===errr"))
+
 
     const { amount, status, created, id } = body.data.object;
 
@@ -87,8 +89,7 @@ async function addStripeTransaction(body , renterApplicationID) {
 
     data.save()
 
-    await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err ,"===errr"))
-
+   
     return {
 
         data: [],
