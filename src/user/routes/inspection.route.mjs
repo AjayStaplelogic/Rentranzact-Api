@@ -8,7 +8,8 @@ import {
   getInspectionRequests,
   getAvailableDates,
   searchInspection,
-  getAllInspections
+  getAllInspections,
+  getInspectionById
 } from "../controllers/inspection.controller.mjs";
 import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -44,5 +45,8 @@ router.get("/available-inspection-dates/:id", authorizer([UserRoles.RENTER]), ge
 
 
 router.get("/inspections", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), getAllInspections);
+
+router.get("/inspection/by-id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), getInspectionById);
+
 
 export default router;
