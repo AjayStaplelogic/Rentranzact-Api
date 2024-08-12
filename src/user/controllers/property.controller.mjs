@@ -9,7 +9,8 @@ import {
   addFavoriteProperties,
   searchPropertyByString,
   getMyProperties,
-  leavePropertyService
+  leavePropertyService,
+  deletePropertyService
 } from "../services/property.service.mjs";
 import { Property } from "../models/property.model.mjs";
 
@@ -96,6 +97,16 @@ async function propertyByID(req, res) {
   const { _id } = req.user.data;
 
   const data = await getPropertyByID(id, _id);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
+async function deleteProperty(req, res) {
+
+  const { id } = req.params;
+  const { _id } = req.user.data;
+
+  const data = await deletePropertyService(_id, id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
@@ -274,5 +285,6 @@ export {
   searchPropertyByKeywords,
   myProperties,
   leaveProperty,
-  getAllProperties
+  getAllProperties,
+  deleteProperty
 };

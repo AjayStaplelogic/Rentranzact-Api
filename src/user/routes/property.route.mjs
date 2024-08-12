@@ -12,7 +12,8 @@ import {
   searchPropertyByKeywords,
   myProperties,
   leaveProperty,
-  getAllProperties
+  getAllProperties,
+  deleteProperty
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -174,6 +175,8 @@ router.get("/my-properties", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, U
 router.post("/leave-property/:id" , authorizer([UserRoles.RENTER]) , leaveProperty)
 
 router.get("/properties", getAllProperties)
+
+router.delete("/property/:id" , authorizer([UserRoles.LANDLORD]), deleteProperty)
 
 
 
