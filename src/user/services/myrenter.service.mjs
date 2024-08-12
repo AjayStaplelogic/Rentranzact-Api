@@ -17,7 +17,7 @@ async function myRentersService(id) {
                             $expr: { $eq: ["$_id", "$$propertyID"] }, // Match ObjectId type
                         },
                     },
-                    { $project: { propertyName: 1 } }, // Project only the images array from properties
+                    { $project: { propertyName: 1 , rent_period_end, rented , rent_period_start } }, // Project only the images array from properties
                 ],
                 as: "propertyDetails",
             }
@@ -47,7 +47,6 @@ async function myRentersService(id) {
         statusCode: 200,
     };
 }
-
 
 
 export { myRentersService };
