@@ -11,7 +11,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function payRentService(body, userID) {
 
-    const { amount, propertyID, wallet , renterApplicationID } = body;
+    const { amount, propertyID, wallet , renterApplicationID , notificationID } = body;
 
     console.log(typeof wallet , "--------wallet typeof ")
 
@@ -25,7 +25,8 @@ async function payRentService(body, userID) {
             propertyID: propertyID,
             userID: userID,
             wallet: wallet,
-            renterApplicationID : renterApplicationID
+            renterApplicationID : renterApplicationID,
+            notificationID: notificationID
         }
     });
 
