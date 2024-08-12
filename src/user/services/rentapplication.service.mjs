@@ -166,7 +166,7 @@ async function addRentApplicationService(body, user) {
 
       kinDetails["identificationType"] = identificationType;
 
-      const permanentAddress = {
+      const permanentAddress_ = {
         permanentAddress,
         permanentCity,
         permanentState,
@@ -181,7 +181,7 @@ async function addRentApplicationService(body, user) {
         occupation
       }
 
-      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails , age : age, maritialStatus: maritialStatus , permanentAddress : permanentAddress , employmentDetails : employmentDetails})
+      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails , age : age, maritialStatus: maritialStatus , permanentAddress : permanentAddress_ , employmentDetails : employmentDetails})
       
 
 
