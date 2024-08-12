@@ -5,6 +5,7 @@ import { User } from "../models/user.model.mjs";
 import { Inspection } from "../models/inspection.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { RentBreakDownPer } from "../enums/property.enums.mjs"
+import { InspectionStatus } from "../enums/inspection.enums.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -420,7 +421,7 @@ async function getMyProperties(role, id, req) {
     };
   }
 
-  if(req?.user?.data?.role== UserRoles.LANDLORD){
+  if (req?.user?.data?.role == UserRoles.LANDLORD) {
     query["landlord_id"] = id;
   }
 
@@ -503,10 +504,10 @@ async function getMyProperties(role, id, req) {
           propertyName: 1,
           rent: 1,
           rentType: 1,
-          images: 1, 
+          images: 1,
           rented: "$rented",
-          city : "$city",
-          type : "$type",
+          city: "$city",
+          type: "$type",
 
         }
       }
@@ -526,11 +527,11 @@ async function getMyProperties(role, id, req) {
 }
 
 
-async function leavePropertyService(userID , propertyID) {
+async function leavePropertyService(userID, propertyID) {
 
-  console.log(propertyID,"--=-=-=-=")
+  console.log(propertyID, "--=-=-=-=")
 
-  const data = await Property.findByIdAndUpdate(propertyID , {renterID : "" , rented : false, rent_period_start : "", rent_period_end : ""})
+  const data = await Property.findByIdAndUpdate(propertyID, { renterID: "", rented: false, rent_period_start: "", rent_period_end: "" })
 
   return {
     data: data,
@@ -541,7 +542,42 @@ async function leavePropertyService(userID , propertyID) {
 
 }
 
+async function deletePropertyService(userID, propertyID) {
+
+  const data = await Inspection.find({ landlordID: userID, inspectionStatus: InspectionStatus.ACCEPTED });
+  console.log(data.length, "-----data")
+
+  if (data.length !== 0) {
+    return {
+      data: [],
+      message: "Unable To Delete Property",
+      status: false,
+      statusCode: 400,
+    };
+
+  } else {
+
+    const data = await Property.findByIdAndDelete(propertyID);
+
+    await Inspection.deleteMany({ landlordID: userID })
+
+    return {
+      data: data,
+      message: "Property Deleted Successfully",
+      status: true,
+      statusCode: 200,
+    };
+
+  }
+
+
+
+
+
+}
+
 export {
+  deletePropertyService,
   getMyProperties,
   addPropertyService,
   searchInProperty,
