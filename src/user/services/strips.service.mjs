@@ -9,6 +9,7 @@ import { Wallet } from "../models/wallet.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { Notification } from "../models/notification.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -16,7 +17,9 @@ async function addStripeTransaction(body , renterApplicationID) {
 
     console.log(body , "----bodddyyyy")
 
-    const { userID, propertyID } = body.data.object.metadata;
+    console.log("metadata ",body.data.object.metadata)
+
+    const { userID, propertyID , notificationID } = body.data.object.metadata;
 
     const { amount, status, created, id } = body.data.object;
 
@@ -83,6 +86,8 @@ async function addStripeTransaction(body , renterApplicationID) {
     await rentApplication.findByIdAndUpdate(renterApplicationID,{ "applicationStatus" : RentApplicationStatus.COMPLETED })
 
     data.save()
+
+    await Notification.findByIdAndDelete(notificationID)
 
     return {
 

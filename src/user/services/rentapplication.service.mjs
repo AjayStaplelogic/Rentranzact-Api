@@ -44,7 +44,9 @@ async function addRentApplicationService(body, user) {
       nin,
       voter_id,
       checkinDate,
-      checkoutDate
+      checkoutDate,
+      previousLandlordAddress,
+      previousLandlordName
     } = body;
 
 
@@ -80,7 +82,9 @@ async function addRentApplicationService(body, user) {
       permanentContactNumber,
       landlordID: landlord.landlord_id,
       propertyName: landlord.propertyName,
-      verifcationType: identificationType
+      verifcationType: identificationType,
+      previousLandlordAddress : previousLandlordAddress,
+      previousLandlordName : previousLandlordName
     };
 
 
@@ -107,7 +111,10 @@ async function addRentApplicationService(body, user) {
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
-      voter_id: voter_id
+      voter_id: voter_id,
+      kinContactNumber : kinContactNumber ,
+      kinEmail: kinEmail,
+      relationshipKin : relationshipKin
     }
 
     const renterDetails = await User.findById(renterID);

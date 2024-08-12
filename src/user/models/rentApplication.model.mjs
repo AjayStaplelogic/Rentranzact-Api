@@ -167,7 +167,16 @@ const rentApplicationSchema = new mongoose.Schema(
     propertyName: {
       type: String,
       required: true
+    },
+    previousLandlordAddress : {
+      type: String,
+      required: true
+    },
+    previousLandlordName : {
+      type: String,
+      required: true
     }
+
   },
 
   { timestamps: true }
