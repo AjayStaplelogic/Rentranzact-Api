@@ -51,7 +51,7 @@ async function adddummyTransactionService(body) {
         const originalDate = moment.unix(created);
 
         // Add one year to the original date
-        const oneYearLater = originalDate.add(1, 'yearly');
+        const oneYearLater = originalDate.add(1, 'years');
 
         // Get the Unix timestamp of one year later
         const timestampOneYearLater = oneYearLater.unix();
