@@ -85,7 +85,7 @@ async function createInspection(body, renterID) {
 }
 
 async function fetchInspections(userData, req) {
-  let { search } = req.query;
+  let { search, status } = req.query;
   if (userData.role === UserRoles.LANDLORD) {
     let query = {
       landlordID: userData?._id
@@ -96,6 +96,9 @@ async function fetchInspections(userData, req) {
         { "RenterDetails.fullName": { $regex: search, $options: "i" } },
         { landlordName: { $regex: search, $options: "i" } },
       ]
+    }
+    if(status){
+      query.inspectionStatus = status;
     }
     const data = await Inspection.find(query);
 
@@ -115,6 +118,9 @@ async function fetchInspections(userData, req) {
         { "RenterDetails.fullName": { $regex: search, $options: "i" } },
         { landlordName: { $regex: search, $options: "i" } },
       ]
+    }
+    if(status){
+      query.inspectionStatus = status;
     }
     const data = await Inspection.find(query);
     return {
@@ -138,7 +144,9 @@ async function fetchInspections(userData, req) {
         { landlordName: { $regex: search, $options: "i" } },
       ]
     }
-
+    if(status){
+      query.inspectionStatus = status;
+    }
     // Import ObjectId from MongoDB driver
     const data = await Inspection.aggregate([
       {
