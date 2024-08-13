@@ -1,8 +1,10 @@
 import { UserRoles } from "../enums/role.enums.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addToCalender, getToCalender, getRenterCalender, getTimeSlotByDate } from "../services/calender.service.mjs";
-import {Inspection } from "../models/inspection.model.mjs";
+import { Inspection } from "../models/inspection.model.mjs";
 import { Calender } from "../models/calender.model.mjs";
+import { validator } from "../helpers/schema-validator.mjs";
+import * as calenderValidations from "../validations/calender.validation.mjs";
 
 async function calender(req, res) {
 
@@ -81,12 +83,12 @@ async function getCalenderTimeSlots(req, res) {
                 $match: query
             },
             {
-                $set : {
+                $set: {
                     inspectionDate: {
                         $dateFromString: {
-                           dateString: "$inspectionDate",
+                            dateString: "$inspectionDate",
                         }
-                     }
+                    }
                 }
             },
             {
@@ -109,8 +111,8 @@ async function getCalenderTimeSlots(req, res) {
                     inspections: {
                         $push: {
                             inspectionTime: "$inspectionTime",
-                            id : "$id",
-                            fullDay : "$fullDay",
+                            id: "$id",
+                            fullDay: "$fullDay",
                         }
                     },
                 }
@@ -169,35 +171,35 @@ async function getCalenderTimeSlots(req, res) {
             // },
 
             {
-                $facet : {
-                    pagination : [
+                $facet: {
+                    pagination: [
                         {
-                            $count : "total"
+                            $count: "total"
                         },
                         {
-                            $addFields : {
-                                page : Number(page)
+                            $addFields: {
+                                page: Number(page)
                             }
                         }
                     ],
-                    data : [
+                    data: [
                         {
-                            $project : {
-                                year : "$_id.year",
-                                month : "$_id.month",
-                                day : "$_id.day",
-                                inspections : "$inspections",
+                            $project: {
+                                year: "$_id.year",
+                                month: "$_id.month",
+                                day: "$_id.day",
+                                inspections: "$inspections",
                                 // calender_data : "$calender_data"
                             }
                         },
                         {
-                            $unset : ["_id"]
+                            $unset: ["_id"]
                         },
                         {
-                            $skip : Number(skip)
+                            $skip: Number(skip)
                         },
                         {
-                            $limit : Number(count)
+                            $limit: Number(count)
                         },
                     ]
                 }
@@ -254,7 +256,7 @@ async function getCalenderTimeSlots(req, res) {
 async function getCalenderBlockedSlots(req, res) {
     try {
         // console.log("[Calender Blocked Time Slot]")
-        let {  userID, day, month, year } = req.query;
+        let { userID, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -266,15 +268,15 @@ async function getCalenderBlockedSlots(req, res) {
         let skip = Number(page - 1) * count;
         let pipeline = [
             {
-                $match :query
+                $match: query
             },
             {
-                $set : {
-                   date: {
+                $set: {
+                    date: {
                         $dateFromString: {
-                           dateString: "$date",
+                            dateString: "$date",
                         }
-                     }
+                    }
                 }
             },
             {
@@ -297,41 +299,41 @@ async function getCalenderBlockedSlots(req, res) {
                     blocked_dates: {
                         $push: {
                             inspectionTime: "$time",
-                            id : "$id",
-                            fullDay : "$fullDay",
+                            id: "$id",
+                            fullDay: "$fullDay",
                         }
                     },
                 }
             },
             {
-                $facet : {
-                    pagination : [
+                $facet: {
+                    pagination: [
                         {
-                            $count : "total"
+                            $count: "total"
                         },
                         {
-                            $addFields : {
-                                page : Number(page)
+                            $addFields: {
+                                page: Number(page)
                             }
                         }
                     ],
-                    data : [
+                    data: [
                         {
-                            $project : {
-                                year : "$_id.year",
-                                month : "$_id.month",
-                                day : "$_id.day",
-                                blocked_dates : "$blocked_dates",
+                            $project: {
+                                year: "$_id.year",
+                                month: "$_id.month",
+                                day: "$_id.day",
+                                blocked_dates: "$blocked_dates",
                             }
                         },
                         {
-                            $unset : ["_id"]
+                            $unset: ["_id"]
                         },
                         {
-                            $skip : Number(skip)
+                            $skip: Number(skip)
                         },
                         {
-                            $limit : Number(count)
+                            $limit: Number(count)
                         },
                     ]
                 }
@@ -347,4 +349,31 @@ async function getCalenderBlockedSlots(req, res) {
     }
 }
 
-export { calender, getCalender, getTimeSlot, getCalenderTimeSlots , getCalenderBlockedSlots }
+async function blockMultipleTimeSlots(req, res) {
+    try {
+        const { isError, errors } = validator(req.body, calenderValidations.blockMultipleTimeSlots);
+
+        if (isError) {
+            let errorMessage = errors[0].replace(/['"]/g, "")
+            return sendResponse(res, [], errorMessage, false, 403);
+        }
+
+        let { slots } = req.body
+        if (slots && slots.length) {
+            let blocked_slots = [];
+            for await (let slot of slots) {
+                slot["userID"] = req?.user?.data?._id;
+                let block_slot = await Calender.create(slot);
+                if (block_slot) {
+                    blocked_slots.push(block_slot);
+                }
+            }
+            return sendResponse(res, blocked_slots, "Success", true, 201);
+        }
+        return sendResponse(res, {}, "Slots lengths must be greater than 0", false, 400);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export { calender, getCalender, getTimeSlot, getCalenderTimeSlots, getCalenderBlockedSlots, blockMultipleTimeSlots }
