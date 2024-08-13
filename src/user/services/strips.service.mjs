@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { Transaction } from "../models/transactions.model.mjs";
 import { Property } from "../models/property.model.mjs";
-import { RentType } from "../enums/property.enums.mjs";
+import { RentBreakDownPer, RentType } from "../enums/property.enums.mjs";
 import moment from "moment";
 import { User } from "../models/user.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
@@ -13,14 +13,14 @@ import { Notification } from "../models/notification.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
-async function addStripeTransaction(body , renterApplicationID) {
+async function addStripeTransaction(body, renterApplicationID) {
 
-    console.log(body , "----bodddyyyy")
+    console.log(body, "----bodddyyyy")
 
-    console.log("metadata ",body.data.object.metadata)
+    console.log("metadata ", body.data.object.metadata)
 
-    const { userID, propertyID , notificationID } = body.data.object.metadata;
-    await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err ,"===errr"))
+    const { userID, propertyID, notificationID } = body.data.object.metadata;
+    await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
 
 
     const { amount, status, created, id } = body.data.object;
@@ -83,13 +83,46 @@ async function addStripeTransaction(body , renterApplicationID) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    const data = new Transaction({wallet : false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT", payment_mode : "stripe" })
+    async function rentalBreakdown(propertyID) {
 
-    await rentApplication.findByIdAndUpdate(renterApplicationID,{ "applicationStatus" : RentApplicationStatus.COMPLETED })
+        const property = await Property.getByID(propertyID);
+
+
+        const data = {
+            service_charge: 0,
+            rent: 0,
+            insurance: 0,
+            agency_fee: 0,
+            legal_Fee: 0,
+            caution_deposite: 0,
+            total_amount: 0
+        }
+
+
+        let rent = Number(property.rent);
+        data.rent = property.rent;
+        data.service_charge = property.servicesCharges;
+        data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+        data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+        data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+        data.insurance = 0;    // variable declaration for future use
+        data.total_amount = rent + data.insurance + dataMerge.agency_fee + data.legal_Fee + data.caution_deposite;
+
+
+        return data
+    }
+
+    let breakdown = await rentalBreakdown(propertyID)
+
+    const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
+
+    await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
     data.save()
 
-   
+
+
+
     return {
 
         data: [],
@@ -112,7 +145,7 @@ async function rechargeWallet(body) {
     const { amount, status, created, id } = body.data.object;
     let payload = {}
 
-    if(userDetail.role === UserRoles.RENTER) {
+    if (userDetail.role === UserRoles.RENTER) {
         payload = {
             amount,
             status,
@@ -122,8 +155,8 @@ async function rechargeWallet(body) {
             intentID: id
         }
 
-        const data_ = new Transaction({wallet : true ,renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
-    
+        const data_ = new Transaction({ wallet: true, renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode: "stripe" })
+
         data_.save()
         if (status === "succeeded") {
 
@@ -132,7 +165,7 @@ async function rechargeWallet(body) {
                 { $inc: { walletPoints: amount } },
                 { new: true }
             );
-    
+
         }
 
     } else if (userDetail.role === UserRoles.LANDLORD) {
@@ -141,7 +174,7 @@ async function rechargeWallet(body) {
             status,
             createdAt: created,
             type: "CREDIT",
-            landlordID : userID,
+            landlordID: userID,
             intentID: id
         }
 
@@ -150,7 +183,7 @@ async function rechargeWallet(body) {
     const data = new Wallet(payload)
     data.save()
 
-    const data_ = new Transaction({wallet : true ,renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode : "stripe" })
+    const data_ = new Transaction({ wallet: true, renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode: "stripe" })
     data_.save()
 
     return {
