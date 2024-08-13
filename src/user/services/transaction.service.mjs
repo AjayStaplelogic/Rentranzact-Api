@@ -43,6 +43,11 @@ async function getMyTransaction(userID, role, req) {
           as: "landlordDetails",
         }
       },
+      {
+        $sort : {
+          createdAt : -1
+        }
+      }
     ])
 
     return {
