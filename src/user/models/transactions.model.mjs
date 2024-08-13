@@ -58,6 +58,10 @@ const transactionSchema = new mongoose.Schema(
     },
     payment_mode: {
       type: String,
+    },
+    allCharges : {
+      type : Object,
+      required: false
     }
   },
   { timestamps: true }
