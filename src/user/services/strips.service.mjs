@@ -106,7 +106,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
         data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
         data.insurance = 0;    // variable declaration for future use
-        data.total_amount = rent + data.insurance + dataMerge.agency_fee + data.legal_Fee + data.caution_deposite;
+        data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
 
 
         return data
