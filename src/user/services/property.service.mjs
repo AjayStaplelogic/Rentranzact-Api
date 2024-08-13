@@ -94,7 +94,7 @@ async function searchInProperty(body) {
     return "Longitude and latitude are required";
   }
 
-  if(!maxDistance){ 
+  if (!maxDistance) {
     maxDistance = 500
   }
 
@@ -315,6 +315,22 @@ async function getPropertyByID(id, userID) {
       verified,
       role,
     };
+  }
+
+  
+  if (data.rented) {
+    const renter = await User.findById(data.renterID);
+
+    console.log(renter,"=renterr")
+
+    const { fullName, picture, verified, role } = renter;
+
+    dataMerge.renterInfo = {
+      fullName,
+      picture,
+      verified,
+      role,
+    }
   }
 
   return {
