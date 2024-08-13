@@ -26,6 +26,8 @@ async function getDashboardStats(user) {
 
     const totalIncome = await Transaction.find({ landlordID: user._id, status: "succeeded" });
 
+    const recentTransaction = await Transaction.find({landlordID : user._id}).sort({createdAt : -1}).limit(3).select('amount property renter date')
+
      let data = [{1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0 }];
 
     //  console.log(totalIncome)
@@ -47,7 +49,8 @@ async function getDashboardStats(user) {
                 rented, vacant, maintenance, total
             },
             newestInspectionRequest: mostRecentInspection,
-            totalIncome : data
+            totalIncome : data,
+            recentTransaction :recentTransaction
 
         },
         message: "dashboard stats",
