@@ -22,6 +22,8 @@ import { User } from '../models/user.model.mjs'
 import { Tokens } from '../models/tokens.model.mjs'
 import moment from 'moment';
 import * as bcrypt from "bcrypt";
+import { Property } from "../models/property.model.mjs";
+import { Maintenance } from "../models/maintenance.model.mjs";
 
 
 async function login(req, res) {
@@ -261,23 +263,23 @@ async function resetPassword(req, res) {
 
 async function editMyProfile(req, res) {
   try {
-      let id = req.user.data._id;
-      delete req.body.email;
-      delete req.body.password;
-      delete req.body.otp;
-      delete req.body.role;
-      let update_user = await User.findByIdAndUpdate(id,
-        req.body,
-        {new : true}
-      );
+    let id = req.user.data._id;
+    delete req.body.email;
+    delete req.body.password;
+    delete req.body.otp;
+    delete req.body.role;
+    let update_user = await User.findByIdAndUpdate(id,
+      req.body,
+      { new: true }
+    );
 
-      if(update_user){
-        delete update_user.email;
-        delete update_user.password;
-        delete update_user.otp;
-        return sendResponse(res, update_user, "Profile updated successfully", true, 200);
+    if (update_user) {
+      delete update_user.email;
+      delete update_user.password;
+      delete update_user.otp;
+      return sendResponse(res, update_user, "Profile updated successfully", true, 200);
 
-      }
+    }
 
     return sendResponse(res, {}, "User not found", false, 404);
   } catch (error) {
@@ -286,4 +288,24 @@ async function editMyProfile(req, res) {
   }
 }
 
-export { deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile };
+async function teriminateRenter(req, res) {
+  try {
+
+    const propertyID = req.params.id;
+
+    await Property.findByIdAndUpdate(propertyID, {
+      rented: false,
+      rent_period_end: "",
+      rent_period_start: "",
+      renterID: ""
+    })
+
+    await Maintenance.deleteMany({ propertyID: propertyID });
+    return sendResponse(res, [], `terminated successfully`, true, 200);
+
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+}
+
+export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile };
