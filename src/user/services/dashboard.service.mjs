@@ -3,6 +3,7 @@ import { Inspection } from "../models/inspection.model.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
+import { InspectionStatus } from "../enums/inspection.enums.mjs";
 
 async function getDashboardStats(user) {
 
@@ -17,7 +18,8 @@ async function getDashboardStats(user) {
     const mostRecentInspection = await Inspection.aggregate([
         {
             $match: {
-                "landlordID": user._id
+                "landlordID": user._id,
+                "inspectionStatus" : InspectionStatus.INITIATED
             }
         },
         { $sort: { createdAt: -1 } },

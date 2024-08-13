@@ -85,7 +85,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
     async function rentalBreakdown(propertyID) {
 
-        const property = await Property.getByID(propertyID);
+        const property = await Property.findById(propertyID);
 
 
         const data = {
