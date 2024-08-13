@@ -15,6 +15,14 @@ async function createInspection(body, renterID) {
   let notificationBody;
 
   const property = await Property.findById(propertyID);
+  if(!property) {
+    return {
+      data: {},
+      message: "Invalid property Id",
+      status: false,
+      statusCode: 400
+    };
+  }
 
   const renterDetails = await User.findById(renterID);
 
