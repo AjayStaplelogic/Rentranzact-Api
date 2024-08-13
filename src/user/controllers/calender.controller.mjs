@@ -298,6 +298,7 @@ async function getCalenderBlockedSlots(req, res) {
                     },
                     blocked_dates: {
                         $push: {
+                            _id : "$_id",
                             inspectionTime: "$time",
                             id: "$id",
                             fullDay: "$fullDay",
@@ -358,10 +359,16 @@ async function blockMultipleTimeSlots(req, res) {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        let { slots } = req.body
-        if (slots && slots.length) {
+        let { slots, slots_to_delete } = req.body;
+        if(slots_to_delete && slots_to_delete.length){      // slots to delete if calender request for edit
+            for await(let slot of slots_to_delete){
+                await Calender.findByIdAndDelete(slot)
+            }
+        }
+
+        if (slots && slots.length) {                // New blocked slots to add
             let blocked_slots = [];
-            for await (let slot of slots) {
+            for await (let slot of slots) { 
                 slot["userID"] = req?.user?.data?._id;
                 let block_slot = await Calender.create(slot);
                 if (block_slot) {
