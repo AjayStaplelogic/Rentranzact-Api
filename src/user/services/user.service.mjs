@@ -621,7 +621,7 @@ async function getWalletDetails(id) {
   ]
 
   let rent_transactions = await Transaction.aggregate(rent_transaction_pipeline);
-  if(rent_transactions && rent_transactions.length > 0){
+  if (rent_transactions && rent_transactions.length > 0) {
     RentCollected = rent_transactions[0].totalAmount || 0;
   }
 
@@ -649,17 +649,18 @@ async function deleteAggrementByID(userID, aggrementID, role) {
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
 
     // console.log(data, "===data aaaaaaa")
-    const match = data.url.match(regex);
+    if (data) {
+      const match = data?.url?.match(regex);
+      if (match) {
+        const filenameWithExtension = match[1];
+        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
 
-    if (match) {
-      const filenameWithExtension = match[1];
-      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-
-      // console.log(filePath, "=====pathid ")
-      fs.unlinkSync(filePath)
-      // console.log(filenameWithExtension);
-    } else {
-      // console.log('Filename not found in URL');
+        // console.log(filePath, "=====pathid ")
+        fs.unlinkSync(filePath)
+        // console.log(filenameWithExtension);
+      } else {
+        // console.log('Filename not found in URL');
+      }
     }
 
     return {
@@ -673,13 +674,12 @@ async function deleteAggrementByID(userID, aggrementID, role) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
 
-    console.log(data, "===data aaaaaaa")
-    if(data ){
+    if (data) {
       const match = data?.url?.match(regex);
       if (match) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-  
+
         // console.log(filePath, "=====pathid ")
         fs.unlinkSync(filePath)
         // console.log(filenameWithExtension);
