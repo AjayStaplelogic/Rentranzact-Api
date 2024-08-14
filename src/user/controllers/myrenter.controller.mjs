@@ -87,7 +87,7 @@ async function getAllMyRenters(req, res) {
   }
 }
 
-async function viewMyRenter(req, res) {
+async function myRenterHistory(req, res) {
   try {
     let { id } = req.query;
     let page = Number(req.query.page) || 1;
@@ -117,36 +117,36 @@ async function viewMyRenter(req, res) {
       },
       {
         $facet: {
-          renter: [
-            {
-              $group: {
-                _id: "$renterID",
-                renterID: { $first: "$renterID" }
-              }
-            },
-            {
-              $lookup: {
-                from: "users",
-                localField : "renterID",
-                foreignField: "_id",
-                as: "renterDetails",
-              }
-            },
-            {
-              $unwind: {
-                path: "$renterDetails",
-                preserveNullAndEmptyArrays: true
-              }
-            },
-            {
-              $project: {
-                picture: "$renterDetails.picture",
-                fullName: "$renterDetails.fullName",
-                phone: "$renterDetails.phone",
-                email: "$renterDetails.email",
-              }
-            }
-          ],
+          // renter: [
+          //   {
+          //     $group: {
+          //       _id: "$renterID",
+          //       renterID: { $first: "$renterID" }
+          //     }
+          //   },
+          //   {
+          //     $lookup: {
+          //       from: "users",
+          //       localField : "renterID",
+          //       foreignField: "_id",
+          //       as: "renterDetails",
+          //     }
+          //   },
+          //   {
+          //     $unwind: {
+          //       path: "$renterDetails",
+          //       preserveNullAndEmptyArrays: true
+          //     }
+          //   },
+          //   {
+          //     $project: {
+          //       picture: "$renterDetails.picture",
+          //       fullName: "$renterDetails.fullName",
+          //       phone: "$renterDetails.phone",
+          //       email: "$renterDetails.email",
+          //     }
+          //   }
+          // ],
           properties: [
             {
               $lookup: {
@@ -172,12 +172,15 @@ async function viewMyRenter(req, res) {
               $project: {
                 propertyID: "$propertyID",
                 propertyName: "$propertyDetails.propertyName",
-                propertyimages: "$propertyDetails.images",
-                propertyAddress: "$propertyDetails.address",
-                propertyRentType: "$propertyDetails.rentType",
-                propertyRent: "$propertyDetails.rent",
-                propertyAvgRating: "$propertyDetails.avg_rating",
-                propertyTotalReviews: "$propertyDetails.total_reviews",
+                images: "$propertyDetails.images",
+                address: "$propertyDetails.address",
+                // rentType: "$propertyDetails.rentType",
+                rent: "$propertyDetails.rent",
+                avg_rating: "$propertyDetails.avg_rating",
+                total_reviews: "$propertyDetails.total_reviews",
+                rentingStart: "$rentingStart",
+                rentingEnd: "$rentingEnd",
+                rentingType: "$rentingType",
               }
             },
             {
@@ -206,4 +209,4 @@ async function viewMyRenter(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
-export { myRenters, viewMyRenter, getAllMyRenters };
+export { myRenters, myRenterHistory, getAllMyRenters };
