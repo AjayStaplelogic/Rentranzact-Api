@@ -20,10 +20,11 @@ import { generateOTP } from '../helpers/otpGenerator.mjs'
 import { forgot_password_email } from '../emails/onboarding.emails.mjs'
 import { generate_token } from "../helpers/tokens.mjs";
 import { ObjectId } from 'bson';
+import { Transaction } from "../models/transactions.model.mjs";
 
 
 async function loginUser(body) {
-  const { email, password ,fcmToken } = body;
+  const { email, password, fcmToken } = body;
 
   const user = await User.findOne({ email: email });
 
@@ -42,10 +43,10 @@ async function loginUser(body) {
     if (isPasswordValid) {
       if (user.verified) {
 
-        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken}).then((Res) => console.log(Res , "0000res")).catch((err) => console.log(err, "00000000err"))
-        
+        await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken }).then((Res) => console.log(Res, "0000res")).catch((err) => console.log(err, "00000000err"))
 
-        
+
+
 
         const accessToken = await accessTokenGenerator(user);
         return {
@@ -65,7 +66,7 @@ async function loginUser(body) {
         }
 
         return {
-          data:  { id: update_user?._id},
+          data: { id: update_user?._id },
           message: "please verify email id",
           status: false,
           statusCode: 401,
@@ -175,14 +176,14 @@ async function applyReferralCode(code, userID) {
 }
 
 async function verifyOtp(body) {
-  const { otp, id , fcmToken} = body;
+  const { otp, id, fcmToken } = body;
 
   const user = await User.findById(id);
 
   if (user?.otp === otp) {
 
-    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "" , fcmToken : fcmToken});
-     
+    const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "", fcmToken: fcmToken });
+
 
     return {
       data: user_,
@@ -203,7 +204,7 @@ async function verifyOtp(body) {
 
 async function socialSignup(body) {
 
-  const { socialPlatform, email, email_verified, name, picture, exp , fcmToken} = body;
+  const { socialPlatform, email, email_verified, name, picture, exp, fcmToken } = body;
 
 
 
@@ -230,12 +231,12 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-     
+
 
       // console.log(user, "0-----user");
 
       if (user) {
-        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
           data: user,
           message: "login successfully",
@@ -251,13 +252,13 @@ async function socialSignup(body) {
           verified: email_verified,
           picture: picture,
           socialPlatform: socialPlatform,
-          fcmToken : fcmToken
+          fcmToken: fcmToken
         };
 
         const newUser = new User(userPayload);
-       
+
         newUser.save();
-        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
         return {
           data: newUser,
@@ -290,10 +291,10 @@ async function socialSignup(body) {
         socialPlatform: socialPlatform,
       });
 
-      
+
 
       if (user) {
-        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
           data: user,
           message: "login successfully",
@@ -309,14 +310,14 @@ async function socialSignup(body) {
           verified: email_verified,
           picture: picture?.data?.url,
           socialPlatform: socialPlatform,
-          fcmToken : fcmToken
+          fcmToken: fcmToken
         };
 
         const newUser = new User(userPayload);
 
-       
+
         newUser.save();
-        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
         return {
           data: newUser,
@@ -357,10 +358,10 @@ async function socialSignup(body) {
         email: email,
         socialPlatform: socialPlatform,
       });
-   
+
 
       if (user) {
-        await User.findByIdAndUpdate(user._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
           data: user,
           message: "login successfully",
@@ -380,10 +381,10 @@ async function socialSignup(body) {
         };
 
         const newUser = new User(userPayload);
-       
+
         newUser.save();
 
-        await User.findByIdAndUpdate(newUser._id, {fcmToken : fcmToken})
+        await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
         return {
           data: newUser,
@@ -580,7 +581,7 @@ async function getLeaseAggrementList(id, role) {
 async function getWalletDetails(id) {
 
 
-  const { walletPoints } = await User.findById(id);
+  const { walletPoints, role } = await User.findById(id);
 
   const results = await Wallet.aggregate([
     { $match: { userID: id } },
@@ -597,14 +598,39 @@ async function getWalletDetails(id) {
 
   const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
   const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
+  let RentCollected = 0;
+  let EarnedRewards = 0;
 
+  let rent_transaction_query = {
+    propertyID: { $exists: true }
+  };
+  if (role == UserRoles.LANDLORD) {
+    rent_transaction_query.landlordID = id;
+  }
+
+  let rent_transaction_pipeline = [
+    { $match: rent_transaction_query },
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: '$amount' }
+      }
+    }
+  ]
+
+  let rent_transactions = await Transaction.aggregate(rent_transaction_pipeline);
+  if(rent_transactions && rent_transactions.length > 0){
+    RentCollected = rent_transactions[0].totalAmount || 0;
+  }
 
 
   return {
     data: {
       walletPoints,
       Deposited,
-      Withdrawn
+      Withdrawn,
+      RentCollected,
+      EarnedRewards
     },
     message: "successfully fetched lease aggrements",
     status: true,
