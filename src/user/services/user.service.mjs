@@ -655,8 +655,12 @@ async function deleteAggrementByID(userID, aggrementID, role) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
 
-        // console.log(filePath, "=====pathid ")
-        fs.unlinkSync(filePath)
+        console.log(filePath, "=====pathid ")
+        try {
+          fs.unlinkSync(filePath)
+        } catch (error) {
+          console.log(error, '====error');
+        }
         // console.log(filenameWithExtension);
       } else {
         // console.log('Filename not found in URL');
@@ -680,8 +684,12 @@ async function deleteAggrementByID(userID, aggrementID, role) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
 
-        // console.log(filePath, "=====pathid ")
-        fs.unlinkSync(filePath)
+        console.log(filePath, "=====pathid 22222 ")
+        try {
+          fs.unlinkSync(filePath)
+        } catch (error) {
+          console.log(error, '====error22222');
+        }
         // console.log(filenameWithExtension);
       } else {
         // console.log('Filename not found in URL');
