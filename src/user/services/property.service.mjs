@@ -48,7 +48,7 @@ async function addPropertyService(
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
       property_manager_id:
-      role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
+        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: body.number_of_rooms,
@@ -434,6 +434,10 @@ async function getMyProperties(role, id, req) {
     query["landlord_id"] = id;
   }
 
+  if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER) {
+    query["property_manager_id"] = id;
+  }
+
   let data;
   if (role === UserRoles.RENTER) {
 
@@ -472,7 +476,86 @@ async function getMyProperties(role, id, req) {
           as: "propertyApplication"
         }
       },
+      {
+        $lookup: {
+          from: "inspections",
+          let: { propertyId: { $toObjectId: "$_id" } }, // Convert _id from Property to ObjectId
+          pipeline: [
+            {
+              $addFields: {
+                propertyIDObjectId: { $toObjectId: "$propertyID" } // Convert propertyID to ObjectId
+              }
+            },
+            {
+              $match: {
+                $and: [
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
+                  { inspectionStatus: { $eq: "initiated" } },
+                ]
+              }
+            },
+            {
+              $count: "inspectionCount"
+            }
+          ],
+          as: "inspectionRequest"
+        }
+      },
+      {
+        $addFields: {
+          applicationCount: { $arrayElemAt: ["$propertyApplication.applicationCount", 0] },
+          inspectionCount: { $arrayElemAt: ["$inspectionRequest.inspectionCount", 0] }
+        }
+      },
+      {
+        $project: {
+          _id: 1,
+          applicationCount: 1,
+          inspectionCount: 1,
+          address: 1,
+          propertyName: 1,
+          rent: 1,
+          rentType: 1,
+          images: 1,
+          rented: "$rented",
+          city: "$city",
+          type: "$type",
+          land
 
+        }
+      }
+    ]);
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    data = await Property.aggregate([
+      {
+        $match: query
+      },
+      {
+        $lookup: {
+          from: "rentapplications",
+          let: { propertyId: { $toObjectId: "$_id" } }, // Convert _id from Property to ObjectId
+          pipeline: [
+            {
+              $addFields: {
+                propertyIDObjectId: { $toObjectId: "$propertyID" } // Convert propertyID to ObjectId
+              }
+            },
+            {
+              $match: {
+                $and: [
+                  { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
+                  { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
+                  { kinIdentityCheck: { $eq: true } }
+                ]
+              }
+            },
+            {
+              $count: "applicationCount"
+            }
+          ],
+          as: "propertyApplication"
+        }
+      },
       {
         $lookup: {
           from: "inspections",
@@ -521,8 +604,6 @@ async function getMyProperties(role, id, req) {
         }
       }
     ]);
-  } else if (role === UserRoles.PROPERTY_MANAGER) {
-    data = await Property.find({ property_manager_id: id });
 
   }
 
