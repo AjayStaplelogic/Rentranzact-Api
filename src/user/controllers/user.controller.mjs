@@ -308,4 +308,65 @@ async function teriminateRenter(req, res) {
   }
 }
 
-export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile };
+async function commisions(req, res) {
+
+  const userID = req.user.data._id;
+
+  const data = await Property.aggregate([
+    {
+      $match: {
+        property_manager_id: userID  // Match the property_manager_id
+      }
+    },
+    {
+      $addFields: {
+        propertyIDStr: { $toString: "$_id" }  // Convert _id to string for matching
+      }
+    },
+    {
+      $lookup: {
+        from: "transactions",               // The transactions collection
+        let: { propertyIDStr: "$propertyIDStr" }, // Variable for the property ID string
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$propertyID", "$$propertyIDStr"] } // Match propertyID with the propertyIDStr
+            }
+          },
+          {
+            $project: {
+              _id: 0,                        // Exclude _id from the transactions if not needed
+              allCharges: 1,
+              date : 1                  // Include allCharges field
+            }
+          }
+        ],
+        as: "transactions"                  // Output array field
+      }
+    },
+    {
+      $unwind: "$transactions"              // Flatten the transactions array
+    },
+    {
+      $match: {
+        "transactions.allCharges.agent_fee": { $exists: true, $ne: null } // Ensure agent_fee is present and not null
+      }
+    },
+    {
+      $project: {
+        images : 1,
+        propertyName: 1,                   // Include propertyName from properties
+        address: 1,                        // Include address from properties
+        commision: "$transactions.allCharges.agent_fee" ,// Include agent_fee from transactions
+        rent : "$transactions.allCharges.rent",
+        date : "$transactions.date"
+      }
+    }
+  ])
+
+
+  sendResponse(res, data, "commsision list fetched", true, 200);
+
+}
+
+export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions };

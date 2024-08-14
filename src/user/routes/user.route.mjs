@@ -1,7 +1,8 @@
 import express from 'express'
 const router = express.Router();
 import { wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, deleteAggrement, userOtpVerification, resetPassword, editMyProfile , 
-    teriminateRenter
+    teriminateRenter,
+    commisions
 } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
@@ -79,5 +80,7 @@ router.post("/reset-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]
 router.put("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), editMyProfile)
 
 router.get("/terminate-renter/:id" , authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]) , teriminateRenter)
+
+router.get("/commisions" , authorizer([UserRoles.PROPERTY_MANAGER]) , commisions)
 
 export default router;

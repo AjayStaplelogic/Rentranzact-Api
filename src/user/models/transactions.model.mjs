@@ -32,6 +32,12 @@ const transactionSchema = new mongoose.Schema(
       required: false
     },
 
+    pmID : {
+      type : String,
+      required : false
+
+    },
+
     status: {
       type: String,
       required: true,
