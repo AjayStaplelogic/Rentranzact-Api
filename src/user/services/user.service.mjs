@@ -21,6 +21,8 @@ import { forgot_password_email } from '../emails/onboarding.emails.mjs'
 import { generate_token } from "../helpers/tokens.mjs";
 import { ObjectId } from 'bson';
 import { Transaction } from "../models/transactions.model.mjs";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 async function loginUser(body) {
@@ -668,14 +670,30 @@ async function deleteAggrementByID(userID, aggrementID, role) {
     };
 
   } else if (role === UserRoles.LANDLORD) {
+    const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
+    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
 
-
-
+    console.log(data, "===data aaaaaaa")
+    if(data ){
+      const match = data?.url?.match(regex);
+      if (match) {
+        const filenameWithExtension = match[1];
+        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
+  
+        // console.log(filePath, "=====pathid ")
+        fs.unlinkSync(filePath)
+        // console.log(filenameWithExtension);
+      } else {
+        // console.log('Filename not found in URL');
+      }
+    }
+    return {
+      data,
+      message: "successfully deleted lease aggrements",
+      status: true,
+      statusCode: 200
+    };
   }
-
-
-
-
 }
 
 async function verifyUserOtp(user_id, otp) {
