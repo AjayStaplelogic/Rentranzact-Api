@@ -1,4 +1,3 @@
-import mongoose from "mongoose";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
@@ -17,16 +16,10 @@ async function addPropertyService(
 ) {
   const { email, role } = body;
 
-  const propertyPostedBy = await User.findOne({ email: "propertymanager1@yopmail.com", role: UserRoles.PROPERTY_MANAGER });
-
-  //const propertyPostedBy = await User.findOne({ email: "propertymanager@gmail.com", role: UserRoles.PROPERTY_MANAGER });
-  // console.log(role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id);
-
-  // console.log(propertyPostedBy, "-----property posedted by ")
+  const propertyPostedBy = await User.findOne({ email: email, role: role });
 
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
-  // Step 2: Parse the JSON string into a JavaScript array
   let arr = JSON.parse("[" + trimmedStr + "]");
 
   if (propertyPostedBy) {
@@ -55,7 +48,7 @@ async function addPropertyService(
       communityType: body.communityType,
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
       property_manager_id:
-        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
+      role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: body.number_of_rooms,
@@ -80,7 +73,7 @@ async function addPropertyService(
   } else {
     return {
       data: [],
-      message: "kindly give correct project manager or landlord email",
+      message: "email of property manager or landlord is not valid",
       status: false,
       statusCode: 403,
     };
@@ -317,11 +310,11 @@ async function getPropertyByID(id, userID) {
     };
   }
 
-  
+
   if (data.rented) {
     const renter = await User.findById(data.renterID);
 
-    console.log(renter,"=renterr")
+    console.log(renter, "=renterr")
 
     const { fullName, picture, verified, role } = renter;
 
