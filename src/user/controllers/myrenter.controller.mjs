@@ -117,36 +117,36 @@ async function myRenterHistory(req, res) {
       },
       {
         $facet: {
-          // renter: [
-          //   {
-          //     $group: {
-          //       _id: "$renterID",
-          //       renterID: { $first: "$renterID" }
-          //     }
-          //   },
-          //   {
-          //     $lookup: {
-          //       from: "users",
-          //       localField : "renterID",
-          //       foreignField: "_id",
-          //       as: "renterDetails",
-          //     }
-          //   },
-          //   {
-          //     $unwind: {
-          //       path: "$renterDetails",
-          //       preserveNullAndEmptyArrays: true
-          //     }
-          //   },
-          //   {
-          //     $project: {
-          //       picture: "$renterDetails.picture",
-          //       fullName: "$renterDetails.fullName",
-          //       phone: "$renterDetails.phone",
-          //       email: "$renterDetails.email",
-          //     }
-          //   }
-          // ],
+          renter: [
+            {
+              $group: {
+                _id: "$renterID",
+                renterID: { $first: "$renterID" }
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField : "renterID",
+                foreignField: "_id",
+                as: "renterDetails",
+              }
+            },
+            {
+              $unwind: {
+                path: "$renterDetails",
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $project: {
+                picture: "$renterDetails.picture",
+                fullName: "$renterDetails.fullName",
+                phone: "$renterDetails.phone",
+                email: "$renterDetails.email",
+              }
+            }
+          ],
           properties: [
             {
               $lookup: {
