@@ -30,6 +30,7 @@ import propertyRoutes from "./admin/routes/properties.route.mjs"
 import roleRoutes from "./admin/routes/role.route.mjs"
 import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
+import financeRoute from "./admin/routes/finance.route.mjs";
 import { fileURLToPath } from "url";
 import path from "path";
 import http from "http";
@@ -106,6 +107,7 @@ app.use("/api/admin", propertyRoutes)
 app.use("/api/admin", roleRoutes)
 app.use("/api/admin", employeeRoutes)
 app.use("/api/admin", transactionAdminRoutes)
+app.use("/api/admin" , financeRoute)
 
 
 
