@@ -87,7 +87,6 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         const property = await Property.findById(propertyID);
 
-
         const data = {
             service_charge: 0,
             rent: 0,
@@ -95,9 +94,9 @@ async function addStripeTransaction(body, renterApplicationID) {
             agency_fee: 0,
             legal_Fee: 0,
             caution_deposite: 0,
-            total_amount: 0
+            total_amount: 0,
+            agent_fee: 0
         }
-
 
         let rent = Number(property.rent);
         data.rent = property.rent;
@@ -108,6 +107,10 @@ async function addStripeTransaction(body, renterApplicationID) {
         data.insurance = 0;    // variable declaration for future use
         data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
 
+
+        if (property.property_manager_id) {
+            data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+        }
 
         return data
     }
