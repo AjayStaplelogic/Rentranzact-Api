@@ -519,9 +519,7 @@ async function getMyProperties(role, id, req) {
           images: 1,
           rented: "$rented",
           city: "$city",
-          type: "$type",
-          land
-
+          type: "$type"
         }
       }
     ]);
