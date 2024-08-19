@@ -11,6 +11,7 @@ import {
 } from "../services/inspection.service.mjs";
 import { Inspection } from "../models/inspection.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { User } from "../models/user.model.mjs";
 
 
 async function getAvailableDates(req, res) {
@@ -172,6 +173,14 @@ async function getInspectionById(req, res) {
     let { id } = req.query;
     let get_inspection = await Inspection.findById(id).lean().exec();
     if (get_inspection) {
+      if (get_inspection.RenterDetails && get_inspection.RenterDetails.id) {
+        let get_inspection_details = await User.findById(get_inspection.RenterDetails.id).lean().exec();
+        if (get_inspection_details) {
+          get_inspection.RenterDetails.age = get_inspection_details.age;
+          get_inspection.RenterDetails.permanentAddress = get_inspection_details.permanentAddress;
+
+        }
+      }
       return sendResponse(res, get_inspection, "success", true, 200);
     }
     return sendResponse(res, {}, "Invalid Id", false, 400);
