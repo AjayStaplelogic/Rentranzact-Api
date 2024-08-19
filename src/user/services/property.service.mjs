@@ -5,6 +5,7 @@ import { Inspection } from "../models/inspection.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { RentBreakDownPer } from "../enums/property.enums.mjs"
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
+import { rentApplication } from "../models/rentApplication.model.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -325,6 +326,9 @@ async function getPropertyByID(id, userID) {
       role,
     }
   }
+
+  dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id });
+  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id });
 
   return {
     data: dataMerge,
