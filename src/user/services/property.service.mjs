@@ -327,8 +327,8 @@ async function getPropertyByID(id, userID) {
     }
   }
 
-  dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id });
-  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id });
+  dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id,  inspectionStatus : "initiated"});
+  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus : RentApplicationStatus.PENDING, kinIdentityCheck : true });
 
   return {
     data: dataMerge,
