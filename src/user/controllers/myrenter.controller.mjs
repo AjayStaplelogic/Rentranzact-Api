@@ -39,7 +39,7 @@ async function getAllMyRenters(req, res) {
       {
         $lookup: {
           from: "users",
-          localField : "renterID",
+          localField: "renterID",
           foreignField: "_id",
           as: "renterDetails",
         }
@@ -56,19 +56,20 @@ async function getAllMyRenters(req, res) {
           fullName: "$renterDetails.fullName",
           phone: "$renterDetails.phone",
           email: "$renterDetails.email",
+          permanentAddress: "$renterDetails.permanentAddress"
         }
       },
       {
         $facet: {
           renters: [
             {
-              $skip : skip
+              $skip: skip
             },
             {
-              $limit : count
+              $limit: count
             }
           ],
-          pagination : [
+          pagination: [
             {
               $count: "total"
             },
@@ -127,7 +128,7 @@ async function myRenterHistory(req, res) {
             {
               $lookup: {
                 from: "users",
-                localField : "renterID",
+                localField: "renterID",
                 foreignField: "_id",
                 as: "renterDetails",
               }
@@ -144,6 +145,7 @@ async function myRenterHistory(req, res) {
                 fullName: "$renterDetails.fullName",
                 phone: "$renterDetails.phone",
                 email: "$renterDetails.email",
+                permanentAddress: "$renterDetails.permanentAddress"
               }
             }
           ],
@@ -151,11 +153,11 @@ async function myRenterHistory(req, res) {
             {
               $lookup: {
                 from: "properties",
-                let: { propertyID: { $toObjectId: "$propertyID" } }, 
+                let: { propertyID: { $toObjectId: "$propertyID" } },
                 pipeline: [
                   {
                     $match: {
-                      $expr: { $eq: ["$_id", "$$propertyID"] }, 
+                      $expr: { $eq: ["$_id", "$$propertyID"] },
                     },
                   },
                 ],
@@ -184,13 +186,13 @@ async function myRenterHistory(req, res) {
               }
             },
             {
-              $skip : skip
+              $skip: skip
             },
             {
-              $limit : count
+              $limit: count
             }
           ],
-          pagination : [
+          pagination: [
             {
               $count: "total"
             },
