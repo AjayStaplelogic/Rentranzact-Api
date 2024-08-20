@@ -526,7 +526,7 @@ async function updateRentApplications(body, id) {
     let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID,landlordID :  landlordDetails._id })
 
     const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
 
