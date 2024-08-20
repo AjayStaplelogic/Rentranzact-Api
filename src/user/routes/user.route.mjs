@@ -19,7 +19,6 @@ const hostUrl = process.env.HOST_URL;
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const documentDir = path.join(baseUploadPath, "LeaseAggrements");
-
         if (!fs.existsSync(documentDir)) {
             fs.mkdirSync(documentDir);
         }
