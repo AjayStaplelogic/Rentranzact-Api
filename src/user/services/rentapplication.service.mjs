@@ -581,7 +581,8 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         propertyID: PropertyID
         // applicationStatus: RentApplicationStatus.PENDING
       }
-    }, {
+    },
+     {
       $lookup: {
         from: "users",
         let: { renter_ID: { $toObjectId: "$renterID" } },
@@ -603,8 +604,34 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
           }
         ],
         as: "renter_info",
+      },
+      
+    },
+    {
+      $lookup: {
+        from: "properties",
+        let: { propertyID: { $toObjectId: "$propertyID" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $eq: ["$_id", "$$propertyID"]
+              }
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              propertyName: 1,
+              images: "$images",
+              address: "$address"
+            }
+          }
+        ],
+        as: "property_info"
       }
-    }])
+    },
+  ])
   }
   return {
     data: data,
@@ -617,6 +644,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
 
 async function getRentApplicationByID(id) {
   try {
+    console.log(`[Rent Application By Id]`)
     const data = await rentApplication.findById(id).lean().exec();
     if (data) {
       if (data.renterID) {
