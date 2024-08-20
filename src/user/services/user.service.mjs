@@ -563,9 +563,6 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
 }
 
 async function getLeaseAggrementList(id, role) {
-
-  console.log(role, '===role')
-
   if (role === UserRoles.RENTER) {
 
     const data = await LeaseAggrements.find({ renterID: id })
@@ -632,13 +629,24 @@ async function getWalletDetails(id) {
     RentCollected = rent_transactions[0].totalAmount || 0;
   }
 
+  let total = Number(Deposited) + Number(Withdrawn) + RentCollected + EarnedRewards;
+  let deposite_percentage = Number(Deposited) * 100 / total;
+  let withdrawn_percentage = Number(Withdrawn) * 100 / total;
+  let rent_collected_percentage = Number(RentCollected) * 100 / total;
+  let earned_rewards_percentage = Number(EarnedRewards) * 100 / total;
+  // console.log(total, "==-=-=-=-=-total")
+
   return {
     data: {
       walletPoints,
       Deposited,
       Withdrawn,
       RentCollected,
-      EarnedRewards
+      EarnedRewards,
+      deposite_percentage,
+      withdrawn_percentage,
+      rent_collected_percentage,
+      earned_rewards_percentage
     },
     message: "successfully fetched lease aggrements",
     status: true,
