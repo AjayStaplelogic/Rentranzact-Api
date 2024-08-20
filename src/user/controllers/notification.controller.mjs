@@ -3,6 +3,10 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getNotificationService } from "../services/notification.service.mjs";
 import { Notification } from "../models/notification.model.mjs"
 import { UserRoles } from '../enums/role.enums.mjs';
+import { User } from "../models/user.model.mjs"
+import { Property } from "../models/property.model.mjs"
+
+
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -52,15 +56,14 @@ async function getAllNotifications(req, res) {
       order = sortBy.split(' ')[1];
     }
     sort_query[field] = order == "desc" ? -1 : 1;
-    console.log(query, '====query')
     let pipeline = [
       {
         $match: query
       },
       {
         $project: {
-          createdAt : "$createdAt",
-          updatedAt : "$updatedAt",
+          createdAt: "$createdAt",
+          updatedAt: "$updatedAt",
           propertyID: "$propertyID",
           renterID: "$renterID",
           notificationHeading: "$notificationHeading",
@@ -106,4 +109,51 @@ async function getAllNotifications(req, res) {
   }
 }
 
-export { getNotification, getAllNotifications };
+
+async function getNotificationById(req, res) {
+  try {
+    const role = req.user.data.role;
+    let { id } = req.query;
+    if (!id) {
+      return sendResponse(res, {}, "Id required", false, 400);
+    }
+
+    let query = {};
+    if (id) { query._id = id };
+    if (role == UserRoles.LANDLORD) { query.landlordID = req.user.data._id };
+    if (role == UserRoles.RENTER) { query.renterID = req.user.data._id };
+    let data = await Notification.findOne(query).lean().exec();
+    if (data) {
+      if (data.renterID) {
+        data.renter_info = await User.findById(data.renterID, {
+          fullName: 1,
+          phone: 1,
+          countryCode: 1,
+          picture: 1,
+        });
+      }
+
+      if (data.landlordID) {
+        data.landlord_info = await User.findById(data.landlordID, {
+          fullName: 1,
+          phone: 1,
+          countryCode: 1,
+          picture: 1,
+        });
+      }
+
+      if (data.propertyID) {
+        data.property_info = await Property.findById(data.propertyID, {
+          propertyName: 1,
+          images: 1,
+          address: 1,
+        });
+      }
+      return sendResponse(res, data, "success", true, 200);
+    }
+    return sendResponse(res, {}, "Invalid Id", false, 400);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+}
+export { getNotification, getAllNotifications, getNotificationById };
