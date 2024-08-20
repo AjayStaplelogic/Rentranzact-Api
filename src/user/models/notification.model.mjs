@@ -24,13 +24,18 @@ const notificationSchema = new mongoose.Schema(
             type: Boolean,
             default: false
         },
-        amount : {
+        amount: {
             type: Number,
             required: false
         },
         renterApplicationID: {
-            type : String,
-            required : false
+            type: String,
+            required: false
+        },
+        landlordID: {
+            type: mongoose.Types.ObjectId,
+            ref: 'users',
+            index: true
         }
     },
     { timestamps: true }
