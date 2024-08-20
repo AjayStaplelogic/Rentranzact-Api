@@ -526,8 +526,15 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
   } else if (role === UserRoles.LANDLORD) {
 
 
-    const { renterID, propertyName } = await Property.findById(propertyID);
-
+    const { renterID, propertyName, rented } = await Property.findById(propertyID);
+    if (!rented) {
+      return {
+        data: {},
+        message: "Property not rented",
+        status: false,
+        statusCode: 404,
+      }
+    }
     const data = new LeaseAggrements({
       propertyName: propertyName,
       propertyID: propertyID,
@@ -557,7 +564,7 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
 
 async function getLeaseAggrementList(id, role) {
 
-
+  console.log(role, '===role')
 
   if (role === UserRoles.RENTER) {
 
@@ -624,7 +631,6 @@ async function getWalletDetails(id) {
   if (rent_transactions && rent_transactions.length > 0) {
     RentCollected = rent_transactions[0].totalAmount || 0;
   }
-
 
   return {
     data: {
