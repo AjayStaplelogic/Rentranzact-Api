@@ -85,8 +85,8 @@ async function addRentApplicationService(body, user) {
       landlordID: landlord.landlord_id,
       propertyName: landlord.propertyName,
       verifcationType: identificationType,
-      previousLandlordAddress : previousLandlordAddress,
-      previousLandlordName : previousLandlordName,
+      previousLandlordAddress: previousLandlordAddress,
+      previousLandlordName: previousLandlordName,
       employmentStatus: employmentStatus,
       employerName: employerName,
       employerAddress: employerAddress,
@@ -118,9 +118,9 @@ async function addRentApplicationService(body, user) {
       dob: kinDOB,
       nin: nin,
       voter_id: voter_id,
-      kinContactNumber : kinContactNumber ,
+      kinContactNumber: kinContactNumber,
       kinEmail: kinEmail,
-      relationshipKin : relationshipKin
+      relationshipKin: relationshipKin
     }
 
     const renterDetails = await User.findById(renterID);
@@ -181,8 +181,8 @@ async function addRentApplicationService(body, user) {
         occupation
       }
 
-      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails , age : age, maritialStatus: maritialStatus , permanentAddress : permanentAddress_ , employmentDetails : employmentDetails})
-      
+      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails, age: age, maritialStatus: maritialStatus, permanentAddress: permanentAddress_, employmentDetails: employmentDetails })
+
 
 
       payload["kinIdentityCheck"] = true;
@@ -526,7 +526,7 @@ async function updateRentApplications(body, id) {
     let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID,landlordID :  landlordDetails._id })
+    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID, landlordID: landlordDetails._id })
 
     const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
 
@@ -550,6 +550,23 @@ async function updateRentApplications(body, id) {
       cancelReason: reason
     });
 
+    if (data) {
+      const renterDetails = await User.findById(data.renterID);
+      let notification_payload = {};
+      notification_payload.notificationHeading = "Rent Application Cancelled";
+      notification_payload.notificationBody = `Your rent application has beed cancelled by landlord`;
+      notification_payload.renterID = data.renterID;
+      notification_payload.landlordID = data.landlordID;
+      notification_payload.renterApplicationID = data._id;
+      notification_payload.propertyID = data.propertyID;
+      let create_notification = await Notification.create(notification_payload);
+      if (create_notification) {
+        if (renterDetails && renterDetails.fcmToken) {
+          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID }
+          await sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+        }
+      }
+    }
     // console.log(data)
 
     return {
@@ -563,6 +580,24 @@ async function updateRentApplications(body, id) {
       applicationStatus: status,
     });
 
+    if (data) {
+      const landlordDetails = await User.findById(data.landlordID);
+
+      let notification_payload = {};
+      notification_payload.notificationHeading = "Rent Application Withdrawn";
+      notification_payload.notificationBody = `Renter withdraw his rent application`;
+      notification_payload.renterID = data.renterID;
+      notification_payload.landlordID = data.landlordID;
+      notification_payload.renterApplicationID = data._id;
+      notification_payload.propertyID = data.propertyID;
+      let create_notification = await Notification.create(notification_payload);
+      if (create_notification) {
+        if (landlordDetails && landlordDetails.fcmToken) {
+          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID }
+          await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+        }
+      }
+    }
     return {
       data: data,
       message: "rent application canceled successfully",
@@ -582,7 +617,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         // applicationStatus: RentApplicationStatus.PENDING
       }
     },
-     {
+    {
       $lookup: {
         from: "users",
         let: { renter_ID: { $toObjectId: "$renterID" } },
@@ -605,7 +640,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         ],
         as: "renter_info",
       },
-      
+
     },
     {
       $lookup: {
@@ -631,7 +666,7 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
         as: "property_info"
       }
     },
-  ])
+    ])
   }
   return {
     data: data,
