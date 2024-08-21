@@ -1,3 +1,4 @@
+import activityLog from "../helpers/activityLog.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import pkg from "bcrypt";
 
@@ -55,6 +56,8 @@ async function getEmployeeService(pageNo, pageSize) {
     const admin = new Admin(body);
   
     await admin.save();
+
+    await activityLog(admin._id , `created new employee ${admin.fullName}`)
   
     return {
       data: admin,
