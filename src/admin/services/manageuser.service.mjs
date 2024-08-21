@@ -2,6 +2,7 @@ import { Property } from "../../user/models/property.model.mjs";
 import { UserRoles } from "../../user/enums/role.enums.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import pkg from "bcrypt";
+import activityLog from "../helpers/activityLog.mjs";
 
 async function addUserByAdmin(body) {
 
@@ -37,6 +38,11 @@ async function addUserByAdmin(body) {
 
     const data = new User(body);
     data.save();
+
+    
+    
+    await activityLog(data._id , `created new user ${data.fullName}`)
+
 
     return {
       data: data,
@@ -89,6 +95,7 @@ async function deleteUserService(id) {
 
   const data = await User.findByIdAndDelete(id);
 
+  await activityLog(data._id , `deleted a user ${data.fullName}`)
   return {
     data: data,
     message: `deleted user successfully`,
