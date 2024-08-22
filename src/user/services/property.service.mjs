@@ -317,9 +317,9 @@ async function getPropertyByID(id, userID) {
   if (data.rented) {
     const renter = await User.findById(data.renterID);
 
-    console.log(renter, "=renterr")
+    // console.log(renter, "=renterr")
 
-    const { fullName, picture, verified, role } = renter;
+    const { fullName, picture, verified, role,countryCode,  phone} = renter;
 
     dataMerge.renterInfo = {
       fullName,
