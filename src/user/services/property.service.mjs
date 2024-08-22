@@ -326,6 +326,8 @@ async function getPropertyByID(id, userID) {
       picture,
       verified,
       role,
+      countryCode,
+      phone
     }
   }
 
