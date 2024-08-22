@@ -39,9 +39,9 @@ async function addUserByAdmin(body) {
     const data = new User(body);
     data.save();
 
-    
-    
-    await activityLog(data._id , `created new user ${data.fullName}`)
+
+
+    await activityLog(data._id, `created new user ${data.fullName}`)
 
 
     return {
@@ -56,7 +56,7 @@ async function addUserByAdmin(body) {
 
 
 
-async function getUsersList(body, pageNo , pageSize) {
+async function getUsersList(body, pageNo, pageSize) {
   const { role } = body;
   const skip = (pageNo - 1) * pageSize;
 
@@ -75,7 +75,7 @@ async function getUsersList(body, pageNo , pageSize) {
     message: `successfully fetched ${role} list`,
     status: true,
     statusCode: 201,
-    additionalData : {pageNo , pageSize , count }
+    additionalData: { pageNo, pageSize, count }
   };
 }
 
@@ -95,7 +95,7 @@ async function deleteUserService(id) {
 
   const data = await User.findByIdAndDelete(id);
 
-  await activityLog(data._id , `deleted a user ${data.fullName}`)
+  await activityLog(data._id, `deleted a user ${data.fullName}`)
   return {
     data: data,
     message: `deleted user successfully`,
@@ -112,10 +112,10 @@ async function searchUsersService(text, role) {
 
   const regex = new RegExp(text, "ig");
 
-   const data = await User.aggregate([
+  const data = await User.aggregate([
     {
       $match: {
-        role :role,
+        role: role,
         $or: [
           { fullName: regex },
           { email: regex },
@@ -123,8 +123,8 @@ async function searchUsersService(text, role) {
         ],
       },
     },
-   ]);
- 
+  ]);
+
   return {
     data: data,
     message: `search results`,
@@ -134,4 +134,19 @@ async function searchUsersService(text, role) {
 
 }
 
-export { addUserByAdmin, getUsersList, getUserByID, deleteUserService , searchUsersService };
+
+async function changeStatus(id) {
+  const data = await User.findById(id);
+
+  data.status = !data.status;
+  await data.save()
+
+  return {
+    data: data,
+    message: `user is ${data.status ? "enabled" : "disabled"}`,
+    status: true,
+    statusCode: 201,
+  };
+}
+
+export { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus };

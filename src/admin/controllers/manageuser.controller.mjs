@@ -1,5 +1,5 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addUserByAdmin , getUsersList , getUserByID , deleteUserService , searchUsersService} from "../services/manageuser.service.mjs";
+import { addUserByAdmin , getUsersList , getUserByID , deleteUserService , searchUsersService , changeStatus} from "../services/manageuser.service.mjs";
 
 async function addUser(req, res) {
   const { body } = req;
@@ -15,9 +15,6 @@ async function addUser(req, res) {
     data.accessToken
   );
 }
-
-
-
 
 async function userList(req, res) {
   const { body } = req;
@@ -86,10 +83,29 @@ async function searchUsers(req, res) {
   );
 }
 
+async function updateStatus(req, res) {
+
+
+  const { id } = req.params;
+
+  const data = await changeStatus(id);
+
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data.accessToken
+  );
+
+}
+
 export {
   searchUsers,
     addUser,
     userList,
     user,
-    deleteUser
+    deleteUser,
+    updateStatus
 }
