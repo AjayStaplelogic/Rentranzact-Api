@@ -35,6 +35,10 @@ const maintenanceSchema = new mongoose.Schema(
         resolvedOn : {
             type: String,
             required: false
+        },
+        canceledOn : {
+            type: String,
+            required : false
         }
     },
     { timestamps: true }

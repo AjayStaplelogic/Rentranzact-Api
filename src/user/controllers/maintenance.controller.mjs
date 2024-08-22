@@ -1,6 +1,6 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addMaintenanceRequests, getMaintenanceRequestsRenter , getMaintenanceRequestsLandlord , resolveMaintenanceRequests  , addRemarkToRequest} from "../services/maintenance.service.mjs";
+import { addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, addRemarkToRequest, cancelMaintenanceRequests } from "../services/maintenance.service.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenance(req, res) {
@@ -38,7 +38,7 @@ async function getMaintenanceRenter(req, res) {
 }
 
 async function resolveMaintenance(req, res) {
- 
+
   const { id } = req.params;
 
   const data = await resolveMaintenanceRequests(id);
@@ -47,13 +47,22 @@ async function resolveMaintenance(req, res) {
 }
 
 async function addRemark(req, res) {
- 
-  const { landlordRemark , maintenanceID } = req.body;
 
-  const data = await addRemarkToRequest(landlordRemark , maintenanceID);
+  const { landlordRemark, maintenanceID } = req.body;
+
+  const data = await addRemarkToRequest(landlordRemark, maintenanceID);
+
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
+async function cancelMaintenace(req, res) {
+
+  const { id } = req.params;
+
+  const data = await cancelMaintenanceRequests(id);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
 
-export { addMaintenance, getMaintenanceRenter  , resolveMaintenance , addRemark};
+export { addMaintenance, getMaintenanceRenter, resolveMaintenance, addRemark, cancelMaintenace };

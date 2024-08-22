@@ -119,4 +119,22 @@ async function addRemarkToRequest(landlordRemark, maintenanceID) {
     };
 }
 
-export { addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests };
+
+async function cancelMaintenanceRequests(id) {
+
+    const data = await Maintenance.findByIdAndUpdate(id, { status: ManinenanceEnums.STATUS.CANCEL, canceledOn: Date.now() })
+
+    const propertyDetails = await Property.findById(data.propertyID);
+
+
+
+    return {
+        data: data,
+        message: `Maintenance request for ${propertyDetails.propertyName} is canceled.`,
+        status: true,
+        statusCode: 200,
+    };
+
+}
+
+export { cancelMaintenanceRequests , addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests ,  };
