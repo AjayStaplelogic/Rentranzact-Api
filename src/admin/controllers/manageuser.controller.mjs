@@ -70,8 +70,8 @@ async function deleteUser(req, res) {
 
 async function searchUsers(req, res) {
 
-  const {search} = req.query;
-  const {role} = req.body;
+  const {search , role} = req.query;
+  
 
   const data = await searchUsersService(search, role);
 

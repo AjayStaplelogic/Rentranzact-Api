@@ -168,6 +168,11 @@ const propertySchema = new mongoose.Schema(
       required: false,
     },
 
+    rent_period_due: {
+      type: String,
+      required: false,
+    },
+
     rent_paid_due: {
       type: Boolean,
       required: false,
