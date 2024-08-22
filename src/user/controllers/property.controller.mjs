@@ -198,7 +198,7 @@ async function getAllProperties(req, res) {
     let skip = Number(page - 1) * count;
     if (search) {
       query2.$or = [
-        { landmark: { $regex: search, $options: 'i' } },
+        { propertyName: { $regex: search, $options: 'i' } },
       ]
     }
     let field = "createdAt";
@@ -281,13 +281,13 @@ async function getAllProperties(req, res) {
       pipeline.unshift({
         $geoNear: {
           near: { type: "Point", coordinates: [Number(longitude), Number(latitude)] },
-          distanceMultiplier: 1 / 1609.34,
+          distanceMultiplier: 1 / 1609.344,
           distanceField: "dist.calculated",
-          maxDistance: Number(radius) * 1609.34,    // Converting in miles
+          maxDistance: Number(radius) * 1609.344,    // Converting in miles
         }
       })
     }
-    console.log(pipeline, '====pipeline')
+    // console.log(pipeline, '====pipeline')
     let get_properties = await Property.aggregate(pipeline);
     return sendResponse(res, get_properties, "success", true, 200);
   } catch (error) {
