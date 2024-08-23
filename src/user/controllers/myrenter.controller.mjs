@@ -2,6 +2,7 @@ import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { myRentersService } from "../services/myrenter.service.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
+import { Property } from "../models/property.model.mjs";
 
 async function myRenters(req, res) {
   const { _id } = req.user.data;
@@ -13,15 +14,29 @@ async function myRenters(req, res) {
 
 async function getAllMyRenters(req, res) {
   try {
-    let { id } = req.query;
+    let { id, current_status } = req.query;
     let page = Number(req.query.page) || 1;
     let count = Number(req.query.count) || 10;
     let skip = (page - 1) * count;
+    let query = {};
+    query.landlordID = `${req.user.data._id}`;
+
+    if (current_status) {
+      let renters = await Property.distinct("renterID", {
+        landlord_id: req?.user?.data?._id,
+        renterID: { $nin: ["", null] },
+      }).lean().exec();
+
+      if (current_status == "active") {
+        query.renterID = { $in: renters };
+      } else if (current_status == "past") {
+        query.renterID = { $nin: renters }
+      }
+    }
+
     let data = await RentingHistory.aggregate([
       {
-        $match: {
-          landlordID: `${req.user.data._id}`
-        }
+        $match: query
       },
       {
         $set: {
@@ -61,14 +76,6 @@ async function getAllMyRenters(req, res) {
       },
       {
         $facet: {
-          renters: [
-            {
-              $skip: skip
-            },
-            {
-              $limit: count
-            }
-          ],
           pagination: [
             {
               $count: "total"
@@ -78,10 +85,19 @@ async function getAllMyRenters(req, res) {
                 page: Number(page)
               }
             }
-          ]
+          ],
+          renters: [
+            {
+              $skip: skip
+            },
+            {
+              $limit: count
+            }
+          ],
         }
       },
     ]);
+
     return sendResponse(res, data, "My Renter Details fetched successfully", true, 200);
   } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 500);
@@ -211,4 +227,5 @@ async function myRenterHistory(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
+
 export { myRenters, myRenterHistory, getAllMyRenters };
