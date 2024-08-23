@@ -8,7 +8,7 @@ router.post("/calender", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , ca
 router.get("/calender", authorizer([UserRoles.RENTER, UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , getCalender)
 router.post("/timeslot", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , getTimeSlot)
 router.get("/calender/timeslot", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , getCalenderTimeSlots)
-router.get("/calender/blocked-timeslot", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , getCalenderBlockedSlots)
+router.get("/calender/blocked-timeslot", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]) , getCalenderBlockedSlots)
 router.post("/calender/block/slot/multiple", authorizer([UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) , blockMultipleTimeSlots);
 
 
