@@ -222,9 +222,19 @@ async function getAllPropertyList(req, res) {
         }
       })
     }
-    // console.log(pipeline, '====pipeline')
+    
     let get_properties = await Property.aggregate(pipeline);
-    return sendResponse(res, get_properties, "success", true, 200);
+    let additional_data = {
+      pageNo : page,
+      pageSize : count,
+    };
+    console.log(get_properties[0].pagination)
+    if(get_properties && get_properties.length > 0) {
+        if( get_properties[0].pagination &&  get_properties[0].pagination.length){
+          additional_data.count = get_properties[0]?.pagination[0]?.total;
+        }
+    }
+    return sendResponse(res, get_properties[0].data, "success", true, 200, {}, additional_data);
   } catch (error) {
     console.log(error)
     return sendResponse(res, {}, `${error}`, false, 500);
