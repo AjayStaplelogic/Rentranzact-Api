@@ -84,9 +84,9 @@ async function getDashboardStatsPM(user) {
         { $limit: 1 }
     ]);
 
-    const totalIncome = await Transaction.find({ landlordID: user._id, status: "succeeded" });
+    const totalIncome = await Transaction.find({ pmID: user._id, status: "succeeded" });
 
-    const recentTransaction = await Transaction.find({landlordID : user._id}).sort({createdAt : -1}).limit(3).select('amount property renter date')
+    const recentTransaction = await Transaction.find({pmID : user._id}).sort({createdAt : -1}).limit(3).select('amount property renter date')
 
      let data = [{1 : 0, 2 : 0, 3 : 0, 4 : 0, 5 : 0, 6 : 0, 7 : 0, 8 : 0, 9 : 0, 10 : 0, 11 : 0, 12 : 0 }];
 
