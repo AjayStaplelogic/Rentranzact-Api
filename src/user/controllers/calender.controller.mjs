@@ -1,10 +1,11 @@
 import { UserRoles } from "../enums/role.enums.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addToCalender, getToCalender, getRenterCalender, getTimeSlotByDate } from "../services/calender.service.mjs";
+import { addToCalender, getToCalender, getRenterCalender, getTimeSlotByDate ,getPMCalender } from "../services/calender.service.mjs";
 import { Inspection } from "../models/inspection.model.mjs";
 import { Calender } from "../models/calender.model.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
 import * as calenderValidations from "../validations/calender.validation.mjs";
+import { User } from "../models/user.model.mjs";
 
 async function calender(req, res) {
 
@@ -41,7 +42,15 @@ async function getCalender(req, res) {
         sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
-    }
+    } else if (role === UserRoles.PROPERTY_MANAGER) {
+
+
+      const data = await getPMCalender(_id, propertyID);
+
+        sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+
+    } 
 
 }
 async function getTimeSlot(req, res) {
