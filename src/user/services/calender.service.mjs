@@ -48,8 +48,8 @@ async function addToCalender(body, userID) {
 
 }
 
-async function getPMCalender(userID, propertyID) {
-    const result = await Calender.find({ userID: propertyID })
+async function getPMCalender(userID) {
+    const result = await Calender.find({ userID: userID })
 
     const result2 = await Inspection.find({
         inspectionStatus: InspectionStatus.INITIATED,
