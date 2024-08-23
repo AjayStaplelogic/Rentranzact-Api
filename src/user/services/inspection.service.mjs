@@ -118,7 +118,7 @@ async function fetchInspections(userData, req) {
     };
   } else if (userData.role === UserRoles.PROPERTY_MANAGER) {
     let query = {
-      propertyID: userData?._id
+      property_manager_id: userData?._id
     }
     if (search) {
       query.$or = [
