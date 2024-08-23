@@ -53,6 +53,7 @@ async function addRentApplicationService(body, user) {
 
 
     const landlord = await Property.findById(propertyID);
+    
 
     const payload = {
       propertyID: propertyID,
@@ -83,6 +84,7 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber,
       landlordID: landlord.landlord_id,
+      pmID : landlord.property_manager_id,
       propertyName: landlord.propertyName,
       verifcationType: identificationType,
       previousLandlordAddress: previousLandlordAddress,
@@ -241,6 +243,9 @@ async function rentApplicationsList(user, req) {
     query.renterID = req?.user?.data?._id;
   } else if (req?.user?.data?.role == UserRoles.LANDLORD) {
     query.landlordID = req?.user?.data?._id;
+  } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER){
+
+    query.pmID = req?.user?.data?._id;
   }
 
   if (applicationStatus) {
