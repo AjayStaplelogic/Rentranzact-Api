@@ -15,7 +15,7 @@ router.post(
   "/rentApplication",
   authorizer([UserRoles.RENTER]), addRentApplication
 );
-router.get('/rentApplications', authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), rentApplications);
+router.get('/rentApplications', authorizer([UserRoles.RENTER, UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]), rentApplications);
 
 router.get('/rentApplications/:id', authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), rentApplicationsByID);
 

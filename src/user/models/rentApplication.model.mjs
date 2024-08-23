@@ -175,6 +175,10 @@ const rentApplicationSchema = new mongoose.Schema(
     previousLandlordName : {
       type: String,
       required: true
+    },
+    pmID : {
+      type: String,
+      required: false
     }
 
   },
