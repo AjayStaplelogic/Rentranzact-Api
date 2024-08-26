@@ -177,7 +177,7 @@ async function getAllProperties(req, res) {
     }
 
     if (!radius) {
-      radius = 1000;    // 1000 miles
+      radius = 125;    // 125 miles, approx 200 kilometers
     }
     if (min_rent && max_rent) {
       query.rent = { $gte: Number(min_rent), $lte: Number(max_rent) }
@@ -242,7 +242,7 @@ async function getAllProperties(req, res) {
           updatedAt: "$updatedAt",
           availability: "$availability",
           landmark: "$landmark",
-          // dist  : "$dist",
+          dist  : "$dist",
         }
       },
       {

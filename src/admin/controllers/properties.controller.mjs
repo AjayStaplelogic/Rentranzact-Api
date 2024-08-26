@@ -94,7 +94,7 @@ async function getAllPropertyList(req, res) {
     if (category) { query.category = { $in: category.split(",") } };
     if (type) { query.type = { $in: type.split(",") } };
     if (!radius) {
-      radius = 1000;    // 1000 miles
+      radius = 125;    // 125 miles
     }
 
     if (rented) {
