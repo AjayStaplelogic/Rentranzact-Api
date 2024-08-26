@@ -256,6 +256,8 @@ async function getPropertyByID(id, userID) {
   }
 
   if (data.landlord_id) {
+    console.log(data.landlord_id, '====data.landlord_id====')
+
     const favorite = await User.findById(userID).select("favorite")
 
 
@@ -273,17 +275,20 @@ async function getPropertyByID(id, userID) {
 
     }
 
+    console.log(landlord, '====landlord====')
     // console.log(dataMerge.propertyData, "==final ")
-    const { fullName, picture, verified, role, countryCode,phone } = landlord;
-
-    dataMerge.landlord = {
-      fullName,
-      picture,
-      verified,
-      role,
-      countryCode,
-      phone
-    };
+    if(landlord){
+      const { fullName, picture, verified, role, countryCode,phone } = landlord;
+  
+      dataMerge.landlord = {
+        fullName,
+        picture,
+        verified,
+        role,
+        countryCode,
+        phone
+      };
+    }
   } else {
 
 
