@@ -11,7 +11,7 @@ async function getDashboardStats(user) {
 
     const vacant = await Property.find({ landlord_id: user._id, rented: false }).countDocuments();
 
-    const maintenance = await Maintenance.find({ landlordID: user._id, status: true }).countDocuments();
+    const maintenance = await Maintenance.find({ landlordID: user._id, status: "pending" }).countDocuments();
 
     const total = await Property.find({ landlord_id: user._id }).countDocuments()
 
@@ -69,7 +69,7 @@ async function getDashboardStatsPM(user) {
 
     const vacant = await Property.find({ property_manager_id: user._id, rented: false }).countDocuments();
 
-    const maintenance = await Maintenance.find({ property_manager_id: user._id, status: true }).countDocuments();
+    const maintenance = await Maintenance.find({ property_manager_id: user._id, status: "pending" }).countDocuments();
 
     const total = await Property.find({ property_manager_id: user._id }).countDocuments()
 
