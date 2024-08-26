@@ -337,7 +337,7 @@ async function commisions(req, res) {
             $project: {
               _id: 0,                        // Exclude _id from the transactions if not needed
               allCharges: 1,
-              date : 1                  // Include allCharges field
+              date: 1                  // Include allCharges field
             }
           }
         ],
@@ -354,12 +354,12 @@ async function commisions(req, res) {
     },
     {
       $project: {
-        images : 1,
+        images: 1,
         propertyName: 1,                   // Include propertyName from properties
         address: 1,                        // Include address from properties
-        commision: "$transactions.allCharges.agent_fee" ,// Include agent_fee from transactions
-        rent : "$transactions.allCharges.rent",
-        date : "$transactions.date"
+        commision: "$transactions.allCharges.agent_fee",// Include agent_fee from transactions
+        rent: "$transactions.allCharges.rent",
+        date: "$transactions.date"
       }
     }
   ])
@@ -369,4 +369,26 @@ async function commisions(req, res) {
 
 }
 
-export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions };
+const getUserDetails = async (req, res) => {
+  try {
+    let { id } = req.query;
+    if (!id) {
+      return sendResponse(res, {}, "Id is required", false, 400);
+    }
+
+    let data = await User.findById(id, {
+      password: 0,
+      otp: 0,
+      kinDetails: 0
+    }).lean().exec();
+
+    if (data) {
+      return sendResponse(res, data, "User details fetched", true, 200);
+    }
+    return sendResponse(res, {}, "User not found", false, 404);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
+export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions, getUserDetails };
