@@ -21,6 +21,7 @@ import dummyRoutes from "./user/routes/dummy.route.mjs"
 import calenderRoutes from "./user/routes/calender.route.mjs"
 import reviewRoutes from "./user/routes/review.route.mjs"
 import uploadRoutes from "./user/routes/upload.route.mjs"
+import userBlogRoutes from "./user/routes/blog.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -32,7 +33,7 @@ import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
 import financeRoute from "./admin/routes/finance.route.mjs";
 import activityRoute from "./admin/routes/activity.route.mjs"
-import blogRoutes from "./admin/routes/blog.route.mjs"
+import adminBlogRoutes from "./admin/routes/blog.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -98,7 +99,7 @@ app.use("/api", calenderRoutes)
 app.use("/api/dummy", dummyRoutes)
 app.use("/api", reviewRoutes)
 app.use("/api", uploadRoutes)
-
+app.use("/api", userBlogRoutes)
 
 
 
@@ -112,7 +113,7 @@ app.use("/api/admin", employeeRoutes)
 app.use("/api/admin", transactionAdminRoutes)
 app.use("/api/admin" , financeRoute)
 app.use("/api/admin" , activityRoute )
-app.use("/api/admin", blogRoutes)
+app.use("/api/admin", adminBlogRoutes)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
