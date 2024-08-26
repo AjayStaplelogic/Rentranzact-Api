@@ -33,7 +33,8 @@ import employeeRoutes from "./admin/routes/manageemployee.route.mjs"
 import transactionAdminRoutes from "./admin/routes/transaction.route.mjs"
 import financeRoute from "./admin/routes/finance.route.mjs";
 import activityRoute from "./admin/routes/activity.route.mjs"
-import adminBlogRoutes from "./admin/routes/blog.route.mjs"
+import adminBlogRoutes from "./admin/routes/blog.route.mjs";
+import adminSiteContentRoutes from "./admin/routes/sitecontents.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -111,9 +112,10 @@ app.use("/api/admin", propertyRoutes)
 app.use("/api/admin", roleRoutes)
 app.use("/api/admin", employeeRoutes)
 app.use("/api/admin", transactionAdminRoutes)
-app.use("/api/admin" , financeRoute)
-app.use("/api/admin" , activityRoute )
+app.use("/api/admin", financeRoute)
+app.use("/api/admin", activityRoute)
 app.use("/api/admin", adminBlogRoutes)
+app.use("/api/admin", adminSiteContentRoutes)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
