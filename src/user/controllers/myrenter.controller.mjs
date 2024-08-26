@@ -228,4 +228,111 @@ async function myRenterHistory(req, res) {
   }
 }
 
-export { myRenters, myRenterHistory, getAllMyRenters };
+async function rentedProperties(req, res) {
+  console.log(`[My Renter/Current-Rented/Properties]`)
+  try {
+    let { id } = req.query;
+    let page = Number(req.query.page) || 1;
+    let count = Number(req.query.count) || 10;
+    let skip = (page - 1) * count;
+    let query = {
+      renterID: id,
+      landlord_id: `${req.user.data._id}`,
+      rented : true
+    };
+    console.log(query);
+    let data = await Property.aggregate([
+      {
+        $match: query
+      },
+      {
+        $set: {
+          renterID: {
+            $toObjectId: "$renterID"
+          },
+          landlord_id: {
+            $toObjectId: "$landlord_id"
+          }
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1
+        }
+      },
+      {
+        $facet: {
+          renter: [
+            {
+              $group: {
+                _id: "$renterID",
+                renterID: { $first: "$renterID" },
+              }
+            },
+            {
+              $lookup: {
+                from: "users",
+                localField: "renterID",
+                foreignField: "_id",
+                as: "renterDetails",
+              }
+            },
+            {
+              $unwind: {
+                path: "$renterDetails",
+                preserveNullAndEmptyArrays: true
+              }
+            },
+            {
+              $project: {
+                picture: "$renterDetails.picture",
+                fullName: "$renterDetails.fullName",
+                phone: "$renterDetails.phone",
+                email: "$renterDetails.email",
+                permanentAddress: "$renterDetails.permanentAddress"
+              }
+            }
+          ],
+          properties: [
+            {
+              $project: {
+                propertyID: "$propertyID",
+                propertyName: "$propertyName",
+                images: "$images",
+                address: "$address",
+                rent: "$rent",
+                avg_rating: "$avg_rating",
+                total_reviews: "$total_reviews",
+                rentingStart: "$rentingStart",
+                rentingEnd: "$rentingEnd",
+                rentingType: "$rentingType",
+              }
+            },
+            {
+              $skip: skip
+            },
+            {
+              $limit: count
+            }
+          ],
+          pagination: [
+            {
+              $count: "total"
+            },
+            {
+              $addFields: {
+                page: Number(page)
+              }
+            }
+          ]
+        }
+      },
+    ]);
+
+    return sendResponse(res, data, "My Renter Details fetched successfully", true, 200);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+}
+
+export { myRenters, myRenterHistory, getAllMyRenters, rentedProperties };
