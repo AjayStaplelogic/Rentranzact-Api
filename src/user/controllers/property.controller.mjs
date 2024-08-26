@@ -242,7 +242,7 @@ async function getAllProperties(req, res) {
           updatedAt: "$updatedAt",
           availability: "$availability",
           landmark: "$landmark",
-          dist  : "$dist",
+          // dist  : "$dist",
         }
       },
       {
