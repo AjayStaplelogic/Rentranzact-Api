@@ -6,8 +6,8 @@ const adminSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
-      unique: true,
       lowercase: true,
+      trime : true
     },
     password: {
       type: String,
@@ -36,6 +36,23 @@ const adminSchema = new mongoose.Schema(
       default:
         "https://st3.depositphotos.com/6672868/13801/v/1600/depositphotos_138013506-stock-illustration-user-profile-group.jpg",
       required: false,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false
+    },
+    countryCode: {
+      type: String,
+    },
+    phone: {
+      type: String,
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
+    },
+    joining_date : {
+      type : Date
     }
   },
   { timestamps: true }
