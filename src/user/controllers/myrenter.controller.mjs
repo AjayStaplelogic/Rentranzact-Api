@@ -192,13 +192,12 @@ async function myRenterHistory(req, res) {
                 propertyName: "$propertyDetails.propertyName",
                 images: "$propertyDetails.images",
                 address: "$propertyDetails.address",
-                // rentType: "$propertyDetails.rentType",
                 rent: "$propertyDetails.rent",
                 avg_rating: "$propertyDetails.avg_rating",
                 total_reviews: "$propertyDetails.total_reviews",
-                rentingStart: "$rentingStart",
-                rentingEnd: "$rentingEnd",
-                rentingType: "$rentingType",
+                rent_period_end: "$rentingStart",
+                rent_period_start: "$rentingEnd",
+                rentType: "$rentingType",
               }
             },
             {
@@ -238,7 +237,7 @@ async function rentedProperties(req, res) {
     let query = {
       renterID: id,
       landlord_id: `${req.user.data._id}`,
-      rented : true
+      rented: true
     };
     console.log(query);
     let data = await Property.aggregate([
@@ -305,7 +304,7 @@ async function rentedProperties(req, res) {
                 total_reviews: "$total_reviews",
                 rent_period_end: "$rent_period_end",
                 rent_period_start: "$rent_period_start",
-                rentingType: "$rentingType",
+                rentType: "$rentType",
               }
             },
             {
