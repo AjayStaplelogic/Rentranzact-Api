@@ -35,6 +35,7 @@ import financeRoute from "./admin/routes/finance.route.mjs";
 import activityRoute from "./admin/routes/activity.route.mjs"
 import adminBlogRoutes from "./admin/routes/blog.route.mjs";
 import adminSiteContentRoutes from "./admin/routes/sitecontents.route.mjs"
+import adminCareerRoutes from "./admin/routes/careers.route.mjs";
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -42,7 +43,6 @@ import http from "http";
 
 import admin from 'firebase-admin'
 import serviceAccount from "./user/helpers/serviceAccount.js";
-
 import io from "./user/services/socket.service.mjs"
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -116,6 +116,7 @@ app.use("/api/admin", financeRoute)
 app.use("/api/admin", activityRoute)
 app.use("/api/admin", adminBlogRoutes)
 app.use("/api/admin", adminSiteContentRoutes)
+app.use("/api/admin", adminCareerRoutes)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
