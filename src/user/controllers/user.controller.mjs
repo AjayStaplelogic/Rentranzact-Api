@@ -46,7 +46,7 @@ async function login(req, res) {
 
   const { isError, errors } = validator(body, userLogin);
 
-  if (isError) {
+  if (false) {
     sendResponse(res, [], errors, false, 403);
   } else {
     const data = await loginUser(body);
