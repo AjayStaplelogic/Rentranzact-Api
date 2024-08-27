@@ -1,11 +1,15 @@
 import express from 'express'
-import { getEmployee , addEmployee } from '../controllers/manageemployee.controller.mjs';
+import { getEmployee , addEmployee, getEmployeeById, editEmployee, deleteEmployee } from '../controllers/manageemployee.controller.mjs';
 const router = express.Router();
 
 router.get('/employees', getEmployee);
 router.post('/addEmployee' , addEmployee)
-// router.delete('/roles/:id' , deleteRole);
-// router.put("/roles/:id" , updateRoles);
+router.get('/employee', getEmployeeById);
+router.put('/employee', editEmployee);
+router.delete('/employee', deleteEmployee);
+
+
+
 
 export default router;
 
