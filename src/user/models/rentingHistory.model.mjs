@@ -21,7 +21,7 @@ const rentingHistorySchema = new mongoose.Schema(
         },
         rentingEnd: {
             type: String,
-            required: true,
+            required: false,
         },
         rentingType: {
             type: String,
