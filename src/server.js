@@ -22,6 +22,7 @@ import calenderRoutes from "./user/routes/calender.route.mjs"
 import reviewRoutes from "./user/routes/review.route.mjs"
 import uploadRoutes from "./user/routes/upload.route.mjs"
 import userBlogRoutes from "./user/routes/blog.route.mjs"
+import userNewsLetterSubscription from "./user/routes/newlettersubscription.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -36,6 +37,7 @@ import activityRoute from "./admin/routes/activity.route.mjs"
 import adminBlogRoutes from "./admin/routes/blog.route.mjs";
 import adminSiteContentRoutes from "./admin/routes/sitecontents.route.mjs"
 import adminCareerRoutes from "./admin/routes/careers.route.mjs";
+import adminNewsLetterSubscriptions from "./admin/routes/newslettersubscription.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -101,7 +103,7 @@ app.use("/api/dummy", dummyRoutes)
 app.use("/api", reviewRoutes)
 app.use("/api", uploadRoutes)
 app.use("/api", userBlogRoutes)
-
+app.use("/api", userNewsLetterSubscription)
 
 
 //admin
@@ -117,6 +119,8 @@ app.use("/api/admin", activityRoute)
 app.use("/api/admin", adminBlogRoutes)
 app.use("/api/admin", adminSiteContentRoutes)
 app.use("/api/admin", adminCareerRoutes)
+app.use("/api/admin", adminNewsLetterSubscriptions)
+
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
