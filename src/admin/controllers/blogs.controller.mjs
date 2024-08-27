@@ -3,6 +3,8 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as blogValidations from "../validations/blogs.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import * as blogServices from "../services/blog.service.mjs";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 export const addBlog = async (req, res) => {
     try {
@@ -83,7 +85,7 @@ export const editBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
     try {
-        let { search, status, sortBy } = req.query;
+        let { search, status, sortBy, exclude_id } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -103,6 +105,11 @@ export const getAllBlogs = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
+
+        if (exclude_id) {
+            query._id = { $ne: new ObjectId(exclude_id) }
+        }
+
         let pipeline = [
             {
                 $match: query
