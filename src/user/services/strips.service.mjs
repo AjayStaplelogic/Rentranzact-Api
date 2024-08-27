@@ -29,7 +29,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
     if (propertyDetails.rentType === RentType.MONTHLY) {
 
-        let newCount = propertyDetails.payment_count;
+        let newCount = propertyDetails.payment_count + 1;
 
         const originalDate = moment.unix(created);
 
@@ -47,7 +47,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
     } else if (propertyDetails.rentType === RentType.QUATERLY) {
         // Convert timestamp to a Moment.js object
-        let newCount = propertyDetails.payment_count;
+        let newCount = propertyDetails.payment_count + 1;
         const originalDate = moment.unix(created);
 
         // Add one year to the original date
@@ -66,7 +66,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         addRenterHistory.save()
 
     } else if (propertyDetails.rentType === RentType.YEARLY) {
-        let newCount = propertyDetails.payment_count;
+        let newCount = propertyDetails.payment_count + 1;
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(created);
 
