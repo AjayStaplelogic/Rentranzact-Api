@@ -4,6 +4,11 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const userSchema = new mongoose.Schema(
   {
+    deleted : {
+     type : Boolean,
+     default: false
+    },
+
     socialPlatform: {
       type: String,
 
@@ -89,7 +94,9 @@ const userSchema = new mongoose.Schema(
       type : Object,
       required : false
     }
+
   },
+
   { timestamps: true }
 );
 
