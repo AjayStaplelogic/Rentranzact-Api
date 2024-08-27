@@ -45,31 +45,44 @@ async function loginUser(body) {
     if (isPasswordValid) {
       if (user.verified) {
 
-        if (user.status) {
-
-              await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken }).then((Res) => console.log(Res, "0000res")).catch((err) => console.log(err, "00000000err"))
-
-        const accessToken = await accessTokenGenerator(user);
-        return {
-          data: user,
-          message: "logged in successfully",
-          status: true,
-          statusCode: 200,
-          accessToken: accessToken,
-        };
-        } else {
-
+        if (user.deleted) {
           return {
-            data: user,
-            message: "user account is disabled by admin",
+            data: {},
+            message: "your account is deleted",
             status: false,
             statusCode: 401,
             accessToken: "",
           };
 
+        } else {
+          if (user.status) {
+
+            await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken }).then((Res) => console.log(Res, "0000res")).catch((err) => console.log(err, "00000000err"))
+
+            const accessToken = await accessTokenGenerator(user);
+            return {
+              data: user,
+              message: "logged in successfully",
+              status: true,
+              statusCode: 200,
+              accessToken: accessToken,
+            };
+          } else {
+
+            return {
+              data: user,
+              message: "user account is disabled by admin",
+              status: false,
+              statusCode: 401,
+              accessToken: "",
+            };
+
+          }
+
         }
 
-    
+
+
       } else {
 
         let otp = generateOTP();

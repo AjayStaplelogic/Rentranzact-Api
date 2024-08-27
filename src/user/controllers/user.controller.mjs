@@ -26,6 +26,21 @@ import { Property } from "../models/property.model.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs";
 
 
+
+async function deleteUser(req, res) {
+
+  try {
+    const id = req.user.data._id;
+    console.log(id, "===id")
+    const data = User.findByIdAndUpdate(id, { deleted: true }).then((Res) => console.log(Res))
+    return sendResponse(res, {} , 'successfully deleted data', true , 200)
+
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+
+}
+
 async function login(req, res) {
   const { body } = req;
 
@@ -391,4 +406,4 @@ const getUserDetails = async (req, res) => {
   }
 }
 
-export { teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions, getUserDetails };
+export { deleteUser, teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions, getUserDetails };
