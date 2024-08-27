@@ -6,7 +6,8 @@ async function getEmployeeService(pageNo, pageSize, req) {
 
   let { search, role } = req.query;
   let query = {
-    role: { $ne: "superAdmin" }
+    role: { $ne: "superAdmin" },
+    isDeleted : false
   };
 
   if (search) {
@@ -61,7 +62,7 @@ async function addEmployeeService(body) {
   });
 
   body.password = hashedPassword;
-
+  body.joining_date = new Date();
   const admin = new Admin(body);
 
   await admin.save();
