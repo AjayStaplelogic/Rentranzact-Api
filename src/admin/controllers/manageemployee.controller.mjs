@@ -91,10 +91,32 @@ async function deleteEmployee(req, res) {
   }
 }
 
+async function updateEmployeeStatus(req, res) {
+  try {
+    let { id } = req.body;
+    if (!id) {
+      return sendResponse(res, {}, "ID is required", false, 400);
+    }
+
+    let get_employee = await Admin.findById(id).lean().exec();
+    if (get_employee) {
+      let data = await Admin.findByIdAndUpdate(id, { status: !get_employee.status });
+      if (data) {
+        return sendResponse(res, null, "Status updated successfully", true, 200);
+      }
+      return sendResponse(res, {}, "Something went wrong", false, 400);
+    }
+    return sendResponse(res, {}, "Employee not found", false, 404);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
 export {
   getEmployee,
   addEmployee,
   getEmployeeById,
   editEmployee,
-  deleteEmployee
+  deleteEmployee,
+  updateEmployeeStatus
 }
