@@ -2,12 +2,12 @@ import activityLog from "../helpers/activityLog.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import pkg from "bcrypt";
 
-async function getEmployeeService(pageNo, pageSize, req) {
+async function getEmployeeService(pageNo = 1, pageSize = 10, req) {
 
   let { search, role } = req.query;
   let query = {
     role: { $ne: "superAdmin" },
-    isDeleted : false
+    isDeleted: false
   };
 
   if (search) {
