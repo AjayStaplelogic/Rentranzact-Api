@@ -303,8 +303,8 @@ async function rentedProperties(req, res) {
                 rent: "$rent",
                 avg_rating: "$avg_rating",
                 total_reviews: "$total_reviews",
-                rentingStart: "$rentingStart",
-                rentingEnd: "$rentingEnd",
+                rent_period_end: "$rent_period_end",
+                rent_period_start: "$rent_period_start",
                 rentingType: "$rentingType",
               }
             },
