@@ -4,8 +4,8 @@ import { getEmployeeService, addEmployeeService } from "../services/manageeemplo
 import { Admin } from "../models/admin.model.mjs";
 
 async function getEmployee(req, res) {
-  const pageNo = parseInt(req.query.pageNo);
-  const pageSize = parseInt(req.query.pageSize);
+  const pageNo = parseInt(req.query.pageNo) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 10;
   const data = await getEmployeeService(pageNo, pageSize, req)
 
   sendResponse(
