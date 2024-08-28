@@ -8,7 +8,7 @@ async function addRoleService(body) {
     data.save();
 
 
-    await activityLog(admin._id, `created a new role ${data.name}`)
+    // await activityLog(admin._id, `created a new role ${data.name}`) // Commented because we don't have auth middleware for admin
 
     return {
         data: data,
@@ -44,7 +44,7 @@ async function getRoleService(body, req) {
 async function deleteRoleService(id) {
     const data = await Roles.findByIdAndDelete(id);
 
-    await activityLog(admin._id, `deleted a role ${data.name}`)
+    // await activityLog(admin._id, `deleted a role ${data.name}`)  // Commented because we don't have auth middleware for admin
     return {
         data: data,
         message: `successfully fetched  list`,
@@ -56,7 +56,7 @@ async function deleteRoleService(id) {
 async function updateRoleService(id, permissions) {
     const data = await Roles.findByIdAndUpdate(id, { permissions: permissions });
 
-    await activityLog(admin._id, `updated a ${data.name} role`)
+    // await activityLog(admin._id, `updated a ${data.name} role`)  // Commented because we don't have auth middleware for admin
     return {
         data: data,
         message: `successfully fetched  list`,
