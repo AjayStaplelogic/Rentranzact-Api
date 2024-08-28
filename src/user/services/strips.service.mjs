@@ -291,7 +291,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         let newCount = propertyDetails.payment_count + 1;
 
         console.log(timestampOneYearLater, "-----timestampOneYearLater")
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID,  payment_count : newCount , rent_period_due: timestampOneYearLater }, {new : true})
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID,  payment_count : newCount , rent_period_due: timestampOneYearLater })
 
         console.log(updateProperty , "======updarteeeee Yearly")
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: updateProperty.rent_period_start, propertyID: propertyID, renterActive: true })
