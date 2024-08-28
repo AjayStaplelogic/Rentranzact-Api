@@ -29,7 +29,7 @@ async function financePerformance(req, res) {
                     total_rent: { $sum: "$allCharges.rent" },
                     total_insurance: { $sum: "$allCharges.insurance" },
                     total_agency_fee: { $sum: "$allCharges.agency_fee" },
-                    total_legal_fee: { $sum: "$allCharges.legal_fee" },
+                    total_legal_fee: { $sum: "$allCharges.legal_Fee" },
                     total_caution_deposite: { $sum: "$allCharges.caution_deposite" },
                     total_amount: { $sum: "$allCharges.total_amount" },
                     total_amount_transactions: { $sum: "$amount" },
