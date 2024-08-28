@@ -222,9 +222,9 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         console.log(propertyDetails.payment_count , "------------> payment count");
 
-        console.log(propertyDetails.rent_paid_due , "------------> payment rent paid due");
+        console.log(propertyDetails.rent_period_due , "------------> payment rent paid due");
 
-        const originalDate = moment.unix(propertyDetails.rent_paid_due);
+        const originalDate = moment.unix(propertyDetails.rent_period_due);
 
         console.log(originalDate, "------------> originalDate");
 
@@ -252,7 +252,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     } else if (propertyDetails.rentType === RentType.QUATERLY) {
         // Convert timestamp to a Moment.js object
-        const originalDate = moment.unix(propertyDetails.rent_paid_due);
+        const originalDate = moment.unix(propertyDetails.rent_period_due);
 
         // Add one year to the original date
         const oneQuaterLater = originalDate.add(3, 'months');
@@ -276,7 +276,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     } else if (propertyDetails.rentType === RentType.YEARLY) {
         // Convert timestamp to a Moment.js object
-        const originalDate = moment.unix(propertyDetails.rent_paid_due);
+        const originalDate = moment.unix(propertyDetails.rent_period_due);
 
         // Add one year to the original date
         const oneYearLater = originalDate.add(1, 'yearly');
