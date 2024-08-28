@@ -9,10 +9,7 @@ async function stripe(req, res) {
 
         const { wallet , renterApplicationID} = body.data.object.metadata;
 
-
-        console.log(body.data.object.metadata , "=============meta data ")
-
-        console.log(typeof wallet , "-----wallet ")
+        console.log(wallet , "===wallet value")
 
         if (wallet === "true") {
 
@@ -23,12 +20,11 @@ async function stripe(req, res) {
            
         } else {
 
-
             const { propertyID } = body.data.object.metadata;
-
 
             const property = await Property.findById(propertyID);
 
+            console.log("payment count ===>" ,property.payment_count)
 
             if(property.payment_count === 0) {
 

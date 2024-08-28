@@ -15,10 +15,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function addStripeTransaction(body, renterApplicationID) {
 
-    console.log(body, "----bodddyyyy")
-
-    console.log("metadata ", body.data.object.metadata)
-
     const { userID, propertyID, notificationID } = body.data.object.metadata;
     await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
 
@@ -224,18 +220,29 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     if (propertyDetails.rentType === RentType.MONTHLY) {
 
+        console.log(propertyDetails.payment_count , "------------> payment count");
+
+        console.log(propertyDetails.rent_paid_due , "------------> payment rent paid due");
 
         const originalDate = moment.unix(propertyDetails.rent_paid_due);
 
+        console.log(originalDate, "------------> originalDate");
+
         const oneMonthLater = originalDate.add(1, 'months');
+
+        console.log(oneMonthLater, "------------> oneMonthLater");
 
         const timestampOneMonthLater = oneMonthLater.unix();
 
+        console.log(timestampOneMonthLater, "------------> timestampOneMonthLater");
+
         let newCount = propertyDetails.payment_count + 1;
+
+        console.log(newCount, "------------> newCount");
 
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID,  rent_period_due: timestampOneMonthLater , payment_count : newCount })
 
-        console.log(updateProperty , "======updarteeeee")
+        console.log(updateProperty , "---------------> updateProperty")
 
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, propertyID: propertyID, renterActive: true , rentingStart: updateProperty.rent_period_start})
 
