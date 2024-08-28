@@ -93,6 +93,20 @@ const userSchema = new mongoose.Schema(
     employmentDetails : {
       type : Object,
       required : false
+    },
+    customer_id : {
+      type : String,
+    },
+    account_status : {
+      type : String,
+      enum : ["active", "suspended", "blacklisted"],
+      default : "active"
+    },
+    suspendedAt : {
+      type : Date
+    },
+    blacklistedAt : {
+      type : Date
     }
 
   },
