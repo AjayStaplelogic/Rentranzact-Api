@@ -22,69 +22,78 @@ async function addStripeTransaction(body, renterApplicationID) {
     const { amount, status, created, id } = body.data.object;
 
     const propertyDetails = await Property.findById(propertyID);
+    if (propertyDetails) {
+        let lease_end_timestamp = "";
+        if (["commercial", "residential"].includes(propertyDetails.category)) {
+            lease_end_timestamp = moment.unix(created).add(1, "years").unix();
+        } else if (propertyDetails.category === "short stay") {
+            lease_end_timestamp = moment.unix(created).add(1, "months").unix();
+        }
 
-    if (propertyDetails.rentType === RentType.MONTHLY) {
+        if (propertyDetails.rentType === RentType.MONTHLY) {
 
-        let newCount = propertyDetails.payment_count + 1;
+            let newCount = propertyDetails.payment_count + 1;
 
-        console.log(newCount ,"--new count 1")
+            console.log(newCount, "--new count 1")
 
-        const originalDate = moment.unix(created);
+            const originalDate = moment.unix(created);
 
-        const oneMonthLater = originalDate.add(1, 'months');
+            const oneMonthLater = originalDate.add(1, 'months');
 
-        const timestampOneMonthLater = oneMonthLater.unix();
+            const timestampOneMonthLater = oneMonthLater.unix();
 
-        console.log(timestampOneMonthLater , "====TIMESTAMPE ONE MONTH LASTER")
+            console.log(timestampOneMonthLater, "====TIMESTAMPE ONE MONTH LASTER")
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneMonthLater ,rent_period_due: timestampOneMonthLater , payment_count : newCount })
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneMonthLater, rent_period_due: timestampOneMonthLater, payment_count: newCount, lease_end_timestamp : lease_end_timestamp })
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: created, propertyID: propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: created, propertyID: propertyID, renterActive: true })
 
-        addRenterHistory.save()
+            addRenterHistory.save()
 
-        // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
+            // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
 
-    } else if (propertyDetails.rentType === RentType.QUATERLY) {
-        // Convert timestamp to a Moment.js object
-        let newCount = propertyDetails.payment_count + 1;
-        const originalDate = moment.unix(created);
+        } else if (propertyDetails.rentType === RentType.QUATERLY) {
+            // Convert timestamp to a Moment.js object
+            let newCount = propertyDetails.payment_count + 1;
+            const originalDate = moment.unix(created);
 
-        // Add one year to the original date
-        const oneQuaterLater = originalDate.add(3, 'months');
-
-
-
-        // Get the Unix timestamp of one year later
-        const timestampOneQuaterLater = oneQuaterLater.unix();
-
-        console.log(newCount ,"-----new count" , timestampOneQuaterLater, "----timestamppppp ")
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneQuaterLater , rent_period_due: timestampOneQuaterLater , payment_count : newCount })
-
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created, propertyID: propertyID, renterActive: true })
+            // Add one year to the original date
+            const oneQuaterLater = originalDate.add(3, 'months');
 
 
-        // console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
+
+            // Get the Unix timestamp of one year later
+            const timestampOneQuaterLater = oneQuaterLater.unix();
+
+            console.log(newCount, "-----new count", timestampOneQuaterLater, "----timestamppppp ")
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneQuaterLater, rent_period_due: timestampOneQuaterLater, payment_count: newCount,  lease_end_timestamp : lease_end_timestamp })
+
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created, propertyID: propertyID, renterActive: true })
 
 
-        addRenterHistory.save()
+            // console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
 
-    } else if (propertyDetails.rentType === RentType.YEARLY) {
-        let newCount = propertyDetails.payment_count + 1;
-        // Convert timestamp to a Moment.js object
-        const originalDate = moment.unix(created);
 
-        // Add one year to the original date
-        const oneYearLater = originalDate.add(1, 'yearly');
+            addRenterHistory.save()
 
-        // Get the Unix timestamp of one year later
-        const timestampOneYearLater = oneYearLater.unix();
+        } else if (propertyDetails.rentType === RentType.YEARLY) {
+            let newCount = propertyDetails.payment_count + 1;
+            // Convert timestamp to a Moment.js object
+            const originalDate = moment.unix(created);
 
-        // console.log(timestampOneYearLater, "-----timestampOneYearLater")
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater , rent_period_due: timestampOneYearLater , payment_count : newCount})
+            // Add one year to the original date
+            const oneYearLater = originalDate.add(1, 'yearly');
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created, propertyID: propertyID, renterActive: true })
-        addRenterHistory.save()
+            // Get the Unix timestamp of one year later
+            const timestampOneYearLater = oneYearLater.unix();
+
+            // console.log(timestampOneYearLater, "-----timestampOneYearLater")
+            const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_start: created, rent_period_end: timestampOneYearLater, rent_period_due: timestampOneYearLater, payment_count: newCount,  lease_end_timestamp : lease_end_timestamp })
+
+            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created, propertyID: propertyID, renterActive: true })
+            addRenterHistory.save()
+        }
+
     }
 
     const renterDetails = await User.findById(userID);
@@ -125,15 +134,11 @@ async function addStripeTransaction(body, renterApplicationID) {
 
     let breakdown = await rentalBreakdown(propertyID)
 
-    const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id,  pmID : propertyDetails.property_manager_id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
+    const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, pmID: propertyDetails.property_manager_id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
 
     await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
     data.save()
-
-
-
-
     return {
 
         data: [],
@@ -216,13 +221,13 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     const propertyDetails = await Property.findById(propertyID);
 
-    console.log(propertyDetails,"=====peroperty detailsss")
+    console.log(propertyDetails, "=====peroperty detailsss")
 
     if (propertyDetails.rentType === RentType.MONTHLY) {
 
-        console.log(propertyDetails.payment_count , "------------> payment count");
+        console.log(propertyDetails.payment_count, "------------> payment count");
 
-        console.log(propertyDetails.rent_period_due , "------------> payment rent paid due");
+        console.log(propertyDetails.rent_period_due, "------------> payment rent paid due");
 
         const originalDate = moment.unix(propertyDetails.rent_period_due);
 
@@ -240,11 +245,11 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         console.log(newCount, "------------> newCount");
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID,  rent_period_due: timestampOneMonthLater , payment_count : newCount })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_due: timestampOneMonthLater, payment_count: newCount })
 
-        console.log(updateProperty , "---------------> updateProperty")
+        console.log(updateProperty, "---------------> updateProperty")
 
-        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, propertyID: propertyID, renterActive: true , rentingStart: updateProperty.rent_period_start})
+        const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, propertyID: propertyID, renterActive: true, rentingStart: updateProperty.rent_period_start })
 
         addRenterHistory.save()
 
@@ -263,9 +268,9 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         let newCount = propertyDetails.payment_count + 1;
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count : newCount, rent_period_due: timestampOneQuaterLater })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count: newCount, rent_period_due: timestampOneQuaterLater })
 
-        console.log(updateProperty , "======updarteeeee")
+        console.log(updateProperty, "======updarteeeee")
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: updateProperty.rent_period_start, propertyID: propertyID, renterActive: true })
 
 
@@ -291,9 +296,9 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         let newCount = propertyDetails.payment_count + 1;
 
         console.log(timestampOneYearLater, "-----timestampOneYearLater")
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID,  payment_count : newCount , rent_period_due: timestampOneYearLater })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count: newCount, rent_period_due: timestampOneYearLater })
 
-        console.log(updateProperty , "======updarteeeee Yearly")
+        console.log(updateProperty, "======updarteeeee Yearly")
         const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: updateProperty.rent_period_start, propertyID: propertyID, renterActive: true })
         addRenterHistory.save()
     }
@@ -336,7 +341,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     let breakdown = await rentalBreakdown(propertyID)
 
-    const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id,  pmID : propertyDetails.property_manager_id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
+    const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created, intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, pmID: propertyDetails.property_manager_id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
 
     // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
@@ -355,4 +360,4 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     }
 }
 
-export { addStripeTransaction, rechargeWallet , addStripeTransactionForOld };
+export { addStripeTransaction, rechargeWallet, addStripeTransactionForOld };

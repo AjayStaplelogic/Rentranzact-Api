@@ -229,8 +229,11 @@ const propertySchema = new mongoose.Schema(
     payment_count : {
       type : Number,
       default : 0
-    }
-    
+    },
+    lease_end_timestamp: {
+      type: String,
+    },
+
   },
   { timestamps: true }
 );
