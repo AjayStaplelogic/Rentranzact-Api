@@ -103,7 +103,7 @@ export const getAllCards = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
-        query.user_id = { $ne: new ObjectId(req?.user?.data?._id) }
+        query.user_id = { $eq: new ObjectId(req?.user?.data?._id) }
 
         let pipeline = [
             {
