@@ -53,4 +53,19 @@ async function stripe(req, res) {
 
 }
 
-export { stripe };
+async function paystack(req,res) {
+
+    const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
+
+    const testPublicKey = "pk_test_db9e3e625d89f39ace0be33b1550218e7603ed96";
+
+    console.log(req.body ,"-------------webhook event")
+
+
+
+
+
+
+}
+
+export { stripe ,paystack };
