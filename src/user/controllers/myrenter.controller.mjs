@@ -305,6 +305,7 @@ async function rentedProperties(req, res) {
                 rent_period_end: "$rent_period_end",
                 rent_period_start: "$rent_period_start",
                 rentType: "$rentType",
+                lease_end_timestamp: "$lease_end_timestamp",
               }
             },
             {
