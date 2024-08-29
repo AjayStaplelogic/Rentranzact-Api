@@ -53,7 +53,7 @@ async function addRentApplicationService(body, user) {
 
 
     const landlord = await Property.findById(propertyID);
-    
+
 
     const payload = {
       propertyID: propertyID,
@@ -84,7 +84,7 @@ async function addRentApplicationService(body, user) {
       permanentZipcode,
       permanentContactNumber,
       landlordID: landlord.landlord_id,
-      pmID : landlord.property_manager_id,
+      pmID: landlord.property_manager_id,
       propertyName: landlord.propertyName,
       verifcationType: identificationType,
       previousLandlordAddress: previousLandlordAddress,
@@ -233,7 +233,7 @@ async function addRentApplicationService(body, user) {
 
 async function rentApplicationsList(user, req) {
 
-  let { search, applicationStatus, sortBy } = req.query;
+  let { search, applicationStatus, sortBy, propertyID, kinIdentityCheck } = req.query;
   let page = Number(req.query.page || 1);
   let count = Number(req.query.count || 20);
   let skip = Number(page - 1) * count;
@@ -243,13 +243,25 @@ async function rentApplicationsList(user, req) {
     query.renterID = req?.user?.data?._id;
   } else if (req?.user?.data?.role == UserRoles.LANDLORD) {
     query.landlordID = req?.user?.data?._id;
-  } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER){
+  } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER) {
 
     query.pmID = req?.user?.data?._id;
   }
 
   if (applicationStatus) {
     query.applicationStatus = { $in: applicationStatus.split(',') };
+  }
+
+  if (propertyID) {
+    query.propertyID = propertyID;
+  }
+
+  if (kinIdentityCheck) {
+    if (kinIdentityCheck === "true") {
+      query.kinIdentityCheck = true;
+    } else if (kinIdentityCheck === "false") {
+      query.kinIdentityCheck = false;
+    }
   }
 
   let field = "updatedAt";
@@ -270,6 +282,7 @@ async function rentApplicationsList(user, req) {
     ]
   }
 
+  // console.log(query, "====query")
   let pipeline = [
     {
       $match: query
