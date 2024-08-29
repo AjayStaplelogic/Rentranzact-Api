@@ -282,7 +282,7 @@ async function rentApplicationsList(user, req) {
     ]
   }
 
-  console.log(query, "====query")
+  // console.log(query, "====query")
   let pipeline = [
     {
       $match: query
