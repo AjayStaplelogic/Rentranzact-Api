@@ -40,7 +40,6 @@ async function payRentService(body, userID) {
         if(get_card){
             payload.customer = get_card.customer_id;
             payload.payment_method = get_card.card_id;
-            payload.automatic_payment_methods.enabled = false;
         }else {
             return {
                 data: {},
