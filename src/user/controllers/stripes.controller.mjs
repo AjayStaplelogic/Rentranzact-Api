@@ -1,6 +1,6 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
-import { createHmac } from "crypto" 
+import { createHmac } from "crypto"
 import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
 async function stripe(req, res) {
 
@@ -11,6 +11,8 @@ async function stripe(req, res) {
         const { wallet, renterApplicationID } = body.data.object.metadata;
 
         console.log(wallet, "===wallet value")
+
+        body.paymentMethod = "stripe"
 
         if (wallet === "true") {
 
@@ -40,13 +42,6 @@ async function stripe(req, res) {
 
             }
 
-
-
-
-
-
-
-
         }
 
     }
@@ -58,27 +53,69 @@ async function paystack(req, res) {
 
     const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
 
-    const testPublicKey = "pk_test_db9e3e625d89f39ace0be33b1550218e7603ed96";
-
     console.log(req.body, "-------------webhook event")
 
-    const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
+    const {body} = req;
 
-    console.log(hash, "---------------hash")
+    body.paymentMethod = "paystack"
 
-    if (hash == req.headers['x-paystack-signature']) {
+    if (req.body.event === "charge.success") {
+        const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
 
-        console.log("----hash is working ")
+        if (hash == req.headers['x-paystack-signature']) {
 
-        return {
-            status : 200
+
+
+            const { wallet, renterApplicationID } = req.body.data.metadata;
+
+            if (wallet === "true") {
+
+                const data = await rechargeWallet(body);
+
+                sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+
+            } else {
+
+                const { propertyID } = body.data.metadata;
+
+                const property = await Property.findById(propertyID);
+
+                console.log("payment count ===>", property.payment_count)
+
+                if (property.payment_count === 0) {
+
+                    const data = await addStripeTransaction(body, renterApplicationID);
+
+                    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+                } else {
+
+                    const data = await addStripeTransactionForOld(body, renterApplicationID);
+
+                    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+                }
+
+            }
+
+            return {
+                status: 200
+            }
+        } else {
+            console.log("------------> hash not working")
+            return {
+                status: 401
+            }
         }
-    } else {
-        console.log("------------> hash not working")
-        return {
-            status : 200
-        }
+
+
+
     }
+
+
+
+
+
 
 
 }
