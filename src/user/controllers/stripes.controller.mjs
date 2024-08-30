@@ -61,11 +61,15 @@ async function paystack(req,res) {
 
     console.log(req.body ,"-------------webhook event")
 
+    const hash = crypto.createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
+    if (hash == req.headers['x-paystack-signature']) {
 
+        console.log("----hash is working ")
 
+       
+    }
 
-
-
+    console.log(req.body ,"-------------webhook event")
 }
 
 export { stripe ,paystack };
