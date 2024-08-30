@@ -174,7 +174,7 @@ async function addToWallet(body) {
     let { userID } = body.meta_data;
     const created = moment(createdAt).unix();
     if (status === "successful") {
-        let userDetail = await User.findByID(userID);
+        let userDetail = await User.findById(userID);
         if (userDetail) {
             let payload = {
                 amount,
