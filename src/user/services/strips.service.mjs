@@ -339,7 +339,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         amount = body.data.amount;
         status = body.data.status;
         created = moment(createdAt).unix();
-        id = body.data.object.id;
+        id = body.data.id;
 
     }
 
