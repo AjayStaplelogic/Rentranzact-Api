@@ -7,7 +7,7 @@ async function flutterwave(req, res) {
   console.log(req.body, "=========boddyyyy Flutterwave webhook")
   const { wallet, meta_data } = body;
 
-  if (wallet) {
+  if (wallet == "true") {
     const data = await addToWallet(body)
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
