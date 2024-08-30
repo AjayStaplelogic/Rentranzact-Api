@@ -1,5 +1,6 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
+import { createHmac } from "crypto" 
 import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
 async function stripe(req, res) {
 
@@ -61,7 +62,7 @@ async function paystack(req, res) {
 
     console.log(req.body, "-------------webhook event")
 
-    const hash = crypto.createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
+    const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
 
     console.log(hash, "---------------hash")
 
