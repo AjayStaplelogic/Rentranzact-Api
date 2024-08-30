@@ -59,13 +59,16 @@ async function identityVerifier(identificationType, kinDetails) {
             dob: "1994-02-33",
             phone_number: "9988666666",
         };
+        console.log(id_info , "------------------> id info")
 
         let options = {
             signature: true,
         };
 
+
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
+        console.log(response , "------------------------> resp")
         // console.log(response.FullData , "full data")
 
         // console.log(response?.FullData?.FirstName ,"response?.FullData?.FirstNameresponse?.FullData?.FirstName")
