@@ -8,8 +8,7 @@ async function flutterwave(req, res) {
   const { wallet, meta_data } = body;
 
   if (wallet == "true") {
-    const data = await addToWallet(body)
-    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+    addToWallet(body)
   } else {
     let property = await Property.findById(meta_data.propertyID);
     let data = {}
@@ -20,9 +19,9 @@ async function flutterwave(req, res) {
         data = await addFlutterwaveTransactionForOld(body)
       }
     }
-
-    sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }
+
+  return res.status(200).end();
 }
 
 export { flutterwave };

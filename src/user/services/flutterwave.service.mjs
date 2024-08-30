@@ -6,6 +6,7 @@ import moment from "moment";
 import { User } from "../models/user.model.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -169,17 +170,40 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 }
 
 async function addToWallet(body) {
+    let { amount, status, createdAt, id } = body;
+    let { userID } = body.meta_data;
+    const created = moment(createdAt).unix();
+    if (status === "successful") {
+        let userDetail = await User.findByID(userID);
+        if (userDetail) {
+            let payload = {
+                amount,
+                status,
+                createdAt: created,
+                type: "CREDIT",
+                userID,
+                intentID: id
+            }
 
+            let add_wallet = await Wallet.create(payload);
+            if (add_wallet) {
+                let update_user = await User.findByIdAndUpdate(userID, {
+                    $inc: { walletPoints: amount }
+                });
 
-
-
-    return {
-        data: [],
-        message: "dashboard stats",
-        status: true,
-        statusCode: 200,
-    };
-
+                let create_transaction = await Transaction.create({
+                    wallet: true,
+                    renterID: userID,
+                    amount: amount,
+                    status: status,
+                    date: created,
+                    intentID: id,
+                    type: "CREDIT",
+                    payment_mode: "flutterwave"
+                });
+            }
+        }
+    }
 }
 
 async function addFlutterwaveTransactionForOld(body) {
