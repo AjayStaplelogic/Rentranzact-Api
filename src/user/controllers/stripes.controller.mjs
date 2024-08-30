@@ -81,21 +81,21 @@ async function paystack(req, res) {
 
                 const property = await Property.findById(propertyID);
 
-                console.log("payment count ===>", property.payment_count)
-
-                if (property.payment_count === 0) {
-
-                    const data = await addStripeTransaction(body, renterApplicationID);
-
-                    sendResponse(res, data.data, data.message, data.status, data.statusCode);
-                } else {
-
-                    const data = await addStripeTransactionForOld(body, renterApplicationID);
-
-                    sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
+                if(property){
+                    console.log("payment count ===>", property.payment_count)
+    
+                    if (property.payment_count === 0) {
+    
+                        const data = await addStripeTransaction(body, renterApplicationID);
+    
+                        sendResponse(res, data.data, data.message, data.status, data.statusCode);
+                    } else {
+    
+                        const data = await addStripeTransactionForOld(body, renterApplicationID);
+    
+                        sendResponse(res, data.data, data.message, data.status, data.statusCode);
+                    }
                 }
-
             }
 
             return {
