@@ -50,6 +50,8 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const { first_name, last_name, middle_name, dob, nin } = kinDetails;
 
+        console.log(kinDetails, "--------------------------------> kin details")
+
         let id_info = {
             first_name: "<first name>",
             last_name: "<surname>",
@@ -59,7 +61,7 @@ async function identityVerifier(identificationType, kinDetails) {
             dob: "1994-02-33",
             phone_number: "9988666666",
         };
-        console.log(id_info , "------------------> id info")
+        console.log(id_info, "------------------> id info")
 
         let options = {
             signature: true,
@@ -68,10 +70,13 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => err)
 
-        console.log(response , "------------------------> resp")
+        console.log(response, "------------------------> resp")
         // console.log(response.FullData , "full data")
 
         // console.log(response?.FullData?.FirstName ,"response?.FullData?.FirstNameresponse?.FullData?.FirstName")
+
+        console.log(response?.FullData?.firstname.toLowerCase() , first_name.toLowerCase() , response?.FullData?.middlename.toLowerCase() ,  middle_name.toLowerCase() ,  response?.FullData?.surname.toLowerCase() , last_name.toLowerCase() , response?.FullData?.dateOfBirth , dob, "==============> bug discovery")
+
 
         if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.surname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
 
@@ -101,7 +106,7 @@ async function identityVerifier(identificationType, kinDetails) {
         };
 
 
-        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => console.log(err,"-errrrrr") & false);
+        const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => console.log(err, "-errrrrr") & false);
 
         // console.log(response ,"==-=-=-=-=-=-=respone in voter id card ")
 
