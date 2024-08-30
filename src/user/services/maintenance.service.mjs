@@ -2,12 +2,15 @@ import { Maintenance } from "../models/maintenance.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import * as ManinenanceEnums from "../enums/maintenance.enums.mjs"
+import { Notification } from "../models/notification.model.mjs";
+import sendNotification from "../helpers/sendNotification.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenanceRequests(body) {
 
     console.log(body,"------------bodyyy")
 
-    const { landlord_id } = await Property.findById(body.propertyID).select("landlord_id")
+    const { landlord_id, propertyName } = await Property.findById(body.propertyID);
 
 
     body.landlordID = landlord_id;
@@ -19,6 +22,29 @@ async function addMaintenanceRequests(body) {
     const data = new Maintenance(body);
 
     data.save()
+
+    let landlordDetails = await User.findById(landlord_id)
+    let renterDetails = await User.findById(data.renterID)
+
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Inspection Update";
+    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied maintanence requests for ${propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails._id;
+    notification_payload.maintanence_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+      if (landlordDetails && landlordDetails.fcmToken) {
+        const metadata = {
+          "propertyID": data.propertyID.toString(),
+          "redirectTo": "maintanence",
+          "maintanence_id": create_notification.maintanence_id,
+        }
+        sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+      }
+    }
+
     return {
         data: data,
         message: "created maintenance successfully",

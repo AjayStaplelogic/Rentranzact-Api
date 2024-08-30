@@ -7,6 +7,7 @@ import ObjectID from "bson-objectid";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
 import sendNotification from "../helpers/sendNotification.mjs";
+import { Notification } from "../models/notification.model.mjs";
 
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id } = body;
@@ -15,7 +16,7 @@ async function createInspection(body, renterID) {
   let notificationBody;
 
   const property = await Property.findById(propertyID);
-  if(!property) {
+  if (!property) {
     return {
       data: {},
       message: "Invalid property Id",
@@ -28,7 +29,7 @@ async function createInspection(body, renterID) {
 
   const landlordDetails = await User.findById(property.landlord_id)
 
-  const { fullName, picture, phone, countryCode , email} = renterDetails;
+  const { fullName, picture, phone, countryCode, email } = renterDetails;
 
 
   const payload = {
@@ -43,7 +44,7 @@ async function createInspection(body, renterID) {
     picture: picture,
     countryCode: countryCode,
     phone: phone,
-    email : email
+    email: email
   };
 
   // console.log(property, "==========property")
@@ -71,18 +72,35 @@ async function createInspection(body, renterID) {
 
   // console.log(data, "====+++++++data ")
 
-  
-  const metadata = {
-    redirectTo: "inspection"
+
+  // const metadata = {
+  //   redirectTo: "inspection"
+  // }
+
+  // title = "Inspection Update"
+
+  // notificationBody = `${renterDetails.fullName} applied inspection for ${property.propertyName}`
+
+  // const data_ = await sendNotification(landlordDetails, "single", title, notificationBody, metadata, UserRoles.LANDLORD)
+
+  let notification_payload = {};
+  notification_payload.notificationHeading = "Inspection Update";
+  notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
+  notification_payload.renterID = renterDetails._id;
+  notification_payload.landlordID = landlordDetails._id;
+  notification_payload.inspection_id = data._id;
+  notification_payload.propertyID = data.propertyID;
+  let create_notification = await Notification.create(notification_payload);
+  if (create_notification) {
+    if (landlordDetails && landlordDetails.fcmToken) {
+      const metadata = {
+        "propertyID": data.propertyID.toString(),
+        "redirectTo": "inspection",
+        "inspection_id": create_notification.inspection_id,
+      }
+      sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+    }
   }
-
-  title = "Inspection Update"
-
-  notificationBody = `${renterDetails.fullName} applied inspection for ${property.propertyName}`
-  
-  const data_ = await sendNotification(landlordDetails, "single", title, notificationBody, metadata, UserRoles.LANDLORD)
-
-
 
   return {
     data: data,
@@ -105,7 +123,7 @@ async function fetchInspections(userData, req) {
         { landlordName: { $regex: search, $options: "i" } },
       ]
     }
-    if(status){
+    if (status) {
       query.inspectionStatus = status;
     }
     const data = await Inspection.find(query);
@@ -127,7 +145,7 @@ async function fetchInspections(userData, req) {
         { landlordName: { $regex: search, $options: "i" } },
       ]
     }
-    if(status){
+    if (status) {
       query.inspectionStatus = status;
     }
     const data = await Inspection.find(query);
@@ -152,7 +170,7 @@ async function fetchInspections(userData, req) {
         { landlordName: { $regex: search, $options: "i" } },
       ]
     }
-    if(status){
+    if (status) {
       query.inspectionStatus = status;
     }
     // Import ObjectId from MongoDB driver
