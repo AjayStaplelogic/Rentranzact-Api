@@ -68,6 +68,8 @@ async function paystack(req, res) {
 
             const { wallet, renterApplicationID } = req.body.data.metadata;
 
+            console.log(wallet , "--------------> wallet")
+
             if (wallet === "true") {
 
                 const data = await rechargeWallet(body);
