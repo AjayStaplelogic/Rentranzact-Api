@@ -1,15 +1,15 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
-import { addStripeTransaction, rechargeWallet , addStripeTransactionForOld } from "../services/strips.service.mjs";
+import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
 async function stripe(req, res) {
 
     const { body } = req;
 
     if (body.type === "payment_intent.succeeded") {
 
-        const { wallet , renterApplicationID} = body.data.object.metadata;
+        const { wallet, renterApplicationID } = body.data.object.metadata;
 
-        console.log(wallet , "===wallet value")
+        console.log(wallet, "===wallet value")
 
         if (wallet === "true") {
 
@@ -17,34 +17,34 @@ async function stripe(req, res) {
 
             sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
-           
+
         } else {
 
             const { propertyID } = body.data.object.metadata;
 
             const property = await Property.findById(propertyID);
 
-            console.log("payment count ===>" ,property.payment_count)
+            console.log("payment count ===>", property.payment_count)
 
-            if(property.payment_count === 0) {
+            if (property.payment_count === 0) {
 
-                const data = await addStripeTransaction(body , renterApplicationID);
+                const data = await addStripeTransaction(body, renterApplicationID);
 
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
             } else {
 
-                const data = await addStripeTransactionForOld(body , renterApplicationID);
+                const data = await addStripeTransactionForOld(body, renterApplicationID);
 
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
             }
 
 
-            
 
-            
 
-          
+
+
+
 
         }
 
@@ -53,23 +53,33 @@ async function stripe(req, res) {
 
 }
 
-async function paystack(req,res) {
+async function paystack(req, res) {
 
     const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
 
     const testPublicKey = "pk_test_db9e3e625d89f39ace0be33b1550218e7603ed96";
 
-    console.log(req.body ,"-------------webhook event")
+    console.log(req.body, "-------------webhook event")
 
     const hash = crypto.createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
+
+    console.log(hash, "---------------hash")
+
     if (hash == req.headers['x-paystack-signature']) {
 
         console.log("----hash is working ")
 
-       
+        return {
+            status : 200
+        }
+    } else {
+        console.log("------------> hash not working")
+        return {
+            status : 200
+        }
     }
 
-    console.log(req.body ,"-------------webhook event")
+
 }
 
-export { stripe ,paystack };
+export { stripe, paystack };
