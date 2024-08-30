@@ -5,9 +5,9 @@ import { Property } from "../models/property.model.mjs";
 async function flutterwave(req, res) {
   const { body } = req;
   console.log(req.body, "=========boddyyyy Flutterwave webhook")
-  const { wallet, meta_data } = body;
-
-  if (wallet == "true") {
+  const { meta_data } = body;
+  let { wallet } = meta_data
+  if (wallet === "true") {
     addToWallet(body)
   } else {
     let property = await Property.findById(meta_data.propertyID);
