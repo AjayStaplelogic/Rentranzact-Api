@@ -23,6 +23,7 @@ import reviewRoutes from "./user/routes/review.route.mjs"
 import uploadRoutes from "./user/routes/upload.route.mjs"
 import userBlogRoutes from "./user/routes/blog.route.mjs"
 import userNewsLetterSubscription from "./user/routes/newlettersubscription.route.mjs";
+import userCardRoutes from "./user/routes/cards.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -38,7 +39,8 @@ import adminBlogRoutes from "./admin/routes/blog.route.mjs";
 import adminSiteContentRoutes from "./admin/routes/sitecontents.route.mjs"
 import adminCareerRoutes from "./admin/routes/careers.route.mjs";
 import adminNewsLetterSubscriptions from "./admin/routes/newslettersubscription.route.mjs"
-import adminTestimonialRoutes from "./admin/routes/testimonials.route.mjs"
+import adminTestimonialRoutes from "./admin/routes/testimonials.route.mjs";
+import adminFaqRoutes from "./admin/routes/faq.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -105,7 +107,7 @@ app.use("/api", reviewRoutes)
 app.use("/api", uploadRoutes)
 app.use("/api", userBlogRoutes)
 app.use("/api", userNewsLetterSubscription)
-
+app.use("/api", userCardRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
@@ -122,6 +124,7 @@ app.use("/api/admin", adminSiteContentRoutes)
 app.use("/api/admin", adminCareerRoutes)
 app.use("/api/admin", adminNewsLetterSubscriptions)
 app.use("/api/admin", adminTestimonialRoutes)
+app.use("/api/admin", adminFaqRoutes)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
