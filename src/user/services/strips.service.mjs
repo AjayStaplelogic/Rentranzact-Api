@@ -196,6 +196,7 @@ async function addStripeTransaction(body, renterApplicationID) {
     }
 
 }
+}
 
 async function rechargeWallet(body) {
 
