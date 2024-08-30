@@ -3,7 +3,7 @@ import { User } from "../models/user.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { RentType } from "../enums/property.enums.mjs";
 import moment from "moment";
-import { RentingHistory} from "../models/rentingHistory.model.mjs";
+import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { v4 as uuidv4 } from 'uuid';
 import Cards from "../models/cards.model.mjs"
@@ -12,9 +12,9 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function payRentService(body, userID) {
 
-    const { amount, propertyID, wallet , renterApplicationID , notificationID, payment_card_id } = body;
+    const { amount, propertyID, wallet, renterApplicationID, notificationID, payment_card_id } = body;
 
-    console.log(typeof wallet , "--------wallet typeof ")
+    console.log(typeof wallet, "--------wallet typeof ")
 
     let payload = {
         amount: amount,
@@ -26,21 +26,21 @@ async function payRentService(body, userID) {
             propertyID: propertyID,
             userID: userID,
             wallet: wallet,
-            renterApplicationID : renterApplicationID,
+            renterApplicationID: renterApplicationID,
             notificationID: notificationID
         }
     }
 
-    if(payment_card_id){
+    if (payment_card_id) {
         let get_card = await Cards.findOne({
-            _id : payment_card_id,
-            user_id : userID
+            _id: payment_card_id,
+            user_id: userID
         });
 
-        if(get_card){
+        if (get_card) {
             payload.customer = get_card.customer_id;
             payload.payment_method = get_card.card_id;
-        }else {
+        } else {
             return {
                 data: {},
                 message: "Invalid payment card id provided",
@@ -67,12 +67,8 @@ async function payRentService(body, userID) {
 
 async function addToWallet(body, userID) {
 
-    const { amount, wallet } = body;
-
-
-    // console.log(amount, wallet  , "=======amopunt wallet ")
-
-    const paymentIntent = await stripe.paymentIntents.create({
+    const { amount, wallet, payment_card_id } = body;
+    let payload = {
         amount: amount,
         currency: 'ngn',
         automatic_payment_methods: {
@@ -82,9 +78,29 @@ async function addToWallet(body, userID) {
             wallet: wallet,
             userID: userID
         }
-    })
+    };
+    // console.log(amount, wallet  , "=======amopunt wallet ")
 
+    if (payment_card_id) {
+        let get_card = await Cards.findOne({
+            _id: payment_card_id,
+            user_id: userID
+        });
 
+        if (get_card) {
+            payload.customer = get_card.customer_id;
+            payload.payment_method = get_card.card_id;
+        } else {
+            return {
+                data: {},
+                message: "Invalid payment card id provided",
+                status: false,
+                statusCode: 400,
+            }
+        }
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(payload);
     // console.log(paymentIntent , "=====PAYMENT INTENT  ")
 
     return {
@@ -118,7 +134,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
 
         const propertyDetails = await Property.findById(propertyID);
 
-        
+
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
 

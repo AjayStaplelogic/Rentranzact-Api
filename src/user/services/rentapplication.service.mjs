@@ -284,7 +284,7 @@ async function rentApplicationsList(user, req) {
     }
   }
 
-  let field = "updatedAt";
+  let field = "createdAt";
   let order = "desc";
   let sort_query = {};
   if (sortBy) {

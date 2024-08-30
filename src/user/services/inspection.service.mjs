@@ -126,7 +126,7 @@ async function fetchInspections(userData, req) {
     if (status) {
       query.inspectionStatus = status;
     }
-    const data = await Inspection.find(query);
+    const data = await Inspection.find(query).sort({createdAt: -1});
 
     return {
       data: data,
@@ -148,7 +148,7 @@ async function fetchInspections(userData, req) {
     if (status) {
       query.inspectionStatus = status;
     }
-    const data = await Inspection.find(query);
+    const data = await Inspection.find(query).sort({createdAt: -1});
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -218,6 +218,9 @@ async function fetchInspections(userData, req) {
           "propertyDetails.address": 1,
         },
       },
+      {
+        $sort: { createdAt: -1 }, // Sort by createdAt in descending order$s
+      }
     ]);
 
 
