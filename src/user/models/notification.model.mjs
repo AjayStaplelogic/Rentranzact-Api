@@ -36,6 +36,14 @@ const notificationSchema = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: 'users',
             index: true
+        },
+        inspection_id : {
+            type : mongoose.Types.ObjectId,
+            ref : "inspections"
+        },
+        maintanence_id : {
+            type : mongoose.Types.ObjectId,
+            ref : "maintenances"
         }
     },
     { timestamps: true }
