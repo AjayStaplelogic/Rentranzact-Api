@@ -6,16 +6,17 @@ import moment from "moment";
 import { RentingHistory} from "../models/rentingHistory.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { v4 as uuidv4 } from 'uuid';
+import Cards from "../models/cards.model.mjs"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function payRentService(body, userID) {
 
-    const { amount, propertyID, wallet , renterApplicationID , notificationID } = body;
+    const { amount, propertyID, wallet , renterApplicationID , notificationID, payment_card_id } = body;
 
     console.log(typeof wallet , "--------wallet typeof ")
 
-    const paymentIntent = await stripe.paymentIntents.create({
+    let payload = {
         amount: amount,
         currency: 'ngn',
         automatic_payment_methods: {
@@ -28,7 +29,29 @@ async function payRentService(body, userID) {
             renterApplicationID : renterApplicationID,
             notificationID: notificationID
         }
-    });
+    }
+
+    if(payment_card_id){
+        let get_card = await Cards.findOne({
+            _id : payment_card_id,
+            user_id : userID
+        });
+
+        if(get_card){
+            payload.customer = get_card.customer_id;
+            payload.payment_method = get_card.card_id;
+            payload.automatic_payment_methods.enabled = false;
+        }else {
+            return {
+                data: {},
+                message: "Invalid payment card id provided",
+                status: false,
+                statusCode: 400,
+            }
+        }
+    }
+
+    const paymentIntent = await stripe.paymentIntents.create(payload);
 
     return {
         data: { client_secret: paymentIntent.client_secret },

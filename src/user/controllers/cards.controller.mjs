@@ -120,8 +120,8 @@ export const getAllCards = async (req, res) => {
                     last4: "$last4",
                     exp_month: "$exp_month",
                     exp_year: "$exp_year",
-                    card_id: "$card_id",
-                    customer_id: "$customer_id",
+                    // card_id: "$card_id",
+                    // customer_id: "$customer_id",
                     isPrimary: "$isPrimary",
                 }
             },
