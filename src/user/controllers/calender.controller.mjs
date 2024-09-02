@@ -275,6 +275,9 @@ async function getCalenderBlockedSlots(req, res) {
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
+        console.log(query, '===query')
+        console.log(query2, '===query2')
+
         let pipeline = [
             {
                 $match: query
@@ -379,9 +382,11 @@ async function blockMultipleTimeSlots(req, res) {
             let blocked_slots = [];
             for await (let slot of slots) { 
                 slot["userID"] = req?.user?.data?._id;
-                let block_slot = await Calender.create(slot);
-                if (block_slot) {
-                    blocked_slots.push(block_slot);
+                if(!slot._id){
+                    let block_slot = await Calender.create(slot);
+                    if (block_slot) {
+                        blocked_slots.push(block_slot);
+                    }
                 }
             }
             return sendResponse(res, blocked_slots, "Success", true, 201);
