@@ -23,11 +23,13 @@ async function addStripeTransaction(body, renterApplicationID) {
     let created;
     let id;
 
+    console.log(body.paymentMethod , "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx paymentMethod")
+    console.log(body ,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXBODY")
+
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
         propertyID = body.data.object.metadata.propertyID;
         notificationID = body.data.object.notificationID;
-
         //   const { userID, propertyID, notificationID } = body.data.object.metadata;
         // const { amount, status, created, id } = body.data.object;
         amount = body.data.object.amount;
@@ -53,7 +55,6 @@ async function addStripeTransaction(body, renterApplicationID) {
         id = body.data.object.id;
 
     }
-
 
     await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
 
