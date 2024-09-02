@@ -19,7 +19,7 @@ export const blockMultipleTimeSlots = Joi.object().keys({
         date : Joi.string().required(),
         time : Joi.string().optional().allow(""),
         fullDay : Joi.boolean().optional(),
-        _id : Joi.string().optional(),
+        _id : Joi.string().optional().allow("", null),
     }).required(),
     slots_to_delete : Joi.array().items(Joi.string().optional()).optional()
 });
