@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const blogSchema = new Schema({
     title : {
         type : String,
     },
@@ -30,5 +30,5 @@ const chatSchema = new Schema({
 });
 
 
-const Blogs = mongoose.model('Blogs', chatSchema);
+const Blogs = mongoose.model('Blogs', blogSchema);
 export default Blogs;

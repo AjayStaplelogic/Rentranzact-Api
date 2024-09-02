@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const newsLetterSubscriptionSchema = new Schema({
     email : {
         type : String,
     },
@@ -13,5 +13,5 @@ const chatSchema = new Schema({
 });
 
 
-const NewsLetterSubscriptions = mongoose.model('newslettersubscriptions', chatSchema);
+const NewsLetterSubscriptions = mongoose.model('newslettersubscriptions', newsLetterSubscriptionSchema);
 export default NewsLetterSubscriptions;

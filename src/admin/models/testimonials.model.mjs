@@ -3,7 +3,7 @@ import { UserRoles } from "../../user/enums/role.enums.mjs"
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const testimonialSchema = new Schema({
     name: {
         type: String,
     },
@@ -35,5 +35,5 @@ const chatSchema = new Schema({
 });
 
 
-const Testimonials = mongoose.model('testimonials', chatSchema);
+const Testimonials = mongoose.model('testimonials', testimonialSchema);
 export default Testimonials;

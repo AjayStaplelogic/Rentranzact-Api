@@ -40,7 +40,8 @@ import adminSiteContentRoutes from "./admin/routes/sitecontents.route.mjs"
 import adminCareerRoutes from "./admin/routes/careers.route.mjs";
 import adminNewsLetterSubscriptions from "./admin/routes/newslettersubscription.route.mjs"
 import adminTestimonialRoutes from "./admin/routes/testimonials.route.mjs";
-import adminFaqRoutes from "./admin/routes/faq.route.mjs"
+import adminFaqRoutes from "./admin/routes/faq.route.mjs";
+import adminSocialMediaIconRoutes from "./admin/routes/socialmediaicons.route.mjs"
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -125,6 +126,7 @@ app.use("/api/admin", adminCareerRoutes)
 app.use("/api/admin", adminNewsLetterSubscriptions)
 app.use("/api/admin", adminTestimonialRoutes)
 app.use("/api/admin", adminFaqRoutes)
+app.use("/api/admin", adminSocialMediaIconRoutes)
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
