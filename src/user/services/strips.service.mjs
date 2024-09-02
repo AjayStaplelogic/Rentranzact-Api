@@ -25,6 +25,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
     console.log(body.paymentMethod , "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx paymentMethod")
     console.log(body ,"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXBODY")
+    console.log(body.data.object.metadata , "---------------meta")
 
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
