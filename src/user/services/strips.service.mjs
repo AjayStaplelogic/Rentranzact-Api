@@ -30,7 +30,8 @@ async function addStripeTransaction(body, renterApplicationID) {
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
         propertyID = body.data.object.metadata.propertyID;
-        notificationID = body.data.object.notificationID;
+        notificationID = body.data.object.metadata.notificationID;
+
         //   const { userID, propertyID, notificationID } = body.data.object.metadata;
         // const { amount, status, created, id } = body.data.object;
         amount = body.data.object.amount;
