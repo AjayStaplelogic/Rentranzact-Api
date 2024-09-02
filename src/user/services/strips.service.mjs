@@ -56,6 +56,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         id = body.data.object.id;
 
     }
+    console.log(notificationID , "xxxxxxxxxxxxxxxxxxxxxxxNotification ID")
 
     await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
 
