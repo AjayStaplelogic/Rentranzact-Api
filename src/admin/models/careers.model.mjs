@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const careerSchema = new Schema({
     title : {               // Job title
         type : String,
     },
@@ -20,5 +20,5 @@ const chatSchema = new Schema({
 });
 
 
-const Careers = mongoose.model('Careers', chatSchema);
+const Careers = mongoose.model('Careers', careerSchema);
 export default Careers;

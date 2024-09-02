@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const siteContentSchema = new Schema({
     slug : {
         type: String,
         enum : ["about-us", "privacy-policy", "data-protection"],
@@ -21,5 +21,5 @@ const chatSchema = new Schema({
 });
 
 
-const SiteContents = mongoose.model('SiteContents', chatSchema);
+const SiteContents = mongoose.model('SiteContents', siteContentSchema);
 export default SiteContents;

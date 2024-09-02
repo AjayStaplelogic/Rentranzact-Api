@@ -3,7 +3,7 @@ import * as FaqEnums from "../enums/faq.enums.mjs";
 
 const Schema = mongoose.Schema;
 
-const chatSchema = new Schema({
+const faqSchema = new Schema({
     category: {
         type: String,
         enum: Object.values(FaqEnums.CATEGORIES),
@@ -32,5 +32,5 @@ const chatSchema = new Schema({
 });
 
 
-const Faqs = mongoose.model('faqs', chatSchema);
+const Faqs = mongoose.model('faqs', faqSchema);
 export default Faqs;
