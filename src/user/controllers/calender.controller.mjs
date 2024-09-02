@@ -383,6 +383,7 @@ async function blockMultipleTimeSlots(req, res) {
             for await (let slot of slots) { 
                 slot["userID"] = req?.user?.data?._id;
                 if(!slot._id){
+                    delete slot._id;
                     let block_slot = await Calender.create(slot);
                     if (block_slot) {
                         blocked_slots.push(block_slot);
