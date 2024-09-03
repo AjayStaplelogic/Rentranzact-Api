@@ -13,6 +13,8 @@ import {
   deletePropertyService
 } from "../services/property.service.mjs";
 import { Property } from "../models/property.model.mjs";
+import { User } from "../models/user.model.mjs";
+
 
 
 async function addProperty(req, res) {
@@ -159,7 +161,7 @@ async function leaveProperty(req, res) {
 
 async function getAllProperties(req, res) {
   try {
-    let { category, type, min_availability, max_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy } = req.query;
+    let { category, type, min_availability, max_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy, user_id } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
@@ -172,7 +174,7 @@ async function getAllProperties(req, res) {
       query.availability = { $lte: 0 }
     }
 
-    if(Number(min_availability) > 0){
+    if (Number(min_availability) > 0) {
       query.availability = { $gt: Number(min_availability) }
     }
 
@@ -209,9 +211,34 @@ async function getAllProperties(req, res) {
       order = sortBy.split(' ')[1];
     }
     sort_query[field] = order == "desc" ? -1 : 1;
+    let favorite_arr = [];
+    if (user_id) {
+      let get_user = await User.findById(user_id);
+      if (get_user) {
+        favorite_arr = get_user.favorite;
+      }
+    }
     let pipeline = [
       {
         $match: query
+      },
+      {
+        $addFields: {
+          string_property_id: {
+            $toString: "$_id"
+          }
+        }
+      },
+      {
+        $addFields: {
+          liked: {
+            $cond: {
+              if: { $in: ["$string_property_id", favorite_arr] },
+              then: true,
+              else: false
+            }
+          }
+        }
       },
       {
         $project: {
@@ -243,6 +270,7 @@ async function getAllProperties(req, res) {
           availability: "$availability",
           landmark: "$landmark",
           rented: "$rented",
+          liked : "$liked"
           // dist  : "$dist",
         }
       },
@@ -275,8 +303,8 @@ async function getAllProperties(req, res) {
 
         }
       }
+    ];
 
-    ]
 
     if (longitude && longitude) {
       pipeline.unshift({
