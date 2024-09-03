@@ -18,6 +18,15 @@ import { Property } from "../models/property.model.mjs";
 async function addProperty(req, res) {
   const { body } = req;
 
+  const startTime = Date.now();
+  console.log(startTime , "=================start time")
+
+  body.startTime;
+
+  const memoryUsageBefore = process.memoryUsage();
+
+  console.log(memoryUsageBefore , "=====> MUB")
+
   // console.log(body , "body in add propertyyyyyy")
 
 
