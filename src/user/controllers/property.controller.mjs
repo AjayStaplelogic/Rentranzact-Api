@@ -25,6 +25,8 @@ async function addProperty(req, res) {
 
   const memoryUsageBefore = process.memoryUsage();
 
+  body.memoryUsageBefore;
+
   console.log(memoryUsageBefore , "=====> MUB")
 
   // console.log(body , "body in add propertyyyyyy")
