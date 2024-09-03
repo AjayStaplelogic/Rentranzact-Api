@@ -1,7 +1,7 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
-import { payRentService, addToWallet ,payViaWalletService } from "../services/stripe.service.mjs"
+import { payRentService, addToWallet, payViaWalletService, payViaWalletServiceForOld } from "../services/stripe.service.mjs"
 
 async function payRent(req, res) {
   const { body } = req;
@@ -18,7 +18,7 @@ async function payRent(req, res) {
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
-  }  else {
+  } else {
     const userID = req.user.data._id;
     const data = await payRentService(body, userID);
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
@@ -32,20 +32,26 @@ async function payRent(req, res) {
 }
 async function payViaWallet(req, res) {
 
-  const {propertyID  } = req.body;
-      const userID = req.user.data._id;
-    const propertyDetails = await Property.findById(propertyID);
-    const amount = propertyDetails.rent;
-    const landlordID = propertyDetails.landlord_id;
-    const renterDetails = await User.findById(userID);
-    const walletPoints = renterDetails.walletPoints;
+  const { propertyID, renterApplicationID } = req.body;
+  const userID = req.user.data._id;
+  const propertyDetails = await Property.findById(propertyID);
+  const amount = propertyDetails.rent;
+  const landlordID = propertyDetails.landlord_id;
+  const renterDetails = await User.findById(userID);
+  const walletPoints = renterDetails.walletPoints;
 
-    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints);
+  if (amount > walletPoints) {
+    return sendResponse(res, [], "Insufficient Amount in wallet", false, 400);
+  }
 
+  if (propertyDetails.payment_count === 0) {
+    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID);
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
-
+  } else {
+    const data = await payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID)
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  }
 }
 
 
-export { payRent , payViaWallet };
+export { payRent, payViaWallet };

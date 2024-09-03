@@ -253,6 +253,7 @@ async function addFlutterwaveTransactionForOld(body) {
 
             addRenterHistory.save()
 
+            
             console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
 
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
@@ -342,7 +343,6 @@ async function addFlutterwaveTransactionForOld(body) {
         if (propertyDetails.property_manager_id) {
             breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
         }
-
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
