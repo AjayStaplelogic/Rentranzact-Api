@@ -15,7 +15,8 @@ async function addPropertyService(
   body,
   id
 ) {
-  const endTime = Date.now();
+  
+  
   const { email, role } = body;
 
   const propertyPostedBy = await User.findOne({ email: email, role: role });
@@ -62,16 +63,6 @@ async function addPropertyService(
       Property_["number_of_floors"] = body.number_of_floors
       Property_["number_of_bathrooms"] = body.number_of_bathrooms
     }
-
-
-    const memoryUsageAfter = process.memoryUsage();
-    const memoryDiff = memoryUsageAfter.heapUsed - body.memoryUsageBefore.heapUsed;
-
-    
-    const uploadTime = endTime - body.startTime;
-
-    console.log(uploadTime , "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz upload time")
-    console.log(memoryDiff , "=============================== memory Diff")
 
     const property = new Property(Property_);
     property.save();

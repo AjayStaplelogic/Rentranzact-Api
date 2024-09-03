@@ -20,19 +20,7 @@ import { User } from "../models/user.model.mjs";
 async function addProperty(req, res) {
   const { body } = req;
 
-  const startTime = Date.now();
-  console.log(startTime , "=================start time")
-
-  body.startTime;
-
-  const memoryUsageBefore = process.memoryUsage();
-
-  body.memoryUsageBefore;
-
-  console.log(memoryUsageBefore , "=====> MUB")
-
   // console.log(body , "body in add propertyyyyyy")
-
 
   const id = req.user.data._id;
 
@@ -71,8 +59,6 @@ async function addProperty(req, res) {
     body,
     id
   );
-
-
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
