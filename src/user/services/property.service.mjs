@@ -15,8 +15,8 @@ async function addPropertyService(
   body,
   id
 ) {
-  
-  
+
+
   const { email, role } = body;
 
   const propertyPostedBy = await User.findOne({ email: email, role: role });
@@ -279,9 +279,9 @@ async function getPropertyByID(id, userID) {
 
     console.log(landlord, '====landlord====')
     // console.log(dataMerge.propertyData, "==final ")
-    if(landlord){
-      const { fullName, picture, verified, role, countryCode,phone } = landlord;
-  
+    if (landlord) {
+      const { fullName, picture, verified, role, countryCode, phone } = landlord;
+
       dataMerge.landlord = {
         fullName,
         picture,
@@ -326,7 +326,7 @@ async function getPropertyByID(id, userID) {
 
     // console.log(renter, "=renterr")
 
-    const { fullName, picture, verified, role,countryCode,  phone} = renter;
+    const { fullName, picture, verified, role, countryCode, phone } = renter;
 
     dataMerge.renterInfo = {
       fullName,
@@ -338,8 +338,8 @@ async function getPropertyByID(id, userID) {
     }
   }
 
-  dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id,  inspectionStatus : "initiated"});
-  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus : RentApplicationStatus.PENDING, kinIdentityCheck : true });
+  dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });
+  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus: RentApplicationStatus.PENDING, kinIdentityCheck: true });
 
   return {
     data: dataMerge,
@@ -535,7 +535,7 @@ async function getMyProperties(role, id, req) {
           rented: "$rented",
           city: "$city",
           type: "$type",
-          rent_period_due : 1
+          rent_period_due: 1
         }
       }
     ]);
@@ -648,7 +648,11 @@ async function leavePropertyService(userID, propertyID) {
 
 async function deletePropertyService(userID, propertyID) {
 
-  const data = await Inspection.find({ landlordID: userID, inspectionStatus: InspectionStatus.ACCEPTED });
+  const data = await Inspection.find({
+    landlordID: userID,
+    inspectionStatus: InspectionStatus.ACCEPTED,
+    propertyID: propertyID
+  });
   console.log(data.length, "-----data")
 
   if (data.length !== 0) {
