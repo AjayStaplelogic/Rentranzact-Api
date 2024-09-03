@@ -118,7 +118,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
 
     // const { amount, status, created, id } = body.data.object;
     const created = moment().unix();
-    const propertyDetails = await Property.findById(propertyID);
+    propertyDetails = await Property.findById(propertyID);
     if (propertyDetails) {
         let lease_end_timestamp = "";
         if (["commercial", "residential"].includes(propertyDetails.category)) {
@@ -252,7 +252,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
         }
 
-        const renterDetails = await User.findById(userID);
+        renterDetails = await User.findById(userID);
 
         const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
@@ -292,8 +292,8 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
     const data_ = await User.findByIdAndUpdate(userID, { $inc: { walletPoints: -amount } });
     const data1 = await User.findByIdAndUpdate(landlordID, { $inc: { walletPoints: amount } })
     const created = moment().unix();
-    const renterDetails = await User.findById(userID)
-    const propertyDetails = await Property.findById(propertyID);
+    renterDetails = await User.findById(userID)
+    propertyDetails = await Property.findById(propertyID);
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
     if (propertyDetails) {
