@@ -65,7 +65,7 @@ async function addPropertyService(
 
 
     const memoryUsageAfter = process.memoryUsage();
-    const memoryDiff = memoryUsageAfter.heapUsed - memoryUsageBefore.heapUsed;
+    const memoryDiff = memoryUsageAfter.heapUsed - body.memoryUsageBefore.heapUsed;
 
     
     const uploadTime = endTime - body.startTime;
