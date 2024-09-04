@@ -3,6 +3,7 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { myRentersService } from "../services/myrenter.service.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import { Property } from "../models/property.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 async function myRenters(req, res) {
   const { _id } = req.user.data;
@@ -14,25 +15,51 @@ async function myRenters(req, res) {
 
 async function getAllMyRenters(req, res) {
   try {
+
+    const role = req.user.data.role;
+
     let { id, current_status } = req.query;
     let page = Number(req.query.page) || 1;
     let count = Number(req.query.count) || 10;
     let skip = (page - 1) * count;
     let query = {};
-    query.landlordID = `${req.user.data._id}`;
 
-    if (current_status) {
-      let renters = await Property.distinct("renterID", {
-        landlord_id: req?.user?.data?._id,
-        renterID: { $nin: ["", null] },
-      }).lean().exec();
-
-      if (current_status == "active") {
-        query.renterID = { $in: renters };
-      } else if (current_status == "past") {
-        query.renterID = { $nin: renters }
+    if (role === UserRoles.LANDLORD) {
+      query.landlordID = `${req.user.data._id}`;
+      if (current_status) {
+        let renters = await Property.distinct("renterID", {
+          landlord_id: req?.user?.data?._id,
+          renterID: { $nin: ["", null] },
+        }).lean().exec();
+        if (current_status == "active") {
+          query.renterID = { $in: renters };
+        } else if (current_status == "past") {
+          query.renterID = { $nin: renters }
+        }
       }
+
+    } else if (role === UserRoles.PROPERTY_MANAGER) {
+
+      query.pmID = `${req.user.data._id}`;
+      if (current_status) {
+        let renters = await Property.distinct("renterID", {
+          property_manager_id: req?.user?.data?._id,
+          renterID: { $nin: ["", null] },
+        }).lean().exec();
+
+        if (current_status == "active") {
+          query.renterID = { $in: renters };
+        } else if (current_status == "past") {
+          query.renterID = { $nin: renters }
+        }
+      }
+
     }
+
+
+
+
+
 
     let data = await RentingHistory.aggregate([
       {
