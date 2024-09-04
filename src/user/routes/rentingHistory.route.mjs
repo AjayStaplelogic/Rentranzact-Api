@@ -5,7 +5,7 @@ import { myRenters, myRenterHistory, getAllMyRenters, rentedProperties } from '.
 import authorizer from '../middleware/authorizer.middleware.mjs';
 
 router.get('/my-renters', authorizer([UserRoles.LANDLORD]), myRenters);
-router.get('/v2/my-renters', authorizer([UserRoles.LANDLORD]), getAllMyRenters);
+router.get('/v2/my-renters', authorizer([UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]), getAllMyRenters);
 router.get('/my-renter/history', authorizer([UserRoles.LANDLORD]), myRenterHistory);
 router.get('/my-renter/properties/current-rented', authorizer([UserRoles.LANDLORD]), rentedProperties);
 

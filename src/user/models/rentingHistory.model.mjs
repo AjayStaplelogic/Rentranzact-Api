@@ -2,15 +2,18 @@ import mongoose from "mongoose";
 
 const rentingHistorySchema = new mongoose.Schema(
     {
-        propertyID : {
+        propertyID: {
             type: String,
             required: true,
-        }, 
+        },
         renterID: {
             type: String,
             required: true,
         },
-
+        pmID: {
+            type: String,
+            required: false,
+        },
         landlordID: {
             type: String,
             required: true,
@@ -27,8 +30,8 @@ const rentingHistorySchema = new mongoose.Schema(
             type: String,
             required: true,
         },
-        renterActive  : {
-            type : Boolean,
+        renterActive: {
+            type: Boolean,
             required: true
         }
     },
