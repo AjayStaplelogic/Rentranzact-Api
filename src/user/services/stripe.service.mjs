@@ -146,6 +146,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -178,6 +179,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -215,6 +217,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -311,6 +314,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -341,6 +345,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -370,6 +375,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
+                pmID : propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
