@@ -59,7 +59,31 @@ async function getMyTransaction(userID, role, req) {
 
   } else if (role === UserRoles.LANDLORD) {
 
-    const data = await Transaction.find(query);
+    const data = await Transaction.aggregate([
+      {
+        $match: query
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { userID: { $toObjectId: "$renterID" } }, // Convert propertyID to ObjectId
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+              },
+            },
+            { $project: { picture: 1 } }, // Project only the images array from properties
+          ],
+          as: "RenterDetails",
+        }
+      },
+      {
+        $sort : {
+          createdAt : -1
+        }
+      }
+    ])
 
     return {
       data: data,
@@ -67,11 +91,7 @@ async function getMyTransaction(userID, role, req) {
       status: true,
       statusCode: 200,
     };
-
-
   }
-
-
 }
 
 
