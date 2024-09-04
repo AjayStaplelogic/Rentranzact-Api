@@ -321,6 +321,70 @@ async function getAllProperties(req, res) {
   }
 }
 
+async function getPropertyManagerList(req, res) {
+  try {
+
+    const landlordID = req.user.data._id;
+
+    const data = await Property.aggregate([
+      {
+    
+        $match : {
+            landlord_id : "66b5c2642aae11346af64e3d"
+        }  
+        
+        },
+        {
+            $group : {
+                _id : "$property_manager_id",
+            }
+        },
+         {
+        // Convert the string propertyID to an ObjectId
+        $addFields: {
+          pm_id: { $toObjectId: "$_id" }
+        }
+      }, 
+        
+        {
+            $lookup : {
+                from : "users",
+              localField : "pm_id",
+              foreignField : "_id",
+              as : "pm_info"
+                
+            }
+        },
+        {
+            $project : {
+              _id : 0,
+              pmInfo: { $arrayElemAt: ["$pm_info", 0] },
+            }
+        },
+        {
+          $project : {
+            email : "$pmInfo.email",
+            name : "$pmInfo.fullName",
+            phone : { $concat: [
+              "$pmInfo.countryCode",
+              " ",
+              "$pmInfo.phone"
+            ]            
+          },
+          pic : "$pmInfo.picture"
+          }
+        }
+        
+    
+  ])
+    
+
+    return sendResponse(res, data, `list of property managers`, true, 200);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
 export {
   addProperty,
   searchProperty,
@@ -331,5 +395,6 @@ export {
   myProperties,
   leaveProperty,
   getAllProperties,
-  deleteProperty
+  deleteProperty,
+  getPropertyManagerList
 };

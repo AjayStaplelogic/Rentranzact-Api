@@ -13,7 +13,8 @@ import {
   myProperties,
   leaveProperty,
   getAllProperties,
-  deleteProperty
+  deleteProperty,
+  getPropertyManagerList
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -178,6 +179,7 @@ router.get("/properties", getAllProperties)
 
 router.delete("/property/:id" , authorizer([UserRoles.LANDLORD]), deleteProperty)
 
+router.get("/property-managers" , authorizer([UserRoles.LANDLORD]) , getPropertyManagerList)
 
 
 export default router;
