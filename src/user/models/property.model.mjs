@@ -86,7 +86,7 @@ const propertySchema = new mongoose.Schema(
     },
 
     age_of_construction: {
-      type: string,
+      type: String,
       required: true,
     },
 
