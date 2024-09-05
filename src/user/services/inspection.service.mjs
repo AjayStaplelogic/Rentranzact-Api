@@ -126,7 +126,7 @@ async function fetchInspections(userData, req) {
     if (status) {
       query.inspectionStatus = status;
     }
-    const data = await Inspection.find(query).sort({createdAt: -1});
+    const data = await Inspection.find(query).sort({ createdAt: -1 });
 
     return {
       data: data,
@@ -148,7 +148,7 @@ async function fetchInspections(userData, req) {
     if (status) {
       query.inspectionStatus = status;
     }
-    const data = await Inspection.find(query).sort({createdAt: -1});
+    const data = await Inspection.find(query).sort({ createdAt: -1 });
     return {
       data: data,
       message: "inspection list fetched successfully",
@@ -240,13 +240,19 @@ async function updateInspectionStatus(body, id) {
   const inspectionDetails = await Inspection.findById(inspectionID);
 
   const renterDetails = await User.findById(inspectionDetails.RenterDetails.id);
+  const landlordDetails = await User.findById(inspectionDetails.landlordID);
 
-  let title = "Inspection Update";
-  let notificationBody;
-
-  const metadata = {
-    redirectTo: "inspection"
-  }
+  // let title = "Inspection Update";
+  // let notificationBody;
+  let notification_payload = {};
+  notification_payload.notificationHeading = "Inspection Update";
+  notification_payload.renterID = renterDetails._id;
+  notification_payload.landlordID = landlordDetails._id;
+  notification_payload.inspection_id = inspectionDetails._id;
+  notification_payload.propertyID = inspectionDetails.propertyID;
+  // const metadata = {
+  //   redirectTo: "inspection"
+  // }
 
   let update_payload = {
     inspectionStatus: status
@@ -257,27 +263,39 @@ async function updateInspectionStatus(body, id) {
     if (reason) {
       update_payload.cancelReason = reason;
     }
-    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is canceled by ${inspectionDetails.landlordName}`
-
-    console.log(notificationBody, "---notification body in condition")
+    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`
+    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`;
+    // console.log(notificationBody, "---notification body in condition")
   }
 
   if (InspectionStatus.ACCEPTED === status) {
     update_payload.acceptedBy = id;
-    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
+    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
+    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`;
   }
 
   if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
-    notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
+    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
+    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is completed by ${inspectionDetails.landlordName}`;
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
 
+  let create_notification = await Notification.create(notification_payload);
+  if (create_notification) {
+    if (landlordDetails && landlordDetails.fcmToken) {
+      const metadata = {
+        "propertyID": data.propertyID.toString(),
+        "redirectTo": "inspection",
+        "inspection_id": create_notification.inspection_id,
+      }
+      sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
+    }
+  }
+  // console.log(notificationBody, "----notificationBody")
 
-  console.log(notificationBody, "----notificationBody")
-
-  const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
+  // const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
 
   return {
     data: data,
