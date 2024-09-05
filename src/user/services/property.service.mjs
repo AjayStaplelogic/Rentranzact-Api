@@ -17,16 +17,40 @@ async function addPropertyService(
 ) {
 
 
-  const { email, role } = body;
-
-  const propertyPostedBy = await User.findOne({ email: email, role: role });
+  let { email, role } = body;
 
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
   let arr = JSON.parse("[" + trimmedStr + "]");
 
-  if (propertyPostedBy) {
-    // console.log("property [posedted by true")
+  let landlord_id = role === UserRoles.LANDLORD ? id : null;
+  let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
+  let name = "";
+  if (email) {
+    let user = await User.findOne({
+      email: email.toLowerCase().trim(),
+      role: {
+        $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
+        deleted: false
+      }
+    }).lean().exec();
+    if (user) {
+      name = user.fullName;
+      if (user.role === UserRoles.LANDLORD) {
+        landlord_id = user._id;
+      } else if (user.role === UserRoles.PROPERTY_MANAGER) {
+        property_manager_id = user._id;
+      }
+    } else {
+      return {
+        data: [],
+        message: "email of property manager or landlord is not valid",
+        status: false,
+        statusCode: 403,
+      };
+    }
+  }
+
     const Property_ = {
       propertyID: PropertyID,
       images: images,
@@ -36,8 +60,8 @@ async function addPropertyService(
       address: JSON.parse(body.address),
       rent: parseInt(body.rent),
       propertyName: body.propertyName,
-      email: propertyPostedBy.email,
-      name: propertyPostedBy.fullName,
+      email: email.toLowerCase().trim(),
+      name: name,
       rentType: body.rentType,
       city: body.city || "",
       carpetArea: parseInt(body.carpetArea),
@@ -49,9 +73,8 @@ async function addPropertyService(
       superArea: body.superArea || "",
       availability: parseInt(body.availability),
       communityType: body.communityType || "",
-      landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
-      property_manager_id:
-        role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,
+      landlord_id: landlord_id,
+      property_manager_id: property_manager_id,
       servicesCharges: parseInt(body.servicesCharges),
       amenities: arr,
       number_of_rooms: Number(body.number_of_rooms) || 0,
@@ -61,10 +84,10 @@ async function addPropertyService(
       estate_name: body.estate_name || "",
       state: body.state || "",
       country: body.country || "",
-      servicing : body.servicing || "",
-      total_space_for_rent : body.total_space_for_rent || 0,
-      total_administrative_offices : body.total_administrative_offices || 0,
-      is_legal_partner : body.is_legal_partner || false,
+      servicing: body.servicing || "",
+      total_space_for_rent: body.total_space_for_rent || 0,
+      total_administrative_offices: body.total_administrative_offices || 0,
+      is_legal_partner: body.is_legal_partner || false,
     };
 
     if (body.type != "Open Space") {
@@ -76,20 +99,21 @@ async function addPropertyService(
     const property = new Property(Property_);
     property.save();
 
-    return {
-      data: property,
-      message: "property created successfully",
-      status: true,
-      statusCode: 201,
-    };
-  } else {
+    if(property){
+      return {
+        data: property,
+        message: "property created successfully",
+        status: true,
+        statusCode: 201,
+      };
+    }
+
     return {
       data: [],
-      message: "email of property manager or landlord is not valid",
+      message: "Unable to add property",
       status: false,
-      statusCode: 403,
+      statusCode: 400,
     };
-  }
 }
 
 async function searchInProperty(body) {
