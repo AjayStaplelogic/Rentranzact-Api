@@ -13,12 +13,13 @@ async function addPropertyService(
   documents,
   videos,
   body,
-  id
+  id,
+  req
 ) {
 
 
-  let { email, role } = body;
-
+  let { email } = body;
+  const role = req?.user?.data?.role;
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
   let arr = JSON.parse("[" + trimmedStr + "]");
@@ -63,24 +64,24 @@ async function addPropertyService(
       videos: videos,
       category: body.category,
       address: JSON.parse(body.address),
-      rent: parseInt(body.rent),
+      rent: Number(body.rent),
       propertyName: body.propertyName,
       email: email.toLowerCase().trim(),
       name: name,
       rentType: body.rentType,
       city: body.city || "",
-      carpetArea: parseInt(body.carpetArea),
+      carpetArea: Number(body.carpetArea) || 0,
       age_of_construction: body.age_of_construction,
       aboutProperty: body.aboutProperty,
       type: body.type,
       furnishingType: body.furnishingType,
       landmark: body.landmark || "",
       superArea: body.superArea || "",
-      availability: parseInt(body.availability),
+      availability: Number(body.availability),
       communityType: body.communityType || "",
       landlord_id: landlord_id,
       property_manager_id: property_manager_id,
-      servicesCharges: parseInt(body.servicesCharges),
+      servicesCharges: Number(body.servicesCharges),
       amenities: arr,
       number_of_rooms: Number(body.number_of_rooms) || 0,
       postedByAdmin: body.postedByAdmin,
