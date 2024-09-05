@@ -48,7 +48,7 @@ async function addPropertyService(
       landmark: body.landmark || "",
       superArea: body.superArea || "",
       availability: parseInt(body.availability),
-      communityType: body.communityType,
+      communityType: body.communityType || "",
       landlord_id: role === UserRoles.LANDLORD ? propertyPostedBy.id : id,
       property_manager_id:
         role === UserRoles.PROPERTY_MANAGER ? propertyPostedBy._id : id,

@@ -123,7 +123,7 @@ const propertySchema = new mongoose.Schema(
     },
     communityType: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     cautionDeposite: {
