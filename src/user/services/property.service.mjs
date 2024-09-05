@@ -22,9 +22,14 @@ async function addPropertyService(
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
   let arr = JSON.parse("[" + trimmedStr + "]");
+  console.log(role, '===role')
+  console.log(role === UserRoles.LANDLORD, '===role === UserRoles.LANDLORD')
 
   let landlord_id = role === UserRoles.LANDLORD ? id : null;
   let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
+  console.log(landlord_id, '===landlord_id')
+  console.log(property_manager_id, '===property_manager_id')
+  
   let name = "";
   if (email) {
     let user = await User.findOne({
