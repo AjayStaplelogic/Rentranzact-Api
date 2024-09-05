@@ -35,10 +35,10 @@ async function addPropertyService(
   if (email) {
     let user = await User.findOne({
       email: email.toLowerCase().trim(),
+      deleted: false,
       role: {
         $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
-        deleted: false
-      }
+      },
     }).lean().exec();
     if (user) {
       name = user.fullName;
@@ -102,9 +102,8 @@ async function addPropertyService(
       Property_["number_of_bathrooms"] = body.number_of_bathrooms
     }
 
-    const property = new Property(Property_);
-    property.save();
-
+    const property = await Property.create(Property_);
+    console.log(property, '===property')
     if(property){
       return {
         data: property,
