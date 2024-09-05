@@ -35,10 +35,10 @@ async function addPropertyService(
   if (email) {
     let user = await User.findOne({
       email: email.toLowerCase().trim(),
+      deleted: false,
       role: {
         $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
-        deleted: false
-      }
+      },
     }).lean().exec();
     if (user) {
       name = user.fullName;
