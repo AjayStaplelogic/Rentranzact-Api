@@ -102,9 +102,8 @@ async function addPropertyService(
       Property_["number_of_bathrooms"] = body.number_of_bathrooms
     }
 
-    const property = new Property(Property_);
-    property.save();
-
+    const property = await Property.create(Property_);
+    console.log(property, '===property')
     if(property){
       return {
         data: property,
