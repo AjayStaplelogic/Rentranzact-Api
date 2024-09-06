@@ -15,6 +15,8 @@ async function getMyTransaction(userID, role, req) {
     query.renterID = userID;
   } else if (role === UserRoles.LANDLORD) {
     query.landlordID = userID;
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    query.pmID;
   }
 
   if (type) { query.type = type };
@@ -91,6 +93,21 @@ async function getMyTransaction(userID, role, req) {
       status: true,
       statusCode: 200,
     };
+
+
+
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+
+    
+    const data = await Transaction.find(query);
+
+    return {
+      data: data,
+      message: "successfully fetched my transactions",
+      status: true,
+      statusCode: 200,
+    };
+
   }
 }
 
