@@ -8,7 +8,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenanceRequests(body) {
 
-    console.log(body,"------------bodyyy")
+    console.log(body, "------------bodyyy")
 
     const { landlord_id, propertyName } = await Property.findById(body.propertyID);
 
@@ -27,7 +27,7 @@ async function addMaintenanceRequests(body) {
     let renterDetails = await User.findById(data.renterID)
 
     let notification_payload = {};
-    notification_payload.notificationHeading = "Inspection Update";
+    notification_payload.notificationHeading = "Maintainance Requested";
     notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied maintanence requests for ${propertyName ?? ""}`;
     notification_payload.renterID = renterDetails._id;
     notification_payload.landlordID = landlordDetails._id;
@@ -35,14 +35,14 @@ async function addMaintenanceRequests(body) {
     notification_payload.propertyID = data.propertyID;
     let create_notification = await Notification.create(notification_payload);
     if (create_notification) {
-      if (landlordDetails && landlordDetails.fcmToken) {
-        const metadata = {
-          "propertyID": data.propertyID.toString(),
-          "redirectTo": "maintanence",
-          "maintanence_id": create_notification.maintanence_id,
+        if (landlordDetails && landlordDetails.fcmToken) {
+            const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "maintanence",
+                "maintanence_id": create_notification.maintanence_id,
+            }
+            sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
         }
-        sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-      }
     }
 
     return {
@@ -122,6 +122,27 @@ async function resolveMaintenanceRequests(id) {
     const data = await Maintenance.findByIdAndUpdate(id, { status: ManinenanceEnums.STATUS.RESOLVED, resolvedOn: Date.now() })
 
     const renterDetails = await User.findById(data.renterID);
+    let landlordDetails = await User.findById(data.landlordID)
+    const propertyDetails = await Property.findById(data.propertyID);
+
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Maintenance Resolved";
+    notification_payload.notificationBody = `Your maintenance has been resolved for ${propertyDetails?.propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails._id;
+    notification_payload.maintanence_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+        if (renterDetails && renterDetails.fcmToken) {
+            const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "maintanence",
+                "maintanence_id": create_notification.maintanence_id,
+            }
+            sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
+        }
+    }
 
     return {
         data: data,
@@ -136,6 +157,28 @@ async function resolveMaintenanceRequests(id) {
 async function addRemarkToRequest(landlordRemark, maintenanceID) {
 
     const data = await Maintenance.findByIdAndUpdate(maintenanceID, { landlordRemark: landlordRemark, status: ManinenanceEnums.STATUS.REMARKED })
+    const renterDetails = await User.findById(data.renterID);
+    let landlordDetails = await User.findById(data.landlordID)
+    const propertyDetails = await Property.findById(data.propertyID);
+
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Maintenance Remarks";
+    notification_payload.notificationBody = `${landlordDetails?.fullName ?? ""} added remarks on your maintenance request for ${propertyDetails?.propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails._id;
+    notification_payload.maintanence_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+        if (renterDetails && renterDetails.fcmToken) {
+            const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "maintanence",
+                "maintanence_id": create_notification.maintanence_id,
+            }
+            sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
+        }
+    }
 
     return {
         data: data,
@@ -151,7 +194,26 @@ async function cancelMaintenanceRequests(id) {
     const data = await Maintenance.findByIdAndUpdate(id, { status: ManinenanceEnums.STATUS.CANCEL, canceledOn: Date.now() })
 
     const propertyDetails = await Property.findById(data.propertyID);
-
+    const renterDetails = await User.findById(data.renterID);
+    let landlordDetails = await User.findById(data.landlordID)
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Maintenance Request Cancelled";
+    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} cancelled the maintenance request for ${propertyDetails?.propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails._id;
+    notification_payload.maintanence_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+        if (landlordDetails && landlordDetails.fcmToken) {
+            const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "maintanence",
+                "maintanence_id": create_notification.maintanence_id,
+            }
+            sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+        }
+    }
 
 
     return {
@@ -163,4 +225,4 @@ async function cancelMaintenanceRequests(id) {
 
 }
 
-export { cancelMaintenanceRequests , addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests ,  };
+export { cancelMaintenanceRequests, addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, };

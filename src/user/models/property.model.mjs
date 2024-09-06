@@ -44,12 +44,12 @@ const propertySchema = new mongoose.Schema(
 
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     email: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     renterID: {
@@ -67,7 +67,7 @@ const propertySchema = new mongoose.Schema(
     },
     city: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     number_of_floors: {
@@ -86,7 +86,7 @@ const propertySchema = new mongoose.Schema(
     },
 
     age_of_construction: {
-      type: Number,
+      type: String,
       required: true,
     },
 
@@ -105,7 +105,7 @@ const propertySchema = new mongoose.Schema(
     },
     landmark: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     bedrooms: {
@@ -115,7 +115,7 @@ const propertySchema = new mongoose.Schema(
 
     superArea: {
       type: String,
-      required: true,
+      // required: true,
     },
     availability: {
       type: Number,
@@ -123,7 +123,7 @@ const propertySchema = new mongoose.Schema(
     },
     communityType: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     cautionDeposite: {
@@ -203,7 +203,7 @@ const propertySchema = new mongoose.Schema(
 
     landlord_id: {
       type: String,
-      required: true,
+      // required: true,
     },
     
     inDemand: {
@@ -233,6 +233,36 @@ const propertySchema = new mongoose.Schema(
     lease_end_timestamp: {
       type: String,
     },
+    building_number : {
+      type: String,
+    },
+    street_name : {
+      type: String,
+    },
+    estate_name : {
+      type: String,
+    },
+    state : {
+      type: String,
+    },
+    country : {
+      type: String,
+    },
+    servicing : {
+        type: String,
+    },
+    total_space_for_rent : {
+      type: Number,
+      default: 0,
+    },
+    total_administrative_offices : {
+      type: Number,
+      default: 0,
+    },
+    is_legal_partner : {
+      type: Boolean,
+      default: false,
+    }
 
   },
   { timestamps: true }

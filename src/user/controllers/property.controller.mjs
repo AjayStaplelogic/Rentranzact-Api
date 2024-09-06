@@ -57,7 +57,8 @@ async function addProperty(req, res) {
     req.documents,
     req.videos,
     body,
-    id
+    id,
+    req
   );
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);

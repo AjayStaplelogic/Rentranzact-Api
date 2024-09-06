@@ -61,6 +61,41 @@ async function getAllNotifications(req, res) {
         $match: query
       },
       {
+        $set: {
+          renterID: {
+            $toObjectId: "$renterID"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "renterID",
+          foreignField: "_id",
+          as: "renter_details"
+        }
+      },
+      {
+        $unwind: {
+          path: "$renter_details",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "landlordID",
+          foreignField: "_id",
+          as: "landlord_details"
+        }
+      },
+      {
+        $unwind: {
+          path: "$landlord_details",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
         $project: {
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
@@ -72,6 +107,10 @@ async function getAllNotifications(req, res) {
           amount: "$amount",
           renterApplicationID: "$renterApplicationID",
           landlordID: "$landlordID",
+          renter_name: "$renter_details.fullName",
+          renter_picture: "$renter_details.picture",
+          landlord_name: "$landlord_details.fullName",
+          landlord_picture: "$landlord_details.picture",
         }
       },
       {
