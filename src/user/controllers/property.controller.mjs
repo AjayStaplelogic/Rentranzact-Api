@@ -15,8 +15,6 @@ import {
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 
-
-
 async function addProperty(req, res) {
   const { body } = req;
 
@@ -132,7 +130,6 @@ async function searchPropertyByKeywords(req, res) {
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 }
-
 
 async function myProperties(req, res) {
   // console.log(`[My Properties API]`)
@@ -268,7 +265,7 @@ async function getAllProperties(req, res) {
           availability: "$availability",
           landmark: "$landmark",
           rented: "$rented",
-          liked : "$liked"
+          liked: "$liked"
           // dist  : "$dist",
         }
       },
@@ -329,56 +326,58 @@ async function getPropertyManagerList(req, res) {
 
     const data = await Property.aggregate([
       {
-    
-        $match : {
-            landlord_id : "66b5c2642aae11346af64e3d"
-        }  
-        
-        },
-        {
-            $group : {
-                _id : "$property_manager_id",
-            }
-        },
-         {
+
+        $match: {
+          landlord_id: landlordID
+        }
+
+      },
+      {
+        $group: {
+          _id: "$property_manager_id",
+        }
+      },
+      {
         // Convert the string propertyID to an ObjectId
         $addFields: {
           pm_id: { $toObjectId: "$_id" }
         }
-      }, 
-        
-        {
-            $lookup : {
-                from : "users",
-              localField : "pm_id",
-              foreignField : "_id",
-              as : "pm_info"
-                
-            }
-        },
-        {
-            $project : {
-              _id : 0,
-              pmInfo: { $arrayElemAt: ["$pm_info", 0] },
-            }
-        },
-        {
-          $project : {
-            email : "$pmInfo.email",
-            name : "$pmInfo.fullName",
-            phone : { $concat: [
+      },
+
+      {
+        $lookup: {
+          from: "users",
+          localField: "pm_id",
+          foreignField: "_id",
+          as: "pm_info"
+
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          pmInfo: { $arrayElemAt: ["$pm_info", 0] },
+        }
+      },
+      {
+        $project: {
+          id: "$pmInfo._id",
+          email: "$pmInfo.email",
+          name: "$pmInfo.fullName",
+          phone: {
+            $concat: [
               "$pmInfo.countryCode",
               " ",
               "$pmInfo.phone"
-            ]            
+            ]
           },
-          pic : "$pmInfo.picture"
-          }
+          pic: "$pmInfo.picture"
         }
-        
-    
-  ])
-    
+      }
+
+
+    ])
+
 
     return sendResponse(res, data, `list of property managers`, true, 200);
   } catch (error) {
@@ -386,7 +385,52 @@ async function getPropertyManagerList(req, res) {
   }
 }
 
+async function getPropertyManagerDetails(req, res) {
+  try {
+
+    const id = req.params.id;
+
+    const data = await User.findById(id).select('fullName role email verified countryCode phone picture')
+    return sendResponse(res, data, `user detail`, true, 200);
+
+  } catch (error) {
+    return sendResponse(res, [], `${error}`, false, 500);
+  }
+
+}
+
+async function getPropertyListByPmID(req, res) {
+
+  try {
+    const id = req.params.id;
+    const data = await Property.find({ property_manager_id: id }).select('propertyName images address.addressText rent rentType ')
+
+    return sendResponse(res, data, `property list for property manager`, true, 200);
+
+  } catch (error) {
+    return sendResponse(res, [], `${error}`, false, 500);
+  }
+}
+
+async function teminatePM(req, res) {
+
+  try {
+
+    const id = req.params.id;
+
+    const data = await Property.findByIdAndUpdate(id, { property_manager_id: "" })
+
+    return sendResponse(res, data, `teminated property manager successfully`, true, 200);
+
+  } catch (error) {
+    return sendResponse(res, [], `${error}`, false, 500);
+  }
+
+
+}
+
 export {
+  getPropertyListByPmID,
   addProperty,
   searchProperty,
   propertiesList,
@@ -397,5 +441,7 @@ export {
   leaveProperty,
   getAllProperties,
   deleteProperty,
-  getPropertyManagerList
+  getPropertyManagerList,
+  getPropertyManagerDetails,
+  teminatePM
 };

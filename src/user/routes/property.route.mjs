@@ -14,7 +14,10 @@ import {
   leaveProperty,
   getAllProperties,
   deleteProperty,
-  getPropertyManagerList
+  getPropertyManagerList,
+  getPropertyManagerDetails,
+  getPropertyListByPmID,
+  teminatePM
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -181,6 +184,11 @@ router.delete("/property/:id" , authorizer([UserRoles.LANDLORD]), deleteProperty
 
 router.get("/property-managers" , authorizer([UserRoles.LANDLORD]) , getPropertyManagerList)
 
+router.get("/property-manager/:id" , authorizer([UserRoles.LANDLORD]) , getPropertyManagerDetails)
+
+router.get("/property-manager-property-lists/:id" , authorizer([UserRoles.LANDLORD]) , getPropertyListByPmID)
+
+router.get("/terminate-property-manager/:id" , authorizer([UserRoles.LANDLORD]) , teminatePM)
 
 export default router;
 
