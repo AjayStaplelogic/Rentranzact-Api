@@ -67,7 +67,7 @@ const propertySchema = new mongoose.Schema(
     },
     city: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     number_of_floors: {
