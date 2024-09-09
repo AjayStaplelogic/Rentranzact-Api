@@ -13,6 +13,12 @@ const careerSchema = new Schema({
         type : Number,
         default : 0
     },
+    skills : {
+        type: String,
+    },
+    experience : {
+        type: String,
+    },
 }, {
     timestamps: true,
     toJSON: true,
