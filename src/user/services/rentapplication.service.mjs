@@ -110,6 +110,7 @@ async function addRentApplicationService(body, user) {
       businessType: body.businessType || "",
       totalEmployees: Number(body.totalEmployees) || 0,
       identitiy_doc: body.identitiy_doc || "",
+      preferredFloor: Number(body.preferredFloor) || 0
     };
 
 
