@@ -168,19 +168,79 @@ const rentApplicationSchema = new mongoose.Schema(
       type: String,
       required: true
     },
-    previousLandlordAddress : {
+    previousLandlordAddress: {
       type: String,
       required: true
     },
-    previousLandlordName : {
+    previousLandlordName: {
       type: String,
       required: true
     },
-    pmID : {
+    pmID: {
       type: String,
       required: false
-    }
+    },
 
+    /** Personal details */
+    firstName: {
+      type: String,
+    },
+    middleName: {
+      type: String,
+    },
+    lastName: {
+      type: String,
+    },
+    gender: {
+      type: String,
+    },
+    alternativeContactNumber: {
+      type: String,
+    },
+    /** Personal details */
+
+    kinMiddleName: {
+      type: String,
+    },
+
+    /** co-occupents details */
+    expectedCoOccupents: {
+      type: Number,
+      default: 0
+    },
+    coOccupentName: {
+      type: String,
+    },
+    coOccupentContact: {
+      type: String,
+    },
+    relationWithCoOccupent : {
+      type: String,
+    },
+    /** co-occupents details */
+
+    /** Previous landload details */
+    previouLandloadContact : {
+      type: String,
+    },
+    previouReasonForLeaving : {
+      type: String,
+    },
+    /** Previous landload details */
+
+    businessName : {
+      type: String,
+    },
+    businessType : {
+      type: String,
+    },
+    totalEmployees : {
+      type: Number,
+      default: 0,
+    },
+    identitiy_doc : {
+      type: String,
+    }
   },
 
   { timestamps: true }
