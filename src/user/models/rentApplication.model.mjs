@@ -125,11 +125,11 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     permanentCity: {
       type: String,
-      required: true,
+      // required: true,
     },
     permanentState: {
       type: String,
-      required: true,
+      // required: true,
     },
     permanentZipcode: {
       type: Number,
