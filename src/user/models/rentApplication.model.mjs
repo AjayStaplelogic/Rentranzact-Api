@@ -240,7 +240,11 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     identitiy_doc : {
       type: String,
-    }
+    },
+    preferredFloor : {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }
