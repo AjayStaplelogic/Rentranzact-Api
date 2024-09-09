@@ -92,7 +92,24 @@ async function addRentApplicationService(body, user) {
       employmentStatus: employmentStatus,
       employerName: employerName,
       employerAddress: employerAddress,
-      occupation: occupation
+      occupation: occupation,
+
+      firstName: body.firstName || "",
+      middleName: body.middleName || "",
+      lastName: body.lastName || "",
+      gender: body.gender || "",
+      alternativeContactNumber: body.alternativeContactNumber || "",
+      kinMiddleName: body.kinMiddleName || "",
+      expectedCoOccupents: Number(body.expectedCoOccupents) || 0,
+      coOccupentName: body.coOccupentName || "",
+      coOccupentContact: body.coOccupentContact || "",
+      relationWithCoOccupent: body.relationWithCoOccupent || "",
+      previouLandloadContact: body.previouLandloadContact || "",
+      previouReasonForLeaving: body.previouReasonForLeaving || "",
+      businessName: body.businessName || "",
+      businessType: body.businessType || "",
+      totalEmployees: Number(body.totalEmployees) || 0,
+      identitiy_doc: body.identitiy_doc || "",
     };
 
 
@@ -109,7 +126,6 @@ async function addRentApplicationService(body, user) {
       payload["checkinDate"] = checkinDate
       payload["checkoutDate"] = checkoutDate
     }
-
 
 
     const kinDetails = {
