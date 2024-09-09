@@ -17,7 +17,8 @@ const careerSchema = new Schema({
         type: String,
     },
     experience : {
-        type: String,
+        type: Number,
+        default : 0
     },
 }, {
     timestamps: true,
