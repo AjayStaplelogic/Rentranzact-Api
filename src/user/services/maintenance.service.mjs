@@ -33,6 +33,7 @@ async function addMaintenanceRequests(body) {
     notification_payload.landlordID = landlordDetails._id;
     notification_payload.maintanence_id = data._id;
     notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = landlordDetails._id;
     let create_notification = await Notification.create(notification_payload);
     if (create_notification) {
         if (landlordDetails && landlordDetails.fcmToken) {
@@ -132,6 +133,7 @@ async function resolveMaintenanceRequests(id) {
     notification_payload.landlordID = landlordDetails._id;
     notification_payload.maintanence_id = data._id;
     notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = renterDetails._id;
     let create_notification = await Notification.create(notification_payload);
     if (create_notification) {
         if (renterDetails && renterDetails.fcmToken) {
@@ -168,6 +170,7 @@ async function addRemarkToRequest(landlordRemark, maintenanceID) {
     notification_payload.landlordID = landlordDetails._id;
     notification_payload.maintanence_id = data._id;
     notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = renterDetails._id;
     let create_notification = await Notification.create(notification_payload);
     if (create_notification) {
         if (renterDetails && renterDetails.fcmToken) {
@@ -203,6 +206,7 @@ async function cancelMaintenanceRequests(id) {
     notification_payload.landlordID = landlordDetails._id;
     notification_payload.maintanence_id = data._id;
     notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = landlordDetails._id;
     let create_notification = await Notification.create(notification_payload);
     if (create_notification) {
         if (landlordDetails && landlordDetails.fcmToken) {

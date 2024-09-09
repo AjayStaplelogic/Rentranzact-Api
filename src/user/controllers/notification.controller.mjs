@@ -29,9 +29,9 @@ async function getAllNotifications(req, res) {
     let count = Number(req.query.count || 20);
     let query = {};
     if (propertyID) { query.propertyID = propertyID };
-    if (role == UserRoles.LANDLORD) { query.landlordID = new ObjectId(req.user.data._id) };
-    if (role == UserRoles.RENTER) { query.renterID = req.user.data._id };
-
+    if ([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER].includes(role)) {
+      query.send_to = new ObjectId(req.user.data._id)
+    }
     let skip = Number(page - 1) * count;
     if (search) {
       query.$or = [
@@ -111,6 +111,7 @@ async function getAllNotifications(req, res) {
           renter_picture: "$renter_details.picture",
           landlord_name: "$landlord_details.fullName",
           landlord_picture: "$landlord_details.picture",
+          send_to : "$send_to"
         }
       },
       {
