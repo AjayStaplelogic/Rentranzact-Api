@@ -75,7 +75,7 @@ const rentApplicationSchema = new mongoose.Schema(
 
     name: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     no_of_occupant: {
@@ -107,7 +107,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     rentNowPayLater: {
@@ -137,7 +137,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     permanentContactNumber: {
       type: String,
-      required: true,
+      // required: true,
     },
     applicationStatus: {
       type: String,
