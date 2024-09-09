@@ -90,6 +90,7 @@ async function createInspection(body, renterID) {
   notification_payload.landlordID = landlordDetails._id;
   notification_payload.inspection_id = data._id;
   notification_payload.propertyID = data.propertyID;
+  notification_payload.send_to = landlordDetails._id;
   let create_notification = await Notification.create(notification_payload);
   if (create_notification) {
     if (landlordDetails && landlordDetails.fcmToken) {
@@ -250,6 +251,8 @@ async function updateInspectionStatus(body, id) {
   notification_payload.landlordID = landlordDetails._id;
   notification_payload.inspection_id = inspectionDetails._id;
   notification_payload.propertyID = inspectionDetails.propertyID;
+  notification_payload.send_to = landlordDetails._id;
+  
   // const metadata = {
   //   redirectTo: "inspection"
   // }
@@ -284,7 +287,7 @@ async function updateInspectionStatus(body, id) {
 
   let create_notification = await Notification.create(notification_payload);
   if (create_notification) {
-    if (landlordDetails && landlordDetails.fcmToken) {
+    if (renterDetails && renterDetails.fcmToken) {
       const metadata = {
         "propertyID": data.propertyID.toString(),
         "redirectTo": "inspection",
