@@ -260,14 +260,14 @@ async function addRentApplicationService(body, user) {
         };
       }
       return {
-        data: data,
+        data: [],
         message: "Something went wrong",
         status: false,
         statusCode: 400,
       };
     } else {
       return {
-        data: data,
+        data: [],
         message: "Kin details is incorrect",
         status: false,
         statusCode: 400,
