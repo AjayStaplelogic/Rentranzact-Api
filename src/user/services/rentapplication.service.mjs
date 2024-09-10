@@ -156,19 +156,19 @@ async function addRentApplicationService(body, user) {
 
     let isKinSame = kinDetailsSame(kinDetails, renterDetails.kinDetails)
 
-    let verifyStatus;
+    let verifyStatus = true;
 
-    if (isKinSame) {
-      verifyStatus = true
-    } else {
-      console.log("hitting smile api")
-      verifyStatus = await identityVerifier(identificationType, kinDetails);
-    }
+    // if (isKinSame) {             // Commented because client says no need to verify kin details
+    //   verifyStatus = true
+    // } else {
+    //   console.log("hitting smile api")
+    //   verifyStatus = await identityVerifier(identificationType, kinDetails);
+    // }
 
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
-      payload["kinIdentityCheck"] = true;
+      // payload["kinIdentityCheck"] = true;
 
       let data = rentApplication.create(payload);
       if (data) {
