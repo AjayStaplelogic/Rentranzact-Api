@@ -249,7 +249,7 @@ async function addRentApplicationService(body, user) {
               "redirectTo": "rentApplication",
               "rentApplication": create_notification.renterApplicationID
             }
-            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
           }
         }
 
