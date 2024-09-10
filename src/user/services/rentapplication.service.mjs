@@ -156,7 +156,7 @@ async function addRentApplicationService(body, user) {
 
     let isKinSame = kinDetailsSame(kinDetails, renterDetails.kinDetails)
 
-    let verifyStatus = true;
+    // let verifyStatus = true;
 
     // if (isKinSame) {             // Commented because client says no need to verify kin details
     //   verifyStatus = true
@@ -165,10 +165,23 @@ async function addRentApplicationService(body, user) {
     //   verifyStatus = await identityVerifier(identificationType, kinDetails);
     // }
 
+    // verifying personal details
+    let smile_identification_payload = {
+      first_name: body.firstName,
+      last_name: body.lastName,
+      bvn: bvn,
+      dob: kinDOB,
+      nin: nin,
+      voter_id: voter_id,
+      kinContactNumber: contactNumber,
+      kinEmail: emailID,
+    }
+    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
       // payload["kinIdentityCheck"] = true;
+      payload["isPersonalDetailsVerified"] = true;
 
       let data = rentApplication.create(payload);
       if (data) {
@@ -191,11 +204,11 @@ async function addRentApplicationService(body, user) {
           }
         };
         user_update_payload.fullName = data.firstName;
-        if(data.middleName){
+        if (data.middleName) {
           user_update_payload.fullName.concat(' ', data.middleName)
         }
 
-        if(data.lastName){
+        if (data.lastName) {
           user_update_payload.fullName.concat(' ', data.lastName)
         }
 

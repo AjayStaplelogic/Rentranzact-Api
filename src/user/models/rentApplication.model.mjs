@@ -197,6 +197,10 @@ const rentApplicationSchema = new mongoose.Schema(
     alternativeContactNumber: {
       type: String,
     },
+    isPersonalDetailsVerified: {
+      type: Boolean,
+      default: false
+    },
     /** Personal details */
 
     kinMiddleName: {
@@ -214,34 +218,34 @@ const rentApplicationSchema = new mongoose.Schema(
     coOccupentContact: {
       type: String,
     },
-    relationWithCoOccupent : {
+    relationWithCoOccupent: {
       type: String,
     },
     /** co-occupents details */
 
     /** Previous landload details */
-    previouLandloadContact : {
+    previouLandloadContact: {
       type: String,
     },
-    previouReasonForLeaving : {
+    previouReasonForLeaving: {
       type: String,
     },
     /** Previous landload details */
 
-    businessName : {
+    businessName: {
       type: String,
     },
-    businessType : {
+    businessType: {
       type: String,
     },
-    totalEmployees : {
+    totalEmployees: {
       type: Number,
       default: 0,
     },
-    identitiy_doc : {
+    identitiy_doc: {
       type: String,
     },
-    preferredFloor : {
+    preferredFloor: {
       type: Number,
       default: 0,
     },
