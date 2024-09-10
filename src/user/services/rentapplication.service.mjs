@@ -169,6 +169,7 @@ async function addRentApplicationService(body, user) {
     let smile_identification_payload = {
       first_name: body.firstName,
       last_name: body.lastName,
+      middle_name: body.middleName,
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
@@ -248,7 +249,7 @@ async function addRentApplicationService(body, user) {
               "redirectTo": "rentApplication",
               "rentApplication": create_notification.renterApplicationID
             }
-            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
           }
         }
 
@@ -268,7 +269,7 @@ async function addRentApplicationService(body, user) {
     } else {
       return {
         data: [],
-        message: "Kin details is incorrect",
+        message: "Personal information is incorrect",
         status: false,
         statusCode: 400,
       };
