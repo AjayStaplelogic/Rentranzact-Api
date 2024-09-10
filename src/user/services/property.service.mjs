@@ -94,6 +94,7 @@ async function addPropertyService(
       total_space_for_rent: body.total_space_for_rent || 0,
       total_administrative_offices: body.total_administrative_offices || 0,
       is_legal_partner: body.is_legal_partner || false,
+      serviceChargeDuration : body.serviceChargeDuration || ""
     };
 
     if (body.type != "Open Space") {
@@ -103,7 +104,6 @@ async function addPropertyService(
     }
 
     const property = await Property.create(Property_);
-    console.log(property, '===property')
     if(property){
       return {
         data: property,
