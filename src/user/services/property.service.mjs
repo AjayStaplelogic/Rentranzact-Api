@@ -315,7 +315,6 @@ async function getPropertyByID(id, userID) {
 
     }
 
-    console.log(landlord, '====landlord====')
     // console.log(dataMerge.propertyData, "==final ")
     if (landlord) {
       const { fullName, picture, verified, role, countryCode, phone } = landlord;

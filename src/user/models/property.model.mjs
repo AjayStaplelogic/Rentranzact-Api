@@ -262,6 +262,9 @@ const propertySchema = new mongoose.Schema(
     is_legal_partner : {
       type: Boolean,
       default: false,
+    },
+    serviceChargeDuration : {
+      type  : String, // monthly, yearly, quaterly
     }
 
   },
