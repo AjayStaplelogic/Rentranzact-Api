@@ -169,6 +169,7 @@ async function addRentApplicationService(body, user) {
     let smile_identification_payload = {
       first_name: body.firstName,
       last_name: body.lastName,
+      middle_name: body.middleName,
       bvn: bvn,
       dob: kinDOB,
       nin: nin,
@@ -268,7 +269,7 @@ async function addRentApplicationService(body, user) {
     } else {
       return {
         data: [],
-        message: "Kin details is incorrect",
+        message: "Personal information is incorrect",
         status: false,
         statusCode: 400,
       };
