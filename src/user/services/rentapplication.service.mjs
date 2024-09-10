@@ -159,97 +159,98 @@ async function addRentApplicationService(body, user) {
     let verifyStatus;
 
     if (isKinSame) {
-
       verifyStatus = true
     } else {
-
       console.log("hitting smile api")
       verifyStatus = await identityVerifier(identificationType, kinDetails);
     }
 
-
-
-
-    // console.log(verifyStatus, "-ajdssajlksajdlksajdlkj")
-    let data;
-
-
-
-
-
-
-
     if (verifyStatus) {
-
       //add kin details to the user
-
       kinDetails["identificationType"] = identificationType;
-
-      const permanentAddress_ = {
-        permanentAddress,
-        permanentCity,
-        permanentState,
-        permanentZipcode,
-        permanentContactNumber,
-      }
-
-      const employmentDetails = {
-        employmentStatus,
-        employerName,
-        employerAddress,
-        occupation
-      }
-
-      await User.findByIdAndUpdate(renterID, { kinDetails: kinDetails, age: age, maritialStatus: maritialStatus, permanentAddress: permanentAddress_, employmentDetails: employmentDetails })
-
-
-
       payload["kinIdentityCheck"] = true;
 
-      data = new rentApplication(payload);
-
-      data.save();
-
-
-      // const metadata = {
-      //   redirectTo: "rentApplication"
-      // }
-
-      // let notificationTitle = "Rent Application Update"
-
-      const renterDetails = await User.findById(renterID);
-
-      const landlordDetails = await User.findById(landlord.landlord_id)
-
-      // let notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`
-
-      // const data_ = await sendNotification(landlordDetails, "single", notificationTitle, notificationBody, metadata, UserRoles.LANDLORD)
-
-      let notification_payload = {};
-      notification_payload.notificationHeading = "Rent Application Update";
-      notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
-      notification_payload.renterID = renterID;
-      notification_payload.landlordID = landlord.landlord_id;
-      notification_payload.renterApplicationID = data._id;
-      notification_payload.propertyID = landlord._id;
-      notification_payload.send_to = landlordDetails._id;
-      let create_notification = await Notification.create(notification_payload);
-      if (create_notification) {
-        if (landlordDetails && landlordDetails.fcmToken) {
-          const metadata = {
-            "propertyID": landlord._id.toString(),
-            "redirectTo": "rentApplication",
-            "rentApplication": create_notification.renterApplicationID
+      let data = rentApplication.create(payload);
+      if (data) {
+        let user_update_payload = {
+          maritialStatus: data.maritialStatus,
+          phone: data.contactNumber,
+          age: data.age,
+          permanentAddress: {
+            permanentAddress: data.permanentAddress,
+            permanentCity: data.permanentCity,
+            permanentState: data.permanentState,
+            permanentZipcode: data.permanentZipcode,
+            permanentContactNumber: data.permanentContactNumber,
+          },
+          employmentDetails: {
+            employmentStatus: data.employmentStatus,
+            employerName: data.employerName,
+            employerAddress: data.employerAddress,
+            employmentStatus: data.employmentStatus,
           }
-          await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+        };
+        user_update_payload.fullName = data.firstName;
+        if(data.middleName){
+          user_update_payload.fullName.concat(' ', data.middleName)
         }
-      }
 
+        if(data.lastName){
+          user_update_payload.fullName.concat(' ', data.lastName)
+        }
+
+        if (!isKinSame) {
+          user_update_payload.kinDetails = {
+            first_name: data.kinFirstName,
+            last_name: data.kinLastName,
+            middle_name: data.kinMiddleName,
+            bvn: data.bvn,
+            dob: data.kinDOB,
+            nin: data.nin,
+            voter_id: data.voter_id,
+            kinContactNumber: data.kinContactNumber,
+            kinEmail: data.kinEmail,
+            relationshipKin: data.relationshipKin,
+            identificationType: data.verifcationType,
+          }
+        }
+
+        await User.findByIdAndUpdate(renterID, user_update_payload)
+
+        const renterDetails = await User.findById(renterID);
+        const landlordDetails = await User.findById(landlord.landlord_id)
+        let notification_payload = {};
+        notification_payload.notificationHeading = "Rent Application Update";
+        notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+        notification_payload.renterID = renterID;
+        notification_payload.landlordID = landlord.landlord_id;
+        notification_payload.renterApplicationID = data._id;
+        notification_payload.propertyID = landlord._id;
+        notification_payload.send_to = landlordDetails._id;
+        let create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (landlordDetails && landlordDetails.fcmToken) {
+            const metadata = {
+              "propertyID": landlord._id.toString(),
+              "redirectTo": "rentApplication",
+              "rentApplication": create_notification.renterApplicationID
+            }
+            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+          }
+        }
+
+        return {
+          data: data,
+          message: "rent application successfully created",
+          status: true,
+          statusCode: 200,
+        };
+      }
       return {
         data: data,
-        message: "rent application successfully created",
-        status: true,
-        statusCode: 200,
+        message: "Something went wrong",
+        status: false,
+        statusCode: 400,
       };
     } else {
       return {
@@ -258,14 +259,16 @@ async function addRentApplicationService(body, user) {
         status: false,
         statusCode: 400,
       };
-
-
-
     }
 
   } catch (error) {
     console.log(error);
-    // res.status(500).send("Error searching for properties: " + error.message);
+    return {
+      data: [],
+      message: `${error}`,
+      status: false,
+      statusCode: 400,
+    };
   }
 }
 
