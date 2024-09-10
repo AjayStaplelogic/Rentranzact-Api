@@ -183,55 +183,55 @@ async function addRentApplicationService(body, user) {
       kinDetails["identificationType"] = identificationType;
       // payload["kinIdentityCheck"] = true;
       payload["isPersonalDetailsVerified"] = true;
-
-      let data = await rentApplication.create(payload);
-      if (data) {
-        let user_update_payload = {
-          maritialStatus: data.maritialStatus,
-          phone: data.contactNumber,
-          age: data.age,
-          permanentAddress: {
-            permanentAddress: data.permanentAddress,
-            permanentCity: data.permanentCity,
-            permanentState: data.permanentState,
-            permanentZipcode: data.permanentZipcode,
-            permanentContactNumber: data.permanentContactNumber,
-          },
-          employmentDetails: {
-            employmentStatus: data.employmentStatus,
-            employerName: data.employerName,
-            employerAddress: data.employerAddress,
-            employmentStatus: data.employmentStatus,
-          }
-        };
-        user_update_payload.fullName = data.firstName;
-        if (data.middleName) {
-          user_update_payload.fullName.concat(' ', data.middleName)
-        }
-
-        if (data.lastName) {
-          user_update_payload.fullName.concat(' ', data.lastName)
-        }
-
-        if (!isKinSame) {
-          user_update_payload.kinDetails = {
-            first_name: data.kinFirstName,
-            last_name: data.kinLastName,
-            middle_name: data.kinMiddleName,
-            bvn: data.bvn,
-            dob: data.kinDOB,
-            nin: data.nin,
-            voter_id: data.voter_id,
-            kinContactNumber: data.kinContactNumber,
-            kinEmail: data.kinEmail,
-            relationshipKin: data.relationshipKin,
-            identificationType: data.verifcationType,
-          }
-        }
-
-        await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
-
-        const renterDetails = await User.findById(renterID);
+      
+      const renterDetails = await User.findById(renterID);
+      
+            let data = await rentApplication.create(payload);
+            if (data) {
+              let user_update_payload = {
+                maritialStatus: data.maritialStatus,
+                phone: data.contactNumber,
+                age: data.age,
+                permanentAddress: {
+                  permanentAddress: data.permanentAddress,
+                  permanentCity: data.permanentCity,
+                  permanentState: data.permanentState,
+                  permanentZipcode: data.permanentZipcode,
+                  permanentContactNumber: data.permanentContactNumber,
+                },
+                employmentDetails: {
+                  employmentStatus: data.employmentStatus,
+                  employerName: data.employerName,
+                  employerAddress: data.employerAddress,
+                  employmentStatus: data.employmentStatus,
+                }
+              };
+              user_update_payload.fullName = data.firstName;
+              if (data.middleName) {
+                user_update_payload.fullName.concat(' ', data.middleName)
+              }
+      
+              if (data.lastName) {
+                user_update_payload.fullName.concat(' ', data.lastName)
+              }
+      
+              if (!isKinSame) {
+                user_update_payload.kinDetails = {
+                  first_name: data.kinFirstName,
+                  last_name: data.kinLastName,
+                  middle_name: data.kinMiddleName,
+                  bvn: data.bvn,
+                  dob: data.kinDOB,
+                  nin: data.nin,
+                  voter_id: data.voter_id,
+                  kinContactNumber: data.kinContactNumber,
+                  kinEmail: data.kinEmail,
+                  relationshipKin: data.relationshipKin,
+                  identificationType: data.verifcationType,
+                }
+              }
+      
+              await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
         const landlordDetails = await User.findById(landlord.landlord_id)
         let notification_payload = {};
         notification_payload.notificationHeading = "Rent Application Update";
