@@ -177,14 +177,14 @@ async function addRentApplicationService(body, user) {
       kinContactNumber: contactNumber,
       kinEmail: emailID,
     }
-    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);
+    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);    
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
       // payload["kinIdentityCheck"] = true;
       payload["isPersonalDetailsVerified"] = true;
 
-      let data = rentApplication.create(payload);
+      let data = await rentApplication.create(payload);
       if (data) {
         let user_update_payload = {
           maritialStatus: data.maritialStatus,
@@ -229,7 +229,7 @@ async function addRentApplicationService(body, user) {
           }
         }
 
-        await User.findByIdAndUpdate(renterID, user_update_payload)
+        await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
 
         const renterDetails = await User.findById(renterID);
         const landlordDetails = await User.findById(landlord.landlord_id)
@@ -384,7 +384,8 @@ async function rentApplicationsList(user, req) {
               _id: 1,
               propertyName: 1,
               images: "$images",
-              address: "$address"
+              address: "$address",
+              category : "$category",
             }
           }
         ],
