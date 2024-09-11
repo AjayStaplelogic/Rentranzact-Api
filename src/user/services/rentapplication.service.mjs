@@ -617,26 +617,48 @@ async function updateRentApplications(body, id) {
     const propertyDetails = await Property.findById(data.propertyID);
 
     const landlordDetails = await User.findById(data.landlordID);
+    const propertyManagerDetails = await User.findById(data.pmID);
+
 
     let currentDate = moment().format('Do MMM YYYY');
 
     // console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
 
-    let title = `Your rent is due to ${landlordDetails.fullName}`;
-    let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+    // let title = `Your rent is due to ${landlordDetails.fullName}`;
+    // let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
 
 
-    const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID, landlordID: landlordDetails._id })
+    // const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID, landlordID: landlordDetails._id })
 
-    const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
+    // const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
 
-    const renterDetails = await User.findById(data.renterID);
-    if (renterDetails && renterDetails.fcmToken) {
-      const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
+    // const renterDetails = await User.findById(data.renterID);
+    // if (renterDetails && renterDetails.fcmToken) {
+    //   const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
 
+    // }
+
+    // await newNotification.save()
+
+    if (data) {
+      const renterDetails = await User.findById(data.renterID);
+      let notification_payload = {};
+      notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
+      notification_payload.notificationBody =  `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+      notification_payload.renterID = data.renterID;
+      notification_payload.landlordID = data.landlordID;
+      notification_payload.renterApplicationID = data._id;
+      notification_payload.propertyID = data.propertyID;
+      notification_payload.send_to = renterDetails._id;
+      notification_payload.property_manager_id = data.pmID;
+      let create_notification = await Notification.create(notification_payload);
+      if (create_notification) {
+        if (renterDetails && renterDetails.fcmToken) {
+          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID }
+          await sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
+        }
+      }
     }
-
-    await newNotification.save()
 
     return {
       data: data,
@@ -663,7 +685,7 @@ async function updateRentApplications(body, id) {
       let create_notification = await Notification.create(notification_payload);
       if (create_notification) {
         if (renterDetails && renterDetails.fcmToken) {
-          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID }
+          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString(), }
           await sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
         }
       }
@@ -683,20 +705,41 @@ async function updateRentApplications(body, id) {
 
     if (data) {
       const landlordDetails = await User.findById(data.landlordID);
+      if (landlordDetails) {
+        let notification_payload = {};
+        notification_payload.notificationHeading = "Rent Application Withdrawn";
+        notification_payload.notificationBody = `Renter withdraw his rent application`;
+        notification_payload.renterID = data.renterID;
+        notification_payload.landlordID = data.landlordID;
+        notification_payload.renterApplicationID = data._id;
+        notification_payload.propertyID = data.propertyID;
+        notification_payload.send_to = landlordDetails._id;
+        let create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (landlordDetails && landlordDetails.fcmToken) {
+            const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString() }
+            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+          }
+        }
+      }
 
-      let notification_payload = {};
-      notification_payload.notificationHeading = "Rent Application Withdrawn";
-      notification_payload.notificationBody = `Renter withdraw his rent application`;
-      notification_payload.renterID = data.renterID;
-      notification_payload.landlordID = data.landlordID;
-      notification_payload.renterApplicationID = data._id;
-      notification_payload.propertyID = data.propertyID;
-      notification_payload.send_to = landlordDetails._id;
-      let create_notification = await Notification.create(notification_payload);
-      if (create_notification) {
-        if (landlordDetails && landlordDetails.fcmToken) {
-          const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID }
-          await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+      const propertyManagerDetails = await User.findById(data.pmID);
+      if (propertyManagerDetails) {
+        let notification_payload = {};
+        notification_payload.notificationHeading = "Rent Application Withdrawn";
+        notification_payload.notificationBody = `Renter withdraw his rent application`;
+        notification_payload.renterID = data.renterID;
+        notification_payload.landlordID = data.landlordID;
+        notification_payload.renterApplicationID = data._id;
+        notification_payload.propertyID = data.propertyID;
+        notification_payload.send_to = propertyManagerDetails._id;
+        notification_payload.property_manager_id = propertyManagerDetails._id;
+        let create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
+            const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString() }
+            await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
+          }
         }
       }
     }
