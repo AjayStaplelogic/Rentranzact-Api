@@ -74,6 +74,31 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on("join-room", async (data) => {
+        let room = await chatService.get_room_by_id(data.room_id);
+        if (room) {
+            let members = room?.room?.user_ids;
+            let room_id = `${room?.room?.id}`
+            if (members && members.length > 0) {
+                for await (let member of members) {
+                    let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
+                    if (socket_ids && socket_ids.length > 0) {
+                        for (let socket_id of socket_ids) {
+                            console.log(`[socket_id] ${socket_id}`)
+                            console.log(`[room_id] ${room_id}`);
+                            io.in(socket_id).socketsJoin(room_id);
+                        }
+                    }
+                }
+            }
+            io.in(room_id).emit("join-room", {        // sending to current user only
+                status: true,
+                statusCode: 200,
+                data: room?.room ?? ""
+            });
+        }
+    })
+
     socket.on("join-private-room", async (data) => {
         let room = await chatService.join_private_room(socket, data);
         if (room) {
