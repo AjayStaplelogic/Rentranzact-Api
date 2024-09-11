@@ -49,7 +49,12 @@ const notificationSchema = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: 'users',
             index: true
-        }
+        },
+        property_manager_id: {
+            type: mongoose.Types.ObjectId,
+            ref: 'users',
+            index: true
+        },
     },
     { timestamps: true }
 );
