@@ -30,7 +30,7 @@ async function addPropertyService(
   let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
   console.log(landlord_id, '===landlord_id')
   console.log(property_manager_id, '===property_manager_id')
-  
+
   let name = "";
   if (email) {
     let user = await User.findOne({
@@ -57,68 +57,68 @@ async function addPropertyService(
     }
   }
 
-    const Property_ = {
-      propertyID: PropertyID,
-      images: images,
-      documents: documents,
-      videos: videos,
-      category: body.category,
-      address: JSON.parse(body.address),
-      rent: Number(body.rent),
-      propertyName: body.propertyName,
-      email: email.toLowerCase().trim(),
-      name: name,
-      rentType: body.rentType,
-      city: body.city || "",
-      carpetArea: Number(body.carpetArea) || 0,
-      age_of_construction: body.age_of_construction,
-      aboutProperty: body.aboutProperty,
-      type: body.type,
-      furnishingType: body.furnishingType,
-      landmark: body.landmark || "",
-      superArea: body.superArea || "",
-      availability: Number(body.availability),
-      communityType: body.communityType || "",
-      landlord_id: landlord_id,
-      property_manager_id: property_manager_id,
-      servicesCharges: Number(body.servicesCharges),
-      amenities: arr,
-      number_of_rooms: Number(body.number_of_rooms) || 0,
-      postedByAdmin: body.postedByAdmin,
-      building_number: body.building_number || "",
-      street_name: body.street_name || "",
-      estate_name: body.estate_name || "",
-      state: body.state || "",
-      country: body.country || "",
-      servicing: body.servicing || "",
-      total_space_for_rent: body.total_space_for_rent || 0,
-      total_administrative_offices: body.total_administrative_offices || 0,
-      is_legal_partner: body.is_legal_partner || false,
-      serviceChargeDuration : body.serviceChargeDuration || ""
-    };
+  const Property_ = {
+    propertyID: PropertyID,
+    images: images,
+    documents: documents,
+    videos: videos,
+    category: body.category,
+    address: JSON.parse(body.address),
+    rent: Number(body.rent),
+    propertyName: body.propertyName,
+    email: email.toLowerCase().trim(),
+    name: name,
+    rentType: body.rentType,
+    city: body.city || "",
+    carpetArea: Number(body.carpetArea) || 0,
+    age_of_construction: body.age_of_construction,
+    aboutProperty: body.aboutProperty,
+    type: body.type,
+    furnishingType: body.furnishingType,
+    landmark: body.landmark || "",
+    superArea: body.superArea || "",
+    availability: Number(body.availability),
+    communityType: body.communityType || "",
+    landlord_id: landlord_id,
+    property_manager_id: property_manager_id,
+    servicesCharges: Number(body.servicesCharges),
+    amenities: arr,
+    number_of_rooms: Number(body.number_of_rooms) || 0,
+    postedByAdmin: body.postedByAdmin,
+    building_number: body.building_number || "",
+    street_name: body.street_name || "",
+    estate_name: body.estate_name || "",
+    state: body.state || "",
+    country: body.country || "",
+    servicing: body.servicing || "",
+    total_space_for_rent: body.total_space_for_rent || 0,
+    total_administrative_offices: body.total_administrative_offices || 0,
+    is_legal_partner: body.is_legal_partner || false,
+    serviceChargeDuration: body.serviceChargeDuration || ""
+  };
 
-    if (body.type != "Open Space") {
-      Property_["bedrooms"] = body.bedrooms
-      Property_["number_of_floors"] = body.number_of_floors
-      Property_["number_of_bathrooms"] = body.number_of_bathrooms
-    }
+  if (body.type != "Open Space") {
+    Property_["bedrooms"] = body.bedrooms
+    Property_["number_of_floors"] = body.number_of_floors
+    Property_["number_of_bathrooms"] = body.number_of_bathrooms
+  }
 
-    const property = await Property.create(Property_);
-    if(property){
-      return {
-        data: property,
-        message: "property created successfully",
-        status: true,
-        statusCode: 201,
-      };
-    }
-
+  const property = await Property.create(Property_);
+  if (property) {
     return {
-      data: [],
-      message: "Unable to add property",
-      status: false,
-      statusCode: 400,
+      data: property,
+      message: "property created successfully",
+      status: true,
+      statusCode: 201,
     };
+  }
+
+  return {
+    data: [],
+    message: "Unable to add property",
+    status: false,
+    statusCode: 400,
+  };
 }
 
 async function searchInProperty(body) {
@@ -295,6 +295,8 @@ async function getPropertyByID(id, userID) {
     dataMerge.rental_breakdown.total_amount = rent + dataMerge.rental_breakdown.insurance + dataMerge.rental_breakdown.agency_fee + dataMerge.rental_breakdown.legal_Fee + dataMerge.rental_breakdown.caution_deposite;
   }
 
+  dataMerge.propertyData = data;
+
   if (data.landlord_id) {
     console.log(data.landlord_id, '====data.landlord_id====')
 
@@ -303,7 +305,7 @@ async function getPropertyByID(id, userID) {
 
     const landlord = await User.findById(data.landlord_id);
 
-    dataMerge.propertyData = data;
+    // dataMerge.propertyData = data;
 
     if (favorite.favorite.includes(id)) {
 
@@ -332,28 +334,23 @@ async function getPropertyByID(id, userID) {
 
 
     const favorite = await User.findById(userID).select("favorite")
-
-    // console.log(favorite, "===================favroite", favorite.favorite.includes(id))
-
     if (favorite.favorite.includes(id)) {
       dataMerge["liked"] = true
     } else {
       dataMerge["liked"] = false
     }
 
-    // console.log(dataMerge, "----datam,ergherbrrbkjrbkjhrkjh")
-
-
-
     const propertyManager = await User.findById(data.property_manager_id);
 
-    const { fullName, picture, verified, role } = propertyManager;
+    const { fullName, picture, verified, role, countryCode, phone} = propertyManager;
 
     dataMerge.property_manager = {
       fullName,
       picture,
       verified,
       role,
+      countryCode,
+      phone
     };
   }
 
