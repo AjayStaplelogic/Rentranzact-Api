@@ -153,7 +153,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     landlordID: {
       type: String,
-      required: true
+      // required: true
     },
     kinIdentityCheck: {
       type: Boolean,
@@ -178,7 +178,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     pmID: {
       type: String,
-      required: false
+      // required: false
     },
 
     /** Personal details */
