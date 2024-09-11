@@ -12,9 +12,6 @@ import { Notification } from "../models/notification.model.mjs";
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id } = body;
 
-  let title;
-  let notificationBody;
-
   const property = await Property.findById(propertyID);
   if (!property) {
     return {
@@ -37,7 +34,6 @@ async function createInspection(body, renterID) {
   }
 
   payload.renterID = renterID;
-
   payload.RenterDetails = {
     id: renterID,
     fullName: fullName,
@@ -50,56 +46,64 @@ async function createInspection(body, renterID) {
   // console.log(property, "==========property")
 
   payload.propertyName = property.propertyName;
-
   payload.addressText = property.address.addressText;
-
   payload.landlordID = property.landlord_id;
-
-  payload.landlordEmail = landlordDetails.email;
-
   payload.property_manager_id = property.property_manager_id;
-
   payload.images = property.images;
 
-  payload.landlordName = landlordDetails.fullName;
+  if (landlordDetails) {
+    payload.landlordEmail = landlordDetails.email;
+    payload.landlordName = landlordDetails.fullName;
+  }
+
 
   payload.id = id;
-
-  // console.log(payload, "----------BODY")
-
   const data = new Inspection(payload);
   data.save();
 
-  // console.log(data, "====+++++++data ")
-
-
-  // const metadata = {
-  //   redirectTo: "inspection"
-  // }
-
-  // title = "Inspection Update"
-
-  // notificationBody = `${renterDetails.fullName} applied inspection for ${property.propertyName}`
-
-  // const data_ = await sendNotification(landlordDetails, "single", title, notificationBody, metadata, UserRoles.LANDLORD)
-
-  let notification_payload = {};
-  notification_payload.notificationHeading = "Inspection Update";
-  notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
-  notification_payload.renterID = renterDetails._id;
-  notification_payload.landlordID = landlordDetails._id;
-  notification_payload.inspection_id = data._id;
-  notification_payload.propertyID = data.propertyID;
-  notification_payload.send_to = landlordDetails._id;
-  let create_notification = await Notification.create(notification_payload);
-  if (create_notification) {
-    if (landlordDetails && landlordDetails.fcmToken) {
-      const metadata = {
-        "propertyID": data.propertyID.toString(),
-        "redirectTo": "inspection",
-        "inspection_id": create_notification.inspection_id,
+  let property_manger_details = await User.findById(property.property_manager_id);
+  if (landlordDetails) {
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Inspection Update";
+    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails._id;
+    notification_payload.inspection_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = landlordDetails._id;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+      if (landlordDetails && landlordDetails.fcmToken) {
+        const metadata = {
+          "propertyID": data.propertyID.toString(),
+          "redirectTo": "inspection",
+          "inspection_id": create_notification.inspection_id,
+        }
+        sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
       }
-      sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+    }
+  }
+
+  if (property_manger_details) {
+    let notification_payload = {};
+    notification_payload.notificationHeading = "Inspection Update";
+    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
+    notification_payload.renterID = renterDetails._id;
+    notification_payload.landlordID = landlordDetails?._id;
+    notification_payload.inspection_id = data._id;
+    notification_payload.propertyID = data.propertyID;
+    notification_payload.send_to = property_manger_details?._id;
+    notification_payload.property_manager_id = property_manger_details?._id;
+    let create_notification = await Notification.create(notification_payload);
+    if (create_notification) {
+      if (property_manger_details && property_manger_details.fcmToken) {
+        const metadata = {
+          "propertyID": data.propertyID.toString(),
+          "redirectTo": "inspection",
+          "inspection_id": create_notification.inspection_id,
+        }
+        sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
+      }
     }
   }
 
@@ -252,7 +256,7 @@ async function updateInspectionStatus(body, id) {
   notification_payload.inspection_id = inspectionDetails._id;
   notification_payload.propertyID = inspectionDetails.propertyID;
   notification_payload.send_to = landlordDetails._id;
-  
+
   // const metadata = {
   //   redirectTo: "inspection"
   // }

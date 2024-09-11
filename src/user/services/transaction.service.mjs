@@ -16,7 +16,7 @@ async function getMyTransaction(userID, role, req) {
   } else if (role === UserRoles.LANDLORD) {
     query.landlordID = userID;
   } else if (role === UserRoles.PROPERTY_MANAGER) {
-    query.pmID;
+    query.pmID = userID;
   }
 
   if (type) { query.type = type };
@@ -46,8 +46,8 @@ async function getMyTransaction(userID, role, req) {
         }
       },
       {
-        $sort : {
-          createdAt : -1
+        $sort: {
+          createdAt: -1
         }
       }
     ])
@@ -81,8 +81,8 @@ async function getMyTransaction(userID, role, req) {
         }
       },
       {
-        $sort : {
-          createdAt : -1
+        $sort: {
+          createdAt: -1
         }
       }
     ])
@@ -97,9 +97,31 @@ async function getMyTransaction(userID, role, req) {
 
 
   } else if (role === UserRoles.PROPERTY_MANAGER) {
-
-    
-    const data = await Transaction.find(query);
+    const data = await Transaction.aggregate([
+      {
+        $match: query
+      },
+      {
+        $lookup: {
+          from: "users",
+          let: { userID: { $toObjectId: "$renterID" } }, // Convert propertyID to ObjectId
+          pipeline: [
+            {
+              $match: {
+                $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+              },
+            },
+            { $project: { picture: 1 } }, // Project only the images array from properties
+          ],
+          as: "RenterDetails",
+        }
+      },
+      {
+        $sort: {
+          createdAt: -1
+        }
+      }
+    ])
 
     return {
       data: data,
@@ -176,34 +198,34 @@ async function transactionByIdService(id) {
       }
     },
     {
-      $project : {
-        type : "$type",
-        propertyID : "$propertyID",
-        renterID : "$renterID",
-        landlordID : "$landlordID",
-        status : "$status",
-        amount : "$amount",
-        date : "$date",
-        createdAt : "$createdAt",
-        updatedAt : "$updatedAt",
-        renter_details : {
-          _id : "$renter_details._id",
-          fullName : "$renter_details.fullName",
-          picture : "$renter_details.picture"
+      $project: {
+        type: "$type",
+        propertyID: "$propertyID",
+        renterID: "$renterID",
+        landlordID: "$landlordID",
+        status: "$status",
+        amount: "$amount",
+        date: "$date",
+        createdAt: "$createdAt",
+        updatedAt: "$updatedAt",
+        renter_details: {
+          _id: "$renter_details._id",
+          fullName: "$renter_details.fullName",
+          picture: "$renter_details.picture"
         },
-        property_details : {
-          _id : "$property_details._id",
-          propertyName : "$property_details.propertyName",
-          images : "$property_details.images"
+        property_details: {
+          _id: "$property_details._id",
+          propertyName: "$property_details.propertyName",
+          images: "$property_details.images"
         },
-        landlord_details : {
-          _id : "$landlord_details._id",
-          fullName : "$landlord_details.fullName",
-          picture : "$landlord_details.picture"
+        landlord_details: {
+          _id: "$landlord_details._id",
+          fullName: "$landlord_details.fullName",
+          picture: "$landlord_details.picture"
         },
-        payment_mode : "$payment_mode",
-        intentID : "$intentID",
-        wallet : "$wallet",
+        payment_mode: "$payment_mode",
+        intentID: "$intentID",
+        wallet: "$wallet",
       }
     }
   ])
