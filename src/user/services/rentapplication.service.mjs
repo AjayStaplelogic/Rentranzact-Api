@@ -651,6 +651,7 @@ async function updateRentApplications(body, id) {
       notification_payload.propertyID = data.propertyID;
       notification_payload.send_to = renterDetails._id;
       notification_payload.property_manager_id = data.pmID;
+      notification_payload.amount = propertyDetails.rent;
       let create_notification = await Notification.create(notification_payload);
       if (create_notification) {
         if (renterDetails && renterDetails.fcmToken) {
