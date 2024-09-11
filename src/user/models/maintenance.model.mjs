@@ -39,7 +39,11 @@ const maintenanceSchema = new mongoose.Schema(
         canceledOn : {
             type: String,
             required : false
-        }
+        },
+        property_manager_id: {
+            type: mongoose.Types.ObjectId,
+            ref : "users"
+          },
     },
     { timestamps: true }
 );
