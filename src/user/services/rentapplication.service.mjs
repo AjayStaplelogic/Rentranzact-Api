@@ -177,79 +177,105 @@ async function addRentApplicationService(body, user) {
       kinContactNumber: contactNumber,
       kinEmail: emailID,
     }
-    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);    
+    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
       // payload["kinIdentityCheck"] = true;
       payload["isPersonalDetailsVerified"] = true;
-      
+
       const renterDetails = await User.findById(renterID);
-      
-            let data = await rentApplication.create(payload);
-            if (data) {
-              let user_update_payload = {
-                maritialStatus: data.maritialStatus,
-                phone: data.contactNumber,
-                age: data.age,
-                permanentAddress: {
-                  permanentAddress: data.permanentAddress,
-                  permanentCity: data.permanentCity,
-                  permanentState: data.permanentState,
-                  permanentZipcode: data.permanentZipcode,
-                  permanentContactNumber: data.permanentContactNumber,
-                },
-                employmentDetails: {
-                  employmentStatus: data.employmentStatus,
-                  employerName: data.employerName,
-                  employerAddress: data.employerAddress,
-                  employmentStatus: data.employmentStatus,
-                }
-              };
-              user_update_payload.fullName = data.firstName;
-              if (data.middleName) {
-                user_update_payload.fullName.concat(' ', data.middleName)
-              }
-      
-              if (data.lastName) {
-                user_update_payload.fullName.concat(' ', data.lastName)
-              }
-      
-              if (!isKinSame) {
-                user_update_payload.kinDetails = {
-                  first_name: data.kinFirstName,
-                  last_name: data.kinLastName,
-                  middle_name: data.kinMiddleName,
-                  bvn: data.bvn,
-                  dob: data.kinDOB,
-                  nin: data.nin,
-                  voter_id: data.voter_id,
-                  kinContactNumber: data.kinContactNumber,
-                  kinEmail: data.kinEmail,
-                  relationshipKin: data.relationshipKin,
-                  identificationType: data.verifcationType,
-                }
-              }
-      
-              await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
+
+      let data = await rentApplication.create(payload);
+      if (data) {
+        let user_update_payload = {
+          maritialStatus: data.maritialStatus,
+          phone: data.contactNumber,
+          age: data.age,
+          permanentAddress: {
+            permanentAddress: data.permanentAddress,
+            permanentCity: data.permanentCity,
+            permanentState: data.permanentState,
+            permanentZipcode: data.permanentZipcode,
+            permanentContactNumber: data.permanentContactNumber,
+          },
+          employmentDetails: {
+            employmentStatus: data.employmentStatus,
+            employerName: data.employerName,
+            employerAddress: data.employerAddress,
+            employmentStatus: data.employmentStatus,
+          }
+        };
+        user_update_payload.fullName = data.firstName;
+        if (data.middleName) {
+          user_update_payload.fullName.concat(' ', data.middleName)
+        }
+
+        if (data.lastName) {
+          user_update_payload.fullName.concat(' ', data.lastName)
+        }
+
+        if (!isKinSame) {
+          user_update_payload.kinDetails = {
+            first_name: data.kinFirstName,
+            last_name: data.kinLastName,
+            middle_name: data.kinMiddleName,
+            bvn: data.bvn,
+            dob: data.kinDOB,
+            nin: data.nin,
+            voter_id: data.voter_id,
+            kinContactNumber: data.kinContactNumber,
+            kinEmail: data.kinEmail,
+            relationshipKin: data.relationshipKin,
+            identificationType: data.verifcationType,
+          }
+        }
+
+        await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
         const landlordDetails = await User.findById(landlord.landlord_id)
-        let notification_payload = {};
-        notification_payload.notificationHeading = "Rent Application Update";
-        notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
-        notification_payload.renterID = renterID;
-        notification_payload.landlordID = landlord.landlord_id;
-        notification_payload.renterApplicationID = data._id;
-        notification_payload.propertyID = landlord._id;
-        notification_payload.send_to = landlordDetails._id;
-        let create_notification = await Notification.create(notification_payload);
-        if (create_notification) {
-          if (landlordDetails && landlordDetails.fcmToken) {
-            const metadata = {
-              "propertyID": landlord._id.toString(),
-              "redirectTo": "rentApplication",
-              "rentApplication": create_notification.renterApplicationID
+        if (landlordDetails) {
+          let notification_payload = {};
+          notification_payload.notificationHeading = "Rent Application Update";
+          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+          notification_payload.renterID = renterID;
+          notification_payload.landlordID = landlord.landlord_id;
+          notification_payload.renterApplicationID = data._id;
+          notification_payload.propertyID = landlord._id;
+          notification_payload.send_to = landlordDetails._id;
+          let create_notification = await Notification.create(notification_payload);
+          if (create_notification) {
+            if (landlordDetails && landlordDetails.fcmToken) {
+              const metadata = {
+                "propertyID": landlord._id.toString(),
+                "redirectTo": "rentApplication",
+                "rentApplication": create_notification.renterApplicationID
+              }
+              await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
             }
-            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
+          }
+        }
+
+        const propertyManagerDetails = await User.findById(landlord.property_manager_id)
+        if (propertyManagerDetails) {
+          let notification_payload = {};
+          notification_payload.notificationHeading = "Rent Application Update";
+          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+          notification_payload.renterID = renterID;
+          notification_payload.landlordID = landlord?.landlord_id;
+          notification_payload.renterApplicationID = data._id;
+          notification_payload.propertyID = landlord._id;
+          notification_payload.send_to = propertyManagerDetails._id;
+          notification_payload.property_manager_id = propertyManagerDetails._id;
+          let create_notification = await Notification.create(notification_payload);
+          if (create_notification) {
+            if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
+              const metadata = {
+                "propertyID": landlord._id.toString(),
+                "redirectTo": "rentApplication",
+                "rentApplication": create_notification.renterApplicationID
+              }
+              await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.PROPERTY_MANAGER)
+            }
           }
         }
 
@@ -385,7 +411,7 @@ async function rentApplicationsList(user, req) {
               propertyName: 1,
               images: "$images",
               address: "$address",
-              category : "$category",
+              category: "$category",
             }
           }
         ],
