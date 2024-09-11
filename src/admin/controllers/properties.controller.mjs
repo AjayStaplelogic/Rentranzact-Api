@@ -68,6 +68,7 @@ async function deleteProperty(req, res) {
 
 async function updateProperty(req, res) {
   try {
+    console.log(req.body, '======Update Property')
     let { id } = req.body;
     if (!id) {
       return sendResponse(res, {}, "Id required", false, 400);
