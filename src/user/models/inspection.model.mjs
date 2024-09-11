@@ -70,11 +70,11 @@ const inspectionSchema = new mongoose.Schema(
     },
     landlordName : {
      type : String,
-     required : true
+    //  required : true
     },
     landlordEmail : {
       type : String,
-      required: true
+      // required: true
     },
     addressText : {
       type : String,
