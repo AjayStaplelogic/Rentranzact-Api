@@ -177,6 +177,30 @@ io.on('connection', (socket) => {
         })
     })
 
+    socket.on("delete-message", async (data) => {
+        let delete_message = await chatService.delete_message(data.message_id);
+        if (delete_message) {
+            io.in(`${delete_message.room_id}`).emit("delete-message", {
+                status: true,
+                statusCode: 200,
+                data: data
+            });
+
+            let get_room = await chatService.get_room_by_id(delete_message.room_id);
+            io.in(`${delete_message.room_id}`).emit("private-room-updated", { // sending to sender and reciever
+                status: true,
+                statusCode: 200,
+                data: get_room
+            });
+        } else {
+            io.to(socket.id).emit("delete-message", {
+                status: false,
+                statusCode: 400,
+                message: "Invalid message id"
+            });
+        }
+    })
+
     socket.on('disconnect', () => {
         console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
@@ -193,17 +217,15 @@ io.on('connection', (socket) => {
         })
     });
 
-    
-})
 
-// console.log(io)
+})
 
 io.on("connection_error", (err) => {
     console.log(err.req);      // the request object
     console.log(err.code);     // the error code, for example 1
     console.log(err.message);  // the error message, for example "Session ID unknown"
     console.log(err.context);  // some additional error context
-  });
+});
 
 io.on("close", (socket) => {
     console.log(`[socket closed] : ${socket.id}`);

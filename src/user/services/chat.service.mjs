@@ -172,34 +172,46 @@ export const update_room_last_message = async (message) => {
     return update_room;
 }
 
-export const read_message = async(socket, data)=>{
+export const read_message = async (socket, data) => {
     let query = {
-        _id : data.message_id
+        _id: data.message_id
     };
-    if(socket.is_admin){
+    if (socket.is_admin) {
         query.is_reciever_admin = true;
         query.admin_id = socket.admin_id;
-    }else{
+    } else {
         query.is_reciever_admin = false;
         query.reciever_id = socket.user_id;
     }
 
-    let update_message = await Messages.findOneAndUpdate(query, {is_read: true}, {new: true});
+    let update_message = await Messages.findOneAndUpdate(query, { is_read: true }, { new: true });
     // console.log(update_message, '=======updated message====')
     return update_message;
 }
 
-export const join_multiple_rooms = async(socket)=>{
+export const join_multiple_rooms = async (socket) => {
     let get_rooms = await ChatRooms.find({
-        user_ids: {$in: [socket.user_id]},
+        user_ids: { $in: [socket.user_id] },
     });
 
-    if(get_rooms && get_rooms.length){
-        let room_ids = get_rooms.map(room=>`${room._id}`);   
-        if(room_ids && room_ids.length){
-            for (let room_id of room_ids){
+    if (get_rooms && get_rooms.length) {
+        let room_ids = get_rooms.map(room => `${room._id}`);
+        if (room_ids && room_ids.length) {
+            for (let room_id of room_ids) {
                 socket.join(room_id);
             }
         }
     }
+}
+
+export const delete_message = async (message_id) => {
+    let message = await Messages.findByIdAndDelete(message_id);
+    if (message) {
+        let last_message = await Messages.findOne({ room_id: message.room_id }).sort({ createdAt: -1 }).lean().exec();
+        if (last_message) {
+            await update_room_last_message(last_message);
+        }
+        return message;
+    }
+
 }

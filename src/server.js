@@ -24,7 +24,8 @@ import uploadRoutes from "./user/routes/upload.route.mjs"
 import userBlogRoutes from "./user/routes/blog.route.mjs"
 import userNewsLetterSubscription from "./user/routes/newlettersubscription.route.mjs";
 import userCardRoutes from "./user/routes/cards.route.mjs";
-import electricityRoutes from "./user/routes/electricity.route.mjs"
+import electricityRoutes from "./user/routes/electricity.route.mjs";
+import chatRoutes from "./user/routes/chat.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -113,7 +114,7 @@ app.use("/api", userBlogRoutes)
 app.use("/api", userNewsLetterSubscription)
 app.use("/api", userCardRoutes)
 app.use("/api" , electricityRoutes)
-
+app.use("/api" , chatRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
