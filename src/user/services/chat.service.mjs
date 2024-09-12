@@ -22,7 +22,7 @@ export const user_offline = (socket, connected_arr) => {
 export const join_private_room = async (socket, data) => {
     if (!socket.is_admin) {
         let room = await ChatRooms.findOne({
-            user_ids: { $in: [socket.user_id, data.chat_with] }
+            user_ids: { $all: [socket.user_id, data.chat_with] }
         });
         let resObj = {
             new_room: true,
@@ -46,7 +46,7 @@ export const join_private_room = async (socket, data) => {
         return resObj;
     } else if (socket.is_admin) {
         let room = await ChatRooms.findOne({
-            user_ids: { $in: [socket.user_id, data.chat_with] }
+            user_ids: { $all: [socket.user_id, data.chat_with] }
         });
         let resObj = {
             new_room: true,

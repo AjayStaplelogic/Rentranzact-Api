@@ -14,10 +14,11 @@ export const joinChatRoom = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        let { user_id, chat_with, is_admin, admin_id } = req.body;
+        let { user_id, chat_with, is_admin, admin_id,  } = req.body;
 
         const query = {
-            user_ids: { $in: [user_id, chat_with] }
+            is_group : false,
+            user_ids: { $all: [user_id, chat_with] }
         }
 
         if (is_admin && admin_id) {
