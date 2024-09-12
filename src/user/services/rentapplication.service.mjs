@@ -8,7 +8,6 @@ import moment from "moment";
 import { Notification } from "../models/notification.model.mjs";
 import { User } from "../models/user.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
-import notificationType from "../constants/index.mjs";
 import assert from "assert";
 
 async function addRentApplicationService(body, user) {

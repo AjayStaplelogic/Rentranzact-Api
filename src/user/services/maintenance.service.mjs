@@ -9,7 +9,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 async function addMaintenanceRequests(body) {
     const { landlord_id, propertyName, property_manager_id } = await Property.findById(body.propertyID);
     body.landlordID = landlord_id;
-    body.property_manager_id = property_manager_id;
+    body.property_manager_id = property_manager_id || null;
     const data = new Maintenance(body);
 
     data.save()
