@@ -489,6 +489,10 @@ async function editProperty(req, res) {
       }
     }
 
+    if(req.body.address){
+      req.body.address = JSON.parse(req.body.address);
+    }
+
     req.body.landlord_id = landlord_id;
     req.body.property_manager_id = property_manager_id;
     req.body.name = name;
