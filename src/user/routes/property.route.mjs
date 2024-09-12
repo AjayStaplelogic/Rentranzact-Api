@@ -191,7 +191,7 @@ router.get("/property-manager-property-lists/:id", authorizer([UserRoles.LANDLOR
 
 router.get("/terminate-property-manager/:id", authorizer([UserRoles.LANDLORD]), teminatePM)
 
-router.get("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]),
+router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]),
   upload.any(),
   (req, res) => {
 
