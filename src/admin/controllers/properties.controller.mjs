@@ -101,7 +101,7 @@ async function getAllPropertyList(req, res) {
     if (rented) {
       query["rented"] = rented === "true" ? true : false;
     }
-  
+
     if (city) { query.city = city; };
 
     let skip = Number(page - 1) * count;
@@ -125,8 +125,8 @@ async function getAllPropertyList(req, res) {
       },
       {
         $set: {
-          landlord_id : {$toObjectId : "$landlord_id"},
-          property_manager_id : {$toObjectId : "$property_manager_id"},
+          landlord_id: { $toObjectId: "$landlord_id" },
+          property_manager_id: { $toObjectId: "$property_manager_id" },
         }
       },
       {
@@ -167,7 +167,7 @@ async function getAllPropertyList(req, res) {
           status: "$status",
           city: "$city",
           type: "$type",
-          rented : "$rented",
+          rented: "$rented",
           images: "$images",
           landlord_id: "$landlord_id",
           createdAt: "$createdAt",
@@ -223,17 +223,17 @@ async function getAllPropertyList(req, res) {
         }
       })
     }
-    
+
     let get_properties = await Property.aggregate(pipeline);
     let additional_data = {
-      pageNo : page,
-      pageSize : count,
+      pageNo: page,
+      pageSize: count,
     };
     console.log(get_properties[0].pagination)
-    if(get_properties && get_properties.length > 0) {
-        if( get_properties[0].pagination &&  get_properties[0].pagination.length){
-          additional_data.count = get_properties[0]?.pagination[0]?.total;
-        }
+    if (get_properties && get_properties.length > 0) {
+      if (get_properties[0].pagination && get_properties[0].pagination.length) {
+        additional_data.count = get_properties[0]?.pagination[0]?.total;
+      }
     }
     return sendResponse(res, get_properties[0].data, "success", true, 200, {}, additional_data);
   } catch (error) {

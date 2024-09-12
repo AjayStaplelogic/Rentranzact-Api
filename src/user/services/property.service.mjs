@@ -319,9 +319,10 @@ async function getPropertyByID(id, userID) {
 
     // console.log(dataMerge.propertyData, "==final ")
     if (landlord) {
-      const { fullName, picture, verified, role, countryCode, phone } = landlord;
+      const { _id, fullName, picture, verified, role, countryCode, phone } = landlord;
 
       dataMerge.landlord = {
+        _id,
         fullName,
         picture,
         verified,
@@ -342,9 +343,10 @@ async function getPropertyByID(id, userID) {
 
     const propertyManager = await User.findById(data.property_manager_id);
 
-    const { fullName, picture, verified, role, countryCode, phone} = propertyManager;
+    const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
 
     dataMerge.property_manager = {
+      _id,
       fullName,
       picture,
       verified,
@@ -360,9 +362,10 @@ async function getPropertyByID(id, userID) {
 
     // console.log(renter, "=renterr")
 
-    const { fullName, picture, verified, role, countryCode, phone } = renter;
+    const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
 
     dataMerge.renterInfo = {
+      _id,
       fullName,
       picture,
       verified,
