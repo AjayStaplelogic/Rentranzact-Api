@@ -102,7 +102,18 @@ async function getRenterCalender(userID, propertyID) {
         "RenterDetails.id": userID
     }).select('id inspectionTime inspectionDate landlordID fullDay');
 
-    const result = await Calender.find({ userID: property.landlord_id })
+    let calender_query = {}
+    let user_arr = [];
+    if (property) {
+        if (property.landlord_id) {
+            user_arr.push(property.landlord_id);
+        }
+        if (property.property_manager_id) {
+            user_arr.push(property.property_manager_id);
+        }
+    }
+    calender_query["userID"] = { $in: user_arr }
+    const result = await Calender.find(calender_query)
 
     // console.log(result, "====resulttttttttt")
 
