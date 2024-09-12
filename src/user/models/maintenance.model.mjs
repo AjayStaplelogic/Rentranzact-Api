@@ -17,7 +17,7 @@ const maintenanceSchema = new mongoose.Schema(
 
         landlordID: {
             type: String,
-            required: true,
+            // required: true,
         },
         landlordRemark: {
             type: String,

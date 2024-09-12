@@ -8,7 +8,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenanceRequests(body) {
     const { landlord_id, propertyName, property_manager_id } = await Property.findById(body.propertyID);
-    body.landlordID = landlord_id;
+    body.landlordID = landlord_id || null;
     body.property_manager_id = property_manager_id || null;
     const data = new Maintenance(body);
 
@@ -32,7 +32,7 @@ async function addMaintenanceRequests(body) {
                     const metadata = {
                         "propertyID": data.propertyID.toString(),
                         "redirectTo": "maintanence",
-                        "maintanence_id": create_notification.maintanence_id,
+                        "maintanence_id": create_notification.maintanence_id.toString(),
                     }
                     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
                 }
