@@ -307,7 +307,7 @@ async function getPropertyByID(id, userID) {
 
     // dataMerge.propertyData = data;
 
-    if (favorite.favorite.includes(id)) {
+    if (favorite && favorite?.favorite?.includes(id)) {
 
       dataMerge["liked"] = true
 
@@ -335,7 +335,7 @@ async function getPropertyByID(id, userID) {
 
 
     const favorite = await User.findById(userID).select("favorite")
-    if (favorite.favorite.includes(id)) {
+    if (favorite && favorite?.favorite?.includes(id)) {
       dataMerge["liked"] = true
     } else {
       dataMerge["liked"] = false
