@@ -72,6 +72,7 @@ async function paystack(req, res) {
 
                 const data = await rechargeWallet(body);
 
+                return res.send(200);
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
 
