@@ -435,6 +435,8 @@ async function editProperty(req, res) {
   try {
     console.log(req.body, '=====req.body')
     const { id, email } = req.body;
+    const role = req?.user?.data?.role;
+
     if (!id) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
