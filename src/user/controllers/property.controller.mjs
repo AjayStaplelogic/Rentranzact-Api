@@ -440,8 +440,8 @@ async function editProperty(req, res) {
     }
 
     if (req.files && files.length > 0) {
-      const images = files.filter((file) => file.mimetype.startsWith("image/"));
-      const documents = files.filter((file) => file.mimetype === "application/pdf");
+      const images = req.files.filter((file) => file.mimetype.startsWith("image/"));
+      const documents = req.files.filter((file) => file.mimetype === "application/pdf");
       req.body.images = req.body.images || [];
       req.body.documents = req.body.documents || [];
 
