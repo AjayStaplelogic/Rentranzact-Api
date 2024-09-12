@@ -439,7 +439,9 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
-    if (req.files && files.length > 0) {
+    console.log(req.files, '=======req.files')
+
+    if (req.files && req.files.length > 0) {
       const images = req.files.filter((file) => file.mimetype.startsWith("image/"));
       const documents = req.files.filter((file) => file.mimetype === "application/pdf");
       req.body.images = req.body.images || [];
@@ -496,6 +498,7 @@ async function editProperty(req, res) {
 
 
   } catch (error) {
+    console.log(error, '=====error')
     return sendResponse(res, [], error.message, false, 400)
   }
 }
