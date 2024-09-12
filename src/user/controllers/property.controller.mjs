@@ -14,6 +14,8 @@ import {
 } from "../services/property.service.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
+
 
 async function addProperty(req, res) {
   const { body } = req;
@@ -429,6 +431,75 @@ async function teminatePM(req, res) {
 
 }
 
+async function editProperty(req, res) {
+  try {
+    console.log(req.body, '=====req.body')
+    const { id, email } = req.body;
+    if (!id) {
+      return sendResponse(res, {}, 'id is required', false, 400);
+    }
+
+    if (req.files && files.length > 0) {
+      const images = files.filter((file) => file.mimetype.startsWith("image/"));
+      const documents = files.filter((file) => file.mimetype === "application/pdf");
+      req.body.images = req.body.images || [];
+      req.body.documents = req.body.documents || [];
+
+      if (images && images.length) {
+        req.body.images = [...req.body.images, ...images];
+      }
+
+      if (documents && documents.length) {
+        req.body.documents = [...req.body.documents, ...documents];
+      }
+    }
+
+    let landlord_id = role === UserRoles.LANDLORD ? id : null;
+    let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
+    console.log(landlord_id, '===landlord_id')
+    console.log(property_manager_id, '===property_manager_id')
+
+    let name = "";
+    if (email) {
+      let user = await User.findOne({
+        email: email.toLowerCase().trim(),
+        deleted: false,
+        role: {
+          $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
+        },
+      }).lean().exec();
+      if (user) {
+        name = user.fullName;
+        if (user.role === UserRoles.LANDLORD) {
+          landlord_id = user._id;
+        } else if (user.role === UserRoles.PROPERTY_MANAGER) {
+          property_manager_id = user._id;
+        }
+      } else {
+        return {
+          data: [],
+          message: "email of property manager or landlord is not valid",
+          status: false,
+          statusCode: 403,
+        };
+      }
+    }
+
+    req.body.landlord_id = landlord_id;
+    req.body.property_manager_id = property_manager_id;
+    req.body.name = name;
+    const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
+    if (property) {
+      return sendResponse(res, property, 'property updated successfully', true, 200);
+    }
+    return sendResponse(res, null, "Invalid Id", false, 400);
+
+
+  } catch (error) {
+    return sendResponse(res, [], error.message, false, 400)
+  }
+}
+
 export {
   getPropertyListByPmID,
   addProperty,
@@ -443,5 +514,6 @@ export {
   deleteProperty,
   getPropertyManagerList,
   getPropertyManagerDetails,
-  teminatePM
+  teminatePM,
+  editProperty
 };
