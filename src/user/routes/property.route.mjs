@@ -226,8 +226,8 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
       }
 
     });
+    editProperty(req, res)
   },
-  editProperty
 )
 
 
