@@ -102,7 +102,7 @@ const hostUrl = process.env.HOST_URL;
 router.post("/property/search", searchProperty);
 
 router.post("/property/list", authorizer([UserRoles.RENTER]), propertiesList);
-router.get("/property/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), propertyByID);
+router.get("/property/:id", propertyByID);
 router.get(
   "/property/favorite/:id",
   authorizer([UserRoles.RENTER]),

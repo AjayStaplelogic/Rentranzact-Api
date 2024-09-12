@@ -94,9 +94,10 @@ async function propertiesList(req, res) {
 
 async function propertyByID(req, res) {
   const { id } = req.params;
-  const { _id } = req.user.data;
+  // const { _id } = req.user.data;
+  const { userID } = req.query;
 
-  const data = await getPropertyByID(id, _id);
+  const data = await getPropertyByID(id, userID);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
@@ -490,11 +491,11 @@ async function editProperty(req, res) {
       }
     }
 
-    if(req.body.address){
+    if (req.body.address) {
       req.body.address = JSON.parse(req.body.address);
     }
 
-    if(req.body.amenities){
+    if (req.body.amenities) {
       req.body.amenities = JSON.parse(req.body.amenities);
     }
 
