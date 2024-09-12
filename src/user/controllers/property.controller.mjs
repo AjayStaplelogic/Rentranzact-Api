@@ -436,6 +436,7 @@ async function editProperty(req, res) {
     console.log(req.body, '=====req.body')
     const { id, email } = req.body;
     const role = req?.user?.data?.role;
+    const user_id = req?.user?.data?._id;
 
     if (!id) {
       return sendResponse(res, {}, 'id is required', false, 400);
@@ -458,8 +459,8 @@ async function editProperty(req, res) {
       }
     }
 
-    let landlord_id = role === UserRoles.LANDLORD ? id : null;
-    let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
+    let landlord_id = role === UserRoles.LANDLORD ? user_id : null;
+    let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? user_id : null;
     console.log(landlord_id, '===landlord_id')
     console.log(property_manager_id, '===property_manager_id')
 
