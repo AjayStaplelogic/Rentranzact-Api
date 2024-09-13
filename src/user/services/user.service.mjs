@@ -582,6 +582,38 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
 
 
 
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    const { renterID, propertyName, rented } = await Property.findById(propertyID);
+    if (!rented) {
+      return {
+        data: {},
+        message: "Property not rented",
+        status: false,
+        statusCode: 404,
+      }
+    }
+    const data = new LeaseAggrements({
+      propertyName: propertyName,
+      propertyID: propertyID,
+      renterID: renterID,
+      uploadedAt: Date.now(),
+      url: dataUrl,
+      property_manager_id: userID,
+      uploadedBy: role
+    })
+
+    data.save();
+
+
+    return {
+      data: data,
+      message: "submitted lease aggrement successfully",
+      status: true,
+      statusCode: 201
+    };
+
+
+
   }
 
 
@@ -600,6 +632,14 @@ async function getLeaseAggrementList(id, role) {
   } else if (role === UserRoles.LANDLORD) {
 
     const data = await LeaseAggrements.find({ landlordID: id })
+    return {
+      data: data,
+      message: "successfully fetched lease aggrements",
+      status: true,
+      statusCode: 200
+    };
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    const data = await LeaseAggrements.find({ property_manager_id: id })
     return {
       data: data,
       message: "successfully fetched lease aggrements",
@@ -739,6 +779,43 @@ async function deleteAggrementByID(userID, aggrementID, role) {
       message: "successfully deleted lease aggrements",
       status: true,
       statusCode: 200
+    };
+  } else if (role === UserRoles.PROPERTY_MANAGER) {
+    const data = await LeaseAggrements.findOneAndDelete({
+      _id: aggrementID,
+      property_manager_id: userID
+    })
+    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
+
+    if (data) {
+      const match = data?.url?.match(regex);
+      if (match) {
+        const filenameWithExtension = match[1];
+        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
+
+        console.log(filePath, "=====pathid 22222 ")
+        try {
+          fs.unlinkSync(filePath)
+        } catch (error) {
+          console.log(error, '====error22222');
+        }
+        // console.log(filenameWithExtension);
+      } else {
+        // console.log('Filename not found in URL');
+      }
+      return {
+        data,
+        message: "successfully deleted lease aggrements",
+        status: true,
+        statusCode: 200
+      };
+    }
+
+    return {
+      data: [],
+      message: "Invalid Id",
+      status: false,
+      statusCode: 400
     };
   }
 }

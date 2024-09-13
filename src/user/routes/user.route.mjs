@@ -57,7 +57,7 @@ router.post("/forgot-password", forgotPassword)
 
 router.get("/favorites", authorizer([UserRoles.RENTER]), favourites)
 
-router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), upload.single('document'), (req, res) => {
+router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), upload.single('document'), (req, res) => {
 
     const fileName = req.user.data._id;
 
@@ -69,9 +69,9 @@ router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
     uploadLeaseAggrement(req, res);
 })
 
-router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getLeaseAggrements)
+router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getLeaseAggrements)
 
-router.delete("/lease-aggerment/:id", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), deleteAggrement)
+router.delete("/lease-aggerment/:id", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), deleteAggrement)
 
 router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), wallet)
 
@@ -87,6 +87,6 @@ router.get("/commisions", authorizer([UserRoles.PROPERTY_MANAGER]), commisions)
 
 router.get("/user", authorizer([UserRoles.PROPERTY_MANAGER, UserRoles.LANDLORD, UserRoles.RENTER]), getUserDetails)
 
-router.get("/delete/user" , authorizer([UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]), deleteUser )
+router.get("/delete/user", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), deleteUser)
 
 export default router;
