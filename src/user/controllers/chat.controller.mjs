@@ -14,10 +14,10 @@ export const joinChatRoom = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        let { user_id, chat_with, is_admin, admin_id,  } = req.body;
+        let { user_id, chat_with, is_admin, admin_id, } = req.body;
 
         const query = {
-            is_group : false,
+            is_group: false,
             user_ids: { $all: [user_id, chat_with] }
         }
 
@@ -181,6 +181,8 @@ export const getMessages = async (req, res) => {
             },
             {
                 $project: {
+                    createdAt: "$createdAt",
+                    updatedAt: "$updatedAt",
                     room_id: "$room_id",
                     sender_id: "$sender_id",
                     message_type: "$message_type",
