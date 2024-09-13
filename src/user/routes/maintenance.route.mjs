@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.post('/maintenance' , authorizer([UserRoles.RENTER]), addMaintenance);
 
-router.get('/maintenance' , authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getMaintenanceRenter);
+router.get('/maintenance' , authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getMaintenanceRenter);
 
 router.get('/maintenance/:id' , authorizer([UserRoles.LANDLORD]) , resolveMaintenance);
 

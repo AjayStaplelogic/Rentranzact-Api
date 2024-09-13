@@ -1,6 +1,6 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, addRemarkToRequest, cancelMaintenanceRequests } from "../services/maintenance.service.mjs";
+import { addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, addRemarkToRequest, cancelMaintenanceRequests, getMaintenanceRequestsPropertyManager } from "../services/maintenance.service.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addMaintenance(req, res) {
@@ -29,6 +29,12 @@ async function getMaintenanceRenter(req, res) {
   } else if (req?.user?.data?.role === UserRoles.LANDLORD) {
 
     const data = await getMaintenanceRequestsLandlord(id, req);
+
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+
+  }else if (req?.user?.data?.role === UserRoles.PROPERTY_MANAGER) {
+
+    const data = await getMaintenanceRequestsPropertyManager(id, req);
 
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
