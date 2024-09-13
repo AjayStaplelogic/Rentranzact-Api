@@ -3,6 +3,8 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getMyTransaction, transactionByIdService } from "../services/transaction.service.mjs";
 import { UserRoles } from '../enums/role.enums.mjs';
 import { Transaction } from "../models/transactions.model.mjs";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 async function myTransaction(req, res) {
   const { body } = req;
@@ -52,16 +54,39 @@ async function getAllRentTransactions(req, res) {
     }
     sort_query[field] = order == "desc" ? -1 : 1;
 
-    if(req?.user?.data?.role == UserRoles.LANDLORD ){
+    if (req?.user?.data?.role == UserRoles.LANDLORD) {
       query.landlordID = req.user.data._id;
+    } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER) {
+      query.pmID = req.user.data._id;
     }
 
-    query.propertyID = {$exists : true};
+    query.propertyID = { $exists: true };
 
-    console.log(query, '=======query')
+    // console.log(query, '=======query')
+    // console.log(JSON.stringify(query2), '=======JSON.stringify(query2)')
+
     let pipeline = [
       {
         $match: query
+      },
+      {
+        $addFields : {
+          property_manager_id : {$toObjectId : "$pmID"}
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "property_manager_id",
+          foreignField: "_id",
+          as: "property_mananger_details"
+        }
+      },
+      {
+        $unwind: {
+          path: "$property_mananger_details",
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $project: {
@@ -80,6 +105,8 @@ async function getAllRentTransactions(req, res) {
           payment_mode: "$payment_mode",
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
+          property_manager_name: "$property_mananger_details.fullName",
+          property_manager_image: "$property_mananger_details.picture"
         }
       },
       {
