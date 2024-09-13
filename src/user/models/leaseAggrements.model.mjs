@@ -29,8 +29,12 @@ const LeaseAggrementsSchema = new mongoose.Schema(
         uploadedBy : {
             type : String,
             required: true
-
-        }
+        },
+        property_manager_id: {
+            type: mongoose.Types.ObjectId,
+            ref: 'users',
+            index: true
+        },
     },
     { timestamps: true }
 );

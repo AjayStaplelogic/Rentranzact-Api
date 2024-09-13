@@ -241,6 +241,7 @@ async function addRentApplicationService(body, user) {
           notification_payload.renterApplicationID = data._id;
           notification_payload.propertyID = landlord._id;
           notification_payload.send_to = landlordDetails._id;
+          notification_payload.amount = landlord.rent;
           let create_notification = await Notification.create(notification_payload);
           if (create_notification) {
             if (landlordDetails && landlordDetails.fcmToken) {
@@ -265,6 +266,7 @@ async function addRentApplicationService(body, user) {
           notification_payload.propertyID = landlord._id;
           notification_payload.send_to = propertyManagerDetails._id;
           notification_payload.property_manager_id = propertyManagerDetails._id;
+          notification_payload.amount = landlord.rent;
           let create_notification = await Notification.create(notification_payload);
           if (create_notification) {
             if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
