@@ -117,6 +117,35 @@ async function getMyTransaction(userID, role, req) {
         }
       },
       {
+        $addFields: {
+          property_manager_id: { $toObjectId: "$pmID" }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "property_manager_id",
+          foreignField: "_id",
+          as: "property_mananger_details"
+        }
+      },
+      {
+        $unwind: {
+          path: "$property_mananger_details",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          property_manager_name: "$property_mananger_details.fullName",
+          property_manager_image: "$property_mananger_details.picture"
+        },
+      },
+      {
+        
+        $unset : ["property_mananger_details"]
+      },
+      {
         $sort: {
           createdAt: -1
         }

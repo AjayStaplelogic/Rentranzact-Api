@@ -68,12 +68,7 @@ const transactionSchema = new mongoose.Schema(
     allCharges: {
       type: Object,
       required: false
-    },
-    property_manager_id: {
-      type: mongoose.Types.ObjectId,
-      ref: 'users',
-      index: true
-    },
+    }
   },
   { timestamps: true }
 );
