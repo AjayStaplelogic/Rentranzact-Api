@@ -244,22 +244,17 @@ async function updateInspectionStatus(body, id) {
 
   const inspectionDetails = await Inspection.findById(inspectionID);
 
-  const renterDetails = await User.findById(inspectionDetails.RenterDetails.id);
+  const renterDetails = await User.findById(inspectionDetails?.RenterDetails?.id);
   const landlordDetails = await User.findById(inspectionDetails.landlordID);
 
-  // let title = "Inspection Update";
-  // let notificationBody;
   let notification_payload = {};
   notification_payload.notificationHeading = "Inspection Update";
   notification_payload.renterID = renterDetails._id;
-  notification_payload.landlordID = landlordDetails._id;
-  notification_payload.inspection_id = inspectionDetails._id;
-  notification_payload.propertyID = inspectionDetails.propertyID;
-  notification_payload.send_to = landlordDetails._id;
-
-  // const metadata = {
-  //   redirectTo: "inspection"
-  // }
+  notification_payload.landlordID = inspectionDetails.landlordID;
+  notification_payload.inspection_id = inspectionDetails?._id;
+  notification_payload.propertyID = inspectionDetails?.propertyID;
+  notification_payload.send_to = inspectionDetails?.landlordID;
+  notification_payload.property_manager_id = inspectionDetails?.property_manager_id;
 
   let update_payload = {
     inspectionStatus: status
