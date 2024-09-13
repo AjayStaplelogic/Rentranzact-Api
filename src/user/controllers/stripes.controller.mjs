@@ -66,7 +66,7 @@ async function paystack(req, res) {
 
             const { wallet, renterApplicationID } = req.body.data.metadata;
 
-            console.log(wallet , "--------------> wallet")
+            console.log(wallet , "----------------------------> wallet")
             console.log(req?.body?.data?.metadata?.custom_fields , "--------------> req.body.data.metadata?custom_fields:")
             console.log(JSON.stringify(req?.body?.data?.metadata?.custom_fields) , "--------------> JSON.stringify(req?.body?.data?.metadata?.custom_fields)")
 
