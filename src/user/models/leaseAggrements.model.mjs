@@ -16,7 +16,7 @@ const LeaseAggrementsSchema = new mongoose.Schema(
         },
         landlordID: {
             type: String,
-            required: true
+            // required: true
         },
         uploadedAt: {
             type: String,
