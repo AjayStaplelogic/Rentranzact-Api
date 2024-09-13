@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 const transactionSchema = new mongoose.Schema(
   {
 
-    wallet : {
-      type : Boolean,
+    wallet: {
+      type: Boolean,
       required: false
     },
 
-    type : {
+    type: {
       type: String,
-      required : true
+      required: true
     },
 
     intentID: {
@@ -32,9 +32,9 @@ const transactionSchema = new mongoose.Schema(
       required: false
     },
 
-    pmID : {
-      type : String,
-      required : false
+    pmID: {
+      type: String,
+      required: false
 
     },
 
@@ -65,10 +65,15 @@ const transactionSchema = new mongoose.Schema(
     payment_mode: {
       type: String,
     },
-    allCharges : {
-      type : Object,
+    allCharges: {
+      type: Object,
       required: false
-    }
+    },
+    property_manager_id: {
+      type: mongoose.Types.ObjectId,
+      ref: 'users',
+      index: true
+    },
   },
   { timestamps: true }
 );

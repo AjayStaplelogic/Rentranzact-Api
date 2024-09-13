@@ -22,7 +22,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
     const propertyDetails = await Property.findById(propertyID);
 
-    const landlordDetails = await User.findById(propertyDetails.landlord_id)
+    const landlordDetails = await User.findById(propertyDetails.landlord_id);
 
     if (propertyDetails) {
         let lease_end_timestamp = "";
@@ -147,13 +147,17 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             intentID: id,
             property: propertyDetails.propertyName,
             renter: renterDetails.fullName,
-            landlord: landlordDetails.fullName,
-            landlordID: landlordDetails._id,
             pmID: propertyDetails.property_manager_id,
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown
         }
+
+        if (landlordDetails) {
+            changePayload.landlord = landlordDetails.fullName;
+            changePayload.landlordID = landlordDetails._id;
+        }
+
 
         const data = new Transaction(changePayload)
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
@@ -253,7 +257,7 @@ async function addFlutterwaveTransactionForOld(body) {
 
             addRenterHistory.save()
 
-            
+
             console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
 
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
@@ -354,12 +358,15 @@ async function addFlutterwaveTransactionForOld(body) {
             intentID: id,
             property: propertyDetails.propertyName,
             renter: renterDetails.fullName,
-            landlord: landlordDetails.fullName,
-            landlordID: landlordDetails._id,
             pmID: propertyDetails.property_manager_id,
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown
+        }
+
+        if (landlordDetails) {
+            changePayload.landlord = landlordDetails.fullName;
+            changePayload.landlordID = landlordDetails._id;
         }
 
         const data = new Transaction(changePayload)
