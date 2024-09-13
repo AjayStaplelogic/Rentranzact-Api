@@ -5,6 +5,8 @@ import * as ManinenanceEnums from "../enums/maintenance.enums.mjs"
 import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 async function addMaintenanceRequests(body) {
     const { landlord_id, propertyName, property_manager_id } = await Property.findById(body.propertyID);
@@ -176,7 +178,6 @@ async function resolveMaintenanceRequests(id) {
 
 }
 
-
 async function addRemarkToRequest(landlordRemark, maintenanceID) {
 
     const data = await Maintenance.findByIdAndUpdate(maintenanceID, { landlordRemark: landlordRemark, status: ManinenanceEnums.STATUS.REMARKED })
@@ -212,7 +213,6 @@ async function addRemarkToRequest(landlordRemark, maintenanceID) {
         statusCode: 201,
     };
 }
-
 
 async function cancelMaintenanceRequests(id) {
 
@@ -275,4 +275,43 @@ async function cancelMaintenanceRequests(id) {
 
 }
 
-export { cancelMaintenanceRequests, addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, };
+async function getMaintenanceRequestsPropertyManager(id, req) {
+
+    let { status } = req.query;
+    let query = {
+        property_manager_id: new ObjectId(id)
+    }
+
+    if (status) {
+        query.status = status;
+    }
+    const data = await Maintenance.aggregate([
+        {
+            $match: query
+        },
+        {
+            $lookup: {
+                from: "users",
+                let: { userID: { $toObjectId: "$renterID" } }, // Convert propertyID to ObjectId
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ["$_id", "$$userID"] }, // Match ObjectId type
+                        },
+                    },
+                    { $project: { picture: 1, fullName: 1, phone: 1, email: 1, } }, // Project only the images array from properties
+                ],
+                as: "renterDetails",
+            }
+        }
+    ])
+
+    return {
+        data: data,
+        message: "maintenance list fetched successfully",
+        status: true,
+        statusCode: 201,
+    };
+}
+
+export { cancelMaintenanceRequests, addRemarkToRequest, addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, getMaintenanceRequestsPropertyManager };
