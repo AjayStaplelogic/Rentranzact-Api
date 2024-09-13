@@ -67,6 +67,9 @@ async function paystack(req, res) {
             const { wallet, renterApplicationID } = req.body.data.metadata;
 
             console.log(wallet , "--------------> wallet")
+            console.log(req?.body?.data?.metadata?.custom_fields , "--------------> req.body.data.metadata?custom_fields:")
+            console.log(JSON.stringify(req?.body?.data?.metadata?.custom_fields) , "--------------> JSON.stringify(req?.body?.data?.metadata?.custom_fields)")
+
 
             if (wallet === "true") {
 
@@ -88,17 +91,18 @@ async function paystack(req, res) {
                     if (property.payment_count === 0) {
     
                         const data = await addStripeTransaction(body, renterApplicationID);
-    
+                        return res.send(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
                     } else {
     
                         const data = await addStripeTransactionForOld(body, renterApplicationID);
-    
+                        return res.send(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
                     }
                 }
             }
 
+            return res.send(200);
             return {
                 status: 200
             }
