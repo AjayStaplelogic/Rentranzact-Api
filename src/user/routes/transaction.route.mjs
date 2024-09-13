@@ -6,9 +6,9 @@ import { myTransaction , transactionById, getAllRentTransactions } from '../cont
 
 router.get('/my-transactions' , authorizer([UserRoles.RENTER , UserRoles.LANDLORD , UserRoles.PROPERTY_MANAGER]) ,  myTransaction);
 
-router.get('/transaction/:id' , authorizer([UserRoles.RENTER, UserRoles.LANDLORD]) , transactionById);
+router.get('/transaction/:id' , authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]) , transactionById);
 
-router.get('/transactions/rent' , authorizer([UserRoles.LANDLORD ]) ,  getAllRentTransactions);
+router.get('/transactions/rent' , authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER ]) ,  getAllRentTransactions);
 
 
 

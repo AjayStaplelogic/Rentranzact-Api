@@ -9,7 +9,7 @@ const io = new Server()
 // io.origins("*")
 io.use(async (socket, next) => {
     console.log(`[Socket Handshake]`)
-    console.log(socket.handshake)
+    // console.log(socket.handshake)
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
     }
@@ -61,8 +61,8 @@ io.on('connection', (socket) => {
 
     chatService.user_online(socket, connected_users);
     chatService.join_multiple_rooms(socket);
-    console.log(connected_users)
-    console.log(socket.rooms)
+    // console.log(connected_users)
+    // console.log(socket.rooms)
 
     io.emit("user-online", {        // sending to all client about user login
         status: true,
@@ -225,6 +225,20 @@ io.on('connection', (socket) => {
             });
         }
     })
+
+    socket.on('user-offline', () => {
+        console.log(`[socket disconnected] : ${socket.id}`);
+        chatService.user_offline(socket, connected_users);
+        io.emit("user-offline", {        // sending to all client about user logout/offline
+            status: true,
+            statusCode: 200,
+            data: {
+                user_id: socket.user_id,
+                is_admin: socket.is_admin,
+                admin_id: socket.admin_id
+            }
+        })
+    });
 
     socket.on('disconnect', () => {
         console.log(`[socket disconnected] : ${socket.id}`);
