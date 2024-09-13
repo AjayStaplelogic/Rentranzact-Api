@@ -16,7 +16,7 @@ const rentingHistorySchema = new mongoose.Schema(
         },
         landlordID: {
             type: String,
-            required: true,
+            // required: true,
         },
         rentingStart: {
             type: String,

@@ -52,7 +52,16 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 lease_end_timestamp: lease_end_timestamp
             })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneMonthLater, rentingStart: created, propertyID: propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({
+                renterID: userID,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
+                rentingEnd: timestampOneMonthLater,
+                rentingStart: created,
+                propertyID: propertyID,
+                renterActive: true,
+                pmID: propertyDetails?.property_manager_id,
+            })
 
             addRenterHistory.save()
 
@@ -77,8 +86,16 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 lease_end_timestamp: lease_end_timestamp,
             })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: created, propertyID: propertyID, renterActive: true })
-
+            const addRenterHistory = new RentingHistory({
+                renterID: userID,
+                landlordID: propertyDetails.landlord_id,
+                rentingType: propertyDetails.rentType,
+                rentingEnd: timestampOneQuaterLater,
+                rentingStart: created,
+                propertyID: propertyID,
+                renterActive: true,
+                pmID: propertyDetails?.property_manager_id,
+            });
 
             console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
 
@@ -106,7 +123,16 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 lease_end_timestamp: lease_end_timestamp
             })
 
-            const addRenterHistory = new RentingHistory({ renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: created, propertyID, renterActive: true })
+            const addRenterHistory = new RentingHistory({
+                renterID: userID,
+                landlordID: propertyDetails.landlord_id,
+                rentingType: propertyDetails.rentType,
+                rentingEnd: timestampOneYearLater,
+                rentingStart: created,
+                propertyID,
+                renterActive: true,
+                pmID: propertyDetails?.property_manager_id,
+            })
             addRenterHistory.save()
         }
 
@@ -247,12 +273,13 @@ async function addFlutterwaveTransactionForOld(body) {
 
             const addRenterHistory = new RentingHistory({
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneMonthLater,
                 propertyID: propertyID,
                 renterActive: true,
                 rentingStart: updateProperty.rent_period_start,
+                pmID: propertyDetails?.property_manager_id,
             })
 
             addRenterHistory.save()
@@ -278,12 +305,13 @@ async function addFlutterwaveTransactionForOld(body) {
 
             const addRenterHistory = new RentingHistory({
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneQuaterLater,
                 rentingStart: updateProperty.rent_period_start,
                 propertyID: propertyID,
-                renterActive: true
+                renterActive: true,
+                pmID: propertyDetails?.property_manager_id,
             })
 
 
@@ -312,12 +340,13 @@ async function addFlutterwaveTransactionForOld(body) {
 
             const addRenterHistory = new RentingHistory({
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneYearLater,
                 rentingStart: updateProperty.rent_period_start,
                 propertyID: propertyID,
-                renterActive: true
+                renterActive: true,
+                pmID: propertyDetails?.property_manager_id,
             })
             addRenterHistory.save()
         }
