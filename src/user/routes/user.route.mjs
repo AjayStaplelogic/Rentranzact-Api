@@ -73,7 +73,7 @@ router.get("/lease-aggrements", authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
 router.delete("/lease-aggerment/:id", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), deleteAggrement)
 
-router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), wallet)
+router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), wallet)
 
 router.post("/verify-otp", userOtpVerification)
 

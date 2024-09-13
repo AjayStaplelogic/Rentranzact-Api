@@ -7,94 +7,58 @@ async function stripe(req, res) {
     const { body } = req;
 
     if (body.type === "payment_intent.succeeded") {
-
         const { wallet, renterApplicationID } = body.data.object.metadata;
-
         console.log(wallet, "===wallet value")
-
         body.paymentMethod = "stripe"
 
         if (wallet === "true") {
-
             const data = await rechargeWallet(body);
-
             sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
-
         } else {
-
+            
             const { propertyID } = body.data.object.metadata;
-
             const property = await Property.findById(propertyID);
-
             console.log("payment count ===>", property.payment_count)
-
             if (property.payment_count === 0) {
-
                 const data = await addStripeTransaction(body, renterApplicationID);
-
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
             } else {
-
                 const data = await addStripeTransactionForOld(body, renterApplicationID);
-
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
             }
-
         }
-
     }
-
-
 }
 
 async function paystack(req, res) {
 
     const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
-
-    console.log(req.body, "-------------webhook event")
-
-    const {body} = req;
-
+    console.log(req.body, "-------------Pay Stack")
+    const { body } = req;
     body.paymentMethod = "paystack"
-
     if (req.body.event === "charge.success") {
         const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
-
         if (true) {
-
             const { wallet, renterApplicationID } = req.body.data.metadata;
 
-            console.log(wallet , "----------------------------> wallet")
-            console.log(req?.body?.data?.metadata?.custom_fields , "--------------> req.body.data.metadata?custom_fields:")
-            console.log(JSON.stringify(req?.body?.data?.metadata?.custom_fields) , "--------------> JSON.stringify(req?.body?.data?.metadata?.custom_fields)")
-
+            // console.log(wallet, "----------------------------> wallet")
+            console.log(req?.body?.data?.metadata?.custom_fields, "--------------> req.body.data.metadata?custom_fields:")
+            // console.log(JSON.stringify(req?.body?.data?.metadata?.custom_fields), "--------------> JSON.stringify(req?.body?.data?.metadata?.custom_fields)")
 
             if (wallet === "true") {
-
                 const data = await rechargeWallet(body);
-
                 return res.send(200);
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
-
             } else {
-
                 const { propertyID } = body.data.metadata;
-
                 const property = await Property.findById(propertyID);
-
-                if(property){
+                if (property) {
                     console.log("payment count ===>", property.payment_count)
-    
                     if (property.payment_count === 0) {
-    
                         const data = await addStripeTransaction(body, renterApplicationID);
                         return res.send(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
                     } else {
-    
                         const data = await addStripeTransactionForOld(body, renterApplicationID);
                         return res.send(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
@@ -112,17 +76,7 @@ async function paystack(req, res) {
                 status: 401
             }
         }
-
-
-
     }
-
-
-
-
-
-
-
 }
 
 export { stripe, paystack };

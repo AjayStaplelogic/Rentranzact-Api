@@ -97,10 +97,10 @@ async function addStripeTransaction(body, renterApplicationID) {
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails?.property_manager_id,
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneMonthLater,
                 rentingStart: created.toString(),
                 propertyID: propertyID,
@@ -138,10 +138,10 @@ async function addStripeTransaction(body, renterApplicationID) {
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails?.property_manager_id,
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneQuaterLater,
                 rentingStart: created.toString(),
                 propertyID: propertyID,
@@ -180,10 +180,10 @@ async function addStripeTransaction(body, renterApplicationID) {
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails?.property_manager_id,
                 renterID: userID,
-                landlordID: propertyDetails.landlord_id,
-                rentingType: propertyDetails.rentType,
+                landlordID: propertyDetails?.landlord_id,
+                rentingType: propertyDetails?.rentType,
                 rentingEnd: timestampOneYearLater,
                 rentingStart: created.toString(),
                 propertyID: propertyID,
@@ -232,7 +232,23 @@ async function addStripeTransaction(body, renterApplicationID) {
         let breakdown = await rentalBreakdown(propertyID)
 
 
-        const data = new Transaction({ wallet: false, renterID: userID, propertyID: propertyID, amount: amount, status: status, date: created.toString(), intentID: id, property: propertyDetails.propertyName, renter: renterDetails.fullName, landlord: landlordDetails.fullName, landlordID: landlordDetails._id, pmID: propertyDetails.property_manager_id, type: "DEBIT", payment_mode: "stripe", allCharges: breakdown })
+        const data = new Transaction({
+            wallet: false,
+            renterID: userID,
+            propertyID: propertyID,
+            amount: amount,
+            status: status,
+            date: created.toString(),
+            intentID: id,
+            property: propertyDetails.propertyName,
+            renter: renterDetails.fullName,
+            landlord: landlordDetails?.fullName,
+            landlordID: landlordDetails?._id,
+            pmID: propertyDetails?.property_manager_id,
+            type: "DEBIT",
+            payment_mode: "stripe",
+            allCharges: breakdown,
+        })
 
 
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
@@ -435,8 +451,14 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         console.log(updateProperty, "---------------> updateProperty")
 
         const addRenterHistory = new RentingHistory({
-            pmID : propertyDetails.property_manager_id,
-            renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, propertyID: propertyID, renterActive: true, rentingStart: updateProperty.rent_period_start })
+            pmID: propertyDetails?.property_manager_id,
+            renterID: userID,
+            landlordID: propertyDetails?.landlord_id,
+            rentingType: propertyDetails?.rentType,
+            propertyID: propertyID,
+            renterActive: true,
+            rentingStart: updateProperty?.rent_period_start
+        });
 
 
         addRenterHistory.save()
@@ -460,9 +482,16 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count: newCount, rent_period_due: timestampOneQuaterLater })
 
         console.log(updateProperty, "======updarteeeee")
-        const addRenterHistory = new RentingHistory({ 
-            pmID : propertyDetails.property_manager_id,
-            renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneQuaterLater, rentingStart: updateProperty.rent_period_start, propertyID: propertyID, renterActive: true })
+        const addRenterHistory = new RentingHistory({
+            pmID: propertyDetails?.property_manager_id,
+            renterID: userID,
+            landlordID: propertyDetails?.landlord_id,
+            rentingType: propertyDetails?.rentType,
+            rentingEnd: timestampOneQuaterLater,
+            rentingStart: updateProperty?.rent_period_start,
+            propertyID: propertyID,
+            renterActive: true
+        })
 
 
 
@@ -493,8 +522,15 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         console.log(updateProperty, "======updarteeeee Yearly")
         const addRenterHistory = new RentingHistory({
-            pmID : propertyDetails.property_manager_id,
-            renterID: userID, landlordID: propertyDetails.landlord_id, rentingType: propertyDetails.rentType, rentingEnd: timestampOneYearLater, rentingStart: updateProperty.rent_period_start, propertyID: propertyID, renterActive: true })
+            pmID: propertyDetails?.property_manager_id,
+            renterID: userID,
+            landlordID: propertyDetails?.landlord_id,
+            rentingType: propertyDetails?.rentType,
+            rentingEnd: timestampOneYearLater,
+            rentingStart: updateProperty?.rent_period_start,
+            propertyID: propertyID,
+            renterActive: true
+        })
 
         addRenterHistory.save()
     }
@@ -546,11 +582,11 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         status: status,
         date: created.toString(),
         intentID: id,
-        property: propertyDetails.propertyName,
-        renter: renterDetails.fullName,
-        landlord: landlordDetails.fullName,
-        landlordID: landlordDetails._id,
-        pmID: propertyDetails.property_manager_id,
+        property: propertyDetails?.propertyName,
+        renter: renterDetails?.fullName,
+        landlord: landlordDetails?.fullName,
+        landlordID: landlordDetails?._id,
+        pmID: propertyDetails?.property_manager_id,
         type: "DEBIT",
         payment_mode: "stripe",
         allCharges: breakdown
