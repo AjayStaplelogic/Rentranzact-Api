@@ -6,8 +6,8 @@ const router = express.Router();
 
 
 router.get('/notification', authorizer([UserRoles.RENTER]), getNotification);
-router.get('/notifications', authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getAllNotifications);
-router.get('/notification/view', authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), getNotificationById);
+router.get('/notifications', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getAllNotifications);
+router.get('/notification/view', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getNotificationById);
 
 
 
