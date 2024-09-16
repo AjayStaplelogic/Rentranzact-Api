@@ -79,7 +79,7 @@ async function getCalenderTimeSlots(req, res) {
         let count = Number(req.query.count || 20);
         let query = {};
         let query2 = {};
-        if (renterID) { query.renterID = renterID };
+        if (renterID) { query["RenterDetails.id"] = renterID };
         if (propertyID) { query.propertyID = propertyID };
         if (landlordID) { query.landlordID = landlordID };
         if (property_manager_id) { query.property_manager_id = property_manager_id };
@@ -87,6 +87,7 @@ async function getCalenderTimeSlots(req, res) {
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
+        // console.log(query, '===query')
         let pipeline = [
             {
                 $match: query
