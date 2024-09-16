@@ -24,7 +24,7 @@ export const userSignup = Joi.object().keys({
   role: Joi.string().valid(RENTER, LANDLORD, PROPERTY_MANAGER).required().error(new Error("Role should be valid")),
   password: Joi.string()
     .optional()
-    .alphanum()
+    // .alphanum()    // When user added any special character it gives always error
     .min(6)
     .error(new Error("Your password should be at least 6 characters")),
 });
