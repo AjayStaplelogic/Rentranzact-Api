@@ -175,18 +175,17 @@ async function filterProperies(body, id) {
   const { filters } = body;
 
   const data = await Property.find(filters).sort({ createdAt: -1 })
-  const favorite = await User.findById(id).select("favorite")
+  let modifiedProperties = data;
+  if(id){
+    const favorite = await User.findById(id).select("favorite")
+    if(favorite){
+      modifiedProperties = data?.map(property => {
+        const liked = favorite?.favorite.includes(property._id);
+        return { ...property.toObject(), liked };
+      });
+    }
+  }
 
-  const modifiedProperties = data?.map(property => {
-
-    // console.log(property, "===========propertyyyyy")
-
-    const liked = favorite?.favorite.includes(property._id);
-
-    // console.log(property._id, "===========propertyyyyy id")
-
-    return { ...property.toObject(), liked };
-  });
 
   return {
     data: modifiedProperties,
@@ -208,12 +207,6 @@ async function filterProperies(body, id) {
 async function nearbyProperies(body, userID) {
   const { maxDistance, latitude, longitude } = body;
 
-
-
-
-
-
-
   if (maxDistance && latitude && longitude) {
     const data = await Property.find({
       "address.coordinates": {
@@ -226,17 +219,18 @@ async function nearbyProperies(body, userID) {
       },
     });
 
-    const favorite = await User.findById(userID).select("favorite")
+    let modifiedProperties = data;
+    if (userID) {
+      const favorite = await User.findById(userID).select("favorite")
+      if (favorite) {
+        modifiedProperties = data.map(property => {
 
-    const modifiedProperties = data.map(property => {
+          const liked = favorite?.favorite.includes(property._id);
 
-      const liked = favorite?.favorite.includes(property._id);
-
-      return { ...property.toObject(), liked };
-    });
-
-
-
+          return { ...property.toObject(), liked };
+        });
+      }
+    }
 
     return {
       data: modifiedProperties,
@@ -247,16 +241,18 @@ async function nearbyProperies(body, userID) {
   } else {
 
     const data = await Property.find().limit(9);
-    const favorite = await User.findById(userID).select("favorite")
+    let modifiedProperties = data
+    if (userID) {
+      const favorite = await User.findById(userID).select("favorite")
+      if (favorite) {
+        modifiedProperties = data.map(property => {
 
-    const modifiedProperties = data.map(property => {
+          const liked = favorite?.favorite.includes(property._id);
 
-      const liked = favorite?.favorite.includes(property._id);
-
-      return { ...property.toObject(), liked };
-    });
-
-
+          return { ...property.toObject(), liked };
+        });
+      }
+    }
     return {
       data: modifiedProperties,
       message: "Property listing",
