@@ -338,13 +338,13 @@ async function rentApplicationsList(user, req) {
     query.propertyID = propertyID;
   }
 
-  if (kinIdentityCheck) {
-    if (kinIdentityCheck === "true") {
-      query.kinIdentityCheck = true;
-    } else if (kinIdentityCheck === "false") {
-      query.kinIdentityCheck = false;
-    }
-  }
+  // if (kinIdentityCheck) {
+  //   if (kinIdentityCheck === "true") {
+  //     query.kinIdentityCheck = true;
+  //   } else if (kinIdentityCheck === "false") {
+  //     query.kinIdentityCheck = false;
+  //   }
+  // }
 
   let field = "createdAt";
   let order = "desc";
