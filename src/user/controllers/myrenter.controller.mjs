@@ -37,9 +37,7 @@ async function getAllMyRenters(req, res) {
           query.renterID = { $nin: renters }
         }
       }
-
     } else if (role === UserRoles.PROPERTY_MANAGER) {
-
       query.pmID = `${req.user.data._id}`;
       if (current_status) {
         let renters = await Property.distinct("renterID", {
@@ -53,13 +51,7 @@ async function getAllMyRenters(req, res) {
           query.renterID = { $nin: renters }
         }
       }
-
     }
-
-
-
-
-
 
     let data = await RentingHistory.aggregate([
       {
@@ -137,12 +129,21 @@ async function myRenterHistory(req, res) {
     let page = Number(req.query.page) || 1;
     let count = Number(req.query.count) || 10;
     let skip = (page - 1) * count;
+    let query = {
+      renterID: id,
+    };
+
+    const role = req?.user?.data?.role;
+    if (role === UserRoles.LANDLORD) {
+      query.landlordID = `${req?.user?.data?._id}`;
+
+    } else if (role === UserRoles.PROPERTY_MANAGER) {
+      query.pmID = `${req?.user?.data?._id}`;
+    }
+
     let data = await RentingHistory.aggregate([
       {
-        $match: {
-          renterID: id,
-          landlordID: `${req.user.data._id}`
-        }
+        $match:query
       },
       {
         $set: {
@@ -261,12 +262,21 @@ async function rentedProperties(req, res) {
     let page = Number(req.query.page) || 1;
     let count = Number(req.query.count) || 10;
     let skip = (page - 1) * count;
+
     let query = {
       renterID: id,
-      landlord_id: `${req.user.data._id}`,
       rented: true
     };
-    console.log(query);
+
+    const role = req?.user?.data?.role;
+    if (role === UserRoles.LANDLORD) {
+      query.landlord_id = `${req?.user?.data?._id}`;
+
+    } else if (role === UserRoles.PROPERTY_MANAGER) {
+      query.property_manager_id = `${req?.user?.data?._id}`;
+    }
+
+    // console.log(query);
     let data = await Property.aggregate([
       {
         $match: query
