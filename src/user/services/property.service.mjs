@@ -376,7 +376,7 @@ async function getPropertyByID(id, userID) {
   }
 
   dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });
-  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus: RentApplicationStatus.PENDING, kinIdentityCheck: true });
+  dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus: RentApplicationStatus.PENDING, }); // kinIdentityCheck: true , removed this check because kin verification functionality no longer exists
 
   return {
     data: dataMerge,
@@ -517,7 +517,7 @@ async function getMyProperties(role, id, req) {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
                   { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
-                  { kinIdentityCheck: { $eq: true } }
+                  // { kinIdentityCheck: { $eq: true } }      // Commented this code because kin verification functionaliy no longer exists
                 ]
               }
             },
