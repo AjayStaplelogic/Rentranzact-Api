@@ -123,6 +123,7 @@ async function getCalenderTimeSlots(req, res) {
                             inspectionTime: "$inspectionTime",
                             id: "$id",
                             fullDay: "$fullDay",
+                            renter_id : "$RenterDetails.id"
                         }
                     },
                 }

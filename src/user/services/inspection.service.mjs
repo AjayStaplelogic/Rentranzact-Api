@@ -10,7 +10,7 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
 
 async function createInspection(body, renterID) {
-  const { propertyID, inspectionDate, inspectionTime, id } = body;
+  const { propertyID, inspectionDate, inspectionTime, id, _id } = body;
 
   const property = await Property.findById(propertyID);
   if (!property) {
@@ -58,57 +58,59 @@ async function createInspection(body, renterID) {
 
 
   payload.id = id;
-  const data = new Inspection(payload);
-  data.save();
+  if (!_id) {
+    const data = new Inspection(payload);
+    data.save();
 
-  let property_manger_details = await User.findById(property.property_manager_id);
-  if (landlordDetails) {
-    let notification_payload = {};
-    notification_payload.notificationHeading = "Inspection Update";
-    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
-    notification_payload.renterID = renterDetails._id;
-    notification_payload.landlordID = landlordDetails._id;
-    notification_payload.inspection_id = data._id;
-    notification_payload.propertyID = data.propertyID;
-    notification_payload.send_to = landlordDetails._id;
-    let create_notification = await Notification.create(notification_payload);
-    if (create_notification) {
-      if (landlordDetails && landlordDetails.fcmToken) {
-        const metadata = {
-          "propertyID": data.propertyID.toString(),
-          "redirectTo": "inspection",
-          "inspection_id": create_notification.inspection_id,
+    let property_manger_details = await User.findById(property.property_manager_id);
+    if (landlordDetails) {
+      let notification_payload = {};
+      notification_payload.notificationHeading = "Inspection Update";
+      notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
+      notification_payload.renterID = renterDetails._id;
+      notification_payload.landlordID = landlordDetails._id;
+      notification_payload.inspection_id = data._id;
+      notification_payload.propertyID = data.propertyID;
+      notification_payload.send_to = landlordDetails._id;
+      let create_notification = await Notification.create(notification_payload);
+      if (create_notification) {
+        if (landlordDetails && landlordDetails.fcmToken) {
+          const metadata = {
+            "propertyID": data.propertyID.toString(),
+            "redirectTo": "inspection",
+            "inspection_id": create_notification.inspection_id,
+          }
+          sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
         }
-        sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
       }
     }
-  }
 
-  if (property_manger_details) {
-    let notification_payload = {};
-    notification_payload.notificationHeading = "Inspection Update";
-    notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
-    notification_payload.renterID = renterDetails._id;
-    notification_payload.landlordID = landlordDetails?._id;
-    notification_payload.inspection_id = data._id;
-    notification_payload.propertyID = data.propertyID;
-    notification_payload.send_to = property_manger_details?._id;
-    notification_payload.property_manager_id = property_manger_details?._id;
-    let create_notification = await Notification.create(notification_payload);
-    if (create_notification) {
-      if (property_manger_details && property_manger_details.fcmToken) {
-        const metadata = {
-          "propertyID": data.propertyID.toString(),
-          "redirectTo": "inspection",
-          "inspection_id": create_notification.inspection_id,
+    if (property_manger_details) {
+      let notification_payload = {};
+      notification_payload.notificationHeading = "Inspection Update";
+      notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
+      notification_payload.renterID = renterDetails._id;
+      notification_payload.landlordID = landlordDetails?._id;
+      notification_payload.inspection_id = data._id;
+      notification_payload.propertyID = data.propertyID;
+      notification_payload.send_to = property_manger_details?._id;
+      notification_payload.property_manager_id = property_manger_details?._id;
+      let create_notification = await Notification.create(notification_payload);
+      if (create_notification) {
+        if (property_manger_details && property_manger_details.fcmToken) {
+          const metadata = {
+            "propertyID": data.propertyID.toString(),
+            "redirectTo": "inspection",
+            "inspection_id": create_notification.inspection_id,
+          }
+          sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
         }
-        sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
       }
     }
   }
 
   return {
-    data: data,
+    data: [],
     message: "successfully booked inspection",
     status: true,
     statusCode: 201
