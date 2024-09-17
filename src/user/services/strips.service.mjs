@@ -280,26 +280,41 @@ async function rechargeWallet(body) {
 
     const userDetail = await User.findById(userID);
 
-    let payload = {}
+    // let payload = {}
 
-    if (userDetail.role === UserRoles.RENTER) {
-
+    if (userDetail) {
         if (body.paymentMethod === "stripe") {
             const { amount, status, created, id } = body.data.object;
-            payload = {
-                amount,
-                status,
-                createdAt: created,
-                type: "CREDIT",
-                userID,
-                intentID: id
-            }
+            // payload = {
+            //     amount,
+            //     status,
+            //     createdAt: created,
+            //     type: "CREDIT",
+            //     userID,
+            //     intentID: id
+            // }
 
-            const data_ = new Transaction({ wallet: true, renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode: body.paymentMethod })
+            let transaction_payload = {
+                wallet: true,
+                amount: amount,
+                status: status,
+                date: created,
+                intentID: id,
+                type: "CREDIT",
+                payment_mode: body.paymentMethod
+            };
+
+            if (UserRoles.LANDLORD === userDetail?.role) {
+                transaction_payload.landlordID = userDetail._id;
+            } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
+                transaction_payload.pmID = userDetail._id;
+            } else if (UserRoles.RENTER === userDetail?.role) {
+                transaction_payload.renterID = userDetail._id;
+            }
+            const data_ = new Transaction(transaction_payload)
 
             data_.save()
             if (status === "succeeded") {
-
                 const data__ = await User.findByIdAndUpdate(
                     userID,
                     { $inc: { walletPoints: amount } },
@@ -317,16 +332,33 @@ async function rechargeWallet(body) {
             const created = moment(createdAt).unix();
             const id = body.data.id;
 
-            payload = {
-                amount,
-                status,
-                createdAt: created.toString(),
+            // payload = {
+            //     amount,
+            //     status,
+            //     createdAt: created.toString(),
+            //     type: "CREDIT",
+            //     userID,
+            //     intentID: id
+            // }
+
+            const transaction_payload = {
+                wallet: true,
+                amount: amount,
+                status: status,
+                date: created,
+                intentID: id,
                 type: "CREDIT",
-                userID,
-                intentID: id
+                payment_mode: body.paymentMethod
             }
 
-            const data_ = new Transaction({ wallet: true, renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode: body.paymentMethod })
+            if (UserRoles.LANDLORD === userDetail?.role) {
+                transaction_payload.landlordID = userDetail._id;
+            } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
+                transaction_payload.pmID = userDetail._id;
+            } else if (UserRoles.RENTER === userDetail?.role) {
+                transaction_payload.renterID = userDetail._id;
+            }
+            const data_ = new Transaction(transaction_payload)
 
             data_.save()
             if (status === "success") {
@@ -336,29 +368,9 @@ async function rechargeWallet(body) {
                     { $inc: { walletPoints: amount } },
                     { new: true }
                 );
-
             }
-
-
         }
-
-    } else if (userDetail.role === UserRoles.LANDLORD) {
-        // payload = {
-        //     amount,
-        //     status,
-        //     createdAt: created,
-        //     type: "CREDIT",
-        //     landlordID: userID,
-        //     intentID: id
-        // }
-
     }
-
-    // const data = new Wallet(payload)
-    // data.save()
-
-    // const data_ = new Transaction({ wallet: true, renterID: userID, amount: amount, status: status, date: created, intentID: id, type: "CREDIT", payment_mode: body.paymentMethod })
-    // data_.save()
 
     return {
 

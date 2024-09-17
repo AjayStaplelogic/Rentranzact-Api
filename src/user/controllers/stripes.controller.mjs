@@ -47,7 +47,7 @@ async function paystack(req, res) {
 
             if (wallet === "true") {
                 const data = await rechargeWallet(body);
-                return res.send(200);
+                return res.sendStatus(200);
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
             } else {
                 const { propertyID } = body.data.metadata;
@@ -56,17 +56,17 @@ async function paystack(req, res) {
                     console.log("payment count ===>", property.payment_count)
                     if (property.payment_count === 0) {
                         const data = await addStripeTransaction(body, renterApplicationID);
-                        return res.send(200);
+                        return res.sendStatus(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
                     } else {
                         const data = await addStripeTransactionForOld(body, renterApplicationID);
-                        return res.send(200);
+                        return res.sendStatus(200);
                         sendResponse(res, data.data, data.message, data.status, data.statusCode);
                     }
                 }
             }
 
-            return res.send(200);
+            return res.sendStatus(200);
             return {
                 status: 200
             }
