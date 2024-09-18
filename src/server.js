@@ -26,6 +26,8 @@ import userNewsLetterSubscription from "./user/routes/newlettersubscription.rout
 import userCardRoutes from "./user/routes/cards.route.mjs";
 import electricityRoutes from "./user/routes/electricity.route.mjs";
 import chatRoutes from "./user/routes/chat.route.mjs";
+import userContactUsRoutes from "./user/routes/contactus.route.mjs";
+
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -45,6 +47,7 @@ import adminTestimonialRoutes from "./admin/routes/testimonials.route.mjs";
 import adminFaqRoutes from "./admin/routes/faq.route.mjs";
 import adminSocialMediaIconRoutes from "./admin/routes/socialmediaicons.route.mjs";
 import adminBannerRoutes from "./admin/routes/banners.route.mjs";
+import adminContactUsRoutes from "./admin/routes/contactus.route.mjs"
 
 
 import { fileURLToPath } from "url";
@@ -115,6 +118,7 @@ app.use("/api", userNewsLetterSubscription)
 app.use("/api", userCardRoutes)
 app.use("/api" , electricityRoutes)
 app.use("/api" , chatRoutes)
+app.use("/api" , userContactUsRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
@@ -134,6 +138,8 @@ app.use("/api/admin", adminTestimonialRoutes)
 app.use("/api/admin", adminFaqRoutes)
 app.use("/api/admin", adminSocialMediaIconRoutes)
 app.use("/api/admin", adminBannerRoutes)
+app.use("/api/admin", adminContactUsRoutes)
+
 
 // Health check endpoint
 app.get("/api/health", async (req, res) => {
