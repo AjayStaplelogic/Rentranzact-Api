@@ -194,7 +194,6 @@ router.get("/terminate-property-manager/:id", authorizer([UserRoles.LANDLORD]), 
 router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]),
   upload.any(),
   (req, res) => {
-
     req.files.forEach(async (file) => {
       const thumbnailWidth = 89; // Set your desired thumbnail width
       const thumbnailHeight = 68; // Set your desired thumbnail height
