@@ -12,9 +12,7 @@ import assert from "assert";
 
 async function addRentApplicationService(body, user) {
   try {
-
     const renterID = user._id;
-
     const {
       propertyID,
       employmentStatus,
@@ -50,10 +48,7 @@ async function addRentApplicationService(body, user) {
       employerAddress
     } = body;
 
-
     const landlord = await Property.findById(propertyID);
-
-
     const payload = {
       propertyID: propertyID,
       employmentStatus,
@@ -112,21 +107,15 @@ async function addRentApplicationService(body, user) {
       preferredFloor: Number(body.preferredFloor) || 0
     };
 
-
-
     if (employmentStatus !== "unemployed") {
-
       payload["employerName"] = body.employerName
-
       payload["employerAddress"] = body.employerAddress
     }
-
 
     if (checkinDate && checkoutDate) {
       payload["checkinDate"] = checkinDate
       payload["checkoutDate"] = checkoutDate
     }
-
 
     const kinDetails = {
       first_name: kinFirstName,
@@ -314,7 +303,6 @@ async function addRentApplicationService(body, user) {
 }
 
 async function rentApplicationsList(user, req) {
-
   let { search, applicationStatus, sortBy, propertyID, kinIdentityCheck } = req.query;
   let page = Number(req.query.page || 1);
   let count = Number(req.query.count || 20);
@@ -604,7 +592,6 @@ async function rentApplicationsList(user, req) {
 
 }
 
-
 async function updateRentApplications(body, id) {
   const { status, rentApplicationID, reason } = body;
 
@@ -828,7 +815,6 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
   };
 }
 
-
 async function getRentApplicationByID(id) {
   try {
     console.log(`[Rent Application By Id]`)
@@ -877,7 +863,5 @@ async function getRentApplicationByID(id) {
     };
   }
 }
-
-
 
 export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID };

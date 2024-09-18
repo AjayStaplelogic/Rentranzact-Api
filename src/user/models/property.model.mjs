@@ -133,7 +133,7 @@ const propertySchema = new mongoose.Schema(
 
     servicesCharges: {
       type: Number,
-      required: true,
+      // required: true,
     },
     amenities: {
       type: Array,

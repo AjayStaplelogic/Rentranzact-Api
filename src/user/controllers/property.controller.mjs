@@ -435,7 +435,6 @@ async function teminatePM(req, res) {
 
 async function editProperty(req, res) {
   try {
-    // console.log(req.body, '=====req.body')
     const { id, email } = req.body;
     const role = req?.user?.data?.role;
     const user_id = req?.user?.data?._id;
@@ -444,14 +443,7 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
-    // console.log(req.files, '=======req.files')
-
     if (req.files && req.files.length > 0) {
-      // const images = req.files.filter((file) => file.mimetype.startsWith("image/"));
-      // const documents = req.files.filter((file) => file.mimetype === "application/pdf");
-      // console.log(images, '=======images')
-      // console.log(documents, '=======documents')
-
       req.body.images = req.body.images || [];
       req.body.documents = req.body.documents || [];
 
@@ -466,8 +458,6 @@ async function editProperty(req, res) {
 
     let landlord_id = role === UserRoles.LANDLORD ? user_id : null;
     let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? user_id : null;
-    // console.log(landlord_id, '===landlord_id')
-    // console.log(property_manager_id, '===property_manager_id')
 
     let name = "";
     if (email) {

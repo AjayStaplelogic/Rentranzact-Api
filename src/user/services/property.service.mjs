@@ -81,7 +81,7 @@ async function addPropertyService(
     communityType: body.communityType || "",
     landlord_id: landlord_id,
     property_manager_id: property_manager_id,
-    servicesCharges: Number(body.servicesCharges),
+    servicesCharges: Number(body.servicesCharges) || 0,
     amenities: arr,
     number_of_rooms: Number(body.number_of_rooms) || 0,
     postedByAdmin: body.postedByAdmin,
