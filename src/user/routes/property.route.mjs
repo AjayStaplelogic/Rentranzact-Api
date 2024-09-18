@@ -211,7 +211,11 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
       );
 
 
+      console.log(file, '=======file111')
+      console.log(file.mimetype.startsWith("image/"), '=======file.mimetype.startsWith("image/")111')
+
       if (file.mimetype.startsWith("image/")) {
+        console.log("Changes file memetppe")
 
         const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
         const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
