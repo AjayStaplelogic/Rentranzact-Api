@@ -220,6 +220,8 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
         const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
         const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
         req.images.push({ id: uuidv4(), url: relativePath, thumbnail: relativePath2 });
+        console.log(req.images, '=======req.images111')
+
         // Create and save the thumbnail
         await createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
       } else if (file.mimetype.startsWith("video/")) {

@@ -447,20 +447,20 @@ async function editProperty(req, res) {
     console.log(req.files, '=======req.files')
 
     if (req.files && req.files.length > 0) {
-      const images = req.files.filter((file) => file.mimetype.startsWith("image/"));
-      const documents = req.files.filter((file) => file.mimetype === "application/pdf");
+      // const images = req.files.filter((file) => file.mimetype.startsWith("image/"));
+      // const documents = req.files.filter((file) => file.mimetype === "application/pdf");
       console.log(images, '=======images')
       console.log(documents, '=======documents')
 
       req.body.images = req.body.images || [];
       req.body.documents = req.body.documents || [];
 
-      if (images && images.length) {
-        req.body.images = [...req.body.images, ...images];
+      if (req.images && req.images.length) {
+        req.body.images = [...req.body.images, ...req.images];
       }
 
-      if (documents && documents.length) {
-        req.body.documents = [...req.body.documents, ...documents];
+      if (req.documents && req.documents.length) {
+        req.body.documents = [...req.body.documents, ...req.documents];
       }
     }
 
