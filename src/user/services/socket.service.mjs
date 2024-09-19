@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
     socket.on("typing", async (data) => {
         console.log(`[Listener Event]-[typing]`);
         data.user_id = socket.user_id;
-        data.typing = true;
+        // data.typing = true;      // it will come from frontend
         socket.to(data.room_id).emit("typing", {
             status: true,
             statusCode: 200,
