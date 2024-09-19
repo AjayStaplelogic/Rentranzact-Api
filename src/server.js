@@ -64,7 +64,7 @@ admin.initializeApp({
 const app = express();
 
 app.use(express.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '50mb' }));
 
 // Parse JSON bodies (if applicable)
 app.use(bodyParser.json());
@@ -116,9 +116,9 @@ app.use("/api", uploadRoutes)
 app.use("/api", userBlogRoutes)
 app.use("/api", userNewsLetterSubscription)
 app.use("/api", userCardRoutes)
-app.use("/api" , electricityRoutes)
-app.use("/api" , chatRoutes)
-app.use("/api" , userContactUsRoutes)
+app.use("/api", electricityRoutes)
+app.use("/api", chatRoutes)
+app.use("/api", userContactUsRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
