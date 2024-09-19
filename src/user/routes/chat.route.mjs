@@ -2,9 +2,9 @@ import express from 'express';
 const router = express.Router();
 import * as chatController from "../controllers/chat.controller.mjs"
 
-router.post("/chat/room/join", chatController.joinChatRoom)
-router.get("/chat/rooms", chatController.getChatRooms)
-router.get("/chat/messages", chatController.getMessages)
-
+router.post("/chat/room/join", chatController.joinChatRoom);
+router.get("/chat/rooms", chatController.getChatRooms);
+router.get("/chat/messages", chatController.getMessages);
+router.get("/chat/contacts", chatController.getContacts);
 
 export default router

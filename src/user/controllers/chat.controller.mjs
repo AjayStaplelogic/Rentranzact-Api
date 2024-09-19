@@ -4,6 +4,9 @@ import ChatRooms from "../models/chatRooms.model.mjs";
 import Messages from "../models/messages.model.mjs";
 import * as ChatValidations from "../validations/chat.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
+import { User } from "../models/user.model.mjs"
+import { UserRoles } from "../enums/role.enums.mjs";
+import { Property } from "../models/property.model.mjs";
 const ObjectId = mongoose.Types.ObjectId;
 
 export const joinChatRoom = async (req, res) => {
@@ -228,6 +231,106 @@ export const getMessages = async (req, res) => {
 
         ]
         let get_messages = await Messages.aggregate(pipeline);
+        return sendResponse(res, get_messages, "success", true, 200);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const getContacts = async (req, res) => {
+    try {
+        // console.log("[Message Listing]")
+        let { room_id, search, sortBy, user_id } = req.query;
+        let page = Number(req.query.page || 1);
+        let count = Number(req.query.count || 20);
+        let query = {};
+        let query2 = {};
+        if (room_id) { query.room_id = new ObjectId(room_id) };
+        let skip = Number(page - 1) * count;
+        if (search) {
+            query2.$or = [
+                { fullName: { $regex: search, $options: 'i' } },
+            ]
+        }
+        let field = "createdAt";
+        let order = "desc";
+        let sort_query = {};
+        if (sortBy) {
+            field = sortBy.split(' ')[0];
+            order = sortBy.split(' ')[1];
+        }
+        sort_query[field] = order == "desc" ? -1 : 1;
+
+        query.role = { $in: Object.values(UserRoles) };
+        if (user_id) {
+            let get_user = await User.findById(user_id);
+            if (get_user) {
+                const user_query = {
+                    rented: true
+                }
+                let distinct_key = "";
+                if (get_user.role === UserRoles.LANDLORD) {
+                    user_query.landlord_id = get_user._id;
+                    distinct_key = "renterID";
+                } else if (get_user.role === UserRoles.PROPERTY_MANAGER) {
+                    user_query.property_manager_id = get_user._id;
+                    distinct_key = "renterID";
+                } else if (get_user.role === UserRoles.RENTER) {
+                    user_query.renterID = get_user._id;
+                    distinct_key = "landlord_id";
+                }
+                const user_ids = await Property.distinct(distinct_key, user_query);
+                console.log(user_ids, '====user_ids')
+                query._id = { $in: user_ids.map(item => new ObjectId(item)) }
+            } else {
+                query._id = { $exists: false }       // Just to handle if user id is wrong then not sending any user data
+            }
+        }
+        console.log(query, '========query')
+        let pipeline = [
+            {
+                $match: query
+            },
+            {
+                $project: {
+                    _id: "$_id",
+                    createdAt: "$createdAt",
+                    updatedAt: "$updatedAt",
+                    fullName: "$fullName",
+                    role: "$role",
+                }
+            },
+            {
+                $match: query2
+            },
+            {
+                $facet: {
+                    pagination: [
+                        {
+                            $count: "total"
+                        },
+                        {
+                            $addFields: {
+                                page: Number(page)
+                            }
+                        }
+                    ],
+                    data: [
+                        {
+                            $sort: sort_query
+                        },
+                        {
+                            $skip: Number(skip)
+                        },
+                        {
+                            $limit: Number(count)
+                        },
+                    ]
+                }
+            }
+
+        ]
+        let get_messages = await User.aggregate(pipeline);
         return sendResponse(res, get_messages, "success", true, 200);
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
