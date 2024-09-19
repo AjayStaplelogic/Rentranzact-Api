@@ -4,9 +4,8 @@ import { User } from "../models/user.model.mjs";
 import * as chatService from "../services/chat.service.mjs";
 
 const connected_users = [];
+const io = new Server();
 
-const io = new Server()
-// io.origins("*")
 io.use(async (socket, next) => {
     console.log(`[Socket Handshake]`)
     // console.log(socket.handshake)
@@ -75,6 +74,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on("join-room", async (data) => {
+        console.log(`[Listener Event]-[join-room]`);
         let room = await chatService.get_room_by_id(data.room_id);
         if (room) {
             let members = room?.room?.user_ids;
@@ -100,6 +100,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("join-private-room", async (data) => {
+        console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
             let members = room?.room?.user_ids;
@@ -125,18 +126,9 @@ io.on('connection', (socket) => {
     })
 
     socket.on("new-message", async (data) => {
-        // let reciever_sockets = [socket.id];
+        console.log(`[Listener Event]-[new-message]`);
         let message = await chatService.send_message(socket, data)
-        // if (!data.is_reciever_admin && data.reciever_id) {
-        //     let socket_ids = await chatService.get_user_socket_ids(connected_users, data.reciever_id);
-        //     // reciever_sockets = [...reciever_sockets, ...socket_ids];
-        // } else if (data.is_reciever_admin) {
-        //     let admin_socket_ids = await chatService.get_admin_socket_ids(connected_users);
-        //     // reciever_sockets = [...reciever_sockets, ...admin_socket_ids];
-        // }
-        // if (reciever_sockets.length > 0) {
         let get_room = await chatService.get_room_by_id(data.room_id);
-        // for (let socket_id of reciever_sockets) {     // sending to sender and reciever
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
@@ -148,51 +140,22 @@ io.on('connection', (socket) => {
             statusCode: 200,
             data: get_room
         });
-        // }
-        // }
     })
 
     socket.on("read-message", async (data) => {
-        console.log(`[Event]-[Read-Message]`)
+        console.log(`[Listener Event]-[read-message]`);
         let message = await chatService.read_message(socket, data);
         if (message) {
-            // let socket_ids = await chatService.get_user_socket_ids(connected_users, `${message.sender_id}`)
-            // if (socket_ids && socket_ids.length > 0) {
-            // for (let socket_id of socket_ids) {     // sending to sender
             socket.to(`${message.room_id}`).emit("read-message", {
                 status: true,
                 statusCode: 200,
                 data: message
             })
-            // }
-            // }
         }
     })
 
     socket.on("typing", async (data) => {
-        // let get_room = await ChatRooms.findById(data.room_id).lean().exec();
-        // if(get_room){
-        //     let members = get_room.user_ids.filter(member => member != socket.user_id);
-        //    console.log(members, '===members')
-        //     if(members && members.length > 0){
-        //         for (let member of members){
-        //             let socket_ids = await chatService.get_user_socket_ids(connected_users, member);
-        //             if(socket_ids && socket_ids.length > 0){
-        //                 for (let socket_id of socket_ids){
-        //                     data.user_id = member;
-        //                     data.typing = true;
-        //                     console.log(socket_id, "socketid");
-        //                     socket.to(socket_id).emit("typing", {
-        //                         status: true,
-        //                         statusCode: 200,
-        //                         data: data
-        //                     })
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
-
+        console.log(`[Listener Event]-[typing]`);
         data.user_id = socket.user_id;
         data.typing = true;
         socket.to(data.room_id).emit("typing", {
@@ -203,6 +166,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("delete-message", async (data) => {
+        console.log(`[Listener Event]-[delete-message]`);
         let delete_message = await chatService.delete_message(data.message_id);
         if (delete_message) {
             io.in(`${delete_message.room_id}`).emit("delete-message", {
@@ -227,6 +191,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on('user-offline', () => {
+        console.log(`[Listener Event]-[user-offline]`);
         console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
         io.emit("user-offline", {        // sending to all client about user logout/offline
@@ -241,10 +206,9 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
+        console.log(`[Listener Event]-[disconnected]`);
         console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
-        // console.log(connected_users, '====disconnected')
-
         io.emit("user-offline", {        // sending to all client about user logout/offline
             status: true,
             statusCode: 200,
@@ -255,8 +219,6 @@ io.on('connection', (socket) => {
             }
         })
     });
-
-
 })
 
 io.on("connection_error", (err) => {
