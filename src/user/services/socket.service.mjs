@@ -94,7 +94,8 @@ io.on('connection', (socket) => {
                     }
                 }
             }
-            console.log(room_id, '====room_id,', typeof(room_id))
+            console.log(room_id, '====room_id,', typeof (room_id))
+            console.log(socket.rooms, '======socket.rooms1111')
             io.in(room_id).emit("join-room", {        // sending to current user only
                 status: true,
                 statusCode: 200,
@@ -135,6 +136,7 @@ io.on('connection', (socket) => {
         let get_room = await chatService.get_room_by_id(data.room_id);
         console.log(message, '====message')
         console.log(get_room, '====get_room')
+        console.log(socket.rooms, '======socket.rooms')
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
