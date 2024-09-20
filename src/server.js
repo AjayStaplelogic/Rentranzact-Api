@@ -63,12 +63,12 @@ admin.initializeApp({
 
 const app = express();
 
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({limit: '100mb'}));
 // app.use(bodyParser.urlencoded({ extended: false, limit: '50mb', parameterLimit: 500000 }));
 
 // Parse JSON bodies (if applicable)
 // app.use(bodyParser.json({limit: '50mb'}));
-app.use(express.urlencoded({ limit: '10mb', extended: true }))
+app.use(express.urlencoded({ limit: '100mb', extended: true }))
 
 const corsOptions = {
   origin: "*", // Allows requests from any origin
