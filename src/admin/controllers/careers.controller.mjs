@@ -67,7 +67,7 @@ export const editCareer = async (req, res) => {
 
 export const getAllCareers = async (req, res) => {
     try {
-        let { search, sortBy } = req.query;
+        let { search, sortBy, skills, experience } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -86,6 +86,8 @@ export const getAllCareers = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
+        if (skills) { query.skills = skills };
+        if (experience) { query.experience = Number(experience); };
         let pipeline = [
             {
                 $match: query
