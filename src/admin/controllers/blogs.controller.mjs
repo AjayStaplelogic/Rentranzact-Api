@@ -85,9 +85,11 @@ export const editBlog = async (req, res) => {
 
 export const getAllBlogs = async (req, res) => {
     try {
-        let { search, status, sortBy, exclude_id } = req.query;
+        let { search, status, exclude_id } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
+        const sort_key = req.query.sort_key || "createdAt";
+        const sort_order = req.query.sort_order || "desc";
         let query = {};
         if (status) { query.status = status; };
 
@@ -97,14 +99,8 @@ export const getAllBlogs = async (req, res) => {
                 { title: { $regex: search, $options: 'i' } },
             ]
         }
-        let field = "createdAt";
-        let order = "desc";
         let sort_query = {};
-        if (sortBy) {
-            field = sortBy.split(' ')[0];
-            order = sortBy.split(' ')[1];
-        }
-        sort_query[field] = order == "desc" ? -1 : 1;
+        sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
         if (exclude_id) {
             query._id = { $ne: new ObjectId(exclude_id) }
