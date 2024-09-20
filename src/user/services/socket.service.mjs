@@ -76,8 +76,11 @@ io.on('connection', (socket) => {
     socket.on("join-room", async (data) => {
         console.log(`[Listener Event]-[join-room]`);
         let room = await chatService.get_room_by_id(data.room_id);
+        console.log(room, "====room")
         if (room) {
             let members = room?.room?.user_ids;
+            console.log(members, "====members")
+
             let room_id = `${room?.room?.id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
@@ -91,6 +94,7 @@ io.on('connection', (socket) => {
                     }
                 }
             }
+            console.log(room_id, '====room_id,', typeof(room_id))
             io.in(room_id).emit("join-room", {        // sending to current user only
                 status: true,
                 statusCode: 200,
