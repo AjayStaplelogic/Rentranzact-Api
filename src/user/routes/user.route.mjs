@@ -5,7 +5,8 @@ import {
     teriminateRenter,
     commisions,
     getUserDetails,
-    deleteUser
+    deleteUser,
+    switchRole
 } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
@@ -88,5 +89,7 @@ router.get("/commisions", authorizer([UserRoles.PROPERTY_MANAGER]), commisions)
 router.get("/user", authorizer([UserRoles.PROPERTY_MANAGER, UserRoles.LANDLORD, UserRoles.RENTER]), getUserDetails)
 
 router.get("/delete/user", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), deleteUser)
+
+router.post('/switch-role', authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), switchRole);
 
 export default router;
