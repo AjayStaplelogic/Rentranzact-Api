@@ -57,8 +57,7 @@ async function loginUser(body) {
         } else {
           if (user.status) {
 
-            await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken }).then((Res) => console.log(Res, "0000res")).catch((err) => console.log(err, "00000000err"))
-
+            await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken });
             const accessToken = await accessTokenGenerator(user);
             return {
               data: user,
