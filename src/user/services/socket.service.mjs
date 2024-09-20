@@ -75,14 +75,13 @@ io.on('connection', (socket) => {
 
     socket.on("join-room", async (data) => {
         console.log(`[Listener Event]-[join-room]`);
-        console.log(data, "====room data data")
         let room = await chatService.get_room_by_id(data.room_id);
         console.log(room, "====room")
         if (room) {
-            let members = room?.room?.user_ids;
+            let members = room?.user_ids;
             console.log(members, "====members")
 
-            let room_id = `${room?.room?.id}`
+            let room_id = `${room?.id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
@@ -99,7 +98,7 @@ io.on('connection', (socket) => {
             io.in(room_id).emit("join-room", {        // sending to current user only
                 status: true,
                 statusCode: 200,
-                data: room?.room ?? ""
+                data: room
             });
         }
     })
@@ -108,8 +107,8 @@ io.on('connection', (socket) => {
         console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
-            let members = room?.user_ids;
-            let room_id = `${room?.id}`
+            let members = room?.room?.user_ids;
+            let room_id = `${room?.room?.id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
