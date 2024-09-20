@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
 
     socket.on("join-room", async (data) => {
         console.log(`[Listener Event]-[join-room]`);
+        console.log(data, "====room data data")
         let room = await chatService.get_room_by_id(data.room_id);
         console.log(room, "====room")
         if (room) {
