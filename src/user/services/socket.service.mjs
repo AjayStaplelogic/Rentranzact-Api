@@ -75,6 +75,7 @@ io.on('connection', (socket) => {
 
     socket.on("join-room", async (data) => {
         console.log(`[Listener Event]-[join-room]`);
+        console.log(data, "====room data data")
         let room = await chatService.get_room_by_id(data.room_id);
         console.log(room, "====room")
         if (room) {
@@ -107,8 +108,8 @@ io.on('connection', (socket) => {
         console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
-            let members = room?.room?.user_ids;
-            let room_id = `${room?.room?.id}`
+            let members = room?.user_ids;
+            let room_id = `${room?.id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
