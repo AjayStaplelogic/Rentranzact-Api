@@ -107,8 +107,8 @@ io.on('connection', (socket) => {
         console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
-            let members = room?.room?.user_ids;
-            let room_id = `${room?.room?.id}`
+            let members = room?.user_ids;
+            let room_id = `${room?.id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
