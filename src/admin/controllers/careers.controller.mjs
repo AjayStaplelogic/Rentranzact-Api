@@ -116,7 +116,7 @@ export const getAllCareers = async (req, res) => {
                         {
                             $group: {
                                 _id: null,
-                                total_openings: { $sum: "$opening_count" }
+                                total_openings: { $sum: "$opening_count" },
                             }
                         }
                     ],
@@ -175,6 +175,29 @@ export const deleteCareerById = async (req, res) => {
         }
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const getCareerFiltersData = async (req, res) => {
+    try {
+        const pipeline = [
+            {
+                $group: {
+                    _id: null,
+                    skills: {
+                        $addToSet: "$skills"
+                    },
+                    experience: {
+                        $addToSet: "$experience"
+                    },
+                }
+            },
+        ]
+
+        const data = await Careers.aggregate(pipeline);
+        return sendResponse(res, data, "success", true, 200);
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
