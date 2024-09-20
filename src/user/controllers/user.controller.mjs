@@ -1,4 +1,4 @@
-import { userSignup, userLogin, userVerify, socialAuth } from "../validations/user.validation.mjs";
+import { userSignup, userLogin, userVerify, socialAuth, switchRoleValidation } from "../validations/user.validation.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
 import {
   loginUser,
@@ -24,8 +24,7 @@ import moment from 'moment';
 import * as bcrypt from "bcrypt";
 import { Property } from "../models/property.model.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs";
-
-
+import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 
 async function deleteUser(req, res) {
 
@@ -33,7 +32,7 @@ async function deleteUser(req, res) {
     const id = req.user.data._id;
     console.log(id, "===id")
     const data = User.findByIdAndUpdate(id, { deleted: true }).then((Res) => console.log(Res))
-    return sendResponse(res, {} , 'successfully deleted data', true , 200)
+    return sendResponse(res, {}, 'successfully deleted data', true, 200)
 
   } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 500);
@@ -71,6 +70,7 @@ async function signup(req, res) {
   if (isError) {
     sendResponse(res, [], errors, false, 403);
   } else {
+    body.initial_role = body.role;
     if (referralCode) {
       const validCode = await validateCode(referralCode);
       if (validCode) {
@@ -313,7 +313,7 @@ async function teriminateRenter(req, res) {
       rent_period_end: "",
       rent_period_start: "",
       renterID: "",
-      payment_count : 0
+      payment_count: 0
     })
 
     await Maintenance.deleteMany({ propertyID: propertyID });
@@ -407,4 +407,59 @@ const getUserDetails = async (req, res) => {
   }
 }
 
-export { deleteUser, teriminateRenter, deleteAggrement, wallet, login, signup, userVerification, socialLogin, myprofile, forgotPassword, favourites, uploadLeaseAggrement, getLeaseAggrements, userOtpVerification, resetPassword, editMyProfile, commisions, getUserDetails };
+async function switchRole(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, switchRoleValidation);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+    const user_id = req?.user?.data?._id;
+    let { role } = req.body;
+
+    if (role === req?.user?.data?.role) {
+      return sendResponse(res, {}, "You are already on same role", false, 404);
+    }
+
+    let update_user = await User.findByIdAndUpdate(user_id,
+      {
+        role: role
+      },
+      { new: true }
+    );
+
+    if (update_user) {
+      const accessToken = await accessTokenGenerator(update_user);
+      delete update_user.password;
+      delete update_user.otp;
+      return sendResponse(res, update_user, "Profile switched successfully", true, 200, accessToken);
+    }
+
+    return sendResponse(res, {}, "User not found", false, 404);
+  } catch (error) {
+    // console.log(error, '======errir')
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
+export {
+  deleteUser,
+  teriminateRenter,
+  deleteAggrement,
+  wallet,
+  login,
+  signup,
+  userVerification,
+  socialLogin,
+  myprofile,
+  forgotPassword,
+  favourites,
+  uploadLeaseAggrement,
+  getLeaseAggrements,
+  userOtpVerification,
+  resetPassword,
+  editMyProfile,
+  commisions,
+  getUserDetails,
+  switchRole
+};

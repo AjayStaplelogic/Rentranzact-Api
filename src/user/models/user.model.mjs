@@ -4,9 +4,9 @@ import mongoose from "mongoose";
 // Define the schema for the User model
 const userSchema = new mongoose.Schema(
   {
-    deleted : {
-     type : Boolean,
-     default: false
+    deleted: {
+      type: Boolean,
+      default: false
     },
 
     socialPlatform: {
@@ -63,51 +63,55 @@ const userSchema = new mongoose.Schema(
     },
 
     favorite: {
-      type : Array,
-      default : []
+      type: Array,
+      default: []
     },
-    fcmToken : {
-      type : String,
-      default : ""
+    fcmToken: {
+      type: String,
+      default: ""
     },
 
-    walletPoints :{
+    walletPoints: {
       type: Number,
-      default : 0
+      default: 0
     },
-    kinDetails : {
+    kinDetails: {
       type: Object
     },
-    age : {
-      type : Number,
-      required : false
+    age: {
+      type: Number,
+      required: false
     },
-    maritialStatus : {
-      type : String,
-      required : false
+    maritialStatus: {
+      type: String,
+      required: false
     },
-    permanentAddress : {
-      type : Object,
-      required : false
+    permanentAddress: {
+      type: Object,
+      required: false
     },
-    employmentDetails : {
-      type : Object,
-      required : false
+    employmentDetails: {
+      type: Object,
+      required: false
     },
-    customer_id : {
-      type : String,
+    customer_id: {
+      type: String,
     },
-    account_status : {
-      type : String,
-      enum : ["active", "suspended", "blacklisted"],
-      default : "active"
+    account_status: {
+      type: String,
+      enum: ["active", "suspended", "blacklisted"],
+      default: "active"
     },
-    suspendedAt : {
-      type : Date
+    suspendedAt: {
+      type: Date
     },
-    blacklistedAt : {
-      type : Date
-    }
+    blacklistedAt: {
+      type: Date
+    },
+    initial_role: {
+      type: String,
+      select: false,
+    },
 
   },
 

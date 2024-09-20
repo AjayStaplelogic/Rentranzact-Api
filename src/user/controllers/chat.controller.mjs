@@ -286,7 +286,7 @@ export const getContacts = async (req, res) => {
                 query._id = { $exists: false }       // Just to handle if user id is wrong then not sending any user data
             }
         }
-        console.log(query, '========query')
+        // console.log(query, '========query')
         let pipeline = [
             {
                 $match: query
@@ -298,6 +298,7 @@ export const getContacts = async (req, res) => {
                     updatedAt: "$updatedAt",
                     fullName: "$fullName",
                     role: "$role",
+                    picture: "$picture",
                 }
             },
             {
