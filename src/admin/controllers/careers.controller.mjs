@@ -112,6 +112,14 @@ export const getAllCareers = async (req, res) => {
                             }
                         }
                     ],
+                    total_openings: [
+                        {
+                            $group: {
+                                _id: null,
+                                total_openings: { $sum: "$opening_count" }
+                            }
+                        }
+                    ],
                     data: [
                         {
                             $sort: sort_query
