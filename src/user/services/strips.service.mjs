@@ -93,7 +93,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_start: created.toString(),
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -134,7 +135,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_start: created.toString(),
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -145,7 +147,7 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rentingEnd: timestampOneQuaterLater,
                 rentingStart: created.toString(),
                 propertyID: propertyID,
-                renterActive: true
+                renterActive: true,
             })
 
 
@@ -176,7 +178,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_start: created.toString(),
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
