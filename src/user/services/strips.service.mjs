@@ -377,6 +377,8 @@ async function rechargeWallet(body) {
         console.log("payload=----", payload, '====payload')
         if (Object.keys(payload) > 0) {
             let add_wallet = await Wallet.create(payload);
+            console.log("add_wallet=----", add_wallet, '====add_wallet')
+
         }
     }
 
