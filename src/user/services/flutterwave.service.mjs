@@ -228,7 +228,6 @@ async function addToWallet(body) {
 
                     let transaction_payload = {
                         wallet: true,
-                        renterID: userID,
                         amount: amount,
                         status: status,
                         date: created,
