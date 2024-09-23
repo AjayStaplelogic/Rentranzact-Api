@@ -142,7 +142,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_start: created,
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -175,7 +176,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_start: created,
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -213,7 +215,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneYearLater,
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
-                payment_count: newCount
+                payment_count: newCount,
+                lease_end_timestamp : lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
