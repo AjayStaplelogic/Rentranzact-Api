@@ -54,7 +54,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         amount = body.data.amount;
         status = body.data.status;
         created = moment(createdAt).unix();
-        id = body.data.object.id;
+        id = body?.data?.id;
 
     }
     console.log(notificationID, "xxxxxxxxxxxxxxxxxxxxxxxNotification ID")
@@ -94,7 +94,7 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -136,7 +136,7 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -179,7 +179,7 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
@@ -283,19 +283,19 @@ async function rechargeWallet(body) {
 
     const userDetail = await User.findById(userID);
 
-    // let payload = {}
+    let payload = {}
 
     if (userDetail) {
         if (body.paymentMethod === "stripe") {
             const { amount, status, created, id } = body.data.object;
-            // payload = {
-            //     amount,
-            //     status,
-            //     createdAt: created,
-            //     type: "CREDIT",
-            //     userID,
-            //     intentID: id
-            // }
+            payload = {
+                amount,
+                status,
+                createdAt: created,
+                type: "CREDIT",
+                userID,
+                intentID: id
+            }
 
             let transaction_payload = {
                 wallet: true,
@@ -333,16 +333,16 @@ async function rechargeWallet(body) {
             const status = body.data.status;
             const createdAt = body.data.paid_at;
             const created = moment(createdAt).unix();
-            const id = body.data.id;
+            const id = body?.data?.id;
 
-            // payload = {
-            //     amount,
-            //     status,
-            //     createdAt: created.toString(),
-            //     type: "CREDIT",
-            //     userID,
-            //     intentID: id
-            // }
+            payload = {
+                amount,
+                status,
+                createdAt: created.toString(),
+                type: "CREDIT",
+                userID,
+                intentID: id
+            }
 
             const transaction_payload = {
                 wallet: true,
@@ -372,6 +372,10 @@ async function rechargeWallet(body) {
                     { new: true }
                 );
             }
+        }
+
+        if (Object.keys(payload) > 0) {
+            let add_wallet = await Wallet.create(payload);
         }
     }
 
