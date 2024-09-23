@@ -107,6 +107,13 @@ async function createInspection(body, renterID) {
         }
       }
     }
+
+    return {
+      data: data,
+      message: "successfully booked inspection",
+      status: true,
+      statusCode: 201
+    };
   }
 
   return {
