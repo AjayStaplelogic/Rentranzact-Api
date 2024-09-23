@@ -7,6 +7,7 @@ import { User } from "../models/user.model.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -200,40 +201,58 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 }
 
 async function addToWallet(body) {
-    let { amount, status, createdAt, id } = body;
-    let { userID } = body.meta_data;
-    const created = moment(createdAt).unix();
-    if (status === "successful") {
-        let userDetail = await User.findById(userID);
-        if (userDetail) {
-            let payload = {
-                amount,
-                status,
-                createdAt: created,
-                type: "CREDIT",
-                userID,
-                intentID: id
-            }
+    try {
 
-            let add_wallet = await Wallet.create(payload);
-            if (add_wallet) {
-                let update_user = await User.findByIdAndUpdate(userID, {
-                    $inc: { walletPoints: amount }
-                });
 
-                let create_transaction = await Transaction.create({
-                    wallet: true,
-                    renterID: userID,
-                    amount: amount,
-                    status: status,
-                    date: created,
-                    intentID: id,
+        let { amount, status, createdAt, id } = body;
+        let { userID } = body.meta_data;
+        const created = moment(createdAt).unix();
+        if (status === "successful") {
+            let userDetail = await User.findById(userID);
+            if (userDetail) {
+                let payload = {
+                    amount,
+                    status,
+                    createdAt: created,
                     type: "CREDIT",
-                    payment_mode: "flutterwave"
-                });
+                    userID,
+                    intentID: id
+                }
+
+                let add_wallet = await Wallet.create(payload);
+                console.log(add_wallet, '===add_wallet')
+                if (add_wallet) {
+                    let update_user = await User.findByIdAndUpdate(userID, {
+                        $inc: { walletPoints: amount }
+                    });
+
+                    let transaction_payload = {
+                        wallet: true,
+                        renterID: userID,
+                        amount: amount,
+                        status: status,
+                        date: created,
+                        intentID: id,
+                        type: "CREDIT",
+                        payment_mode: "flutterwave"
+                    };
+
+                    if (userDetail.role === UserRoles.LANDLORD) {
+                        transaction_payload.landlordID = userDetail._id;
+                    } else if (userDetail.role === UserRoles.RENTER) {
+                        transaction_payload.renterID = userDetail._id;
+                    } else if (userDetail.role === UserRoles.PROPERTY_MANAGER) {
+                        transaction_payload.pmID = userDetail._id;
+                    }
+
+                    let create_transaction = await Transaction.create(transaction_payload);
+                }
             }
         }
+    } catch (error) {
+        console.log(error, '===Error Add TO Wallet Flutter Wave');
     }
+
 }
 
 async function addFlutterwaveTransactionForOld(body) {
