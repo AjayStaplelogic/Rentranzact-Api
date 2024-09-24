@@ -15,6 +15,7 @@ import {
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { constants } from "crypto";
 
 
 async function addProperty(req, res) {
@@ -161,8 +162,11 @@ async function leaveProperty(req, res) {
 async function getAllProperties(req, res) {
   try {
     let { category, type, min_availability, max_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy, user_id } = req.query;
-    let page = Number(req.query.page || 1);
-    let count = Number(req.query.count || 20);
+    const page = Number(req.query.page || 1);
+    const count = Number(req.query.count || 20);
+    const sort_key = req.query.sort_key || "createdAt";
+    const sort_order = req.query.sort_order || "desc";
+
     let query = {};
     let query2 = {};
     if (category) { query.category = { $in: category.split(",") } };
@@ -202,14 +206,9 @@ async function getAllProperties(req, res) {
         { propertyName: { $regex: search, $options: 'i' } },
       ]
     }
-    let field = "createdAt";
-    let order = "desc";
+
     let sort_query = {};
-    if (sortBy) {
-      field = sortBy.split(' ')[0];
-      order = sortBy.split(' ')[1];
-    }
-    sort_query[field] = order == "desc" ? -1 : 1;
+    sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
     let favorite_arr = [];
     if (user_id) {
       let get_user = await User.findById(user_id);
