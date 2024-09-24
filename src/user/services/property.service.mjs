@@ -173,8 +173,12 @@ async function searchInProperty(body) {
 
 async function filterProperies(body, id) {
   const { filters } = body;
+  const sort_key = body.sort_key || "createdAt";
+  const sort_order = body.sort_order || "desc";
+  let sort_query = {};
+  sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
-  const data = await Property.find(filters).sort({ createdAt: -1 })
+  const data = await Property.find(filters).sort(sort_query)
   let modifiedProperties = data;
   if (id) {
     const favorite = await User.findById(id).select("favorite")
@@ -206,6 +210,11 @@ async function filterProperies(body, id) {
 
 async function nearbyProperies(body, userID) {
   const { maxDistance, latitude, longitude } = body;
+  const sort_key = body.sort_key || "createdAt";
+  const sort_order = body.sort_order || "desc";
+  let sort_query = {};
+  sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
+
 
   if (maxDistance && latitude && longitude) {
     const data = await Property.find({
@@ -217,7 +226,7 @@ async function nearbyProperies(body, userID) {
           ],
         },
       },
-    });
+    }).sort(sort_query);
 
     let modifiedProperties = data;
     if (userID) {
@@ -526,7 +535,7 @@ async function getMyProperties(role, id, req) {
         }
       },
       {
-        $unset : ["landlordDetails"]
+        $unset: ["landlordDetails"]
       }
     ]);
 
