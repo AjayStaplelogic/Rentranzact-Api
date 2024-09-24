@@ -176,9 +176,9 @@ async function filterProperies(body, id) {
 
   const data = await Property.find(filters).sort({ createdAt: -1 })
   let modifiedProperties = data;
-  if(id){
+  if (id) {
     const favorite = await User.findById(id).select("favorite")
-    if(favorite){
+    if (favorite) {
       modifiedProperties = data?.map(property => {
         const liked = favorite?.favorite.includes(property._id);
         return { ...property.toObject(), liked };
@@ -486,10 +486,49 @@ async function getMyProperties(role, id, req) {
     query["property_manager_id"] = id;
   }
 
+  if (req?.user?.data?.role == UserRoles.RENTER) {
+    query["renterID"] = id;
+  }
+
   let data;
   if (role === UserRoles.RENTER) {
 
     data = await Property.find({ renterID: id });
+    data = await Property.aggregate([
+      {
+        $match: query
+      },
+      {
+        $set: {
+          landlord_id: {
+            $toObjectId: "$landlord_id"
+          }
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "landlord_id",
+          foreignField: "_id",
+          as: "landlordDetails",
+        }
+      },
+      {
+        $unwind: {
+          path: "$landlordDetails",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $addFields: {
+          landlord_name: "landlordDetails.fullName",
+          landlord_picture: "landlordDetails.picture",
+        }
+      },
+      {
+        $unset : ["landlordDetails"]
+      }
+    ]);
 
   } else if (role === UserRoles.LANDLORD) {
 
