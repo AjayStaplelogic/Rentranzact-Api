@@ -521,8 +521,8 @@ async function getMyProperties(role, id, req) {
       },
       {
         $addFields: {
-          landlord_name: "landlordDetails.fullName",
-          landlord_picture: "landlordDetails.picture",
+          landlord_name: "$landlordDetails.fullName",
+          landlord_picture: "$landlordDetails.picture",
         }
       },
       {
