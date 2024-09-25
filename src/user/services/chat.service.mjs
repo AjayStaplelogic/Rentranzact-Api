@@ -151,7 +151,7 @@ export const send_message = async (socket, data) => {
         data.is_sender_admin = false;
         data.sender_id = socket.user_id;
     }
-    data.reciever_id = await get_reciever_id_from_room(data.sender_id);
+    // data.reciever_id = await get_reciever_id_from_room(data.sender_id);
     let create_message = await Messages.create(data);
     if (create_message) {
         await update_room_last_message(create_message)
