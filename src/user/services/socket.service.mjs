@@ -132,6 +132,7 @@ io.on('connection', (socket) => {
 
     socket.on("new-message", async (data) => {
         console.log(`[Listener Event]-[new-message]`);
+        console.log(data, '====data new Message')
         let message = await chatService.send_message(socket, data)
         let get_room = await chatService.get_room_by_id(data.room_id);
         console.log(message, '====message')

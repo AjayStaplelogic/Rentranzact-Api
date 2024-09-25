@@ -132,6 +132,17 @@ export const get_room_by_id = async (id) => {
     return null;
 }
 
+export const get_reciever_id_from_room = async (room_id, sender_id) => {
+    const room = await ChatRooms.findById(room_id);
+    if (room) {
+        let user_id = room?.user_ids.filter(user => user != sender_id);
+        if (user_id?.length == 1) {
+            return user_id[0];
+        }
+    }
+    return null;
+}
+
 export const send_message = async (socket, data) => {
     if (socket.is_admin) {
         data.is_sender_admin = true;
@@ -140,6 +151,7 @@ export const send_message = async (socket, data) => {
         data.is_sender_admin = false;
         data.sender_id = socket.user_id;
     }
+    data.reciever_id = await get_reciever_id_from_room(data.sender_id);
     let create_message = await Messages.create(data);
     if (create_message) {
         await update_room_last_message(create_message)

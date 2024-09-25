@@ -192,7 +192,7 @@ export const getMessages = async (req, res) => {
             },
             {
                 $unwind: {
-                    path: "$user_details",
+                    path: "$sender_details",
                     preserveNullAndEmptyArrays: true
                 }
             },
