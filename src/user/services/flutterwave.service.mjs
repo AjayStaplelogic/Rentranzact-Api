@@ -428,6 +428,7 @@ async function addFlutterwaveTransactionForOld(body) {
         const data = new Transaction(changePayload)
         // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
         if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            console.log("Reached to Function scope")
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         data.save()
