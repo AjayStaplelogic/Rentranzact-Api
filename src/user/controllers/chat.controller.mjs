@@ -7,6 +7,8 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 import { User } from "../models/user.model.mjs"
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Property } from "../models/property.model.mjs";
+import * as chatService from "../services/chat.service.mjs";
+
 const ObjectId = mongoose.Types.ObjectId;
 
 export const joinChatRoom = async (req, res) => {
@@ -30,7 +32,8 @@ export const joinChatRoom = async (req, res) => {
 
         const room = await ChatRooms.findOne(query).lean().exec();
         if (room) {
-            return sendResponse(res, room, "success", true, 200);
+            const get_chat_rooms = await chatService.get_room_by_id(create_room._id)
+            return sendResponse(res, get_chat_rooms, "success", true, 200);
         }
 
         const payload = {
@@ -40,7 +43,8 @@ export const joinChatRoom = async (req, res) => {
 
         let create_room = await ChatRooms.create(payload)
         if (create_room) {
-            return sendResponse(res, create_room, "success", true, 200);
+            const get_chat_rooms = await chatService.get_room_by_id(create_room._id)
+            return sendResponse(res, get_chat_rooms, "success", true, 200);
         }
     } catch (error) {
         return sendResponse(res, null, error.message, false, 400)
@@ -182,34 +186,34 @@ export const getMessages = async (req, res) => {
             {
                 $match: query
             },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "sender_id",
-                    foreignField: "_id",
-                    as: "sender_details"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$sender_details",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "reciever_id",
-                    foreignField: "_id",
-                    as: "reciever_details"
-                }
-            },
-            {
-                $unwind: {
-                    path: "$reciever_details",
-                    preserveNullAndEmptyArrays: true
-                }
-            },
+            // {
+            //     $lookup: {
+            //         from: "users",
+            //         localField: "sender_id",
+            //         foreignField: "_id",
+            //         as: "sender_details"
+            //     }
+            // },
+            // {
+            //     $unwind: {
+            //         path: "$sender_details",
+            //         preserveNullAndEmptyArrays: true
+            //     }
+            // },
+            // {
+            //     $lookup: {
+            //         from: "users",
+            //         localField: "reciever_id",
+            //         foreignField: "_id",
+            //         as: "reciever_details"
+            //     }
+            // },
+            // {
+            //     $unwind: {
+            //         path: "$reciever_details",
+            //         preserveNullAndEmptyArrays: true
+            //     }
+            // },
             {
                 $project: {
                     createdAt: "$createdAt",
@@ -226,16 +230,16 @@ export const getMessages = async (req, res) => {
                     is_deleted: "$is_deleted",
                     read_at: "$read_at",
                     admin_id: "$admin_id",
-                    sender_details: {
-                        _id: "$sender_details._id",
-                        fullName: "$sender_details.fullName",
-                        picture: "$sender_details.picture"
-                    },
-                    reciever_details: {
-                        _id: "$reciever_details._id",
-                        fullName: "$reciever_details.fullName",
-                        picture: "$reciever_details.picture"
-                    }
+                    // sender_details: {
+                    //     _id: "$sender_details._id",
+                    //     fullName: "$sender_details.fullName",
+                    //     picture: "$sender_details.picture"
+                    // },
+                    // reciever_details: {
+                    //     _id: "$reciever_details._id",
+                    //     fullName: "$reciever_details.fullName",
+                    //     picture: "$reciever_details.picture"
+                    // }
                 }
             },
             {

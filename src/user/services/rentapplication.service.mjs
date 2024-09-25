@@ -104,7 +104,8 @@ async function addRentApplicationService(body, user) {
       businessType: body.businessType || "",
       totalEmployees: Number(body.totalEmployees) || 0,
       identitiy_doc: body.identitiy_doc || "",
-      preferredFloor: Number(body.preferredFloor) || 0
+      preferredFloor: Number(body.preferredFloor) || 0,
+      expectedStays: Number(body.expectedStays) || 0,
     };
 
     if (employmentStatus !== "unemployed") {
