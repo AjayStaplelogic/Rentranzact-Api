@@ -10,6 +10,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
+import * as commissionServices from "../services/commission.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -256,6 +257,10 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
+        // Adding commission for property manager
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+        }
         data.save()
         return {
 
@@ -617,10 +622,11 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
+    // Adding commission for property manager
+    if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+        await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+    }
     data.save()
-
-
-
 
     return {
 
