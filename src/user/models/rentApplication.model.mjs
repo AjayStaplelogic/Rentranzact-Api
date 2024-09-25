@@ -249,6 +249,10 @@ const rentApplicationSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    expectedStays: {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }
