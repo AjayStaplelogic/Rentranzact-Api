@@ -8,6 +8,7 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import * as commissionServices from "../services/commission.service.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -152,14 +153,16 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         let rent = Number(propertyDetails.rent);
         breakdown.rent = propertyDetails.rent;
         breakdown.service_charge = propertyDetails.servicesCharges;
-        breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+        breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;      // = agent_fee + rtz_fee or 10% of rent
         breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
         breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
         breakdown.insurance = 0;    // variable declaration for future use
+        // breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+        // breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
+
         breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
 
-
-        if (propertyDetails.property_manager_id) {
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
             breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
         }
 
@@ -187,7 +190,13 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
 
         const data = new Transaction(changePayload)
-        await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
+        await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED });
+
+        // Adding commission for property manager
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        }
+
         data.save()
     }
 
@@ -418,6 +427,9 @@ async function addFlutterwaveTransactionForOld(body) {
 
         const data = new Transaction(changePayload)
         // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        }
         data.save()
     }
 
