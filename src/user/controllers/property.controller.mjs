@@ -214,6 +214,11 @@ async function getAllProperties(req, res) {
       let get_user = await User.findById(user_id);
       if (get_user) {
         favorite_arr = get_user.favorite;
+
+        // If landlord or PM added property and switched his role to renter then don't show the properites to him that he added as landlord
+        if (get_user.role === UserRoles.RENTER) {
+          query.landlord_id = { $ne: `${get_user._id}` }
+        }
       }
     }
     let pipeline = [
@@ -325,15 +330,22 @@ async function getAllProperties(req, res) {
 async function getPropertyManagerList(req, res) {
   try {
 
+    const sort_key = req.query.sort_key || "createdAt";
+    const sort_order = req.query.sort_order || "desc";
+
+    const sort_query = {};
+    sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
     const landlordID = req.user.data._id;
 
     const data = await Property.aggregate([
       {
 
         $match: {
-          landlord_id: landlordID
+          landlord_id: landlordID,
+          property_manager_id: {   // Because some value in db are "" empty string and some are null
+            $nin: ["", null]
+          }
         }
-
       },
       {
         $group: {
@@ -346,7 +358,6 @@ async function getPropertyManagerList(req, res) {
           pm_id: { $toObjectId: "$_id" }
         }
       },
-
       {
         $lookup: {
           from: "users",
@@ -367,20 +378,15 @@ async function getPropertyManagerList(req, res) {
           id: "$pmInfo._id",
           email: "$pmInfo.email",
           name: "$pmInfo.fullName",
-          phone: {
-            $concat: [
-              "$pmInfo.countryCode",
-              " ",
-              "$pmInfo.phone"
-            ]
-          },
+          countryCode: "$pmInfo.countryCode",
+          phone: "$pmInfo.phone",
           pic: "$pmInfo.picture"
         }
+      },
+      {
+        $sort: sort_query
       }
-
-
     ])
-
 
     return sendResponse(res, data, `list of property managers`, true, 200);
   } catch (error) {
