@@ -214,6 +214,11 @@ async function getAllProperties(req, res) {
       let get_user = await User.findById(user_id);
       if (get_user) {
         favorite_arr = get_user.favorite;
+
+        // If landlord or PM added property and switched his role to renter then don't show the properites to him that he added as landlord
+        if (get_user.role === UserRoles.RENTER) {
+          query.landlord_id = { $ne: `${get_user._id}` }
+        }
       }
     }
     let pipeline = [
