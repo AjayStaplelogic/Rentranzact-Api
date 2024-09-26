@@ -32,7 +32,7 @@ export const joinChatRoom = async (req, res) => {
 
         const room = await ChatRooms.findOne(query).lean().exec();
         if (room) {
-            const get_chat_rooms = await chatService.get_room_by_id(create_room._id)
+            const get_chat_rooms = await chatService.get_room_by_id(room._id)
             return sendResponse(res, get_chat_rooms, "success", true, 200);
         }
 
