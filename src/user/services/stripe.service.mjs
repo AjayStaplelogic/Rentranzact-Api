@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Cards from "../models/cards.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs"
+import * as commissionServices from "../services/commission.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -126,7 +127,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
         } else if (propertyDetails.category === "short stay") {
             lease_end_timestamp = moment.unix(created).add(1, "months").unix();
         }
-
+3
         let newCount = propertyDetails.payment_count + 1;
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
@@ -143,11 +144,11 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -177,11 +178,11 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -216,11 +217,11 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
-                lease_end_timestamp : lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -253,7 +254,6 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
         breakdown.insurance = 0;    // variable declaration for future use
         breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
 
-
         if (propertyDetails.property_manager_id) {
             breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
         }
@@ -281,6 +281,10 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
 
         data.save()
 
+        // Adding commission for property manager
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        }
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
     }
@@ -317,7 +321,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -348,7 +352,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
@@ -378,7 +382,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             const addRenterHistory = new RentingHistory({
-                pmID : propertyDetails.property_manager_id,
+                pmID: propertyDetails.property_manager_id,
                 renterID: userID,
                 landlordID: propertyDetails.landlord_id,
                 rentingType: propertyDetails.rentType,
