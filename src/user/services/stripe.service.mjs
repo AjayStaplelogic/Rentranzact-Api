@@ -439,6 +439,9 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
         })
 
         // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
+        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        }
         data.save()
 
     }
