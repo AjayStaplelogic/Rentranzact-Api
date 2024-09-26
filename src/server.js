@@ -27,6 +27,7 @@ import userCardRoutes from "./user/routes/cards.route.mjs";
 import electricityRoutes from "./user/routes/electricity.route.mjs";
 import chatRoutes from "./user/routes/chat.route.mjs";
 import userContactUsRoutes from "./user/routes/contactus.route.mjs";
+import userCommissionRoutes from "./user/routes/commissions.route.mjs";
 
 
 //admin imports
@@ -120,6 +121,7 @@ app.use("/api", userCardRoutes)
 app.use("/api", electricityRoutes)
 app.use("/api", chatRoutes)
 app.use("/api", userContactUsRoutes)
+app.use("/api", userCommissionRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
