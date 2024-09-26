@@ -12,7 +12,7 @@ import Commissions from "../models/commissions.model.mjs"
 export const rentCommissionToPM = async (propertyObj = null, property_id = null, rent = 0) => {
     try {
         console.log("Inside Rent Commission Function")
-        console.log(propertyDetails, '====propertyDetails')
+        // console.log(propertyDetails, '====propertyDetails')
 
         if ((!propertyObj || propertyObj._id) && property_id) {     // IF proprty details not comming then fetching it from id
             propertyObj = await Property.findById(property_id);
@@ -20,25 +20,25 @@ export const rentCommissionToPM = async (propertyObj = null, property_id = null,
 
         if (propertyObj && Number(rent) > 0) {
             rent = Number(rent);
-            if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {
+            if (propertyObj.property_manager_id && propertyObj.landlord_id) {
                 const commission = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
                 const pm_commission = {
                     type: ECommissionType.rent,
-                    from: propertyDetails.landlord_id,
-                    to: propertyDetails.property_manager_id,
-                    property_id: propertyDetails._id,
-                    property_name: propertyDetails?.propertyName ?? "",
-                    property_address: propertyDetails ? address?.addressText : "",
-                    property_images: propertyDetails?.images ?? [],
+                    from: propertyObj.landlord_id,
+                    to: propertyObj.property_manager_id,
+                    property_id: propertyObj._id,
+                    property_name: propertyObj?.propertyName ?? "",
+                    property_address: propertyObj ? address?.addressText : "",
+                    property_images: propertyObj?.images ?? [],
                     rent: rent,
                     commission: commission,
                     commission_per: RentBreakDownPer.AGENT_FEE_PERCENT
                 };
 
-                if (propertyDetails?.address?.coordinates?.length > 1) {
+                if (propertyObj?.address?.coordinates?.length > 1) {
                     pm_commission.property_location = {
-                        type: propertyDetails?.address?.type ?? "Point",
-                        coordinates: propertyDetails?.address?.coordinates ?? []
+                        type: propertyObj?.address?.type ?? "Point",
+                        coordinates: propertyObj?.address?.coordinates ?? []
                     }
                 }
 
