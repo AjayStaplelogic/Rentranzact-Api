@@ -11,7 +11,7 @@ router.post('/electricity' , test )
 
 async function test(req, res) {
 
-    console.log(req, "=========request")
+    console.log(req.body, "=========request")
 
     res.status(200).json({});
 }
