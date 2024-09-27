@@ -844,7 +844,8 @@ async function getRentApplicationByID(id) {
           propertyName: 1,
           images: 1,
           address: 1,
-          type : 1
+          type : 1,
+          category : 1
         });
       }
     }
