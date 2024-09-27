@@ -412,7 +412,7 @@ async function getPropertyListByPmID(req, res) {
 
   try {
     const id = req.params.id;
-    const data = await Property.find({ property_manager_id: id }).select('propertyName images address.addressText rent rentType ')
+    const data = await Property.find({ property_manager_id: id }).select('propertyName images address.addressText rent rentType avg_rating total_reviews rent_period_end rent_period_start lease_end_timestamp')
 
     return sendResponse(res, data, `property list for property manager`, true, 200);
 
