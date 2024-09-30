@@ -64,7 +64,7 @@ async function addRentApplicationService(body, user) {
       kinEmail,
       relationshipKin,
       name,
-      no_of_occupant: no_of_occupant,
+      no_of_occupant: Number(no_of_occupant) || 0,
       checkinDate,
       emailID,
       contactNumber,

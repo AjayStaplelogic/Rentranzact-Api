@@ -80,7 +80,7 @@ const rentApplicationSchema = new mongoose.Schema(
 
     no_of_occupant: {
       type: Number,
-      required: true,
+      // required: true,
     },
 
     checkinDate: {

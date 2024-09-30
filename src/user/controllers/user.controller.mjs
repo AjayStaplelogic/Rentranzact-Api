@@ -312,7 +312,7 @@ async function teriminateRenter(req, res) {
       rented: false,
       rent_period_end: "",
       rent_period_start: "",
-      renterID: "",
+      renterID: null,
       payment_count: 0
     })
 
