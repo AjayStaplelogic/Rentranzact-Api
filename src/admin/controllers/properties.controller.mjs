@@ -126,7 +126,7 @@ async function getAllPropertyList(req, res) {
       {
         $set: {
           landlord_id: { $toObjectId: "$landlord_id" },
-          property_manager_id: { $toObjectId: "$property_manager_id" },
+          // property_manager_id: { $toObjectId: "$property_manager_id" },
         }
       },
       {
