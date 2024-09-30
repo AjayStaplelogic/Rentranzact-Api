@@ -427,7 +427,7 @@ async function teminatePM(req, res) {
 
     const id = req.params.id;
 
-    const data = await Property.findByIdAndUpdate(id, { property_manager_id: "" })
+    const data = await Property.findByIdAndUpdate(id, { property_manager_id: null })
 
     return sendResponse(res, data, `teminated property manager successfully`, true, 200);
 
@@ -499,7 +499,7 @@ async function editProperty(req, res) {
     }
 
     req.body.landlord_id = landlord_id;
-    req.body.property_manager_id = property_manager_id;
+    req.body.property_manager_id = property_manager_id ?? null;
     req.body.name = name;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
