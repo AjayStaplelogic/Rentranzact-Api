@@ -1,6 +1,8 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getPropertiesList, getPropertyByID, deletePropertyByID, leaseAggrementsList } from "../services/properties.service.mjs";
 import { Property } from "../../user/models/property.model.mjs"
+import { User } from "../../user/models/user.model.mjs"
+import { UserRoles } from "../../user/enums/role.enums.mjs";
 
 async function properties(req, res) {
 
@@ -87,7 +89,7 @@ async function updateProperty(req, res) {
 async function getAllPropertyList(req, res) {
   try {
     console.log(`[Admin Property List]`)
-    let { category, type, latitude, longitude, radius, search, city, sortBy, rented } = req.query;
+    let { category, type, latitude, longitude, radius, search, city, sortBy, rented, inDemand } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
@@ -100,6 +102,10 @@ async function getAllPropertyList(req, res) {
 
     if (rented) {
       query["rented"] = rented === "true" ? true : false;
+    }
+
+    if (inDemand) {
+      query["inDemand"] = inDemand === "true" ? true : false;
     }
 
     if (city) { query.city = city; };
@@ -241,6 +247,86 @@ async function getAllPropertyList(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
+async function editProperty(req, res) {
+  try {
+    const { id, email } = req.body;
+    // const role = req?.user?.data?.role;
+    // const user_id = req?.user?.data?._id;
+
+    if (!id) {
+      return sendResponse(res, {}, 'id is required', false, 400);
+    }
+
+    if (req.files && req.files.length > 0) {
+      req.body.images = req.body.images || [];
+      req.body.documents = req.body.documents || [];
+
+      if (req.images && req.images.length) {
+        req.body.images = [...req.body.images, ...req.images];
+      }
+
+      if (req.documents && req.documents.length) {
+        req.body.documents = [...req.body.documents, ...req.documents];
+      }
+    }
+
+    // let landlord_id = role === UserRoles.LANDLORD ? user_id : null;
+    // let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? user_id : null;
+
+    // let name = "";
+    // if (email) {
+    //   let user = await User.findOne({
+    //     email: email.toLowerCase().trim(),
+    //     deleted: false,
+    //     role: {
+    //       $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
+    //     },
+    //   }).lean().exec();
+    //   if (user) {
+    //     name = user.fullName;
+    //     if (user.role === UserRoles.LANDLORD) {
+    //       landlord_id = user._id;
+    //     } else if (user.role === UserRoles.PROPERTY_MANAGER) {
+    //       property_manager_id = user._id;
+    //     }
+    //   } else {
+    //     return {
+    //       data: [],
+    //       message: "email of property manager or landlord is not valid",
+    //       status: false,
+    //       statusCode: 403,
+    //     };
+    //   }
+    // }
+
+    if (req.body.address) {
+      req.body.address = JSON.parse(req.body.address);
+    }
+
+    if (req.body.amenities) {
+      req.body.amenities = JSON.parse(req.body.amenities);
+    }
+
+    // req.body.landlord_id = landlord_id;
+    // req.body.property_manager_id = property_manager_id ?? null;
+    // req.body.name = name;
+
+    // Remove unnecessary fields before saving to database, admin cannot edit these details
+    delete req.body.landlord_id;
+    delete req.body.property_manager_id;
+    delete req.body.name;
+    const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
+    if (property) {
+      return sendResponse(res, property, 'property updated successfully', true, 200);
+    }
+    return sendResponse(res, null, "Invalid Id", false, 400);
+
+
+  } catch (error) {
+    console.log(error, '=====error')
+    return sendResponse(res, [], error.message, false, 400)
+  }
+}
 
 export {
   properties,
@@ -248,5 +334,6 @@ export {
   deleteProperty,
   leaseAggrements,
   updateProperty,
-  getAllPropertyList
+  getAllPropertyList,
+  editProperty
 }
