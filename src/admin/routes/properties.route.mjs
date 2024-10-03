@@ -7,7 +7,8 @@ import {
     leaseAggrements,
     updateProperty,
     getAllPropertyList,
-    editProperty
+    editProperty,
+    updatePropertyApprovalStatus
 } from "../controllers/properties.controller.mjs"
 import { generateRandomFileName } from "../../user/helpers/randomNameGenerator.mjs";
 import multer from "multer";
@@ -140,6 +141,8 @@ router.put("/property/edit",
     },
 )
 
+
+router.put("/property/approval-status", updatePropertyApprovalStatus);
 
 
 
