@@ -2,7 +2,11 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getPropertiesList, getPropertyByID, deletePropertyByID, leaseAggrementsList } from "../services/properties.service.mjs";
 import { Property } from "../../user/models/property.model.mjs"
 import { User } from "../../user/models/user.model.mjs"
-import { UserRoles } from "../../user/enums/role.enums.mjs";
+import * as propertyValidation from "../validations/property.validation.mjs"
+import { validator } from "../../user/helpers/schema-validator.mjs";
+import { ApprovalStatus } from "../../user/enums/property.enums.mjs"
+import { Notification } from "../../user/models/notification.model.mjs";
+import sendNotification from "../../user/helpers/sendNotification.mjs";
 
 async function properties(req, res) {
 
@@ -251,6 +255,7 @@ async function getAllPropertyList(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
+
 async function editProperty(req, res) {
   try {
     const { id, email } = req.body;
@@ -332,6 +337,67 @@ async function editProperty(req, res) {
   }
 }
 
+async function updatePropertyApprovalStatus(req, res) {
+  try {
+
+    const { isError, errors } = validator(req.body, propertyValidation.updatePropertyApprovalStatus);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+
+    const { id, status } = req.body;
+
+    if (!id || !status) {
+      return sendResponse(res, {}, 'id and status are required', false, 400);
+    }
+
+    const property = await Property.findById(id);
+    if (property) {
+      if (property.approval_status === status) {
+        return sendResponse(res, {}, 'New status is same as current status', false, 403);
+      }
+
+      if (property.approval_status === ApprovalStatus.REJECTED && status === ApprovalStatus.APPROVED) {
+        return sendResponse(res, {}, 'Cannot approve rejected property', false, 403);
+      }
+
+      const update_property = await Property.findByIdAndUpdate(id, { approval_status: status }, { new: true });
+      if (update_property) {
+
+        // Send notification to landlord
+        const notification_payload = {};
+        notification_payload.notificationHeading = "Approval Status Updated";
+        notification_payload.notificationBody = `Rentranzact has reviewed your property and your current status is ${update_property?.approval_status}`;
+        notification_payload.landlordID = property?.landlord_id ?? null;
+        notification_payload.propertyID = property._id;
+        notification_payload.property_manager_id = property?.property_manager_id ?? null;
+        if (property?.landlord_id) {
+          notification_payload.send_to = property?.landlord_id;
+        } else if (property?.property_manager_id) {
+          notification_payload.send_to = property?.property_manager_id;
+        }
+        const get_send_to_details = await User.findById(notification_payload?.send_to);
+        const create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (get_send_to_details && get_send_to_details.fcmToken) {
+            const metadata = {
+              "propertyID": update_property._id.toString(),
+              "redirectTo": "property",
+            }
+            sendNotification(get_send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, get_send_to_details.role)
+          }
+        }
+        return sendResponse(res, {}, 'property status updated successfully', true, 200);
+      }
+    }
+    return sendResponse(res, null, "Invalid Id", false, 400);
+  } catch (error) {
+    console.log(error, '===error')
+    return sendResponse(res, [], error.message, false, 400)
+
+  }
+}
 export {
   properties,
   property,
@@ -339,5 +405,6 @@ export {
   leaseAggrements,
   updateProperty,
   getAllPropertyList,
-  editProperty
+  editProperty,
+  updatePropertyApprovalStatus
 }

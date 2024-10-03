@@ -4,11 +4,11 @@ const notificationSchema = new mongoose.Schema(
     {
         propertyID: {
             type: String,
-            required: true
+            // required: true
         },
         renterID: {
             type: String,
-            required: true
+            // required: true
         },
         notificationHeading: {
             type: String,
