@@ -3,7 +3,7 @@ import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { Inspection } from "../models/inspection.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
-import { RentBreakDownPer } from "../enums/property.enums.mjs"
+import { ApprovalStatus, RentBreakDownPer } from "../enums/property.enums.mjs"
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { getAdmins } from "../services/user.service.mjs"
@@ -146,7 +146,7 @@ async function addPropertyService(
 }
 
 async function searchInProperty(body) {
-  let { longitude, latitude, type, budget, maxDistance } = body;
+  let { longitude, latitude, type, budget, maxDistance, approval_status } = body;
 
   if (!longitude || !latitude) {
     return "Longitude and latitude are required";
@@ -181,6 +181,10 @@ async function searchInProperty(body) {
       query.type = type;
     }
 
+    if (approval_status) {
+      query.approval_status = { $in: approval_status.split(",") };
+    }
+
     const properties = await Property.find(query);
 
     return {
@@ -196,12 +200,15 @@ async function searchInProperty(body) {
 }
 
 async function filterProperies(body, id) {
-  const { filters } = body;
+  const { filters, approval_status } = body;
   const sort_key = body.sort_key || "createdAt";
   const sort_order = body.sort_order || "desc";
   let sort_query = {};
   sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
+  if (approval_status) {
+    filters.approval_status = { $in: approval_status.split(",") };
+  }
   const data = await Property.find(filters).sort(sort_query)
   let modifiedProperties = data;
   if (id) {
@@ -233,7 +240,7 @@ async function filterProperies(body, id) {
 }
 
 async function nearbyProperies(body, userID) {
-  const { maxDistance, latitude, longitude } = body;
+  const { maxDistance, latitude, longitude, approval_status } = body;
   const sort_key = body.sort_key || "createdAt";
   const sort_order = body.sort_order || "desc";
   let sort_query = {};
@@ -250,6 +257,7 @@ async function nearbyProperies(body, userID) {
           ],
         },
       },
+      approval_status: { $in: approval_status?.split(",") ?? [ApprovalStatus.ACCEPTED] }
     }).sort(sort_query);
 
     let modifiedProperties = data;
@@ -272,8 +280,10 @@ async function nearbyProperies(body, userID) {
       statusCode: 200,
     };
   } else {
-
-    const data = await Property.find().limit(9);
+    console.log("HERE")
+    const data = await Property.find({
+      approval_status: { $in: approval_status?.split(",") ?? [ApprovalStatus.ACCEPTED] }
+    }).limit(9);
     let modifiedProperties = data
     if (userID) {
       const favorite = await User.findById(userID).select("favorite")
@@ -734,7 +744,6 @@ async function getMyProperties(role, id, req) {
   };
 
 }
-
 
 async function leavePropertyService(userID, propertyID) {
 

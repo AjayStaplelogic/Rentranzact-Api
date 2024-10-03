@@ -79,7 +79,7 @@ async function propertiesList(req, res) {
 
   // const id = req.user.data._id;
 
-  const { nearByProperty, userID } = body;
+  const { nearByProperty, userID, } = body;
 
   if (nearByProperty) {
 
@@ -161,7 +161,25 @@ async function leaveProperty(req, res) {
 
 async function getAllProperties(req, res) {
   try {
-    let { category, type, min_availability, max_availability, min_rent, max_rent, min_rooms, max_rooms, latitude, longitude, radius, search, furnishingType, communityType, city, sortBy, user_id } = req.query;
+    let {
+      category,
+      type,
+      min_availability,
+      max_availability,
+      min_rent,
+      max_rent,
+      min_rooms,
+      max_rooms,
+      latitude,
+      longitude,
+      radius,
+      search,
+      furnishingType,
+      communityType,
+      city,
+      user_id,
+      approval_status,
+    } = req.query;
     const page = Number(req.query.page || 1);
     const count = Number(req.query.count || 20);
     const sort_key = req.query.sort_key || "createdAt";
@@ -220,6 +238,10 @@ async function getAllProperties(req, res) {
           query.landlord_id = { $ne: `${get_user._id}` }
         }
       }
+    }
+
+    if (approval_status) {
+      query.approval_status = { $in: approval_status.split(",") };
     }
     let pipeline = [
       {
