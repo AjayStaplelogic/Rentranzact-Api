@@ -12,7 +12,7 @@ import { Admin } from "../models/admin.model.mjs";
 
 
 async function loginAdmin(body) {
-  const { email, password } = body;
+  const { email, password, fcmToken } = body;
 
   const admin = await Admin.findOne({ email: email });
 
@@ -65,9 +65,17 @@ async function loginAdmin(body) {
         ]);
 
 
-        
+
 
         const accessToken = await accessTokenGenerator(admin);
+       
+        // If fcm token found in req then updating it in current document to send FCM notifications
+        if (fcmToken) {
+          await Admin.findByIdAndUpdate(admin._id, {
+            fcmToken: fcmToken
+          })
+        }
+        
         if (admin.role === "superAdmin") {
           return {
             data: admin,

@@ -7,7 +7,7 @@ const adminSchema = new mongoose.Schema(
       type: String,
       required: true,
       lowercase: true,
-      trime : true
+      trim: true
     },
     password: {
       type: String,
@@ -51,9 +51,13 @@ const adminSchema = new mongoose.Schema(
       type: String,
       enum: ["male", "female"],
     },
-    joining_date : {
-      type : Date
-    }
+    joining_date: {
+      type: Date
+    },
+    fcmToken: {
+      type: String,
+      default: ""
+    },
   },
   { timestamps: true }
 );
