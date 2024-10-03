@@ -120,7 +120,7 @@ async function addPropertyService(
         if (create_notification) {
           if (admin && admin.fcmToken) {
             const metadata = {
-              "propertyID": data.propertyID.toString(),
+              "propertyID": property._id.toString(),
               "redirectTo": "property",
             }
             sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
