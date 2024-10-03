@@ -22,19 +22,21 @@ const MessageSchema = new Schema({
     },
     media: [{
         type: String,
+        content: String,
+        url: String,
     }],
     reciever_id: {
         type: mongoose.Types.ObjectId,
         ref: 'users',
         index: true
     },
-    is_sender_admin : {
-        type : Boolean,
-        default : false
+    is_sender_admin: {
+        type: Boolean,
+        default: false
     },
-    is_reciever_admin : {
-        type : Boolean,
-        default : false
+    is_reciever_admin: {
+        type: Boolean,
+        default: false
     },
     is_read: {
         type: Boolean,
@@ -44,7 +46,7 @@ const MessageSchema = new Schema({
         type: Boolean,
         default: false
     },
-    read_at : {
+    read_at: {
         type: Date
     },
     admin_id: {

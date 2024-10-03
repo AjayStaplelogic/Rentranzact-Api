@@ -95,7 +95,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -137,7 +138,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -180,7 +182,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -473,7 +476,13 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         console.log(newCount, "------------> newCount");
 
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, rent_period_due: timestampOneMonthLater, payment_count: newCount })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, {
+            rented: true,
+            renterID: userID,
+            rent_period_due: timestampOneMonthLater,
+            payment_count: newCount,
+            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+        })
 
         console.log(updateProperty, "---------------> updateProperty")
 
@@ -506,7 +515,13 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         let newCount = propertyDetails.payment_count + 1;
 
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count: newCount, rent_period_due: timestampOneQuaterLater })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, {
+            rented: true,
+            renterID: userID,
+            payment_count: newCount,
+            rent_period_due: timestampOneQuaterLater,
+            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+        })
 
         console.log(updateProperty, "======updarteeeee")
         const addRenterHistory = new RentingHistory({
@@ -545,7 +560,13 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         console.log(timestampOneYearLater, "-----timestampOneYearLater")
 
-        const updateProperty = await Property.findByIdAndUpdate(propertyID, { rented: true, renterID: userID, payment_count: newCount, rent_period_due: timestampOneYearLater })
+        const updateProperty = await Property.findByIdAndUpdate(propertyID, {
+            rented: true,
+            renterID: userID,
+            payment_count: newCount,
+            rent_period_due: timestampOneYearLater,
+            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+        })
 
         console.log(updateProperty, "======updarteeeee Yearly")
         const addRenterHistory = new RentingHistory({

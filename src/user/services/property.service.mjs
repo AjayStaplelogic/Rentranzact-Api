@@ -221,22 +221,12 @@ async function filterProperies(body, id) {
     }
   }
 
-
   return {
     data: modifiedProperties,
     message: "Search Results",
     status: true,
     statusCode: 200,
   };
-
-  // const jobs = await MongoPaging.find(this.db.models.Jobs, {
-  //   query: filters,
-  //   limit: payload.limit,
-  //   paginatedField: payload.paginatedField,
-  //   sortAscending: payload.sortAscending,
-  //   next: payload.next,
-  //   previous: payload.previous,
-  // });
 }
 
 async function nearbyProperies(body, userID) {
