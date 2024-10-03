@@ -13,9 +13,17 @@ ADMIN_JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_prod_admin
 
 
 //sendgrid credentials
-  USERNAME = apikey
-  PASSWORD = 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
-  SMTP = smtp.sendgrid.net
+  // USERNAME = apikey
+  // PASSWORD = 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
+  // SMTP = smtp.sendgrid.net
+  // SENDGRID_PORT = 587
+  // FROM = rentranzact@yopmail.com
+  // REPLY = rentranzact@yopmail.com
+
+  //Nodemailer Gmail credentials
+  USERNAME = rentranzactltd@gmail.com
+  PASSWORD = hgkvlroftyulldmy
+  SMTP = gmail
   SENDGRID_PORT = 587
-  FROM = rentranzact@yopmail.com
-  REPLY = rentranzact@yopmail.com
+  FROM = rentranzactltd@gmail.com
+  REPLY = rentranzactltd@gmail.com

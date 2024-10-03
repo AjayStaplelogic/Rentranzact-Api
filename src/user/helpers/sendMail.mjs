@@ -1,10 +1,12 @@
 import nodemailer from 'nodemailer';
 
+console.log(process.env.PASSWORD, '===process.env.PASSWORD')
 const transporterOptions = {
-  host: process.env.SMTP,
+  service : 'gmail',
+  // host: process.env.SMTP,
   port: parseInt(process.env.SENDGRID_PORT),
   auth: {
-    user: "apikey",
+    user: process.env.FROM,
     pass: process.env.PASSWORD
   }
 };
@@ -21,20 +23,21 @@ export const sendMail = (to, subject, html) => {
       }
     });
     const mailOptions = {
-      from: process.env.FROM,
+      from: `"Rentranzact" <${process.env.FROM}>`,
       to,
       subject,
       html,
     };
 
 
-    console.log(mailOptions,"---mail Opitons")
+    console.log(mailOptions,"---mail Opitons1111")
 
 
     console.log(process.env.USERNAME , process.env.PASSWORD , "ennnnnnvvvv")
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
+        console.log(error, '===error when sending mail')
         throw new Error('Error sending email: ', error);
       }
 
