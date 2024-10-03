@@ -156,7 +156,7 @@ async function addUser(body) {
 
   await user.save();
 
-  const htmlTemplate = html(user.otp);
+  const htmlTemplate = html(user.otp, user.fullName);
 
   sendMail(body.email, "OTP Verification", htmlTemplate);
 
@@ -466,7 +466,8 @@ async function forgotPasswordService(email) {
       forgot_password_email({
         email: update_user.email,
         otp: update_user.otp,
-        user_id: update_user._id
+        user_id: update_user._id,
+        fullName: update_user?.fullName
       });
       return {
         data: {
