@@ -23,7 +23,7 @@ import { ObjectId } from 'bson';
 import { Transaction } from "../models/transactions.model.mjs";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-
+import { Admin } from "../../admin/models/admin.model.mjs";
 
 async function loginUser(body) {
   const { email, password, fcmToken } = body;
@@ -841,6 +841,10 @@ async function verifyUserOtp(user_id, otp) {
   };
 }
 
+async function getAdmins() {
+  return await Admin.find().lean().exec();
+}
+
 export {
   loginUser,
   addUser,
@@ -855,5 +859,6 @@ export {
   getLeaseAggrementList,
   getWalletDetails,
   deleteAggrementByID,
-  verifyUserOtp
+  verifyUserOtp,
+  getAdmins
 };

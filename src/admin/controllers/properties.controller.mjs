@@ -89,7 +89,7 @@ async function updateProperty(req, res) {
 async function getAllPropertyList(req, res) {
   try {
     console.log(`[Admin Property List]`)
-    let { category, type, latitude, longitude, radius, search, city, sortBy, rented, inDemand } = req.query;
+    let { category, type, latitude, longitude, radius, search, city, sortBy, rented, inDemand, approval_status } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
@@ -124,6 +124,10 @@ async function getAllPropertyList(req, res) {
       order = sortBy.split(' ')[1];
     }
     sort_query[field] = order == "desc" ? -1 : 1;
+
+    if (approval_status) {
+      query.approval_status = { $in: approval_status.split(',') };
+    }
 
     let pipeline = [
       {

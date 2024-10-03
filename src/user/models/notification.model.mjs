@@ -55,6 +55,10 @@ const notificationSchema = new mongoose.Schema(
             ref: 'users',
             index: true
         },
+        is_send_to_admin : {
+            type : Boolean,
+            default : false
+        }
     },
     { timestamps: true }
 );

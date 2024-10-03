@@ -5,6 +5,7 @@
 // 5. In image and documents page, Add the text after Tap to upload the documents(Deed of assignment, deed of sublease, power of attorney).
 
 import mongoose from "mongoose";
+import { ApprovalStatus } from "../enums/property.enums.mjs"
 // Define the schema for the User model
 const propertySchema = new mongoose.Schema(
   {
@@ -199,14 +200,14 @@ const propertySchema = new mongoose.Schema(
     property_manager_id: {
       type: String,
       required: false,
-      default : null
+      default: null
     },
 
     landlord_id: {
       type: String,
       // required: true,
     },
-    
+
     inDemand: {
       type: Boolean,
       default: false
@@ -215,59 +216,63 @@ const propertySchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
-    avg_rating : {
-      type : Number,
-      default : 0,
-      min : 0,
-      max : 5
+    avg_rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
     },
-    total_reviews : {
-      type : Number,
-      default : 0,
-      min : 0,
-      max : 5
+    total_reviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
     },
-    payment_count : {
-      type : Number,
-      default : 0
+    payment_count: {
+      type: Number,
+      default: 0
     },
     lease_end_timestamp: {
       type: String,
     },
-    building_number : {
+    building_number: {
       type: String,
     },
-    street_name : {
+    street_name: {
       type: String,
     },
-    estate_name : {
+    estate_name: {
       type: String,
     },
-    state : {
+    state: {
       type: String,
     },
-    country : {
+    country: {
       type: String,
     },
-    servicing : {
-        type: String,
+    servicing: {
+      type: String,
     },
-    total_space_for_rent : {
+    total_space_for_rent: {
       type: Number,
       default: 0,
     },
-    total_administrative_offices : {
+    total_administrative_offices: {
       type: Number,
       default: 0,
     },
-    is_legal_partner : {
+    is_legal_partner: {
       type: Boolean,
       default: false,
     },
-    serviceChargeDuration : {
-      type  : String, // monthly, yearly, quaterly
+    serviceChargeDuration: {
+      type: String, // monthly, yearly, quaterly
+    },
+    approval_status: {
+      type: String,
+      enum: Object.values(ApprovalStatus),
+      default: ApprovalStatus.PENDING
     }
-
   },
   { timestamps: true }
 );

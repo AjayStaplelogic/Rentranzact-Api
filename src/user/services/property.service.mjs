@@ -6,6 +6,9 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { RentBreakDownPer } from "../enums/property.enums.mjs"
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs";
+import { getAdmins } from "../services/user.service.mjs"
+import { Notification } from "../models/notification.model.mjs";
+import sendNotification from "../helpers/sendNotification.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -23,13 +26,8 @@ async function addPropertyService(
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
 
   let arr = JSON.parse("[" + trimmedStr + "]");
-  console.log(role, '===role')
-  console.log(role === UserRoles.LANDLORD, '===role === UserRoles.LANDLORD')
-
   let landlord_id = role === UserRoles.LANDLORD ? id : null;
   let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
-  console.log(landlord_id, '===landlord_id')
-  console.log(property_manager_id, '===property_manager_id')
 
   let name = "";
   if (email) {
@@ -105,6 +103,32 @@ async function addPropertyService(
 
   const property = await Property.create(Property_);
   if (property) {
+
+    // Sending notification to admin for approval
+    const admins = await getAdmins();
+    if (admins && admins.length > 0) {
+      for await (const admin of admins) {
+        const notification_payload = {};
+        notification_payload.notificationHeading = "New Property Added";
+        notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} added a new property`;
+        notification_payload.landlordID = property.landlord_id;
+        notification_payload.propertyID = property._id;
+        notification_payload.send_to = admin._id;
+        notification_payload.property_manager_id = property.property_manager_id;
+        notification_payload.is_send_to_admin = true;
+        const create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (admin && admin.fcmToken) {
+            const metadata = {
+              "propertyID": data.propertyID.toString(),
+              "redirectTo": "property",
+            }
+            sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+          }
+        }
+      }
+    }
+
     return {
       data: property,
       message: "property created successfully",
