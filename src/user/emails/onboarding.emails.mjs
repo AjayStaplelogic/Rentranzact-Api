@@ -1,14 +1,15 @@
 import { sendMail } from '../helpers/sendMail.mjs'
 
 const forgot_password_email = (options) => {
-    let { email, otp, user_id } = options;
-    let html = `
+  let { email, otp, user_id, fullName } = options;
+  let html = `
          <html>
 <head>
   <title>Rentranzact - Forgot Password</title>
 </head>
 <body>
 <div style="text-align: center">
+  <p>Hi, ${fullName ?? ""}</p>
   <p>We have received your reset password request. Please find the OTP to reset your password.</p>
   <p><b>${otp}</b></p>
   <p>Looking forward to serve you better.</p>
@@ -21,9 +22,9 @@ const forgot_password_email = (options) => {
 </html>
     `
 
-    sendMail(email, "Forgot Password", html)
+  sendMail(email, "Forgot Password", html)
 }
 
 export {
-    forgot_password_email
+  forgot_password_email
 }
