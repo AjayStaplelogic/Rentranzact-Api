@@ -675,7 +675,7 @@ async function getMyProperties(role, id, req) {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
                   { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
-                  { kinIdentityCheck: { $eq: true } }
+                  // { kinIdentityCheck: { $eq: true } }
                 ]
               }
             },
