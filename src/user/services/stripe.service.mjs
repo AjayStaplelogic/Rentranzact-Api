@@ -144,7 +144,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneMonthLater,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -178,7 +179,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneQuaterLater,
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -217,7 +219,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_end: timestampOneYearLater,
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
-                lease_end_timestamp: lease_end_timestamp
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -317,7 +320,8 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 rented: true,
                 renterID: userID,
                 rent_period_due: timestampOneMonthLater,
-                payment_count: newCount
+                payment_count: newCount,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -348,7 +352,8 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 rented: true,
                 renterID: userID,
                 payment_count: newCount,
-                rent_period_due: timestampOneQuaterLater
+                rent_period_due: timestampOneQuaterLater,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -378,7 +383,8 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 rented: true,
                 renterID: userID,
                 payment_count: newCount,
-                rent_period_due: timestampOneYearLater
+                rent_period_due: timestampOneYearLater,
+                inDemand : false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
