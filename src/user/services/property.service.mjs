@@ -650,7 +650,8 @@ async function getMyProperties(role, id, req) {
           rented: "$rented",
           city: "$city",
           type: "$type",
-          rent_period_due: 1
+          rent_period_due: 1,
+          approval_status: "$approval_status",
         }
       }
     ]);
@@ -729,7 +730,7 @@ async function getMyProperties(role, id, req) {
           rented: "$rented",
           city: "$city",
           type: "$type",
-
+          approval_status: "$approval_status"
         }
       }
     ]);
