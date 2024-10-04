@@ -33,6 +33,7 @@ export const uploadMultipleFiles = async (req, res) => {
 
         const upload = Multer.upload2.array("media", 10);
         upload(req, res, async function (err) {
+            console.log(err, '======err From Upload')
             if (err instanceof multer.MulterError) {
                 // A Multer error occurred when uploading.
                 return sendResponse(res, {}, err?.message, false, 400);
