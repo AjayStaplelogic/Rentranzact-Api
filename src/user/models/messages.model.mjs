@@ -15,16 +15,14 @@ const MessageSchema = new Schema({
     },
     message_type: {
         type: String,
-        enum: ["text", "video", "audio", "document"]
+        enum: ["text", "video", "audio", "document", "image"]
     },
     content: {
         type: String
     },
-    media: [{
+    media: {
         type: String,
-        content: String,
-        url: String,
-    }],
+    },
     reciever_id: {
         type: mongoose.Types.ObjectId,
         ref: 'users',
