@@ -113,6 +113,42 @@ const userSchema = new mongoose.Schema(
       select: false,
     },
 
+    renter_avg_rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    renter_total_reviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    landlord_avg_rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    landlord_total_reviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    pm_avg_rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
+    pm_total_reviews: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5
+    },
   },
 
   { timestamps: true }
