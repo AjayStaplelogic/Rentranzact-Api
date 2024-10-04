@@ -3,20 +3,21 @@ import { Reviews } from "../models/reviews.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import * as ReviewServices from "../services/review.service.mjs";
 import mongoose from "mongoose";
+import { ReviewTypeEnum } from "../enums/review.enum.mjs";
 
 export const addUpdateReview = async (req, res) => {
     try {
-        let { type, property_id } = req.body;
+        let { type, property_id, review_to_id } = req.body;
         if (!type) {
             return sendResponse(res, {}, "Type reqired", false, 400);
         }
 
         let query = {
             isDeleted: false,
-            user_id: req.user.data._id
+            user_id: req.user.data._id,
+            type: type
         }
-        if (type == "property") {
-            query.type == "property";
+        if (type === ReviewTypeEnum.property) {
             if (!property_id) {
                 return sendResponse(res, {}, "Property Id reqired", false, 400);
             }
@@ -27,10 +28,28 @@ export const addUpdateReview = async (req, res) => {
             }
             req.body.landloard_id = get_property.landlord_id;
             query.property_id = property_id;
+            delete req.body.review_to_id;   // Just to avoid conflict with other
         };
+
+        if ([ReviewTypeEnum.toRenter, ReviewTypeEnum.toLandlord, ReviewTypeEnum.toPropertyManager].includes(type)) {
+            if (!review_to_id) {
+                return sendResponse(res, {}, "Review to Id reqired", false, 400);
+            }
+            query.review_to_id = review_to_id;
+            delete req.body.property_id; // Just to avoid conflict with other
+        }
 
         req.body.user_id = req.user.data._id;
         req.body.updated_by = req.user.data._id;
+
+        // To calculate rating
+        const total_score = (Number(req.body.answer1) > 0 ? Number(req.body.answer1) : 0)
+            + (Number(req.body.answer2) > 0 ? Number(req.body.answer2) : 0)
+            + (Number(req.body.answer3) > 0 ? Number(req.body.answer3) : 0)
+            + (Number(req.body.answer4) > 0 ? Number(req.body.answer4) : 0)
+
+        req.body.rating = ReviewServices.get_avg_by_rating_numbers(total_score);    // Calculation avg starts
+
         let update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
         if (update_review) {
             return sendResponse(res, {}, "success", true, 200);
@@ -184,6 +203,7 @@ export const getReviewById = async (req, res) => {
         let get_review = await Reviews.findOne({ _id: id, isDeleted: false })
             .populate('user_id')
             .populate('property_id')
+            .populate('review_to_id')
             .lean().exec();
 
         if (get_review) {
@@ -227,14 +247,7 @@ export const changeReviewStatus = async (req, res) => {
 
         if (update_review) {
             let avg_rating = await ReviewServices.calculate_avg_rating(update_review);
-            if (update_review.type == "property" && avg_rating.avg_rating > 0) {
-                let update_payload = {
-                    avg_rating: avg_rating.avg_rating,
-                    total_reviews: avg_rating.total_reviews
-                }
-
-                let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
-            }
+            await ReviewServices.update_avg_review_rating(update_review, avg_rating);
             return sendResponse(res, {}, "success", true, 200);
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);

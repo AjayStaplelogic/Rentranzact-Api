@@ -12,10 +12,8 @@ export const uploadSingleImage = (req, res) => {
             return sendResponse(res, resObj, "success", true, 200);
         }
         return sendResponse(res, {}, "File not found", false, 400);
-
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
-
     }
 }
 
@@ -59,7 +57,6 @@ export const uploadMultipleFiles = async (req, res) => {
     } catch (error) {
         console.log(error, '=======error')
         return sendResponse(res, {}, `${error}`, false, 500);
-
     }
 }
 
@@ -78,6 +75,5 @@ export const deleteFile = async (req, res) => {
 
     } catch (error) {
         return sendResponse(res, {}, error?.message ?? error, false, 400);
-
     }
 }
