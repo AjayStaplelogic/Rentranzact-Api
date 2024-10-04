@@ -22,11 +22,16 @@ export const uploadSingleImage = (req, res) => {
 export const uploadMultipleFiles = async (req, res) => {
     try {
         Multer.upload2.limits = {
-            fileSize: 10 * 1000000, // Converting 10 MB into bytes
+            fileSize: 50 * 1000000, // Converting 10 MB into bytes
             files: 10,
         };
 
-        let upload = Multer.upload2.array("media", 10);
+        if (req.body.mediaType) {
+            console.log("if countition")
+            Multer.upload2.fileFilter = Multer.fileFilterFun(req.body.mediaType);
+        }
+
+        const upload = Multer.upload2.array("media", 10);
         upload(req, res, async function (err) {
             if (err instanceof multer.MulterError) {
                 // A Multer error occurred when uploading.
