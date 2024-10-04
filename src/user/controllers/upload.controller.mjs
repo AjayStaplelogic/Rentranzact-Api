@@ -22,7 +22,7 @@ export const uploadSingleImage = (req, res) => {
 export const uploadMultipleFiles = async (req, res) => {
     try {
         Multer.upload2.limits = {
-            fileSize: 50 * 1000000, // Converting 10 MB into bytes
+            fileSize: 10 * 1000000, // Converting 10 MB into bytes
             files: 10,
         };
 
@@ -67,6 +67,9 @@ export const deleteFile = async (req, res) => {
         let { folder, filename } = req.query;
         try {
             fs.unlinkSync(`uploads/${folder ?? "images"}/${filename}`);
+            if (!folder) {
+                fs.unlinkSync(`uploads/${filename}`);
+            }
         } catch (error) {
             console.log(error);
         }
