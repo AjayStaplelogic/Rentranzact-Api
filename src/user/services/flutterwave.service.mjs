@@ -9,6 +9,7 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
+import { Notification } from "../models/notification.model.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -18,7 +19,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
 
-    const { wallet, propertyID, userID } = meta_data;
+    const { wallet, propertyID, userID, notificationID } = meta_data;
 
     const renterDetails = await User.findById(userID)
 
@@ -52,7 +53,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -87,7 +88,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -125,7 +126,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -201,6 +202,9 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         }
 
         data.save()
+        if (notificationID) {
+            await Notification.findByIdAndDelete(notificationID)
+        }
     }
 
     return {
@@ -275,7 +279,7 @@ async function addFlutterwaveTransactionForOld(body) {
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
 
-    const { propertyID, userID } = meta_data;
+    const { propertyID, userID, notificationID } = meta_data;
 
     const renterDetails = await User.findById(userID)
 
@@ -299,7 +303,7 @@ async function addFlutterwaveTransactionForOld(body) {
                 renterID: userID,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -332,7 +336,7 @@ async function addFlutterwaveTransactionForOld(body) {
                 renterID: userID,
                 payment_count: newCount,
                 rent_period_due: timestampOneQuaterLater,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -368,7 +372,7 @@ async function addFlutterwaveTransactionForOld(body) {
                 renterID: userID,
                 payment_count: newCount,
                 rent_period_due: timestampOneYearLater,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -438,6 +442,9 @@ async function addFlutterwaveTransactionForOld(body) {
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         data.save()
+        if (notificationID) {
+            await Notification.findByIdAndDelete(notificationID)
+        }
     }
 
     return {

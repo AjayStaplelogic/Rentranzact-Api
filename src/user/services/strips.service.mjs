@@ -60,7 +60,8 @@ async function addStripeTransaction(body, renterApplicationID) {
     }
     console.log(notificationID, "xxxxxxxxxxxxxxxxxxxxxxxNotification ID")
 
-    await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
+    // await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
+
 
     const propertyDetails = await Property.findById(propertyID);
     if (propertyDetails) {
@@ -265,8 +266,10 @@ async function addStripeTransaction(body, renterApplicationID) {
             await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
         }
         data.save()
+        if (notificationID) {
+            await Notification.findByIdAndDelete(notificationID)
+        }
         return {
-
             data: [],
             message: "success",
             status: true,
@@ -648,6 +651,9 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
     }
     data.save()
+    if (notificationID) {
+        await Notification.findByIdAndDelete(notificationID)
+    }
 
     return {
 

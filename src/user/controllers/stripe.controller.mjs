@@ -32,7 +32,7 @@ async function payRent(req, res) {
 }
 async function payViaWallet(req, res) {
 
-  const { propertyID, renterApplicationID } = req.body;
+  const { propertyID, renterApplicationID, notificationID } = req.body;
   const userID = req.user.data._id;
   const propertyDetails = await Property.findById(propertyID);
   const amount = propertyDetails.rent;
@@ -45,10 +45,10 @@ async function payViaWallet(req, res) {
   }
 
   if (propertyDetails.payment_count === 0) {
-    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID);
+    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body);
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
-    const data = await payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID)
+    const data = await payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body)
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }
 }

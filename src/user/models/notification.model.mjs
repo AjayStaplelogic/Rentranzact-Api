@@ -58,10 +58,6 @@ const notificationSchema = new mongoose.Schema(
         is_send_to_admin : {
             type : Boolean,
             default : false
-        },
-        show_pay_now : {
-            type : Boolean,
-            default : false
         }
     },
     { timestamps: true }
