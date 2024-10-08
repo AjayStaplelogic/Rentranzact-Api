@@ -327,30 +327,50 @@ async function getPropertyByID(id, userID) {
   dataMerge.propertyData = data;
 
   if (data.landlord_id) {
-    console.log(data.landlord_id, '====data.landlord_id====')
+    if (userID) {
+      const favorite = await User.findById(userID).select("favorite")
+      const landlord = await User.findById(data.landlord_id);
 
-    const favorite = await User.findById(userID).select("favorite")
+      if (favorite && favorite?.favorite?.includes(id)) {
 
+        dataMerge["liked"] = true
 
-    const landlord = await User.findById(data.landlord_id);
+      } else {
 
-    // dataMerge.propertyData = data;
+        dataMerge["liked"] = false
 
-    if (favorite && favorite?.favorite?.includes(id)) {
+      }
 
-      dataMerge["liked"] = true
+      if (landlord) {
+        const { _id, fullName, picture, verified, role, countryCode, phone } = landlord;
 
-    } else {
-
-      dataMerge["liked"] = false
-
+        dataMerge.landlord = {
+          _id,
+          fullName,
+          picture,
+          verified,
+          role,
+          countryCode,
+          phone
+        };
+      }
     }
-
+    // dataMerge.propertyData = data;
     // console.log(dataMerge.propertyData, "==final ")
-    if (landlord) {
-      const { _id, fullName, picture, verified, role, countryCode, phone } = landlord;
+  } else {
+    if (userID) {
+      const favorite = await User.findById(userID).select("favorite")
+      if (favorite && favorite?.favorite?.includes(id)) {
+        dataMerge["liked"] = true
+      } else {
+        dataMerge["liked"] = false
+      }
 
-      dataMerge.landlord = {
+      const propertyManager = await User.findById(data.property_manager_id);
+
+      const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
+
+      dataMerge.property_manager = {
         _id,
         fullName,
         picture,
@@ -360,53 +380,27 @@ async function getPropertyByID(id, userID) {
         phone
       };
     }
-  } else {
 
+    if (data.rented) {
+      const renter = await User.findById(data.renterID);
 
-    const favorite = await User.findById(userID).select("favorite")
-    if (favorite && favorite?.favorite?.includes(id)) {
-      dataMerge["liked"] = true
-    } else {
-      dataMerge["liked"] = false
-    }
+      // console.log(renter, "=renterr")
 
-    const propertyManager = await User.findById(data.property_manager_id);
+      const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
 
-    const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
-
-    dataMerge.property_manager = {
-      _id,
-      fullName,
-      picture,
-      verified,
-      role,
-      countryCode,
-      phone
-    };
-  }
-
-
-  if (data.rented) {
-    const renter = await User.findById(data.renterID);
-
-    // console.log(renter, "=renterr")
-
-    const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
-
-    dataMerge.renterInfo = {
-      _id,
-      fullName,
-      picture,
-      verified,
-      role,
-      countryCode,
-      phone
+      dataMerge.renterInfo = {
+        _id,
+        fullName,
+        picture,
+        verified,
+        role,
+        countryCode,
+        phone
+      }
     }
   }
-
   dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });
   dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus: RentApplicationStatus.PENDING, }); // kinIdentityCheck: true , removed this check because kin verification functionality no longer exists
-
   return {
     data: dataMerge,
     message: "Nearby Property listing",

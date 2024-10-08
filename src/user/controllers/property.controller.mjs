@@ -101,7 +101,7 @@ async function propertyByID(req, res) {
 
   const data = await getPropertyByID(id, userID);
 
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  sendResponse(res, data?.data, data.message, data.status, data.statusCode);
 }
 
 async function deleteProperty(req, res) {
