@@ -10,6 +10,7 @@ import Cards from "../models/cards.model.mjs"
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs"
 import * as commissionServices from "../services/commission.service.mjs";
+import { Notification } from "../models/notification.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -113,7 +114,8 @@ async function addToWallet(body, userID) {
     };
 }
 
-async function payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID) {
+async function payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body) {
+    let { notificationID } = body;
     const data_ = await User.findByIdAndUpdate(userID, { $inc: { walletPoints: -amount } });
     const data1 = await User.findByIdAndUpdate(landlordID, { $inc: { walletPoints: amount } })
 
@@ -127,7 +129,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
         } else if (propertyDetails.category === "short stay") {
             lease_end_timestamp = moment.unix(created).add(1, "months").unix();
         }
-3
+        
         let newCount = propertyDetails.payment_count + 1;
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
@@ -145,7 +147,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -180,7 +182,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -220,7 +222,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -289,7 +291,9 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
-
+        if(notificationID){
+            await Notification.findByIdAndDelete(notificationID)
+        }
     }
 
     return {
@@ -300,8 +304,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
     };
 }
 
-async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID) {
-
+async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body) {
+    let { notificationID} = body;
     const data_ = await User.findByIdAndUpdate(userID, { $inc: { walletPoints: -amount } });
     const data1 = await User.findByIdAndUpdate(landlordID, { $inc: { walletPoints: amount } })
     const created = moment().unix();
@@ -321,7 +325,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 renterID: userID,
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -353,7 +357,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 renterID: userID,
                 payment_count: newCount,
                 rent_period_due: timestampOneQuaterLater,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -384,7 +388,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
                 renterID: userID,
                 payment_count: newCount,
                 rent_period_due: timestampOneYearLater,
-                inDemand : false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false        // setting this to false because when property is rented then should remove from in demand
             })
 
             const addRenterHistory = new RentingHistory({
@@ -449,6 +453,9 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         data.save()
+        if(notificationID){
+            await Notification.findByIdAndDelete(notificationID)
+        }
 
     }
     return {

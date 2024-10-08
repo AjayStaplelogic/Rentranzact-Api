@@ -111,7 +111,7 @@ async function getAllNotifications(req, res) {
           renter_picture: "$renter_details.picture",
           landlord_name: "$landlord_details.fullName",
           landlord_picture: "$landlord_details.picture",
-          send_to : "$send_to"
+          send_to: "$send_to",
         }
       },
       {
