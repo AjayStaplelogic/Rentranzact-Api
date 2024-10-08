@@ -40,9 +40,9 @@ async function addPropertyService(
     }).lean().exec();
     if (user) {
       name = user.fullName;
-      if (user.role === UserRoles.LANDLORD) {
+      if (user.role === UserRoles.LANDLORD && role ===  UserRoles.PROPERTY_MANAGER) {   // If property is added by property manager, checking email key if it is landlord then adding it as landlord
         landlord_id = user._id;
-      } else if (user.role === UserRoles.PROPERTY_MANAGER) {
+      } else if (user.role === UserRoles.PROPERTY_MANAGER && role ===  UserRoles.LANDLORD) {  // If property is added by landlord, checking email key if it is property manager then adding it as property manager
         property_manager_id = user._id;
       }
     } else {
@@ -640,6 +640,7 @@ async function getMyProperties(role, id, req) {
       }
     ]);
   } else if (role === UserRoles.PROPERTY_MANAGER) {
+    console.log(query, '=====query');
     data = await Property.aggregate([
       {
         $match: query
