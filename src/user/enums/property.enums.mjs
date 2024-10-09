@@ -37,6 +37,7 @@ const ApprovalStatus = {
   REJECTED: "rejected"
 }
 
+
 export {
   PropertiesCategories,
   PropertiesStatus,
@@ -44,5 +45,5 @@ export {
   Type,
   FurnishingType,
   RentBreakDownPer,
-  ApprovalStatus
+  ApprovalStatus,
 };
