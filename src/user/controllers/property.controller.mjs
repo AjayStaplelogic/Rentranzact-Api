@@ -15,8 +15,6 @@ import {
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
-import { constants } from "crypto";
-
 
 async function addProperty(req, res) {
   const { body } = req;

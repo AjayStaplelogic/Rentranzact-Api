@@ -8,7 +8,7 @@ const RentApplicationStatus = {
   
 
   const ExpectedStaysDurationType = {
-    MONTH: "Month",
+    MONTH: "month",
     YEAR: "year",
   }
 
