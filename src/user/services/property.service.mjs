@@ -209,13 +209,27 @@ async function filterProperies(body, id) {
   if (approval_status) {
     filters.approval_status = { $in: approval_status.split(",") };
   }
+
+  let favorite_arr = [];
+  if (id) {
+    let get_user = await User.findById(id);
+    if (get_user) {
+      favorite_arr = get_user.favorite;
+
+      // If landlord or PM added property and switched his role to renter then don't show the properites to him that he added as landlord
+      if (get_user.role === UserRoles.RENTER) {
+        filters.landlord_id = { $ne: `${get_user._id}` }
+      }
+    }
+  }
+
   const data = await Property.find(filters).sort(sort_query)
   let modifiedProperties = data;
   if (id) {
-    const favorite = await User.findById(id).select("favorite")
-    if (favorite) {
+    // const favorite = await User.findById(id).select("favorite")
+    if (favorite_arr && favorite_arr.length > 0) {
       modifiedProperties = data?.map(property => {
-        const liked = favorite?.favorite.includes(property._id);
+        const liked = favorite_arr.includes(property._id);
         return { ...property.toObject(), liked };
       });
     }
@@ -236,9 +250,8 @@ async function nearbyProperies(body, userID) {
   let sort_query = {};
   sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
-
   if (maxDistance && latitude && longitude) {
-    const data = await Property.find({
+    let query = {
       "address.coordinates": {
         $geoWithin: {
           $centerSphere: [
@@ -248,9 +261,16 @@ async function nearbyProperies(body, userID) {
         },
       },
       approval_status: { $in: approval_status?.split(",") ?? [ApprovalStatus.ACCEPTED] }
-    }).sort(sort_query);
+    };
+
+    if (userID) {
+      query.landlord_id = { $ne: userID }
+    }
+    const data = await Property.find(query).sort(sort_query);
 
     let modifiedProperties = data;
+
+
     if (userID) {
       const favorite = await User.findById(userID).select("favorite")
       if (favorite) {
@@ -271,9 +291,15 @@ async function nearbyProperies(body, userID) {
     };
   } else {
     console.log("HERE")
-    const data = await Property.find({
+    let query = {
       approval_status: { $in: approval_status?.split(",") ?? [ApprovalStatus.ACCEPTED] }
-    }).limit(9);
+    }
+
+    if (userID) {
+      query.landlord_id = { $ne: userID }
+    }
+
+    const data = await Property.find().limit(9);
     let modifiedProperties = data
     if (userID) {
       const favorite = await User.findById(userID).select("favorite")
