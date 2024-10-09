@@ -140,6 +140,7 @@ export const getAllReviews = async (req, res) => {
             },
             {
                 $project: {
+                    createdAt: "$createdAt",
                     type: "$type",
                     user_id: "$user_id",
                     property_id: "$property_id",
