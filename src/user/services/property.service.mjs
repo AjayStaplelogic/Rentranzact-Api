@@ -40,9 +40,9 @@ async function addPropertyService(
     }).lean().exec();
     if (user) {
       name = user.fullName;
-      if (user.role === UserRoles.LANDLORD && role ===  UserRoles.PROPERTY_MANAGER) {   // If property is added by property manager, checking email key if it is landlord then adding it as landlord
+      if (user.role === UserRoles.LANDLORD && role === UserRoles.PROPERTY_MANAGER) {   // If property is added by property manager, checking email key if it is landlord then adding it as landlord
         landlord_id = user._id;
-      } else if (user.role === UserRoles.PROPERTY_MANAGER && role ===  UserRoles.LANDLORD) {  // If property is added by landlord, checking email key if it is property manager then adding it as property manager
+      } else if (user.role === UserRoles.PROPERTY_MANAGER && role === UserRoles.LANDLORD) {  // If property is added by landlord, checking email key if it is property manager then adding it as property manager
         property_manager_id = user._id;
       }
     } else {
@@ -380,23 +380,20 @@ async function getPropertyByID(id, userID) {
         phone
       };
     }
+  }
 
-    if (data.rented) {
-      const renter = await User.findById(data.renterID);
+  if (data.rented) {
+    const renter = await User.findById(data.renterID);
+    const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
 
-      // console.log(renter, "=renterr")
-
-      const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
-
-      dataMerge.renterInfo = {
-        _id,
-        fullName,
-        picture,
-        verified,
-        role,
-        countryCode,
-        phone
-      }
+    dataMerge.renterInfo = {
+      _id,
+      fullName,
+      picture,
+      verified,
+      role,
+      countryCode,
+      phone
     }
   }
   dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });
