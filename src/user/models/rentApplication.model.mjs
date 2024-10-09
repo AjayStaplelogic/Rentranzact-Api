@@ -1,7 +1,7 @@
 // models/User.js
 
 import mongoose from "mongoose";
-import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { RentApplicationStatus, ExpectedStaysDurationType } from "../enums/rentApplication.enums.mjs";
 
 // Define the schema for the User model
 const rentApplicationSchema = new mongoose.Schema(
@@ -253,6 +253,10 @@ const rentApplicationSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    expectedStaysDurationType: {
+      type: String,
+      enum: Object.keys(ExpectedStaysDurationType)
+    }
   },
 
   { timestamps: true }

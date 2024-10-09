@@ -6,5 +6,12 @@ const RentApplicationStatus = {
     COMPLETED : "completed"
   };
   
-  export { RentApplicationStatus };
+
+  const ExpectedStaysDurationType = {
+    MONTH: "Month",
+    YEAR: "year",
+  }
+
+  
+  export { RentApplicationStatus, ExpectedStaysDurationType };
   

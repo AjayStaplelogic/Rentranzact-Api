@@ -45,7 +45,8 @@ async function addRentApplicationService(body, user) {
       previousLandlordAddress,
       previousLandlordName,
       employerName,
-      employerAddress
+      employerAddress,
+      expectedStaysDurationType
     } = body;
 
     const landlord = await Property.findById(propertyID);
@@ -116,6 +117,10 @@ async function addRentApplicationService(body, user) {
     if (checkinDate && checkoutDate) {
       payload["checkinDate"] = checkinDate
       payload["checkoutDate"] = checkoutDate
+    }
+
+    if (expectedStaysDurationType) {
+      payload.expectedStaysDurationType = expectedStaysDurationType;
     }
 
     const kinDetails = {
@@ -446,7 +451,7 @@ async function rentApplicationsList(user, req) {
     statusCode: 200,
     pagination: data[0]?.pagination
   };
-  
+
 }
 
 async function updateRentApplications(body, id) {
