@@ -103,7 +103,11 @@ export const update_avg_review_rating = async (update_review, avg_rating) => {
     }
 }
 
-
+/**
+ * @description Use to get the average stars rating with scores
+ * @param {number} score 
+ * @returns {number} Return the average rating according to the score
+ */
 export const get_avg_by_rating_numbers = (score = 0) => {
     for (const [key, value] of Object.entries(RatingFormula)) {
         if (score >= value.min && score <= value.max) {
@@ -112,5 +116,3 @@ export const get_avg_by_rating_numbers = (score = 0) => {
     }
     return 0;
 }
-
-console.log(get_avg_by_rating_numbers(17), '====rating')

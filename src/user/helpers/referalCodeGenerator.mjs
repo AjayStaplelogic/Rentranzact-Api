@@ -8,6 +8,4 @@ function generateReferralCode() {
 }
 
 
-
-
 export default generateReferralCode;

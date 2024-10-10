@@ -1,4 +1,4 @@
-import { userSignup, userLogin, userVerify, socialAuth, switchRoleValidation } from "../validations/user.validation.mjs";
+import { userSignup, userLogin, userVerify, socialAuth, switchRoleValidation, shareReferralCodeValidation } from "../validations/user.validation.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
 import {
   loginUser,
@@ -25,6 +25,9 @@ import * as bcrypt from "bcrypt";
 import { Property } from "../models/property.model.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
+import * as referralService from "../services/referral.service.mjs";
+import { EShareVia } from "../enums/referral.enum.mjs";
+import * as referralEmailService from "../emails/referral.emails.mjs"
 
 async function deleteUser(req, res) {
 
@@ -71,35 +74,36 @@ async function signup(req, res) {
     sendResponse(res, [], errors, false, 403);
   } else {
     body.initial_role = body.role;
+
     if (referralCode) {
-      const validCode = await validateCode(referralCode);
-      if (validCode) {
-        const data = await addUser(body);
+      // const validCode = await validateCode(referralCode);
+      const validCode = referralService.isMyCodeExistsInUsers(referralCode);
+      if (!validCode) {
+        // const data = await addUser(body);
 
-        await applyReferralCode(referralCode, data._id);
+        // await applyReferralCode(referralCode, data._id);
 
-        sendResponse(
-          res,
-          data.data,
-          data.message,
-          data.status,
-          data.statusCode,
-          data.accessToken
-        );
-      } else {
+        // sendResponse(
+        //   res,
+        //   data.data,
+        //   data.message,
+        //   data.status,
+        //   data.statusCode,
+        //   data.accessToken
+        // );
         res.status(400).json({ msg: "Invalid Referral code" });
       }
-    } else {
-      const data = await addUser(body);
-
-      sendResponse(
-        res,
-        { id: data?.data?._id, otp: data?.data?.otp },
-        data.message,
-        data.status,
-        data.statusCode
-      );
     }
+
+    const data = await addUser(body);
+
+    sendResponse(
+      res,
+      { id: data?.data?._id, otp: data?.data?.otp },
+      data.message,
+      data.status,
+      data.statusCode
+    );
   }
 }
 
@@ -442,6 +446,28 @@ async function switchRole(req, res) {
   }
 }
 
+async function shareReferralCode(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, shareReferralCodeValidation);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+
+    if (req.body.share_via === EShareVia.email) {
+      referralEmailService.sendReferralLink({
+        email: req.body.share_via,
+        referralCode: req?.user?.data?.myCode
+      });
+
+      return sendResponse(res, {}, "Success", true, 200, accessToken);
+    }
+    return sendResponse(res, {}, "Invalid Share Type", false, 400);
+  } catch (error) {
+    return sendResponse(res, {}, error?.message, false, 400);
+  }
+}
+
 export {
   deleteUser,
   teriminateRenter,
@@ -461,5 +487,6 @@ export {
   editMyProfile,
   commisions,
   getUserDetails,
-  switchRole
+  switchRole,
+  shareReferralCode
 };
