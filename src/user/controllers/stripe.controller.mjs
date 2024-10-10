@@ -45,10 +45,10 @@ async function payViaWallet(req, res) {
   }
 
   if (propertyDetails.payment_count === 0) {
-    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body);
+    const data = await payViaWalletService(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, req.body);
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
-    const data = await payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body)
+    const data = await payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, req.body)
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }
 }
