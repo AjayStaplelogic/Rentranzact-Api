@@ -81,18 +81,20 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
             };
 
             const new_referral_earnings = new ReferralEarnings(referral_earning_payload);
+            const created = moment().unix();
+           
             const wallet_payload = {
                 amount: Number(amount),
                 status: "successful",
                 type: "CREDIT",
                 userID: to,
                 intentID: uuidv4(),
-                payment_type: EPaymentType.rechargeWallet
+                payment_type: EPaymentType.rechargeWallet,
+                createdAt : created
             }
 
             const add_wallet = new Wallet(wallet_payload);
 
-            const created = moment().unix();
 
             const transaction_payload = {
                 wallet: true,
