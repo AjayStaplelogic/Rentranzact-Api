@@ -12,6 +12,7 @@ import { rentApplication } from "../models/rentApplication.model.mjs"
 import * as commissionServices from "../services/commission.service.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import * as referralService from "../services/referral.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -130,7 +131,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
         } else if (propertyDetails.category === "short stay") {
             lease_end_timestamp = moment.unix(created).add(1, "months").unix();
         }
-        
+
         let newCount = propertyDetails.payment_count + 1;
         if (propertyDetails.rentType === RentType.MONTHLY) {
 
@@ -248,7 +249,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             legal_Fee: 0,
             caution_deposite: 0,
             total_amount: 0,
-            agent_fee: 0
+            agent_fee: 0,
+            rtz_fee: 0
         }
 
         let rent = Number(propertyDetails.rent);
@@ -258,6 +260,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
         breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
         breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
         breakdown.insurance = 0;    // variable declaration for future use
+        breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
         breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
 
         if (propertyDetails.property_manager_id) {
@@ -283,7 +286,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             type: "DEBIT",
             payment_mode: "wallet",
             allCharges: breakdown,
-            transaction_type : ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment
         })
 
         data.save()
@@ -293,7 +296,20 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
-        if(notificationID){
+
+        // If landlord have referral code then transfering referral bonus to their parent or referrer
+        if (landlordDetails?.referralCode) {
+            const payTo = await referralService.getUserByMyCode(landlordDetails.referralCode); // amount to be transferred to
+            if (payTo) {
+                const referralAmount = await referralService.calculateReferralAmountWithRTZFee(breakdown.rtz_fee);
+                if (referralAmount > 0) {
+                    await referralService.addReferralBonusInWallet(referralAmount, landlordDetails._id, payTo._id, propertyDetails._id);
+                }
+            }
+        }
+
+        // Deleting notification which was showing pay now button after payment successfull
+        if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
         }
     }
@@ -307,7 +323,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
 }
 
 async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, amount, landlordID, renterDetails, walletPoints, renterApplicationID, body) {
-    let { notificationID} = body;
+    let { notificationID } = body;
     const data_ = await User.findByIdAndUpdate(userID, { $inc: { walletPoints: -amount } });
     const data1 = await User.findByIdAndUpdate(landlordID, { $inc: { walletPoints: amount } })
     const created = moment().unix();
@@ -448,7 +464,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             type: "DEBIT",
             payment_mode: "wallet",
             allCharges: breakdown,
-            transaction_type : ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment
         })
 
         // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
@@ -456,7 +472,7 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         data.save()
-        if(notificationID){
+        if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
         }
 
