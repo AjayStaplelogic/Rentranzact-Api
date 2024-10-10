@@ -77,7 +77,7 @@ async function signup(req, res) {
 
     if (referralCode) {
       // const validCode = await validateCode(referralCode);
-      const validCode = referralService.isMyCodeExistsInUsers(referralCode);
+      const validCode = await referralService.isMyCodeExistsInUsers(referralCode);
       if (!validCode) {
         // const data = await addUser(body);
 

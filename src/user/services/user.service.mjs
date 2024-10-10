@@ -154,7 +154,8 @@ async function addUser(body) {
   // await saveInReferral.save();
 
 
-  body.myCode = referralService.generateMyCode(8)
+  body.myCode = await referralService.generateMyCode(8);
+  console.log(body.myCode, '====body.myCode')
   const user = new User(body);
 
   await user.save();
@@ -233,9 +234,19 @@ async function verifyOtp(body) {
 
 async function socialSignup(body) {
 
-  const { socialPlatform, email, email_verified, name, picture, exp, fcmToken } = body;
+  const { socialPlatform, email, email_verified, name, picture, exp, fcmToken, referralCode } = body;
 
-
+  if (referralCode) {
+    const validCode = await referralService.isMyCodeExistsInUsers(referralCode);
+    if (!validCode) {
+      return {
+        data: {},
+        message: "Invalid Referral code",
+        status: false,
+        statusCode: 400,
+      };
+    }
+  }
 
 
   if (socialPlatform === "google") {
@@ -283,6 +294,12 @@ async function socialSignup(body) {
           socialPlatform: socialPlatform,
           fcmToken: fcmToken
         };
+
+        if (referralCode) {
+          userPayload.referralCode = referralCode;
+        }
+
+        userPayload.myCode = await referralService.generateMyCode(8);
 
         const newUser = new User(userPayload);
 
@@ -342,6 +359,11 @@ async function socialSignup(body) {
           fcmToken: fcmToken
         };
 
+        if (referralCode) {
+          userPayload.referralCode = referralCode;
+        }
+
+        userPayload.myCode = await referralService.generateMyCode(8);
         const newUser = new User(userPayload);
 
 
@@ -409,6 +431,10 @@ async function socialSignup(body) {
           fcmToken: fcmToken
         };
 
+        if (referralCode) {
+          userPayload.referralCode = referralCode;
+        }
+        userPayload.myCode = await referralService.generateMyCode(8);
         const newUser = new User(userPayload);
 
         newUser.save();
