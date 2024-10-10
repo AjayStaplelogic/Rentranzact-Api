@@ -6,6 +6,8 @@ import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { EBonusPer } from "../enums/referral.enum.mjs"
+import { EPaymentType } from "../enums/wallet.enum.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
 
 /**
  * @description Returns the random string of requested strLength, by default it will return code of length 8
