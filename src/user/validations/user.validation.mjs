@@ -2,6 +2,7 @@ import { UserRoles } from "../enums/role.enums.mjs";
 const { RENTER, LANDLORD, PROPERTY_MANAGER } = UserRoles;
 import Joi from "joi";
 import { address, pagination } from "./common.validation.mjs";
+import { EShareVia } from "../enums/referral.enum.mjs"
 
 export const userLogin = Joi.object().keys({
   email: Joi.string().required().error(new Error("email is required")),
@@ -47,4 +48,11 @@ export const socialAuth = Joi.object().keys({
 
 export const switchRoleValidation = Joi.object().keys({
   role: Joi.string().required().valid(RENTER, LANDLORD, PROPERTY_MANAGER)
+});
+
+export const shareReferralCodeValidation = Joi.object().keys({
+  share_via: Joi.string().required().valid(...Object.values(EShareVia)),
+  refer_to: Joi.array().items(
+    Joi.string().required()
+  ).required()
 });

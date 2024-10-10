@@ -24,6 +24,7 @@ import { Transaction } from "../models/transactions.model.mjs";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { Admin } from "../../admin/models/admin.model.mjs";
+import * as referralService from "../services/referral.service.mjs";
 
 async function loginUser(body) {
   const { email, password, fcmToken } = body;
@@ -128,9 +129,9 @@ async function addUser(body) {
     };
   }
 
-  const referralCode = generateReferralCode();
+  // const referralCode = generateReferralCode();
 
-  body.referralCode = referralCode;
+  // body.referralCode = referralCode;
 
   let { password } = body;
 
@@ -148,10 +149,12 @@ async function addUser(body) {
 
   body.password = hashedPassword;
 
-  const saveInReferral = new Referral({ code: referralCode });
+  // const saveInReferral = new Referral({ code: referralCode });
 
-  await saveInReferral.save();
+  // await saveInReferral.save();
 
+
+  body.myCode = referralService.generateMyCode(8)
   const user = new User(body);
 
   await user.save();

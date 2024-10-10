@@ -8,7 +8,8 @@ STRIPE_SECRET_KEY = sk_test_51MjOBYIqUp9zeP6EgD6MynDrUfFBhueJSuCIBIxFFmDiszXyxkU
 HOST_URL = https://api.rentranzact.com/
 GOOGLE_CLIENT_ID = 550090857989-qqjf9m568ab1d41g6ih3rvqktimuo8d2.apps.googleusercontent.com
 ADMIN_JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_prod_admin
-
+FRONTEND_URL = https://rentranzact.com
+BACKEND_URL = https://api.rentranzact.com
 
 
 
