@@ -7,7 +7,8 @@ import {
     getUserDetails,
     deleteUser,
     switchRole,
-    shareReferralCode
+    shareReferralCode,
+    verifyReferralCode
 } from '../controllers/user.controller.mjs'
 import { resendOTP } from '../controllers/resendOtp.controller.mjs';
 import { UserRoles } from '../enums/role.enums.mjs';
@@ -94,4 +95,6 @@ router.get("/delete/user", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MA
 router.post('/switch-role', authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), switchRole);
 
 router.post("/refer", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), shareReferralCode);
+router.post("/verify/referral-code", verifyReferralCode);
+
 export default router;

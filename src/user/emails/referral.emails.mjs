@@ -1,8 +1,8 @@
 import { sendMail } from '../helpers/sendMail.mjs'
 
 export const sendReferralLink = (options) => {
-    let { email, code } = options;
-    console.log(`${process.env.FRONTEND_URL}/signup?referral=${code}`);
+    let { email, referralCode } = options;
+    console.log(`${process.env.FRONTEND_URL}/signup?referral=${referralCode}`);
     let html = `
          <html>
 <head>
@@ -12,9 +12,9 @@ export const sendReferralLink = (options) => {
 <div style="text-align: center">
   <p>Referral program invitation!</p>
   <p>Hi, your friend referred you to join Rentranzact. Click on the below signup button to register using referral</p>
-  <p><b>${code}</b></p>
+  <p><b>${referralCode}</b></p>
   <span>
-  <a href="${process.env.FRONTEND_URL}/signup?referral=${code}" 
+  <a href="${process.env.FRONTEND_URL}/signup?referral=${referralCode}" 
   style="
   color: #ffffff;
   text-decoration:none; 

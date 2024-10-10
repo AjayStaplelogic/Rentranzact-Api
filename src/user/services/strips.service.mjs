@@ -11,6 +11,10 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
+import { EPaymentType } from "../enums/wallet.enum.mjs";
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import * as referralService from "../services/referral.service.mjs";
+
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -217,7 +221,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 legal_Fee: 0,
                 caution_deposite: 0,
                 total_amount: 0,
-                agent_fee: 0
+                agent_fee: 0,
+                rtz_fee: 0
             }
 
             let rent = Number(property.rent);
@@ -227,6 +232,7 @@ async function addStripeTransaction(body, renterApplicationID) {
             data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
             data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
             data.insurance = 0;    // variable declaration for future use
+            data.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
             data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
 
 
@@ -256,6 +262,7 @@ async function addStripeTransaction(body, renterApplicationID) {
             type: "DEBIT",
             payment_mode: "stripe",
             allCharges: breakdown,
+            transaction_type: ETRANSACTION_TYPE.rentPayment
         })
 
 
@@ -266,6 +273,19 @@ async function addStripeTransaction(body, renterApplicationID) {
             await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
         }
         data.save()
+
+        // If landlord have referral code then transfering referral bonus to their parent or referrer
+        if (landlordDetails?.referralCode) {
+            const payTo = await referralService.getUserByMyCode(landlordDetails.referralCode); // amount to be transferred to
+            if (payTo) {
+                const referralAmount = await referralService.calculateReferralAmountWithRTZFee(breakdown.rtz_fee);
+                if (referralAmount > 0) {
+                    await referralService.addReferralBonusInWallet(referralAmount, landlordDetails?._id, payTo._id, propertyDetails._id);
+                }
+            }
+        }
+        
+        // Deleting notification which was showing pay now button after payment successfull
         if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
         }
@@ -315,7 +335,8 @@ async function rechargeWallet(body) {
                 date: created,
                 intentID: id,
                 type: "CREDIT",
-                payment_mode: body.paymentMethod
+                payment_mode: body.paymentMethod,
+                transaction_type: ETRANSACTION_TYPE.rechargeWallet
             };
 
             if (UserRoles.LANDLORD === userDetail?.role) {
@@ -362,7 +383,8 @@ async function rechargeWallet(body) {
                 date: created,
                 intentID: id,
                 type: "CREDIT",
-                payment_mode: body.paymentMethod
+                payment_mode: body.paymentMethod,
+                transaction_type: ETRANSACTION_TYPE.rechargeWallet
             }
 
             if (UserRoles.LANDLORD === userDetail?.role) {
@@ -387,6 +409,7 @@ async function rechargeWallet(body) {
 
         console.log("payload=----", payload, '====payload')
         if (Object.keys(payload).length > 0) {
+            payload.payment_type = EPaymentType.rechargeWallet
             let add_wallet = await Wallet.create(payload);
             console.log("add_wallet=----", add_wallet, '====add_wallet')
 
@@ -640,7 +663,8 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         pmID: propertyDetails?.property_manager_id,
         type: "DEBIT",
         payment_mode: "stripe",
-        allCharges: breakdown
+        allCharges: breakdown,
+        transaction_type: ETRANSACTION_TYPE.rentPayment
     })
 
 

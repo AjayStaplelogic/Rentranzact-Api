@@ -1,4 +1,4 @@
-import { userSignup, userLogin, userVerify, socialAuth, switchRoleValidation, shareReferralCodeValidation } from "../validations/user.validation.mjs";
+import { userSignup, userLogin, userVerify, socialAuth, switchRoleValidation, shareReferralCodeValidation, verifyReferralCodeValidation } from "../validations/user.validation.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
 import {
   loginUser,
@@ -456,14 +456,34 @@ async function shareReferralCode(req, res) {
 
     if (req.body.share_via === EShareVia.email) {
       referralEmailService.sendReferralLink({
-        email: req.body.share_via,
+        email: req.body.refer_to,
         referralCode: req?.user?.data?.myCode
       });
 
-      return sendResponse(res, {}, "Success", true, 200, accessToken);
+      return sendResponse(res, {}, "Success", true, 200);
     }
     return sendResponse(res, {}, "Invalid Share Type", false, 400);
   } catch (error) {
+    return sendResponse(res, {}, error?.message, false, 400);
+  }
+}
+
+async function verifyReferralCode(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, verifyReferralCodeValidation);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+
+    const validCode = await referralService.isMyCodeExistsInUsers(req.body.referralCode);
+    if (validCode) {
+      return sendResponse(res, {}, "Success", true, 200);
+    }
+
+    return sendResponse(res, {}, "Invalid Referral Code", false, 400);
+  } catch (error) {
+    console.log(error, '===error')
     return sendResponse(res, {}, error?.message, false, 400);
   }
 }
@@ -488,5 +508,6 @@ export {
   commisions,
   getUserDetails,
   switchRole,
-  shareReferralCode
+  shareReferralCode,
+  verifyReferralCode
 };

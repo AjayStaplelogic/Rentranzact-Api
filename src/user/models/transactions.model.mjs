@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 const transactionSchema = new mongoose.Schema(
   {
 
@@ -68,7 +69,12 @@ const transactionSchema = new mongoose.Schema(
     allCharges: {
       type: Object,
       required: false
-    }
+    },
+
+    transaction_type: {
+      type: String,
+      enum: Object.values(ETRANSACTION_TYPE)
+    },
   },
   { timestamps: true }
 );
