@@ -1,4 +1,11 @@
 import { User } from "../models/user.model.mjs";
+import ReferralEarnings from "../models/referralEarnings.model.mjs";
+import { v4 as uuidv4 } from 'uuid';
+import moment from "moment";
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
+import { Transaction } from "../models/transactions.model.mjs";
+import { EBonusPer } from "../enums/referral.enum.mjs"
 
 /**
  * @description Returns the random string of requested strLength, by default it will return code of length 8
@@ -35,4 +42,83 @@ export const generateMyCode = async (codeLength = 8) => {
         myCode = generateRandomString(codeLength);
     }
     return myCode;
+}
+
+/**
+ * @description Retrieves user details based on the given myCode
+ * @param {string} referralCode The myCode of the user
+ * @returns {User} Returns the user document if found, otherwise returns null
+ */
+export const getUserByMyCode = async (referralCode) => {
+    return await User.findOne({ myCode: referralCode });
+}
+
+/**
+ * @description This function will add referral bonus in wallet, create entry in referral earnings and transaction model only for first time
+ * @param {number} amount Total referral bonus amount to transfer in wallet
+ * @param {string} from  Id of the referred to user
+ * @param {string} to  Id of the referred by user
+ * @param {string} property_id Property id whose rent is paid
+ */
+export const addReferralBonusInWallet = async (amount, from, to, property_id = null) => {
+    const benificiaryDetails = await User.findById(to).lean().exec();
+    if (benificiaryDetails) {
+        const already_added = await ReferralEarnings.findOne({
+            from: from,
+            to: to,
+            isDeleted: false
+        });
+
+        if (!already_added) {
+            let referral_earning_payload = {
+                from: from,
+                to: to,
+                amount: amount,
+                isDeleted: false,
+                property_id
+            };
+
+            const new_referral_earnings = new ReferralEarnings(referral_earning_payload);
+            const wallet_payload = {
+                amount: Number(amount),
+                status: "successful",
+                type: "CREDIT",
+                userID: to,
+                intentID: uuidv4(),
+                payment_type: EPaymentType.rechargeWallet
+            }
+
+            const add_wallet = new Wallet(wallet_payload);
+
+            const created = moment().unix();
+
+            const transaction_payload = {
+                wallet: true,
+                amount: amount,
+                status: "successful",
+                date: created,
+                intentID: uuidv4(),
+                type: "CREDIT",
+                transaction_type: ETRANSACTION_TYPE.referralBonus
+            };
+
+            if (UserRoles.LANDLORD === benificiaryDetails?.role) {
+                transaction_payload.landlordID = benificiaryDetails._id;
+            } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
+                transaction_payload.pmID = benificiaryDetails._id;
+            } else if (UserRoles.RENTER === benificiaryDetails?.role) {
+                transaction_payload.renterID = benificiaryDetails._id;
+            }
+
+            const create_transaction = new Transaction(transaction_payload);
+            new_referral_earnings.save();
+            add_wallet.save();
+            create_transaction.save();
+        }
+    }
+
+}
+
+export const calculateReferralAmountWithRTZFee = (rtz_fee = 0) => {
+    return Number((rtz_fee * EBonusPer.referrer) / 100) || 0;
 }

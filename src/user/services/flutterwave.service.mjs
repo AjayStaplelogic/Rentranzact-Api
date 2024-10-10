@@ -11,7 +11,8 @@ import { UserRoles } from "../enums/role.enums.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import { EPaymentType } from "../enums/wallet.enum.mjs"
-
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import * as referralService from "../services/referral.service.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -163,8 +164,8 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
         breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
         breakdown.insurance = 0;    // variable declaration for future use
-        // breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        // breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
+        breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+        breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
 
         breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
 
@@ -186,7 +187,8 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             pmID: propertyDetails.property_manager_id,
             type: "Debit",
             payment_mode: "flutterwave",
-            allCharges: breakdown
+            allCharges: breakdown,
+            transaction_type: ETRANSACTION_TYPE.rentPayment
         }
 
         if (landlordDetails) {
@@ -204,6 +206,20 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         }
 
         data.save()
+
+
+        // If landlord have referral code then transfering referral bonus to their parent or referrer
+        if (landlordDetails?.referralCode) {
+            const payTo = await referralService.getUserByMyCode(landlordDetails.referralCode); // amount to be transferred to
+            if (payTo) {
+                const referralAmount = await referralService.calculateReferralAmountWithRTZFee(breakdown.rtz_fee);
+                if (referralAmount > 0) {
+                    await referralService.addReferralBonusInWallet(referralAmount, landlordDetails._id, payTo._id, propertyDetails._id);
+                }
+            }
+        }
+
+        // Deleting notification which was showing pay now button after payment successfull
         if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
         }
@@ -235,7 +251,7 @@ async function addToWallet(body) {
                     type: "CREDIT",
                     userID,
                     intentID: id,
-                    payment_type : EPaymentType.rechargeWallet
+                    payment_type: EPaymentType.rechargeWallet
                 }
 
                 let add_wallet = await Wallet.create(payload);
@@ -252,7 +268,8 @@ async function addToWallet(body) {
                         date: created,
                         intentID: id,
                         type: "CREDIT",
-                        payment_mode: "flutterwave"
+                        payment_mode: "flutterwave",
+                        transaction_type: ETRANSACTION_TYPE.rechargeWallet
                     };
 
                     if (userDetail.role === UserRoles.LANDLORD) {
@@ -430,7 +447,8 @@ async function addFlutterwaveTransactionForOld(body) {
             pmID: propertyDetails.property_manager_id,
             type: "Debit",
             payment_mode: "flutterwave",
-            allCharges: breakdown
+            allCharges: breakdown,
+            transaction_type: ETRANSACTION_TYPE.rentPayment
         }
 
         if (landlordDetails) {

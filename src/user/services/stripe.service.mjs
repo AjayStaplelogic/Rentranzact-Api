@@ -11,6 +11,7 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { rentApplication } from "../models/rentApplication.model.mjs"
 import * as commissionServices from "../services/commission.service.mjs";
 import { Notification } from "../models/notification.model.mjs";
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -281,7 +282,8 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             landlordID: landlordDetails._id,
             type: "DEBIT",
             payment_mode: "wallet",
-            allCharges: breakdown
+            allCharges: breakdown,
+            transaction_type : ETRANSACTION_TYPE.rentPayment
         })
 
         data.save()
@@ -445,7 +447,8 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             pmID: propertyDetails.property_manager_id,
             type: "DEBIT",
             payment_mode: "wallet",
-            allCharges: breakdown
+            allCharges: breakdown,
+            transaction_type : ETRANSACTION_TYPE.rentPayment
         })
 
         // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
