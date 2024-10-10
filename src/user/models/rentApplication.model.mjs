@@ -255,7 +255,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     expectedStaysDurationType: {
       type: String,
-      enum: Object.value(ExpectedStaysDurationType)
+      enum: Object.values(ExpectedStaysDurationType)
     }
   },
 
