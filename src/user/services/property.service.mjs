@@ -352,51 +352,13 @@ async function getPropertyByID(id, userID) {
 
   dataMerge.propertyData = data;
 
+  // IF property have landlord then sending landlord details
   if (data.landlord_id) {
-    if (userID) {
-      const favorite = await User.findById(userID).select("favorite")
-      const landlord = await User.findById(data.landlord_id);
+    const landlord = await User.findById(data.landlord_id);
+    if (landlord) {
+      const { _id, fullName, picture, verified, role, countryCode, phone } = landlord;
 
-      if (favorite && favorite?.favorite?.includes(id)) {
-
-        dataMerge["liked"] = true
-
-      } else {
-
-        dataMerge["liked"] = false
-
-      }
-
-      if (landlord) {
-        const { _id, fullName, picture, verified, role, countryCode, phone } = landlord;
-
-        dataMerge.landlord = {
-          _id,
-          fullName,
-          picture,
-          verified,
-          role,
-          countryCode,
-          phone
-        };
-      }
-    }
-    // dataMerge.propertyData = data;
-    // console.log(dataMerge.propertyData, "==final ")
-  } else {
-    if (userID) {
-      const favorite = await User.findById(userID).select("favorite")
-      if (favorite && favorite?.favorite?.includes(id)) {
-        dataMerge["liked"] = true
-      } else {
-        dataMerge["liked"] = false
-      }
-
-      const propertyManager = await User.findById(data.property_manager_id);
-
-      const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
-
-      dataMerge.property_manager = {
+      dataMerge.landlord = {
         _id,
         fullName,
         picture,
@@ -408,6 +370,7 @@ async function getPropertyByID(id, userID) {
     }
   }
 
+  // If property is on rent, then sending renter details
   if (data.rented) {
     const renter = await User.findById(data.renterID);
     const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
@@ -422,6 +385,31 @@ async function getPropertyByID(id, userID) {
       phone
     }
   }
+
+  // If property have property manager then sending property manager details
+  if (data.property_manager_id) {
+    const propertyManager = await User.findById(data.property_manager_id);
+    const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
+    dataMerge.property_manager = {
+      _id,
+      fullName,
+      picture,
+      verified,
+      role,
+      countryCode,
+      phone
+    };
+  }
+
+  if (userID) {
+    const favorite = await User.findById(userID).select("favorite")
+    if (favorite && favorite?.favorite?.includes(userID)) {
+      dataMerge["liked"] = true
+    } else {
+      dataMerge["liked"] = false
+    }
+  }
+
   dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });
   dataMerge.application_count = await rentApplication.countDocuments({ propertyID: id, applicationStatus: RentApplicationStatus.PENDING, }); // kinIdentityCheck: true , removed this check because kin verification functionality no longer exists
   return {
