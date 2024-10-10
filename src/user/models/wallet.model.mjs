@@ -1,11 +1,12 @@
 import mongoose from "mongoose";
+import { EPaymentType } from "../enums/wallet.enum.mjs"
 // Define the schema for the User model
 const walletSchema = new mongoose.Schema(
     {
         intentID: {
             type: String,
             required: true
-          },
+        },
         userID: {
             type: String,
             required: true
@@ -27,6 +28,11 @@ const walletSchema = new mongoose.Schema(
         status: {
             type: String,
             default: false
+        },
+
+        payment_type: {
+            type: String,
+            enum: Object.values(EPaymentType)
         }
     },
     { timestamps: true }

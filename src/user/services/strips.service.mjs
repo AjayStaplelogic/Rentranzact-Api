@@ -11,6 +11,7 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
+import { EPaymentType } from "../enums/wallet.enum.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -387,6 +388,7 @@ async function rechargeWallet(body) {
 
         console.log("payload=----", payload, '====payload')
         if (Object.keys(payload).length > 0) {
+            payload.payment_type = EPaymentType.rechargeWallet
             let add_wallet = await Wallet.create(payload);
             console.log("add_wallet=----", add_wallet, '====add_wallet')
 

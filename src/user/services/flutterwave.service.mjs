@@ -10,6 +10,8 @@ import { Wallet } from "../models/wallet.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
 import { Notification } from "../models/notification.model.mjs";
+import { EPaymentType } from "../enums/wallet.enum.mjs"
+
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -232,7 +234,8 @@ async function addToWallet(body) {
                     createdAt: created,
                     type: "CREDIT",
                     userID,
-                    intentID: id
+                    intentID: id,
+                    payment_type : EPaymentType.rechargeWallet
                 }
 
                 let add_wallet = await Wallet.create(payload);
