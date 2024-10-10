@@ -63,6 +63,7 @@ export const getUserByMyCode = async (referralCode) => {
  * @param {string} property_id Property id whose rent is paid
  */
 export const addReferralBonusInWallet = async (amount, from, to, property_id = null) => {
+    try {
     const benificiaryDetails = await User.findById(to).lean().exec();
     if (benificiaryDetails) {
         const already_added = await ReferralEarnings.findOne({
@@ -94,6 +95,7 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
             }
 
             const add_wallet = new Wallet(wallet_payload);
+            console.log(add_wallet, '====add_wallet')
 
 
             const transaction_payload = {
@@ -105,7 +107,8 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 type: "CREDIT",
                 transaction_type: ETRANSACTION_TYPE.referralBonus
             };
-
+            
+            
             if (UserRoles.LANDLORD === benificiaryDetails?.role) {
                 transaction_payload.landlordID = benificiaryDetails._id;
             } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
@@ -113,13 +116,21 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
             } else if (UserRoles.RENTER === benificiaryDetails?.role) {
                 transaction_payload.renterID = benificiaryDetails._id;
             }
-
+            console.log(transaction_payload, '====transaction_payload')
+            
             const create_transaction = new Transaction(transaction_payload);
             new_referral_earnings.save();
             add_wallet.save();
+            console.log(add_wallet, '====add_wallet  222')
+
             create_transaction.save();
+            console.log(create_transaction, '====create_transaction  222')
+
         }
     }
+} catch (error) {
+    console.log(error, '====error from bonus to wallet')       
+}
 
 }
 
