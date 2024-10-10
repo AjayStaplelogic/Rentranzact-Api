@@ -56,3 +56,8 @@ export const shareReferralCodeValidation = Joi.object().keys({
     Joi.string().required()
   ).required()
 });
+
+
+export const verifyReferralCodeValidation = Joi.object().keys({
+  referralCode: Joi.string().required()
+});
