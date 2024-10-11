@@ -473,6 +473,11 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
+    console.log(req.body.images, '========req.body.images');
+    console.log(req.images, '========req.images');
+    console.log(req.files, '========req.files');
+
+
     if (req.files && req.files.length > 0) {
       req.body.images = req.body.images || [];
       req.body.documents = req.body.documents || [];
