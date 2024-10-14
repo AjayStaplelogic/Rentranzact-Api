@@ -200,7 +200,7 @@ async function searchInProperty(body) {
 }
 
 async function filterProperies(body, id) {
-  const { filters, approval_status } = body;
+  const { filters, approval_status, rented } = body;
   const sort_key = body.sort_key || "createdAt";
   const sort_order = body.sort_order || "desc";
   let sort_query = {};
@@ -208,6 +208,10 @@ async function filterProperies(body, id) {
 
   if (approval_status) {
     filters.approval_status = { $in: approval_status.split(",") };
+  }
+
+  if (rented) {
+    filters.rented = rented === 'true' ? true : false;
   }
 
   let favorite_arr = [];
@@ -244,7 +248,7 @@ async function filterProperies(body, id) {
 }
 
 async function nearbyProperies(body, userID) {
-  const { maxDistance, latitude, longitude, approval_status } = body;
+  const { maxDistance, latitude, longitude, approval_status, rented } = body;
   const sort_key = body.sort_key || "createdAt";
   const sort_order = body.sort_order || "desc";
   let sort_query = {};
@@ -266,6 +270,12 @@ async function nearbyProperies(body, userID) {
     if (userID) {
       query.landlord_id = { $ne: userID }
     }
+
+    if (rented) {
+      query.rented = rented === 'true' ? true : false;
+    }
+
+
     const data = await Property.find(query).sort(sort_query);
 
     let modifiedProperties = data;
@@ -297,6 +307,10 @@ async function nearbyProperies(body, userID) {
 
     if (userID) {
       query.landlord_id = { $ne: userID }
+    }
+
+    if (rented) {
+      query.rented = rented === 'true' ? true : false;
     }
 
     const data = await Property.find().limit(9);
