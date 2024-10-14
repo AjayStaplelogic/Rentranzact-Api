@@ -151,6 +151,10 @@ const userSchema = new mongoose.Schema(
       min: 0,
       max: 5
     },
+    earned_rewards: {
+      type: Number,
+      default: 0,
+    },
   },
 
   { timestamps: true }

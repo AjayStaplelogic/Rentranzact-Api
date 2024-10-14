@@ -681,7 +681,7 @@ async function getLeaseAggrementList(id, role) {
 async function getWalletDetails(id) {
 
 
-  const { walletPoints, role } = await User.findById(id);
+  const { walletPoints, role, earned_rewards } = await User.findById(id);
 
   const results = await Wallet.aggregate([
     { $match: { userID: id } },
@@ -699,7 +699,7 @@ async function getWalletDetails(id) {
   const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
   const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
   let RentCollected = 0;
-  let EarnedRewards = 0;
+  let EarnedRewards = Number(earned_rewards) || 0;
 
   let rent_transaction_query = {
     propertyID: { $exists: true }
@@ -748,7 +748,6 @@ async function getWalletDetails(id) {
   };
 
 }
-
 
 async function deleteAggrementByID(userID, aggrementID, role) {
 
