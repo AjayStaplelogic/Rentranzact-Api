@@ -67,7 +67,7 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
         if (amount > 0) {
             amount = Number(amount.toFixed(2));
         }
-        
+
         const benificiaryDetails = await User.findById(to).lean().exec();
         if (benificiaryDetails) {
             const already_added = await ReferralEarnings.findOne({
@@ -130,7 +130,12 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 create_transaction.save();
                 console.log(create_transaction, '====create_transaction  222')
                 if (add_wallet._id) {
-                    await User.findByIdAndUpdate(add_wallet.userID, { $inc: { walletPoints: add_wallet.amount } });
+                    await User.findByIdAndUpdate(add_wallet.userID, {
+                        $inc: {
+                            walletPoints: add_wallet.amount,
+                            earned_rewards: add_wallet.amount
+                        }
+                    });
                 }
             }
         }
