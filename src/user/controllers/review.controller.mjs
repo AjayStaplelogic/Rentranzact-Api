@@ -138,6 +138,21 @@ export const getAllReviews = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
+
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "review_to_id",
+                    foreignField: "_id",
+                    as: "review_to_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$review_to_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
             {
                 $project: {
                     createdAt: "$createdAt",
@@ -155,6 +170,10 @@ export const getAllReviews = async (req, res) => {
                     landloard_id: "$landloard_id",
                     landloard_name: "$landloard_details.fullName",
                     landloard_image: "$landloard_details.picture",
+
+                    review_to_id: "$review_to_id",
+                    review_to_name: "$review_to_details.fullName",
+                    review_to_image: "$review_to_details.picture",
                 }
             },
             {

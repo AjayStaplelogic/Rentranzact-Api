@@ -23,7 +23,7 @@ const reviewSchema = new mongoose.Schema({
         ref: "properties",
         index: true
     },
-    landloard_id: {           // Review given by
+    landloard_id: {           // In case of property
         type: mongoose.Types.ObjectId,
         ref: "users",
         index: true,
