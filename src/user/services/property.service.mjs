@@ -248,11 +248,14 @@ async function filterProperies(body, id) {
 }
 
 async function nearbyProperies(body, userID) {
-  const { maxDistance, latitude, longitude, approval_status, rented } = body;
+  let { maxDistance, latitude, longitude, approval_status, rented } = body;
   const sort_key = body.sort_key || "createdAt";
   const sort_order = body.sort_order || "desc";
   let sort_query = {};
   sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
+  if (!maxDistance) {
+    maxDistance = 125;
+  }
 
   if (maxDistance && latitude && longitude) {
     let query = {
@@ -275,6 +278,7 @@ async function nearbyProperies(body, userID) {
       query.rented = rented === 'true' ? true : false;
     }
 
+    console.log(query, '====query')
 
     const data = await Property.find(query).sort(sort_query);
 
@@ -313,7 +317,7 @@ async function nearbyProperies(body, userID) {
       query.rented = rented === 'true' ? true : false;
     }
 
-    const data = await Property.find().limit(9);
+    const data = await Property.find(query).limit(9);
     let modifiedProperties = data
     if (userID) {
       const favorite = await User.findById(userID).select("favorite")
