@@ -227,6 +227,6 @@ export const deleteAccount = async (acc_id) => {
 }
 
 
-// console.log(deleteAccount("acct_1Q9mVqRBozilKimr"))
+// console.log(deleteAccount("acct_1Q8aGLRRHzUEJINV"))
 
 

@@ -19,6 +19,9 @@ io.use(async (socket, next) => {
         }
         if (token_arr[0] == "Bearer" && token_arr[1]) {
             try {
+                console.log(token_arr[1], '=====token_arr[1]====',process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
+                console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
+
                 if (token_arr[1] == process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
                     if (socket?.handshake?.headers["admin_id"]) {
                         socket["is_admin"] = true;
