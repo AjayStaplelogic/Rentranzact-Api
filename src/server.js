@@ -28,7 +28,7 @@ import electricityRoutes from "./user/routes/electricity.route.mjs";
 import chatRoutes from "./user/routes/chat.route.mjs";
 import userContactUsRoutes from "./user/routes/contactus.route.mjs";
 import userCommissionRoutes from "./user/routes/commissions.route.mjs";
-
+import userAccountsRoutes from "./user/routes/accounts.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -64,7 +64,7 @@ admin.initializeApp({
 
 const app = express();
 
-app.use(express.json({limit: '100mb'}));
+app.use(express.json({ limit: '100mb' }));
 // app.use(bodyParser.urlencoded({ extended: false, limit: '50mb', parameterLimit: 500000 }));
 
 // Parse JSON bodies (if applicable)
@@ -122,6 +122,7 @@ app.use("/api", electricityRoutes)
 app.use("/api", chatRoutes)
 app.use("/api", userContactUsRoutes)
 app.use("/api", userCommissionRoutes)
+app.use("/api", userAccountsRoutes);
 
 //admin
 app.use("/api/admin", adminRoutes)
