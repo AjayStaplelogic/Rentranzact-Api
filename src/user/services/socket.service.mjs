@@ -21,17 +21,19 @@ io.use(async (socket, next) => {
             try {
                 console.log(token_arr[1], '=====token_arr[1]====',process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
                 console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
-
-                if (token_arr[1] == process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
+                console.log(socket?.handshake?.headers["admin_id"], '===socket?.handshake?.headers["admin_id"]')
+                if (token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
                     if (socket?.handshake?.headers["admin_id"]) {
                         socket["is_admin"] = true;
                         socket["admin_id"] = socket?.handshake?.headers["admin_id"]
+                        console.log("Reached To Next Function")
                         return next();
                     }
-
+                    console.log("Reached The Error the next true function")
                     return next(new Error("Admin Id required"));
-
                 }
+
+                console.log("Else Part, Not Entered In IF")
 
                 const decoded = jwt.verify(token_arr[1], process.env.JWT_ACCESS_TOKEN_SECRET);
                 if (decoded.data && decoded.data._id) {
