@@ -12,6 +12,8 @@ io.use(async (socket, next) => {
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
     }
+    console.log(socket.handshake.headers, '===socket?.handshake?.headers')
+
     if (socket?.handshake?.headers["authorization"]) {
         let token_arr = socket?.handshake?.headers["authorization"].split(' ');
         if (token_arr.length < 2) {
