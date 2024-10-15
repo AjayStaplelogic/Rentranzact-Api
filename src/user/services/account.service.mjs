@@ -18,8 +18,9 @@ export const updateAccountFromWebhook = async (event) => {
             const get_user = await User.findById(metadata.user_id);
             if (get_user) {
                 const connected_account = await addUpdateAccount(get_user._id, data);
-                if (data?.external_accounts?.length > 0) {
-                    for await (let external_account of data?.external_accounts) {
+                if (data?.external_accounts?.data?.length > 0) {
+                    console.log(`[External Account Length Condition Matched]`)
+                    for await (let external_account of data?.external_accounts?.data) {
                         await addUpdateExternalAccount(get_user._id, external_account);
                     }
                 }
