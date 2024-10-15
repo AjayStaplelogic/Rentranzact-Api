@@ -8,9 +8,12 @@ export const updateAccountFromWebhook = async (event) => {
     // Example: Update the account status based on the 'account_status' field
     // Return the updated account object
 
+    console.log(event, '=======event Update Account From Webhook')
+
     const data = event?.data?.object;
     if (data) {
         const { metadata } = data;
+        console.log(metadata, '============metadata')
         if (metadata?.user_id) {
             const get_user = await User.findById(metadata.user_id);
             if (get_user) {
