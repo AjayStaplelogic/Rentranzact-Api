@@ -2,6 +2,8 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Property } from "../models/property.model.mjs";
 import { createHmac } from "crypto"
 import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
+import * as AccountSerivices from "../services/account.service.mjs";
+
 async function stripe(req, res) {
 
     const { body } = req;
@@ -15,7 +17,7 @@ async function stripe(req, res) {
             const data = await rechargeWallet(body);
             sendResponse(res, data.data, data.message, data.status, data.statusCode);
         } else {
-            
+
             const { propertyID } = body.data.object.metadata;
             const property = await Property.findById(propertyID);
             console.log("payment count ===>", property.payment_count)
@@ -27,6 +29,23 @@ async function stripe(req, res) {
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
             }
         }
+    }
+
+    switch (body.type) {
+        case "account.updated":
+            AccountSerivices.updateAccountFromWebhook(body);
+            break;
+
+        case "account.external_account.created":
+
+            break;
+
+        case "account.external_account.updated":
+            break;
+
+        case "account.external_account.deleted":
+            break;
+
     }
 }
 

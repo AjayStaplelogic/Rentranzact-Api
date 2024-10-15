@@ -26,15 +26,16 @@ export const updateAccountFromWebhook = async (event) => {
 }
 
 export const addUpdateAccount = async (user_id, account_data) => {
+    console.log(account_data, '=====account_data')
     const query = {
         user_id: user_id,
-        connect_acc_id: id,
+        connect_acc_id: account_data.id,
         isDeleted: false
     }
 
     const payload = {
         user_id: user_id,
-        connect_acc_id: id,
+        connect_acc_id: account_data.id,
         business_name: account_data?.business_profile?.name ?? "",
         business_type: account_data?.business_type ?? "",
         country: account_data?.country,
