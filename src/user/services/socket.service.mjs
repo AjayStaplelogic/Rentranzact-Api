@@ -23,11 +23,11 @@ io.use(async (socket, next) => {
             try {
                 console.log(token_arr[1], '=====token_arr[1]====',process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
                 console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET )
-                console.log(socket?.handshake?.headers["admin_id"], '===socket?.handshake?.headers["admin_id"]')
+                console.log(socket?.handshake?.headers["admin-id"], '===socket?.handshake?.headers["admin-id"]')
                 if (token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
-                    if (socket?.handshake?.headers["admin_id"]) {
+                    if (socket?.handshake?.headers["admin-id"]) {
                         socket["is_admin"] = true;
-                        socket["admin_id"] = socket?.handshake?.headers["admin_id"]
+                        socket["admin_id"] = socket?.handshake?.headers["admin-id"]
                         console.log("Reached To Next Function")
                         return next();
                     }
