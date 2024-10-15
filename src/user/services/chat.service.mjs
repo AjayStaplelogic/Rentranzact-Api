@@ -55,7 +55,7 @@ export const join_private_room = async (socket, data) => {
         if (!room) {
             let create_room = await ChatRooms.create({
                 user_ids: [socket.user_id, data.chat_with],
-                admin_id: socket.admin_id
+                admin_id: socket.user_id
             })
             if (create_room) {
                 room_id = create_room._id;
@@ -199,7 +199,7 @@ export const get_reciever_id_from_room = async (room_id, sender_id) => {
 export const send_message = async (socket, data) => {
     if (socket.is_admin) {
         data.is_sender_admin = true;
-        data.admin_id = socket.admin_id;
+        data.admin_id = socket.user_id;
     } else {
         data.is_sender_admin = false;
         data.sender_id = socket.user_id;
@@ -244,7 +244,7 @@ export const read_message = async (socket, data) => {
     };
     if (socket.is_admin) {
         query.is_reciever_admin = true;
-        query.admin_id = socket.admin_id;
+        query.admin_id = socket.user_id;
     } else {
         query.is_reciever_admin = false;
         query.reciever_id = socket.user_id;
