@@ -106,6 +106,20 @@ export const getChatRooms = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "admins",
+                    localField: "admin_id",
+                    foreignField: "_id",
+                    as: "admin_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$admin_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $group: {
                     _id: "$_id",
                     user_ids: { $push: "$user_details._id" },
@@ -114,16 +128,55 @@ export const getChatRooms = async (req, res) => {
                             _id: "$user_details._id",
                             fullName: "$user_details.fullName",
                             picture: "$user_details.picture"
-                        }
+                        },
+                        // $addToSet: {
+                        //     _id: "$admin_details._id",
+                        //     fullName: "$admin_details.fullName",
+                        //     picture: "$admin_details.picture"
+                        // }
                     },
                     last_message: { $last: "$last_message" },
                     last_message_at: { $last: "$last_message_at" },
                     last_sender: { $last: "$last_sender" },
-                    updatedAt: { $last: "$updatedAt" }
+                    updatedAt: { $last: "$updatedAt" },
+                    admin_details: {
+                        $addToSet: {
+                            _id: "$admin_details._id",
+                            fullName: "$admin_details.fullName",
+                            picture: "$admin_details.picture",
+                            is_admin : true
+                        }
+                    }
                 }
             },
             {
+                $set: {
+                    user_details: {
+                        $concatArrays: ["$user_details", "$admin_details"]
+                    }
+                }
+            },
+            {
+                $set: {
+                    user_details: {
+                        $filter: {
+                            input: "$user_details",
+                            as: "user_details",
+                            cond: {
+                                $eq: [
+                                    { $type: "$$user_details._id" },
+                                    "objectId"
+                                ]
+                            }
+                        }
+                    }
+                },
+            },
+            {
                 $match: query2
+            },
+            {
+                $unset: ["admin_details"]
             },
             {
                 $facet: {
