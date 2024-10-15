@@ -46,11 +46,12 @@ async function stripe(req, res) {
             break;
 
         case "account.external_account.deleted":
+            AccountSerivices.deleteExternalAccountFromWebhook(body);
             break;
 
     }
 
-    res.json({received: true});
+    res.json({ received: true });
 }
 
 async function paystack(req, res) {
