@@ -30,9 +30,11 @@ async function stripe(req, res) {
             }
         }
     }
+    console.log(body.type, '====body.type')
 
     switch (body.type) {
         case "account.updated":
+            console.log(`[Switch Matched]:[${body.type}]`)
             AccountSerivices.updateAccountFromWebhook(body);
             break;
 
@@ -47,6 +49,8 @@ async function stripe(req, res) {
             break;
 
     }
+
+    res.json({received: true});
 }
 
 async function paystack(req, res) {
