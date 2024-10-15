@@ -64,7 +64,7 @@ export const addUpdateReview = async (req, res) => {
 export const getAllReviews = async (req, res) => {
     try {
         // console.log("[Review Listing]")
-        let { type, user_id, property_id, landloard_id, search, rating, status, sortBy } = req.query;
+        let { type, user_id, property_id, landloard_id, review_to_id, search, rating, status, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = { isDeleted: false };
@@ -73,6 +73,7 @@ export const getAllReviews = async (req, res) => {
         if (user_id) { query.user_id = new mongoose.Types.ObjectId(user_id) };
         if (property_id) { query.property_id = new mongoose.Types.ObjectId(property_id) };
         if (landloard_id) { query.landloard_id = new mongoose.Types.ObjectId(landloard_id) };
+        if (review_to_id) { query.review_to_id = new mongoose.Types.ObjectId(review_to_id) };
         if (rating) { query.rating = Number(rating) }
         if (status) { query.status = status };
         let skip = Number(page - 1) * count;
