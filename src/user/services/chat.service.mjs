@@ -122,7 +122,7 @@ export const get_room_by_id = async (id) => {
         {
             $group: {
                 _id: "$_id",
-                user_ids: { $push: "$user_details._id" },
+                // user_ids: { $push: "$user_details._id" },
                 user_details: {
                     $push: {
                         _id: "$user_details._id",
@@ -149,6 +149,11 @@ export const get_room_by_id = async (id) => {
                 user_details: {
                     $concatArrays: ["$user_details", "$admin_details"]
                 }
+            }
+        },
+        {
+            $addFields : {
+                user_ids : "$user_details._id"
             }
         },
         {
