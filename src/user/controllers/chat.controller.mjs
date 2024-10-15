@@ -122,7 +122,7 @@ export const getChatRooms = async (req, res) => {
             {
                 $group: {
                     _id: "$_id",
-                    user_ids: { $push: "$user_details._id" },
+                    // user_ids: { $push: "$user_details._id" },
                     user_details: {
                         $addToSet: {
                             _id: "$user_details._id",
@@ -153,7 +153,12 @@ export const getChatRooms = async (req, res) => {
                 $set: {
                     user_details: {
                         $concatArrays: ["$user_details", "$admin_details"]
-                    }
+                    },
+                }
+            },
+            {
+                $addFields : {
+                    user_ids : "$user_details._id"
                 }
             },
             {
