@@ -7,8 +7,9 @@ import * as Multer from '../helpers/multer.mjs';
 
 
 router.post('/upload/image', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), Multer.upload.single("media"), uploadController.uploadSingleImage);
-router.post('/upload/file/multiple', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]),  uploadController.uploadMultipleFiles);
+router.post('/upload/file/multiple', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), uploadController.uploadMultipleFiles);
 router.delete('/delete/file', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), uploadController.deleteFile);
+router.post('/admin/upload/file/multiple', uploadController.uploadMultipleFilesByAdmin);
 
 export default router;
 
