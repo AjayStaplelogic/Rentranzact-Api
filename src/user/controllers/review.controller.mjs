@@ -12,7 +12,7 @@ export const addUpdateReview = async (req, res) => {
             return sendResponse(res, {}, "Type reqired", false, 400);
         }
 
-        let query = {
+        const query = {
             isDeleted: false,
             user_id: req.user.data._id,
             type: type
@@ -49,9 +49,10 @@ export const addUpdateReview = async (req, res) => {
             + (Number(req.body.answer4) > 0 ? Number(req.body.answer4) : 0)
 
         req.body.rating = ReviewServices.get_avg_by_rating_numbers(total_score);    // Calculation avg starts
-
-        let update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
+        const update_review = await Reviews.findOneAndUpdate(query, req.body, { new: true, upsert: true });
         if (update_review) {
+            const avg_rating = await ReviewServices.calculate_avg_rating(update_review);
+            ReviewServices.update_avg_review_rating(update_review, avg_rating);
             return sendResponse(res, {}, "success", true, 200);
         }
         return sendResponse(res, {}, "success", true, 200);
