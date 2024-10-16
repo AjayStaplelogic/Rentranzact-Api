@@ -12,3 +12,9 @@ export const RatingFormula = {
     FOUR_STARS: { min: 12, max: 16, stars : 4 },
     FIVE_STARS: { min: 17, max: 20, stars : 5 },
 }
+
+export const EReviewStatus = {
+    pending: "pending",
+    approved: "approved",
+    rejected: "rejected"
+}
