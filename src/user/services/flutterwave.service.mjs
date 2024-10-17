@@ -13,6 +13,7 @@ import { Notification } from "../models/notification.model.mjs";
 import { EPaymentType } from "../enums/wallet.enum.mjs"
 import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
+import * as TransferServices from "../services/transfer.service.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
 
@@ -222,6 +223,11 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         // Deleting notification which was showing pay now button after payment successfull
         if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
+        }
+
+        // Requesting Admin for transfer admin account to landlord account
+        if (propertyDetails?.landlord_id) {
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
         }
     }
 
@@ -465,6 +471,11 @@ async function addFlutterwaveTransactionForOld(body) {
         data.save()
         if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
+        }
+
+        // Requesting Admin for transfer admin account to landlord account
+        if (propertyDetails?.landlord_id) {
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
         }
     }
 

@@ -37,6 +37,10 @@ const AccountSchema = new Schema({
     isDeleted : {
         type : Boolean,
         default : false
+    },
+    isPrimary : {
+        type : Boolean,
+        default : false
     }
 }, {
     timestamps: true,
