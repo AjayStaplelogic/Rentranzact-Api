@@ -17,10 +17,7 @@ import {
   verifyUserOtp
 } from "../services/user.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { UserRoles } from "../enums/role.enums.mjs";
 import { User } from '../models/user.model.mjs'
-import { Tokens } from '../models/tokens.model.mjs'
-import moment from 'moment';
 import * as bcrypt from "bcrypt";
 import { Property } from "../models/property.model.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs";
