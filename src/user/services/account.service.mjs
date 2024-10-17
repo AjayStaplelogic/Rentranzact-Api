@@ -3,6 +3,11 @@ import { User } from "../models/user.model.mjs";
 import Accounts from "../models/accounts.model.mjs";
 import ConnectedAccounts from "../models/connectedAccounts.model.mjs";
 
+/**
+ * @description when ever account_update webhook event is received, adding and updating connected account and external account
+ * @param {object} event This will contain the event object from stripe webhook
+ * @return {void} Nothing
+ */
 export const updateAccountFromWebhook = async (event) => {
     // Implement the logic to update the account based on the webhook payload
     // Example: Update the account status based on the 'account_status' field
@@ -29,6 +34,12 @@ export const updateAccountFromWebhook = async (event) => {
     }
 }
 
+/**
+ * @description Add and update connected accounts in database
+ * @param {string} user_id Id of the user wo initiated add and update of the account
+ * @param {object} account_data A valid account object from stripe
+ * @returns {connected_account} object containing the connected account information stored in the database
+ */
 export const addUpdateAccount = async (user_id, account_data) => {
     console.log(account_data, '=====account_data')
     const query = {
@@ -45,13 +56,20 @@ export const addUpdateAccount = async (user_id, account_data) => {
         country: account_data?.country,
         default_currency: account_data?.default_currency,
         email: account_data?.email,
-        status: account_data?.individual?.verification?.status
+        // status: account_data?.individual?.verification?.status
     }
 
+    payload.status = getConnectedAccountState(account_data);
     const connected_account = await ConnectedAccounts.findOneAndUpdate(query, payload, { upsert: true, new: true });
     return connected_account;
 }
 
+/**
+ * @description Add and update external accounts in database
+ * @param {string} user_id Id of the user wo initiated add and update of the account
+ * @param {object} account_data A valid external account object from stripe
+ * @returns {external_account} object containing the account information stored in the database
+ */
 export const addUpdateExternalAccount = async (user_id, account_data) => {
     const query = {
         user_id: user_id,
@@ -69,13 +87,18 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
         country: account_data?.country,
         currency: account_data?.currency,
         last_four: account_data?.last_four,
-        status: account_data?.status,
+        // status: account_data?.status,
     }
-
+    payload.status = getConnectedAccountState(account_data);
     const external_account = await Accounts.findOneAndUpdate(query, payload, { upsert: true, new: true });
     return external_account;
 }
 
+/**
+ * @description Whenever external accounts are deleted on stripe, deleting them from the database
+ * @param {object} event A valid event object from stripe event
+ * @returns {void} Nothing
+ */
 export const deleteExternalAccountFromWebhook = async (event) => {
     const data = event?.data?.object;
     if (data) {
@@ -86,3 +109,45 @@ export const deleteExternalAccountFromWebhook = async (event) => {
         });
     }
 }
+
+export const getConnectedAccountState = (account_data) => {
+    const reqs = account_data.requirements;
+
+    if (reqs.disabled_reason && reqs.disabled_reason.indexOf("rejected") > -1) {
+        return "rejected";
+    }
+
+    if (account_data.payouts_enabled && account_data.charges_enabled) {
+        if (reqs.pending_verification) {
+            return "pending enablement";
+        }
+
+        if (!reqs.disabled_reason && !reqs.currently_due) {
+            if (!reqs.eventually_due) {
+                return "complete";
+            } else {
+                return "enabled";
+            }
+        } else {
+            return "restricted";
+        }
+    }
+
+    if (!account_data.payouts_enabled && account_data.charges_enabled) {
+        return "restricted (payouts disabled)";
+    }
+
+    if (!account_data.charges_enabled && account_data.payouts_enabled) {
+        return "restricted (charges disabled)";
+    }
+
+    if (reqs.past_due) {
+        return "restricted (past due)";
+    }
+
+    if (reqs.pending_verification) {
+        return "pending (disabled)";
+    }
+
+    return "restricted";
+};

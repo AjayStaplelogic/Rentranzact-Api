@@ -5,9 +5,8 @@ import authorizer from "../middleware/authorizer.middleware.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 
 router.post("/connect-account", authorizer([UserRoles.LANDLORD, UserRoles.RENTER, UserRoles.PROPERTY_MANAGER]), AccountsController.createConnectedAccount);
-router.get("/cards", authorizer([UserRoles.LANDLORD, UserRoles.RENTER, UserRoles.PROPERTY_MANAGER]), AccountsController.getAllCards);
-router.delete("/card", authorizer([UserRoles.LANDLORD, UserRoles.RENTER, UserRoles.PROPERTY_MANAGER]), AccountsController.deleteCard);
-
+router.get("/connect-account", authorizer([UserRoles.LANDLORD, UserRoles.RENTER, UserRoles.PROPERTY_MANAGER]), AccountsController.getConnectedAccount);
+router.get("/connect-account/bank-accounts", authorizer([UserRoles.LANDLORD, UserRoles.RENTER, UserRoles.PROPERTY_MANAGER]), AccountsController.getAllAccounts);
 
 
 export default router

@@ -93,7 +93,9 @@ async function getUserByID(id) {
 
 async function deleteUserService(id) {
 
-  const data = await User.findByIdAndDelete(id);
+  const data = await User.findByIdAndUpdate(id,{    // changed this because earlier there was no checks mantained
+    deleted : true
+  });
 
   await activityLog(data._id, `deleted a user ${data.fullName}`)
   return {

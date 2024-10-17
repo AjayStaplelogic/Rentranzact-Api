@@ -1,5 +1,5 @@
 import { Reviews } from "../models/reviews.model.mjs";
-import { ReviewTypeEnum, RatingFormula } from "../enums/review.enum.mjs";
+import { ReviewTypeEnum, RatingFormula, EReviewStatus } from "../enums/review.enum.mjs";
 import { User } from "../models/user.model.mjs";
 import { Property } from "../models/property.model.mjs";
 
@@ -12,7 +12,7 @@ export const calculate_avg_rating = async (options) => {
     let { type, property_id, review_to_id } = options;
     let query = {
         isDeleted: false,
-        status: "accepted",
+        status: EReviewStatus.approved,
         type: type
     };
     let group_by = {}

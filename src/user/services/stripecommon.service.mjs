@@ -139,7 +139,7 @@ export const createAccount = async (user) => {
 
 // console.log(createAccount(
 //     {
-//         email: "test6@yopmail.com",
+//         email: "Testing6@yopmail.com",
 //         fullName: "TEST ACCOUNT 6",
 //     }
 // ))
@@ -166,7 +166,7 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
 
 }
 
-// console.log(createAccountLink("acct_1Q9gceI8UDBBc9bA"))
+// console.log(createAccountLink("acct_1QAQWXIXrnpy9Q28"))
 
 
 export const transferFunds = async (acc_id) => {
