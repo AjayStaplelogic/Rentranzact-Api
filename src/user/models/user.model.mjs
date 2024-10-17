@@ -155,6 +155,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
+    terms_n_condition : {
+      type: Boolean,
+      default: false,
+    }
   },
 
   { timestamps: true }

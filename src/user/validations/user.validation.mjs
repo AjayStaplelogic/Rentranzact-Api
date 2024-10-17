@@ -17,11 +17,12 @@ export const userSignup = Joi.object().keys({
     .min(3)
     .max(20)
     .error(new Error("name should be between 3 to 20 characters")),
-  referralCode: Joi.string().optional(),
+  referralCode: Joi.string().optional().allow(""),
   email: Joi.string().email().error(new Error("Valid email id is required")),
   phone: Joi.string().required().error(new Error("phone number is required")),
   countryCode: Joi.string().required().error(new Error("country code is required")),
   gender: Joi.string().valid("male", "female").required().error(new Error("gender is required")),
+  terms_n_condition : Joi.boolean().required().error(new Error("Accept terms & conditions")),
   role: Joi.string().valid(RENTER, LANDLORD, PROPERTY_MANAGER).required().error(new Error("Role should be valid")),
   password: Joi.string()
     .optional()
