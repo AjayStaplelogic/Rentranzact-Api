@@ -90,6 +90,7 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
         // status: account_data?.status,
     }
     payload.status = getConnectedAccountState(account_data);
+    payload.isPrimary = true;
     const external_account = await Accounts.findOneAndUpdate(query, payload, { upsert: true, new: true });
     return external_account;
 }
@@ -151,3 +152,11 @@ export const getConnectedAccountState = (account_data) => {
 
     return "restricted";
 };
+
+export const getPrimaryAccount = async (user_id) => {
+    return await Accounts.findOne({
+        user_id: user_id,
+        isPrimary: true,
+        isDeleted: false
+    })
+}

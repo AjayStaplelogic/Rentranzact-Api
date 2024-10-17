@@ -9,11 +9,12 @@ const schema = new Schema({
     description: {
         type: String,
     },
-    from: {            // can be admin or user
-        type: String,
+    from: {            
+        type: mongoose.Types.ObjectId,
+        ref: 'users',
         index: true
     },
-    is_from_admin: {    // If true then from will be in admin model else from users model
+    is_from_admin: {   
         type: Boolean,
         default: false
     },
@@ -58,6 +59,9 @@ const schema = new Schema({
         type: Date
     },
     reversedAt: {
+        type: Date
+    },
+    rejectedAt: {
         type: Date
     },
     property_name: {

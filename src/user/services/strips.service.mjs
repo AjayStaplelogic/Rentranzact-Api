@@ -14,6 +14,7 @@ import * as commissionServices from "../services/commission.service.mjs";
 import { EPaymentType } from "../enums/wallet.enum.mjs";
 import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
+import * as TransferServices from "../services/transfer.service.mjs";
 
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
@@ -284,10 +285,16 @@ async function addStripeTransaction(body, renterApplicationID) {
                 }
             }
         }
-        
+
         // Deleting notification which was showing pay now button after payment successfull
         if (notificationID) {
             await Notification.findByIdAndDelete(notificationID)
+        }
+
+
+        // Requesting Admin for transfer admin account to landlord account
+        if (propertyDetails?.landlord_id) {
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
         }
         return {
             data: [],
@@ -679,8 +686,12 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         await Notification.findByIdAndDelete(notificationID)
     }
 
+    // Requesting Admin for transfer admin account to landlord account
+    if (propertyDetails?.landlord_id) {
+        TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
+    }
+    
     return {
-
         data: [],
         message: "success",
         status: true,
