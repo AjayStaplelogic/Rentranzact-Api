@@ -4,8 +4,6 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as Multer from '../helpers/multer.mjs';
 import fs from "fs";
 
-
-
 export const uploadSingleImage = (req, res) => {
     try {
         if (req.file) {
