@@ -94,6 +94,7 @@ export const getAllReviews = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
+
         let pipeline = [
             {
                 $match: query

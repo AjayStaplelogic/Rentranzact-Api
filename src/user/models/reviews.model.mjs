@@ -86,7 +86,7 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         // enum: ["pending", "accepted", "rejected"],
         enum: Object.values(EReviewStatus),
-        default: EReviewStatus.approved 
+        default: EReviewStatus.accepted 
     },
     accepted_at: {
         type: Date
