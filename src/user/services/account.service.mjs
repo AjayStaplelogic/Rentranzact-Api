@@ -136,12 +136,12 @@ export const getConnectedAccountState = (account_data) => {
     }
 
     if (account_data.payouts_enabled && account_data.charges_enabled) {
-        if (reqs.pending_verification) {
+        if (reqs?.pending_verification?.length > 0) {
             return "pending enablement";
         }
 
-        if (!reqs.disabled_reason && !reqs.currently_due) {
-            if (!reqs.eventually_due) {
+        if ((!reqs?.disabled_reason || reqs.disabled_reason.length === 0) && (!reqs.currently_due || reqs.currently_due.length === 0)) {
+            if (!reqs.eventually_due || reqs.eventually_due.length === 0) {
                 return "complete";
             } else {
                 return "enabled";
@@ -159,11 +159,11 @@ export const getConnectedAccountState = (account_data) => {
         return "restricted (charges disabled)";
     }
 
-    if (reqs.past_due) {
+    if (reqs?.past_due?.length > 0) {
         return "restricted (past due)";
     }
 
-    if (reqs.pending_verification) {
+    if (reqs?.pending_verification?.length > 0) {
         return "pending (disabled)";
     }
 
