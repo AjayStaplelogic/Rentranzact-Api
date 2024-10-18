@@ -97,7 +97,8 @@ export const getAllAccounts = async (req, res) => {
                     country: "$country",
                     currency: "$currency",
                     status: "$status",
-                    isDeleted: "$isDeleted"
+                    isDeleted: "$isDeleted",
+                    last_four: "$last_four",
                 }
             },
             {
