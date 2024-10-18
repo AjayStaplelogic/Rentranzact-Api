@@ -15,7 +15,9 @@ export const createConnectedAccount = async (req, res) => {
             isDeleted: false
         }
 
-        const get_account = await ConnectedAccounts.findOne(query);
+        const get_account = await ConnectedAccounts.findOne(query, {
+            connect_acc_id : 1
+        } );
         if (get_account) {
             const account_link = await StripeCommonServices.createAccountLink(get_account.connect_acc_id, "account_update");
             if (account_link) {
@@ -97,7 +99,8 @@ export const getAllAccounts = async (req, res) => {
                     country: "$country",
                     currency: "$currency",
                     status: "$status",
-                    isDeleted: "$isDeleted"
+                    isDeleted: "$isDeleted",
+                    last_four: "$last_four",
                 }
             },
             {

@@ -1,4 +1,3 @@
-import ConnectedAccount from "../models/connectedAccounts.model.mjs";
 import { User } from "../models/user.model.mjs";
 import Accounts from "../models/accounts.model.mjs";
 import ConnectedAccounts from "../models/connectedAccounts.model.mjs";

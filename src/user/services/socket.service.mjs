@@ -12,7 +12,7 @@ io.use(async (socket, next) => {
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
     }
-    console.log(socket.handshake.headers, '===socket?.handshake?.headers')
+    // console.log(socket.handshake.headers, '===socket?.handshake?.headers')
 
     if (socket?.handshake?.headers["authorization"]) {
         let token_arr = socket?.handshake?.headers["authorization"].split(' ');
@@ -21,9 +21,9 @@ io.use(async (socket, next) => {
         }
         if (token_arr[0] == "Bearer" && token_arr[1]) {
             try {
-                console.log(token_arr[1], '=====token_arr[1]====', process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
-                console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
-                console.log(socket?.handshake?.headers["admin-id"], '===socket?.handshake?.headers["admin-id"]')
+                // console.log(token_arr[1], '=====token_arr[1]====', process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
+                // console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
+                // console.log(socket?.handshake?.headers["admin-id"], '===socket?.handshake?.headers["admin-id"]')
                 if (token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
                     if (socket?.handshake?.headers["admin-id"]) {
                         socket["is_admin"] = true;
@@ -32,11 +32,11 @@ io.use(async (socket, next) => {
                         console.log("Reached To Next Function")
                         return next();
                     }
-                    console.log("Reached The Error the next true function")
+                    // console.log("Reached The Error the next true function")
                     return next(new Error("Admin Id required"));
                 }
 
-                console.log("Else Part, Not Entered In IF")
+                // console.log("Else Part, Not Entered In IF")
 
                 const decoded = jwt.verify(token_arr[1], process.env.JWT_ACCESS_TOKEN_SECRET);
                 if (decoded.data && decoded.data._id) {
