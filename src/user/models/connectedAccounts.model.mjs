@@ -10,7 +10,8 @@ const ConnectedAccountSchema = new Schema({
         index: true
     },
     connect_acc_id: {                       // Stripe connected account id
-        type: String
+        type: String,
+        select: false
     },
     business_name: {
         type: String
@@ -69,7 +70,6 @@ const ConnectedAccountSchema = new Schema({
         year: {
             type: Number
         },
-        // default: null
     },
     i_address: {
         city: {
@@ -90,7 +90,6 @@ const ConnectedAccountSchema = new Schema({
         state: {
             type: String
         },
-        // default: null
     },
     i_verification_status: {
         type: String,       // "verified", pending from stripe

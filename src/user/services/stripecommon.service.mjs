@@ -152,8 +152,8 @@ export const createAccount = async (user) => {
 export const createAccountLink = async (acc_id, type = "account_onboarding") => {
     const accountLink = await stripe.accountLinks.create({
         account: acc_id, // 'acct_1Q8eqdIqX7pxMO0a',
-        refresh_url: 'https://rentranzact.com',
-        return_url: 'https://rentranzact.com',
+        refresh_url: `${process.env.FRONTEND_URL}/bank-account`, //'https://rentranzact.com',
+        return_url: `${process.env.FRONTEND_URL}/bank-account`,
         type: 'account_onboarding',         // account_update for update account
         collection_options: {
             fields: 'eventually_due',
@@ -168,7 +168,13 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
 
 // console.log(createAccountLink("acct_1QAQWXIXrnpy9Q28"))
 
-
+/**
+ * @description To transfer amount from one account to another
+ * @param {string} acc_id stripe account id of benificiary
+ * @param {number} amount amount to transfer
+ * @param {string} currency currency of benificiary account
+ * @returns {transfer} transfer object from stripe
+ */
 export const transferFunds = async (acc_id, amount, currency) => {
     const transfer = await stripe.transfers.create({
         amount: Number(amount) * 100,
@@ -182,14 +188,23 @@ export const transferFunds = async (acc_id, amount, currency) => {
 
 // console.log(transferFunds("acct_1Q9gmYINmaZ2kbt0"))
 
-export const getBalance = async () => {
-    const balance = await stripe.balance.retrieve();
+/**
+ * @description Get current balance in stripe account
+ * @param {string} acc_id Stripe account id whose balance want to get
+ * @returns {balance} balance object from stripe
+ */
+export const getBalance = async (acc_id = null) => {
+    const query = {};
+    if (acc_id) {       // To fetch connected account balance, if not provided will return master account balance
+        query.stripeAccount = acc_id;
+    }
+    const balance = await stripe.balance.retrieve(query);
     console.log(balance, '===balance')
     return balance;
 }
 
 
-// console.log(getBalance("acct_1Q8eqdIqX7pxMO0a"))
+// console.log(getBalance("acct_1Q9gmYINmaZ2kbt0"))
 
 export const payout = async (external_acc_id) => {
 
