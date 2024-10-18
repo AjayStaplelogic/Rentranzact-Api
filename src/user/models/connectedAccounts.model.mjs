@@ -10,7 +10,8 @@ const ConnectedAccountSchema = new Schema({
         index: true
     },
     connect_acc_id: {                       // Stripe connected account id
-        type: String
+        type: String,
+        select: false
     },
     business_name: {
         type: String
