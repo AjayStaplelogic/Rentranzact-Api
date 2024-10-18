@@ -41,6 +41,12 @@ const AccountSchema = new Schema({
     isPrimary : {
         type : Boolean,
         default : false
+    },
+    routing_number: {
+        type: String
+    },
+    last_four: {
+        type: String
     }
 }, {
     timestamps: true,

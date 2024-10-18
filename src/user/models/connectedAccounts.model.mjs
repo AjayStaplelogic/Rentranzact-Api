@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import * as Constants from "../enums/common.mjs"
+import { EINDIVIDUAL_VERIFICATION_STATUS } from "../enums/accounts.enum.mjs"
 
 const Schema = mongoose.Schema;
 
@@ -30,9 +30,72 @@ const ConnectedAccountSchema = new Schema({
     status: {
         type: String
     },
-    isDeleted : {
-        type : Boolean,
-        default : false
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    charges_enabled: {
+        type: Boolean,
+        default: false
+    },
+    payouts_enabled: {
+        type: Boolean,
+        default: false
+    },
+
+    // Individual details
+    i_first_name: {
+        type: String
+    },
+    i_last_name: {
+        type: String
+    },
+    i_maiden_name: {
+        type: String
+    },
+    i_email: {
+        type: String
+    },
+    i_phone: {
+        type: String
+    },
+    i_dob: {
+        day: {
+            type: Number
+        },
+        month: {
+            type: Number
+        },
+        year: {
+            type: Number
+        },
+        default: null
+    },
+    i_address: {
+        city: {
+            type: String
+        },
+        country: {
+            type: String
+        },
+        line1: {
+            type: String
+        },
+        line2: {
+            type: String
+        },
+        postal_code: {
+            type: String
+        },
+        state: {
+            type: String
+        },
+        default: null
+    },
+    i_verification_status: {
+        type: String,       // "verified", pending from stripe
+        enum: Object.values(EINDIVIDUAL_VERIFICATION_STATUS),
+        default: EINDIVIDUAL_VERIFICATION_STATUS.pending
     }
 }, {
     timestamps: true,
