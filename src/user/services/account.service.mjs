@@ -3,6 +3,7 @@ import { User } from "../models/user.model.mjs";
 import Accounts from "../models/accounts.model.mjs";
 import ConnectedAccounts from "../models/connectedAccounts.model.mjs";
 
+
 /**
  * @description when ever account_update webhook event is received, adding and updating connected account and external account
  * @param {object} event This will contain the event object from stripe webhook
@@ -56,6 +57,16 @@ export const addUpdateAccount = async (user_id, account_data) => {
         country: account_data?.country,
         default_currency: account_data?.default_currency,
         email: account_data?.email,
+        payouts_enabled: account_data?.payouts_enabled ?? false,
+        charges_enabled: account_data?.charges_enabled ?? false,
+        i_first_name: account_data?.individual?.first_name,
+        i_last_name: account_data?.individual?.last_name,
+        i_maiden_name: account_data?.individual?.maiden_name,
+        i_email: account_data?.individual?.email,
+        i_phone: account_data?.individual?.phone,
+        i_dob: account_data?.individual?.dob,
+        i_address: account_data?.individual?.address,
+        i_verification_status: account_data?.individual?.status,
         // status: account_data?.individual?.verification?.status
     }
 
@@ -86,6 +97,7 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
         bank_name: account_data?.bank_name,
         country: account_data?.country,
         currency: account_data?.currency,
+        routing_number: account_data?.routing_number,
         last_four: account_data?.last_four,
         // status: account_data?.status,
     }
@@ -111,6 +123,11 @@ export const deleteExternalAccountFromWebhook = async (event) => {
     }
 }
 
+/**
+ * @description Use to identify the current state of the account
+ * @param {object} account_data A valid account object from stripe
+ * @returns {string} current status of the account
+ */
 export const getConnectedAccountState = (account_data) => {
     const reqs = account_data.requirements;
 
@@ -153,6 +170,11 @@ export const getConnectedAccountState = (account_data) => {
     return "restricted";
 };
 
+/**
+ * @description Fetch primary account of user
+ * @param {string | import("mongoose").ObjectId} user_id Id of user
+ * @returns {object | Accounts} Account object from database
+ */
 export const getPrimaryAccount = async (user_id) => {
     return await Accounts.findOne({
         user_id: user_id,
