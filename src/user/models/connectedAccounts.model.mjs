@@ -69,7 +69,7 @@ const ConnectedAccountSchema = new Schema({
         year: {
             type: Number
         },
-        default: null
+        // default: null
     },
     i_address: {
         city: {
@@ -90,7 +90,7 @@ const ConnectedAccountSchema = new Schema({
         state: {
             type: String
         },
-        default: null
+        // default: null
     },
     i_verification_status: {
         type: String,       // "verified", pending from stripe
