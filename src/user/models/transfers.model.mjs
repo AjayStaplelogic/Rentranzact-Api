@@ -8,6 +8,12 @@ const schema = new Schema({
     },
     description: {
         type: String,
+        select : false
+    },
+    account_id: {            
+        type: mongoose.Types.ObjectId,
+        ref: 'accounts',
+        index: true
     },
     from: {            
         type: mongoose.Types.ObjectId,
@@ -44,9 +50,11 @@ const schema = new Schema({
     },
     transfer_id: {
         type: String,
+        select : false
     },
     destination: {
-        type: String
+        type: String,
+        select : false
     },
     reversed: {
         type: Boolean,
@@ -72,6 +80,13 @@ const schema = new Schema({
     },
     property_images: {
         type: Array
+    },
+    conversion_rate : {
+        type: Number
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
     },
 }, {
     timestamps: true,

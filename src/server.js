@@ -49,7 +49,7 @@ import adminFaqRoutes from "./admin/routes/faq.route.mjs";
 import adminSocialMediaIconRoutes from "./admin/routes/socialmediaicons.route.mjs";
 import adminBannerRoutes from "./admin/routes/banners.route.mjs";
 import adminContactUsRoutes from "./admin/routes/contactus.route.mjs"
-
+import adminTransferRoutes from "./admin/routes/transfer.route.mjs";
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -142,7 +142,8 @@ app.use("/api/admin", adminTestimonialRoutes)
 app.use("/api/admin", adminFaqRoutes)
 app.use("/api/admin", adminSocialMediaIconRoutes)
 app.use("/api/admin", adminBannerRoutes)
-app.use("/api/admin", adminContactUsRoutes)
+app.use("/api/admin", adminContactUsRoutes);
+app.use("/api/admin", adminTransferRoutes)
 
 
 // Health check endpoint

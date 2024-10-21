@@ -206,7 +206,7 @@ export const getBalance = async (acc_id = null) => {
 
 // console.log(getBalance("acct_1Q9gmYINmaZ2kbt0"))
 
-export const payout = async (external_acc_id) => {
+export const payout = async (external_acc_id, amount) => {
 
     // const balance = await stripe.balance.retrieve({
     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
@@ -219,7 +219,7 @@ export const payout = async (external_acc_id) => {
 
     const payout = await stripe.payouts.create({
         amount: 1 * 100,
-        currency: 'NGN',
+        currency: 'USD',
         destination: external_acc_id,
         source_type: "card"
     },
@@ -244,4 +244,19 @@ export const deleteAccount = async (acc_id) => {
 
 // console.log(deleteAccount("acct_1Q8aGLRRHzUEJINV"))
 
+// export const topUp = async () => {
+//     const topup = await stripe.topups.create({
+//         amount: 2000,
+//         currency: 'USD',
+//         description: 'Top-up for Jenny Rosen',
+//         statement_descriptor: 'Top-up',
+//     }, 
+//     // {
+//     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
+//     // }
+// );
 
+//     console.log(topup, '=====topup')
+//     return topup;
+// }
+// console.log(topUp())

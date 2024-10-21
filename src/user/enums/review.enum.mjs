@@ -15,6 +15,6 @@ export const RatingFormula = {
 
 export const EReviewStatus = {
     pending: "pending",
-    approved: "approved",
+    accepted: "accepted",
     rejected: "rejected"
 }
