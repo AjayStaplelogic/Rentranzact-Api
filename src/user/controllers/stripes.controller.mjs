@@ -69,7 +69,8 @@ async function paystack(req, res) {
 
     const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
     console.log(req.body, "-------------Pay Stack")
-    const { body } = req;
+    let { body } = req;
+    body = JSON.parse(JSON.stringify(body));
     body.paymentMethod = "paystack"
     if (req.body.event === "charge.success") {
         let metadata = req.body.data.metadata;
@@ -77,6 +78,7 @@ async function paystack(req, res) {
             metadata = CommonHelpers.makePaystackMetaDataObjForNative(req?.body?.data?.reference);
         }
         console.log(metadata, '======metadata111');
+        delete body.metadata;
         body.metadata = metadata;
         console.log(body.metadata, '======body.metadata222');
 
