@@ -79,7 +79,7 @@ async function paystack(req, res) {
         }
         console.log(metadata, '======metadata111');
         delete body.metadata;
-        body?.data?.metadata = metadata;
+        body.data.metadata = metadata;
         console.log(body.metadata, '======body.metadata222');
 
         const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
