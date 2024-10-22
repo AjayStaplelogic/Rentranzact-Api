@@ -76,6 +76,7 @@ async function paystack(req, res) {
         if (req?.body?.data?.reference?.includes("wallet")) {
             metadata = CommonHelpers.makePaystackMetaDataObjForNative(req?.body?.data?.reference);
         }
+        body.metadata = metadata;
         console.log(metadata, '======metadata');
         const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
         if (true) {
