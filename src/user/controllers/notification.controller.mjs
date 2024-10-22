@@ -112,6 +112,11 @@ async function getAllNotifications(req, res) {
           landlord_name: "$landlord_details.fullName",
           landlord_picture: "$landlord_details.picture",
           send_to: "$send_to",
+
+          inspection_id: "$inspection_id",
+          maintanence_id: "$maintanence_id",
+          property_manager_id: "$property_manager_id",
+          is_send_to_admin: "$is_send_to_admin",
         }
       },
       {

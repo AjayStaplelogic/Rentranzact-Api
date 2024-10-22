@@ -3,7 +3,7 @@ import { Property } from "../models/property.model.mjs";
 import { createHmac } from "crypto"
 import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
 import * as AccountSerivices from "../services/account.service.mjs";
-import * as PayoutServices from "../services/payout.service.mjs";
+// import * as PayoutServices from "../services/payout.service.mjs";
 import * as CommonHelpers from "../helpers/common.helper.mjs";
 
 
@@ -50,9 +50,9 @@ async function stripe(req, res) {
             AccountSerivices.deleteExternalAccountFromWebhook(body);
             break;
 
-        case ("payout.paid" || "payout.failed" || "payout.canceled"):
-            PayoutServices.updateStatusFromWebhook(body)
-            break;
+        // case ("payout.paid" || "payout.failed" || "payout.canceled"):
+        //     PayoutServices.updateStatusFromWebhook(body)
+        //     break;
 
         // case "payout.failed":
         //     break;
