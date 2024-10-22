@@ -308,7 +308,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 }
 
 async function rechargeWallet(body) {
-
+    console.log("Recharge wallet function")
     let userID;
 
     if (body.paymentMethod === "stripe") {
