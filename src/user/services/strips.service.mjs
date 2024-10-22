@@ -310,6 +310,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 async function rechargeWallet(body) {
     console.log("Recharge wallet function")
     let userID;
+    console.log(body.data.metadata, '====body.data.metadata');
 
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
