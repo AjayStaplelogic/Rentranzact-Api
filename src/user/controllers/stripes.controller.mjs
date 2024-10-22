@@ -3,6 +3,9 @@ import { Property } from "../models/property.model.mjs";
 import { createHmac } from "crypto"
 import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from "../services/strips.service.mjs";
 import * as AccountSerivices from "../services/account.service.mjs";
+import * as PayoutServices from "../services/payout.service.mjs";
+import * as CommonHelpers from "../helpers/common.helper.mjs";
+
 
 async function stripe(req, res) {
 
@@ -30,24 +33,32 @@ async function stripe(req, res) {
             }
         }
     }
-    console.log(body.type, '====body.type')
 
     switch (body.type) {
         case "account.updated":
-            console.log(`[Switch Matched]:[${body.type}]`)
             AccountSerivices.updateAccountFromWebhook(body);
             break;
 
-        case "account.external_account.created":
-
-            break;
+        // case "account.external_account.created":
+        //     break;
 
         case "account.external_account.updated":
+            AccountSerivices.updateExternalAccountFromWebhook(body);
             break;
 
         case "account.external_account.deleted":
             AccountSerivices.deleteExternalAccountFromWebhook(body);
             break;
+
+        case ("payout.paid" || "payout.failed" || "payout.canceled"):
+            PayoutServices.updateStatusFromWebhook(body)
+            break;
+
+        // case "payout.failed":
+        //     break;
+
+        // case "payout.canceled":
+        //     break;
 
     }
 
@@ -61,9 +72,13 @@ async function paystack(req, res) {
     const { body } = req;
     body.paymentMethod = "paystack"
     if (req.body.event === "charge.success") {
+        let metadata = req.body.data.metadata;
+        if (req?.body?.data?.reference?.includes("wallet")) {
+            metadata = CommonHelpers.makePaystackMetaDataObjForNative(req?.body?.data?.reference);
+        }
         const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
         if (true) {
-            const { wallet, renterApplicationID } = req.body.data.metadata;
+            const { wallet, renterApplicationID } = metadata;
 
             // console.log(wallet, "----------------------------> wallet")
             console.log(req?.body?.data?.metadata?.custom_fields, "--------------> req.body.data.metadata?custom_fields:")
@@ -74,7 +89,7 @@ async function paystack(req, res) {
                 return res.sendStatus(200);
                 sendResponse(res, data.data, data.message, data.status, data.statusCode);
             } else {
-                const { propertyID } = body.data.metadata;
+                const { propertyID } = metadata;
                 const property = await Property.findById(propertyID);
                 if (property) {
                     console.log("payment count ===>", property.payment_count)
