@@ -379,8 +379,9 @@ async function rentApplicationsList(user, req) {
               fullName: 1, // Include fullName field from users collection
               countryCode: 1,
               phone: 1,
-              picture: 1
-
+              picture: 1,
+              renter_avg_rating : 1,
+              renter_total_reviews : 1,
             }
           }
         ],

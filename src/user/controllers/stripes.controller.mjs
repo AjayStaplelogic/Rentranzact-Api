@@ -76,6 +76,7 @@ async function paystack(req, res) {
         if (req?.body?.data?.reference?.includes("wallet")) {
             metadata = CommonHelpers.makePaystackMetaDataObjForNative(req?.body?.data?.reference);
         }
+        console.log(metadata, '======metadata');
         const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
         if (true) {
             const { wallet, renterApplicationID } = metadata;
@@ -83,6 +84,7 @@ async function paystack(req, res) {
             // console.log(wallet, "----------------------------> wallet")
             console.log(req?.body?.data?.metadata?.custom_fields, "--------------> req.body.data.metadata?custom_fields:")
             // console.log(JSON.stringify(req?.body?.data?.metadata?.custom_fields), "--------------> JSON.stringify(req?.body?.data?.metadata?.custom_fields)")
+            console.log(wallet === "true", '======wallet === "true"');
 
             if (wallet === "true") {
                 const data = await rechargeWallet(body);
