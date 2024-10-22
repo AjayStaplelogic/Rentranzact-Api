@@ -320,6 +320,9 @@ async function rechargeWallet(body) {
     }
 
     const userDetail = await User.findById(userID);
+    console.log(userDetail, '====userDetail');
+    console.log(body.paymentMethod, '====body.paymentMethod');
+
 
     let payload = {}
 
@@ -367,7 +370,7 @@ async function rechargeWallet(body) {
 
 
         } else if (body.paymentMethod === "paystack") {
-
+            console.log("Paystack Wallet")
             const amount = body.data.amount;
             const status = body.data.status;
             const createdAt = body.data.paid_at;
@@ -404,6 +407,8 @@ async function rechargeWallet(body) {
             const data_ = new Transaction(transaction_payload)
 
             data_.save()
+            console.log(status, '====status');
+
             if (status === "success") {
 
                 const data__ = await User.findByIdAndUpdate(
@@ -411,7 +416,10 @@ async function rechargeWallet(body) {
                     { $inc: { walletPoints: amount } },
                     { new: true }
                 );
+                console.log(data__, '====data__');
             }
+
+
         }
 
         console.log("payload=----", payload, '====payload')
@@ -690,7 +698,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     if (propertyDetails?.landlord_id) {
         TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
     }
-    
+
     return {
         data: [],
         message: "success",
