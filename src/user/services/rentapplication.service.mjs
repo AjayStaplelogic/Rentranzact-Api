@@ -516,7 +516,7 @@ async function updateRentApplications(body, id) {
           if (data) {
             const renterDetails = await User.findById(data.renterID);
             let notification_payload = {};
-            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
             notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
             notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
             notification_payload.renterID = data.renterID;
@@ -589,7 +589,7 @@ async function updateRentApplications(body, id) {
             const landlordDetails = await User.findById(data.landlordID);
             if (landlordDetails) {
               let notification_payload = {};
-              notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+              // notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
               notification_payload.notificationHeading = "Rent Application Withdrawn";
               notification_payload.notificationBody = `Renter withdraw his rent application`;
               notification_payload.renterID = data.renterID;
@@ -609,7 +609,7 @@ async function updateRentApplications(body, id) {
             const propertyManagerDetails = await User.findById(data.pmID);
             if (propertyManagerDetails) {
               let notification_payload = {};
-              notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+              // notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
               notification_payload.notificationHeading = "Rent Application Withdrawn";
               notification_payload.notificationBody = `Renter withdraw his rent application`;
               notification_payload.renterID = data.renterID;
