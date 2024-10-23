@@ -35,6 +35,7 @@ export const calculate_avg_rating = async (options) => {
         }
     }
 
+    console.log(query, '===query')
     let pipeline = [
         {
             $match: query
@@ -60,7 +61,9 @@ export const calculate_avg_rating = async (options) => {
             }
         }
     ]
+
     let get_rating = await Reviews.aggregate(pipeline);
+    console.log(get_rating, '===get_rating')
     if (get_rating && get_rating.length > 0) {
         return get_rating[0];
     }
