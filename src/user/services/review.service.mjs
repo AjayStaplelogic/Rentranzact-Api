@@ -2,6 +2,8 @@ import { Reviews } from "../models/reviews.model.mjs";
 import { ReviewTypeEnum, RatingFormula, EReviewStatus } from "../enums/review.enum.mjs";
 import { User } from "../models/user.model.mjs";
 import { Property } from "../models/property.model.mjs";
+import { Types } from "mongoose";
+const ObjectId = Types.ObjectId;
 
 /**
  * @description To calculate average rating and total review
@@ -12,13 +14,13 @@ export const calculate_avg_rating = async (options) => {
     let { type, property_id, review_to_id } = options;
     let query = {
         isDeleted: false,
-        status: EReviewStatus.approved,
+        status: EReviewStatus.accepted,
         type: type
     };
     let group_by = {}
     if (type === ReviewTypeEnum.property) {
         // query.type == "property";
-        query.property_id = property_id;
+        query.property_id = new ObjectId(property_id);
         group_by = {
             _id: "$property_id"
         }
@@ -26,7 +28,7 @@ export const calculate_avg_rating = async (options) => {
     };
 
     if ([ReviewTypeEnum.toRenter, ReviewTypeEnum.toLandlord, ReviewTypeEnum.toPropertyManager].includes(type)) {
-        query.review_to_id = review_to_id;
+        query.review_to_id = new ObjectId(review_to_id);
         delete query.property_id; // Just to avoid conflict with other
         group_by = {
             _id: "$review_to_id"
