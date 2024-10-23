@@ -10,13 +10,13 @@ import { User } from "../../user/models/user.model.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
-        let { search, status } = req.query;
+        let { search, status, transfer_type } = req.query;
         const sort_key = req.query.sort_key || "createdAt";
         const sort_order = req.query.sort_order || "desc";
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {
-            isDeleted : false
+            isDeleted: false
         };
         if (status) { query.status = status; };
 
@@ -29,6 +29,8 @@ export const getAllTransfers = async (req, res) => {
 
         let sort_query = {};
         sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
+
+        if (transfer_type) { query.transfer_type = transfer_type };
 
         let pipeline = [
             {

@@ -1,8 +1,8 @@
-import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addMaintenanceRequests, getMaintenanceRequestsRenter, getMaintenanceRequestsLandlord, resolveMaintenanceRequests, addRemarkToRequest, cancelMaintenanceRequests, getMaintenanceRequestsPropertyManager } from "../services/maintenance.service.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Maintenance } from "../models/maintenance.model.mjs"
+import { User } from "../models/user.model.mjs";
 
 async function addMaintenance(req, res) {
   const { body } = req;
@@ -82,23 +82,31 @@ async function getMaintenanceDetails(req, res) {
       _id: id
     };
 
-    switch (req?.user?.data?.role) {
-      case UserRoles.LANDLORD:
-        query.landlordID = req?.user?.data?._id;
-        break;
+    // switch (req?.user?.data?.role) {
+    //   case UserRoles.LANDLORD:
+    //     query.landlordID = req?.user?.data?._id;
+    //     break;
 
-      case UserRoles.PROPERTY_MANAGER:
-        query.property_manager_id = req?.user?.data?._id;
-        break;
+    //   case UserRoles.PROPERTY_MANAGER:
+    //     query.property_manager_id = req?.user?.data?._id;
+    //     break;
 
-      case UserRoles.RENTER:
-        query.renterID = req?.user?.data?._id;
-        break;
-    }
+    //   case UserRoles.RENTER:
+    //     query.renterID = req?.user?.data?._id;
+    //     break;
+    // }
 
-    console.log(query);
+    // console.log(query);
     const data = await Maintenance.findById(query).lean().exec();
     if (data) {
+      if (data.renterID) {
+        data.renterDetails = await User.findById(data.renterID, {
+          picture: 1,
+          fullName: 1,
+          phone: 1,
+          email: 1
+        })
+      }
       return sendResponse(res, data, "Maintenance Details", true, 200)
     }
     return sendResponse(res, null, "No maintenance found", false, 404)
