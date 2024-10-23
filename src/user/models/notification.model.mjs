@@ -37,15 +37,15 @@ const notificationSchema = new mongoose.Schema(
             ref: 'users',
             index: true
         },
-        inspection_id : {
-            type : mongoose.Types.ObjectId,
-            ref : "inspections"
+        inspection_id: {
+            type: mongoose.Types.ObjectId,
+            ref: "inspections"
         },
-        maintanence_id : {
-            type : mongoose.Types.ObjectId,
-            ref : "maintenances"
+        maintanence_id: {
+            type: mongoose.Types.ObjectId,
+            ref: "maintenances"
         },
-        send_to : {
+        send_to: {
             type: mongoose.Types.ObjectId,
             ref: 'users',
             index: true
@@ -55,9 +55,12 @@ const notificationSchema = new mongoose.Schema(
             ref: 'users',
             index: true
         },
-        is_send_to_admin : {
-            type : Boolean,
-            default : false
+        is_send_to_admin: {
+            type: Boolean,
+            default: false
+        },
+        redirect_to: {         // Check the path from notification redirect path enum
+            type: String,
         }
     },
     { timestamps: true }

@@ -9,6 +9,7 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { getAdmins } from "../services/user.service.mjs"
 import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -109,6 +110,7 @@ async function addPropertyService(
     if (admins && admins.length > 0) {
       for await (const admin of admins) {
         const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
         notification_payload.notificationHeading = "New Property Added";
         notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} added a new property`;
         notification_payload.landlordID = property.landlord_id;

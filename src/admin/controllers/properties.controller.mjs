@@ -7,6 +7,7 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 import { ApprovalStatus } from "../../user/enums/property.enums.mjs"
 import { Notification } from "../../user/models/notification.model.mjs";
 import sendNotification from "../../user/helpers/sendNotification.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 
 async function properties(req, res) {
 
@@ -367,6 +368,7 @@ async function updatePropertyApprovalStatus(req, res) {
 
         // Send notification to landlord
         const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
         notification_payload.notificationHeading = "Approval Status Updated";
         notification_payload.notificationBody = `Rentranzact has reviewed your property and your current status is ${update_property?.approval_status}`;
         notification_payload.landlordID = property?.landlord_id ?? null;
