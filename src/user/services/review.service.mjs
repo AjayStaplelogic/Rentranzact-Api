@@ -115,7 +115,6 @@ export const update_avg_review_rating = async (update_review, avg_rating) => {
  */
 export const get_avg_by_rating_numbers = (score = 0) => {
     for (const [key, value] of Object.entries(RatingFormula)) {
-        console.log(value.min, '===value', value.max)
         if (score >= value.min && score <= value.max) {
             return value.stars; // Return the name of the rating
         }
