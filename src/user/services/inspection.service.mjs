@@ -8,6 +8,7 @@ import { InspectionStatus } from "../enums/inspection.enums.mjs";
 import moment from "moment";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id, _id } = body;
@@ -65,6 +66,7 @@ async function createInspection(body, renterID) {
     let property_manger_details = await User.findById(property.property_manager_id);
     if (landlordDetails) {
       let notification_payload = {};
+      notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.inspection_view;
       notification_payload.notificationHeading = "Inspection Update";
       notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
       notification_payload.renterID = renterDetails._id;
@@ -87,6 +89,7 @@ async function createInspection(body, renterID) {
 
     if (property_manger_details) {
       let notification_payload = {};
+      notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.inspection_view;
       notification_payload.notificationHeading = "Inspection Update";
       notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied inspection for ${property?.propertyName ?? ""}`;
       notification_payload.renterID = renterDetails._id;
@@ -257,6 +260,7 @@ async function updateInspectionStatus(body, id) {
   const landlordDetails = await User.findById(inspectionDetails.landlordID);
 
   let notification_payload = {};
+  notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.inspection_view;
   notification_payload.notificationHeading = "Inspection Update";
   notification_payload.renterID = renterDetails._id;
   notification_payload.landlordID = inspectionDetails.landlordID;

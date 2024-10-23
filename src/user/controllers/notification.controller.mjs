@@ -117,6 +117,7 @@ async function getAllNotifications(req, res) {
           maintanence_id: "$maintanence_id",
           property_manager_id: "$property_manager_id",
           is_send_to_admin: "$is_send_to_admin",
+          redirect_to: "$redirect_to",
         }
       },
       {

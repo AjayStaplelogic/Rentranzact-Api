@@ -7,6 +7,7 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
+import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 
 async function addMaintenanceRequests(body) {
     const { landlord_id, propertyName, property_manager_id } = await Property.findById(body.propertyID);
@@ -21,6 +22,7 @@ async function addMaintenanceRequests(body) {
         let landlordDetails = await User.findById(landlord_id)
         if (landlordDetails) {
             let notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
             notification_payload.notificationHeading = "Maintainance Requested";
             notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied maintanence requests for ${propertyName ?? ""}`;
             notification_payload.renterID = renterDetails._id;
@@ -46,6 +48,7 @@ async function addMaintenanceRequests(body) {
         let propertyManagerDetails = await User.findById(property_manager_id)
         if (propertyManagerDetails) {
             let notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
             notification_payload.notificationHeading = "Maintainance Requested";
             notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} applied maintanence requests for ${propertyName ?? ""}`;
             notification_payload.renterID = renterDetails._id;
@@ -150,6 +153,7 @@ async function resolveMaintenanceRequests(id) {
     const propertyDetails = await Property.findById(data.propertyID);
 
     let notification_payload = {};
+    notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
     notification_payload.notificationHeading = "Maintenance Resolved";
     notification_payload.notificationBody = `Your maintenance has been resolved for ${propertyDetails?.propertyName ?? ""}`;
     notification_payload.renterID = renterDetails._id;
@@ -186,6 +190,7 @@ async function addRemarkToRequest(landlordRemark, maintenanceID) {
     const propertyDetails = await Property.findById(data.propertyID);
 
     let notification_payload = {};
+    notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
     notification_payload.notificationHeading = "Maintenance Remarks";
     notification_payload.notificationBody = `${landlordDetails?.fullName ?? ""} added remarks on your maintenance request for ${propertyDetails?.propertyName ?? ""}`;
     notification_payload.renterID = renterDetails._id;
@@ -223,6 +228,7 @@ async function cancelMaintenanceRequests(id) {
     const landlordDetails = await User.findById(data.landlordID)
     if (landlordDetails) {
         let notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
         notification_payload.notificationHeading = "Maintenance Request Cancelled";
         notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} cancelled the maintenance request for ${propertyDetails?.propertyName ?? ""}`;
         notification_payload.renterID = renterDetails._id;
@@ -246,6 +252,7 @@ async function cancelMaintenanceRequests(id) {
     const propertyManagerDetails = await User.findById(data.property_manager_id);
     if (propertyManagerDetails) {
         let notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
         notification_payload.notificationHeading = "Maintenance Request Cancelled";
         notification_payload.notificationBody = `${renterDetails?.fullName ?? ""} cancelled the maintenance request for ${propertyDetails?.propertyName ?? ""}`;
         notification_payload.renterID = renterDetails._id;
