@@ -1,6 +1,5 @@
 import nodemailer from 'nodemailer';
 
-console.log(process.env.PASSWORD, '===process.env.PASSWORD')
 const transporterOptions = {
   service : 'gmail',
   // host: process.env.SMTP,

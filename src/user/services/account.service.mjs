@@ -13,23 +13,22 @@ export const updateAccountFromWebhook = async (event) => {
     // Example: Update the account status based on the 'account_status' field
     // Return the updated account object
 
-    console.log(event, '=======event Update Account From Webhook')
+    // console.log(event, '=======event Update Account From Webhook')
 
     const data = event?.data?.object;
     if (data) {
         const { metadata } = data;
-        console.log(metadata, '============metadata')
+        // console.log(metadata, '============metadata')
         if (metadata?.user_id) {
-            const get_user = await User.findById(metadata.user_id);
-            if (get_user) {
-                const connected_account = await addUpdateAccount(get_user._id, data);
+            User.findById(metadata.user_id).then((get_user) => {
+                addUpdateAccount(get_user._id, data);
                 if (data?.external_accounts?.data?.length > 0) {
                     console.log(`[External Account Length Condition Matched]`)
-                    for await (let external_account of data?.external_accounts?.data) {
-                        await addUpdateExternalAccount(get_user._id, external_account);
+                    for (let external_account of data?.external_accounts?.data) {
+                        addUpdateExternalAccount(get_user._id, external_account);
                     }
                 }
-            }
+            });
         }
     }
 }
@@ -98,9 +97,9 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
         currency: account_data?.currency,
         routing_number: account_data?.routing_number,
         last_four: account_data?.last_four,
-        // status: account_data?.status,
+        status: account_data?.status,
     }
-    payload.status = getConnectedAccountState(account_data);
+    // payload.status = getConnectedAccountState(account_data);
     payload.isPrimary = true;
     const external_account = await Accounts.findOneAndUpdate(query, payload, { upsert: true, new: true });
     return external_account;
@@ -180,4 +179,26 @@ export const getPrimaryAccount = async (user_id) => {
         isPrimary: true,
         isDeleted: false
     })
+}
+
+/**
+ * @description When external accounts update event fired from stripe then updating data in DB
+ * @param {object} event This will contain the event object from stripe webhook.
+ * @return {void} Nothing
+ */
+export const updateExternalAccountFromWebhook = async (event) => {
+    const data = event?.data?.object;
+    if (data) {
+        Accounts.findOne({
+            connect_acc_id: event.account,
+            external_acc_id: data.id
+        }).then(account => {
+            if (account) {
+                if (!account.account) {
+                    account.account = event.account;
+                }
+                addUpdateExternalAccount(account.user_id, account)
+            }
+        });
+    }
 }
