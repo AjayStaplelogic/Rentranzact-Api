@@ -4,6 +4,8 @@ import { rentApplication } from "../models/rentApplication.model.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { User } from "../models/user.model.mjs";
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { Property } from "../models/property.model.mjs";
 
 async function addRentApplication(req, res) {
 
@@ -295,4 +297,59 @@ async function getAllRentApplications(req, res) {
   }
 
 }
-export { addRentApplication, rentApplications, rentApplicationUpdate, getRentApplications, rentApplicationsByID, editRentApplication, getAllRentApplications };
+
+async function getLastApplication(req, res) {
+  try {
+    const data = await rentApplication.findOne({
+      renterID: req.user.data._id,
+      applicationStatus: { $nin: [RentApplicationStatus.CANCELED, RentApplicationStatus.WITHDRAW] }
+    }).lean().exec();
+    const renter = req.user.data;
+
+    if (data) {
+      data.renter_info = {
+        _id: renter._id,
+        countryCode: renter.countryCode,
+        fullName: renter.fullName,
+        phone: renter.phone,
+        picture: renter.picture
+      }
+
+      if (data.landlordID) {
+        data.landlord_info = await User.findById(data.landlordID, {
+          _id: 1,
+          fullName: 1,
+          countryCode: 1,
+          phone: 1,
+          picture: 1
+        })
+      }
+
+      if (data.propertyID) {
+        data.property_info = await Property.findById(data.propertyID, {
+          _id: 1,
+          propertyName: 1,
+          images: 1,
+          address: 1,
+          type: 1,
+          category: 1,
+        })
+      }
+    }
+
+    return sendResponse(res, data, "success", true, 200);
+  } catch (error) {
+    return sendResponse(res, null, error?.message, false, 400);
+  }
+}
+
+export {
+  addRentApplication,
+  rentApplications,
+  rentApplicationUpdate,
+  getRentApplications,
+  rentApplicationsByID,
+  editRentApplication,
+  getAllRentApplications,
+  getLastApplication
+};
