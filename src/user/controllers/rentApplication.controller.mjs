@@ -303,7 +303,7 @@ async function getLastApplication(req, res) {
     const data = await rentApplication.findOne({
       renterID: req.user.data._id,
       applicationStatus: { $nin: [RentApplicationStatus.CANCELED, RentApplicationStatus.WITHDRAW] }
-    }).lean().exec();
+    }).sort({createdAt : -1}).lean().exec();
     const renter = req.user.data;
 
     if (data) {
