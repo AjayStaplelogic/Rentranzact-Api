@@ -16,6 +16,7 @@ export const makeTransferForPropertyRent = async (property_data = null, property
 
     if (amount > 0) {
         const transfer_payload = {
+            transfer_type : ETRANSFER_TYPE.rentPayment,
             is_from_admin: true,
             to: property_data?.landlord_id,
             property_id: property_data._id,

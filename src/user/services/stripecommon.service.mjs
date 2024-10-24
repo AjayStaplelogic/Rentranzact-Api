@@ -206,7 +206,18 @@ export const getBalance = async (acc_id = null) => {
 
 // console.log(getBalance("acct_1Q9gmYINmaZ2kbt0"))
 
-export const payout = async (external_acc_id, amount) => {
+/**
+ * 
+ * @description Use this function to withdraw the balance from the account
+ * @param {string} account_id stripe connected or main account id
+ * @param {string} external_acc_id stripe external source id or external account id to be credited
+ * @param {string} currency default currency of the account 
+ * @param {number} amount amount to be withdrawl 
+ * @param {string} description description to add in statements
+ * @param {object} metadata meta data to receive in webhook for updating payout data in db
+ * @returns { payout | object} payout object from stripe containing payout data
+ */
+export const payout = async (account_id, external_acc_id, currency, amount, description = "", metadata = null) => {
 
     // const balance = await stripe.balance.retrieve({
     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
@@ -215,16 +226,16 @@ export const payout = async (external_acc_id, amount) => {
     //   console.log(balance, '===balance')
     //   console.log(JSON.stringify(balance), '===JSON.stringify(balance)')
 
-
-
     const payout = await stripe.payouts.create({
-        amount: 1 * 100,
-        currency: 'USD',
+        amount: Number(amount) * 100,
+        currency: currency,
         destination: external_acc_id,
-        source_type: "card"
+        source_type: "card",
+        description: description ?? "",
+        metadata: metadata ?? {}
     },
         {
-            stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
+            stripeAccount: account_id,
         }
     );
 
@@ -250,7 +261,7 @@ export const deleteAccount = async (acc_id) => {
 //         currency: 'USD',
 //         description: 'Top-up for Jenny Rosen',
 //         statement_descriptor: 'Top-up',
-//     }, 
+//     },
 //     // {
 //     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
 //     // }
