@@ -90,6 +90,17 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 const hostUrl = process.env.HOST_URL;
 
+async function createThumbnail(filePath, thumbnailPath, width, height) {
+    try {
+      const imageBuffer = fs.readFileSync(filePath);
+      const thumbnailBuffer = await sharp(imageBuffer)
+        .resize(parseInt(width), parseInt(height))
+        .toBuffer();
+      fs.writeFileSync(thumbnailPath, thumbnailBuffer);
+    } catch (error) {
+      console.error('Error creating thumbnail:', error);
+    }
+  }
 
 router.get('/properties', properties)
 router.get('/property/:id', property)

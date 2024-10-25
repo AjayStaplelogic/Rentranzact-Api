@@ -21,7 +21,7 @@ async function addPropertyService(
   req
 ) {
 
-
+  console.log(`[Add PropertyService]`)
   let { email } = body;
   const role = req?.user?.data?.role;
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
@@ -103,6 +103,7 @@ async function addPropertyService(
   }
 
   const property = await Property.create(Property_);
+  console.log(`[Property Created]`);
   if (property) {
 
     // Sending notification to admin for approval
@@ -130,6 +131,7 @@ async function addPropertyService(
         }
       }
     }
+    console.log(`[Property Created][Finished]`);
 
     return {
       data: property,

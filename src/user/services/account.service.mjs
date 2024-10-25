@@ -96,7 +96,7 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
         country: account_data?.country,
         currency: account_data?.currency,
         routing_number: account_data?.routing_number,
-        last_four: account_data?.last_four,
+        last_four: account_data?.last4,
         status: account_data?.status,
     }
     // payload.status = getConnectedAccountState(account_data);
