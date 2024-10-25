@@ -29,6 +29,7 @@ import chatRoutes from "./user/routes/chat.route.mjs";
 import userContactUsRoutes from "./user/routes/contactus.route.mjs";
 import userCommissionRoutes from "./user/routes/commissions.route.mjs";
 import userAccountsRoutes from "./user/routes/accounts.route.mjs";
+import userPayouts from "./user/routes/payout.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -123,6 +124,7 @@ app.use("/api", chatRoutes)
 app.use("/api", userContactUsRoutes)
 app.use("/api", userCommissionRoutes)
 app.use("/api", userAccountsRoutes);
+app.use("/api", userPayouts);
 
 //admin
 app.use("/api/admin", adminRoutes)
