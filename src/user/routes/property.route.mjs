@@ -239,8 +239,8 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
   },
 )
 
-const sourceFolder = path.resolve(__dirname, '../../../uploads/property');
-const compressedFolder = path.resolve(__dirname, '../../../uploads/property_compressed');
+const sourceFolder = path.resolve('/home/rocky/data/uploads/property');
+const compressedFolder = path.resolve('/home/rocky/data/uploads/property_compressed');
 
 // import sharp from 'sharp';
 // import path from "path";
