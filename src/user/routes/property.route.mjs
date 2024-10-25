@@ -164,7 +164,7 @@ router.post(
         req.documents.push({ id: uuidv4(), url: relativePath });
       }
 
-      console.log(`[File Uploaded Count] : [${count}]`)
+      console.log(`[File Uploaded Count] : [${count}]` )
 
 
     });
@@ -238,10 +238,9 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
     editProperty(req, res)
   },
 )
-console.log(path.resolve(""))
-
-const sourceFolder = path.resolve('/uploads/property');
-const compressedFolder = path.resolve('/uploads/property_compressed');
+console.log(path.resolve(__dirname, '../../../uploads/property'))
+const sourceFolder = path.resolve(__dirname, '../../../uploads/property');
+const compressedFolder = path.resolve(__dirname, '../../../uploads/property_compressed');
 
 // import sharp from 'sharp';
 // import path from "path";
@@ -255,16 +254,16 @@ async function createFolderIfNotExists(folderPath) {
     await fs.mkdir(folderPath, { recursive: true });
     console.log(`Directory created or already exists: ${folderPath}`);
   } catch (err) {
-    // console.error(`Error creating directory: ${err.message}`);
+    console.error(`Error creating directory: ${err.message}`);
   }
 }
 
 
 async function compressImagesInFolder() {
   try {
-    console.log(`[Compression code function]`)
+    console.log("COmpressed function")
     // Ensure the compressed folder exists
-    // await createFolderIfNotExists(compressedFolder);
+    await createFolderIfNotExists(compressedFolder);
 
     // Get all files from the source folder
     const files = await fs.readdir(sourceFolder);
@@ -274,14 +273,14 @@ async function compressImagesInFolder() {
     // Initialize counters
     let successCount = 0;
     let skippedCount = 0;
-    console.log(files.length, '========files')
+
     // Loop through each file
     for (const file of files) {
       const filePath = path.join(sourceFolder, file);
 
       // Check if it's an image file (jpg/jpeg)
       if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpeg') {
-
+        
         const compressedFilePath = path.join(compressedFolder, file); // Same file name in compressed folder
 
         try {
