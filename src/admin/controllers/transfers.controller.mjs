@@ -171,7 +171,6 @@ export const updateTransferStatus = async (req, res) => {
                             payload.transfer_id = initiate_transfer.id;
                             payload.conversion_rate = converted_currency.rate;
                             let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                            console.log(update_transfer, '===update_transfer')
                             if (update_transfer) {
                                 return sendResponse(res, null, "Transfered successfully", true, 200);
                             }
