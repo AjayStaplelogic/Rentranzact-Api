@@ -238,9 +238,10 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
     editProperty(req, res)
   },
 )
+console.log(path.resolve("../../"))
 
-const sourceFolder = path.resolve('/home/rocky/data/uploads/property');
-const compressedFolder = path.resolve('/home/rocky/data/uploads/property_compressed');
+const sourceFolder = path.resolve('../../data/uploads/property');
+const compressedFolder = path.resolve('../../data/uploads/property_compressed');
 
 // import sharp from 'sharp';
 // import path from "path";
@@ -254,7 +255,7 @@ async function createFolderIfNotExists(folderPath) {
     await fs.mkdir(folderPath, { recursive: true });
     console.log(`Directory created or already exists: ${folderPath}`);
   } catch (err) {
-    console.error(`Error creating directory: ${err.message}`);
+    // console.error(`Error creating directory: ${err.message}`);
   }
 }
 
@@ -310,7 +311,7 @@ async function compressImagesInFolder() {
 
 
 
-compressImagesInFolder()
+// compressImagesInFolder()
 export default router;
 
 
