@@ -311,7 +311,7 @@ async function compressImagesInFolder() {
 
 
 
-// compressImagesInFolder()
+compressImagesInFolder()
 export default router;
 
 
