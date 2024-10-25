@@ -164,7 +164,7 @@ router.post(
         req.documents.push({ id: uuidv4(), url: relativePath });
       }
 
-      console.log(`[File Uploaded Count] : [${count}]` )
+      console.log(`[File Uploaded Count] : [${count}]`)
 
 
     });
@@ -273,14 +273,14 @@ async function compressImagesInFolder() {
     // Initialize counters
     let successCount = 0;
     let skippedCount = 0;
-
+    console.log(files.length, '========files')
     // Loop through each file
     for (const file of files) {
       const filePath = path.join(sourceFolder, file);
 
       // Check if it's an image file (jpg/jpeg)
       if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpeg') {
-        
+
         const compressedFilePath = path.join(compressedFolder, file); // Same file name in compressed folder
 
         try {
