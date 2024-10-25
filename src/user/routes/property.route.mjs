@@ -262,8 +262,9 @@ async function createFolderIfNotExists(folderPath) {
 
 async function compressImagesInFolder() {
   try {
+    console.log(`[Compression code function]`)
     // Ensure the compressed folder exists
-    await createFolderIfNotExists(compressedFolder);
+    // await createFolderIfNotExists(compressedFolder);
 
     // Get all files from the source folder
     const files = await fs.readdir(sourceFolder);
