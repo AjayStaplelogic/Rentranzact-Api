@@ -22,7 +22,8 @@ import {
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
-import fs from "fs";
+// import fs from "fs";
+import fs from 'fs/promises';
 import path from "path";
 import sharp from "sharp";
 import { fileURLToPath } from 'url';
@@ -238,7 +239,78 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
   },
 )
 
+const sourceFolder = path.resolve(__dirname, '../../uploads/property');
+const compressedFolder = path.resolve(__dirname, '../../uploads/property_compressed');
 
+// import sharp from 'sharp';
+// import path from "path";
+// import { fileURLToPath } from "url";
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
+
+async function createFolderIfNotExists(folderPath) {
+  try {
+    await fs.mkdir(folderPath, { recursive: true });
+    console.log(`Directory created or already exists: ${folderPath}`);
+  } catch (err) {
+    console.error(`Error creating directory: ${err.message}`);
+  }
+}
+
+
+async function compressImagesInFolder() {
+  try {
+    // Ensure the compressed folder exists
+    await createFolderIfNotExists(compressedFolder);
+
+    // Get all files from the source folder
+    const files = await fs.readdir(sourceFolder);
+
+    console.log('Files found:', files);
+
+    // Initialize counters
+    let successCount = 0;
+    let skippedCount = 0;
+
+    // Loop through each file
+    for (const file of files) {
+      const filePath = path.join(sourceFolder, file);
+
+      // Check if it's an image file (jpg/jpeg)
+      if (path.extname(file).toLowerCase() === '.jpg' || path.extname(file).toLowerCase() === '.jpeg') {
+        
+        const compressedFilePath = path.join(compressedFolder, file); // Same file name in compressed folder
+
+        try {
+          // Compress and save the image
+          await sharp(filePath)
+            .jpeg({ quality: 40 }) // Set the quality to 40 (adjust as needed)
+            .toFile(compressedFilePath);
+
+          console.log(`Compressed and saved: ${file}`);
+          successCount++; // Increment success count
+        } catch (compressError) {
+          console.error(`Error compressing ${file}:`, compressError.message);
+          // If there is an error, copy the original file to the compressed folder
+          await fs.copyFile(filePath, compressedFilePath);
+          console.log(`Original file copied to compressed folder: ${file}`);
+          skippedCount++; // Increment skipped count
+        }
+      }
+    }
+
+    // Log the final counts
+    console.log(`All images have been processed. \nSuccessfully compressed: ${successCount} \nSkipped (due to errors): ${skippedCount}`);
+  } catch (error) {
+    console.error('Error reading directory or processing images:', error);
+  }
+}
+
+
+
+
+compressImagesInFolder()
 export default router;
 
 
