@@ -31,25 +31,25 @@ async function addProperty(req, res) {
     return res.status(400).send("No files uploaded.");
   }
 
-  const images = files.filter((file) => file.mimetype.startsWith("image/"));
-  const documents = files.filter((file) => file.mimetype === "application/pdf");
+  // const images = files.filter((file) => file.mimetype.startsWith("image/"));
+  // const documents = files.filter((file) => file.mimetype === "application/pdf");
 
 
 
-  if (images.length > 0) {
-    // console.log("Images uploaded:");
+  // if (images.length > 0) {
+  //   // console.log("Images uploaded:");
 
-    images.forEach((image) => {
+  //   images.forEach((image) => {
 
-    });
-  }
+  //   });
+  // }
 
-  if (documents.length > 0) {
-    // console.log("Documents uploaded:");
-    documents.forEach((document) => {
+  // if (documents.length > 0) {
+  //   // console.log("Documents uploaded:");
+  //   documents.forEach((document) => {
 
-    });
-  }
+  //   });
+  // }
 
   const data = await addPropertyService(
     req.PropertyID,

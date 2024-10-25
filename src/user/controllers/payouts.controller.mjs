@@ -18,8 +18,8 @@ export const createPayout = async (req, res) => {
         const account = await AccountServices.getPrimaryAccount(req.user.data._id);
         if (account) {
             const metadata = {
-                user_id: req.user.data._id,
-                account_id: account._id
+                user_id: `${req.user.data._id}`,
+                account_id: `${account._id}`
             }
             const payout = await StripeCommonServices.payout(
                 account.connect_acc_id,
