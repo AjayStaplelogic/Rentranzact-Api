@@ -19,6 +19,7 @@ services:
       - /usr/src/app
       - /usr/src/app/node_modules
       - /home/rocky/data/uploads:/usr/src/app/uploads
+      - /home/rocky/data/property_compressed:/usr/src/app/property_compressed
 
 volumes:
   mongo_data:
