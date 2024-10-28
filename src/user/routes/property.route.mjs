@@ -50,8 +50,11 @@ const storage = multer.diskStorage({
     const imagesFolder = path.join(propertyFolder, "images");
     const documentsFolder = path.join(propertyFolder, "documents");
     const videosFolder = path.join(propertyFolder, "videos");
+    
 
     const thumbnailFolder = path.join(propertyFolder, "images", "thumbnails")
+    const compressedFolder = path.join(propertyFolder, "images", "compressed")
+
 
     // Create the directories if they don't exist
     if (!fs.existsSync(propertyFolder)) {
@@ -69,6 +72,10 @@ const storage = multer.diskStorage({
 
     if (!fs.existsSync(thumbnailFolder)) {
       fs.mkdirSync(thumbnailFolder);
+    }
+
+    if (!fs.existsSync(compressedFolder)) {
+      fs.mkdirSync(compressedFolder);
     }
 
     // Determine subfolder based on file type
@@ -120,7 +127,7 @@ async function createThumbnail(filePath, thumbnailPath, width, height) {
     console.error('Error creating thumbnail:', error);
   }
 }
-async function compressImages(filePath, thumbnailPath, width, height) {
+async function compressImages(filePath, thumbnailPath) {
   try {
     const imageBuffer = fs.readFileSync(filePath);
 
