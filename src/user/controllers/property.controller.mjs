@@ -17,7 +17,7 @@ import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 
 async function addProperty(req, res) {
-  console.log(`[Inside add property controller]`)
+  // console.log(`[Inside add property controller]`)
   const { body } = req;
 
   // console.log(body , "body in add propertyyyyyy")
