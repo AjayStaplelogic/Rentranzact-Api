@@ -120,6 +120,20 @@ async function createThumbnail(filePath, thumbnailPath, width, height) {
     console.error('Error creating thumbnail:', error);
   }
 }
+async function compressImages(filePath, thumbnailPath, width, height) {
+  try {
+    const imageBuffer = fs.readFileSync(filePath);
+
+    // Compress and save the image
+    const thumbnailBuffer = await sharp(imageBuffer)
+      .webp({ quality: 20 }) // Set the quality to 40 (adjust as needed)
+      .toBuffer();
+
+    fs.writeFileSync(thumbnailPath, thumbnailBuffer);
+  } catch (error) {
+    console.error('Error creating thumbnail:', error);
+  }
+}
 
 router.post(
   "/property",
@@ -223,11 +237,19 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
 
         const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
         const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
-        req.images.push({ id: uuidv4(), url: relativePath, thumbnail: relativePath2 });
+        const compressedPath = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'compressed', randomFileName);
+
+        req.images.push({
+          id: uuidv4(),
+          url: relativePath,
+          thumbnail: relativePath2,
+          compressed: compressedPath
+        });
         // console.log(req.images, '=======req.images111')
 
         // Create and save the thumbnail
         await createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
+        await compressImages(file.path, compressedPath)
       } else if (file.mimetype.startsWith("video/")) {
         req.videos.push({ id: uuidv4(), url: relativePath });
       } else if (file.mimetype.startsWith("application/")) {
@@ -371,11 +393,11 @@ async function compressImagesInFolder() {
 
 
 
-try {
-  compressImagesInFolder()
-} catch (error) {
-  
-}
+// try {
+//   compressImagesInFolder()
+// } catch (error) {
+
+// }
 export default router;
 
 
