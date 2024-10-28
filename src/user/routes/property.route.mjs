@@ -264,65 +264,88 @@ async function compressImagesInFolder() {
     console.log("COmpressed function")
     // Ensure the compressed folder exists
     await createFolderIfNotExists(compressedFolder);
+    // Initialize counters
+    let successCount = 0;
+    let skippedCount = 0;
 
     // Get all files from the source folder
     fs.readdir(sourceFolder, async (err, files) => {
       if (files && files.length > 0) {
         console.log('Files found:', files);
 
-        // Initialize counters
-        let successCount = 0;
-        let skippedCount = 0;
 
         // Loop through each file
         for (const file of files) {
-          await createFolderIfNotExists(`${compressedFolder}/${file}`)
-          fs.readdir(path.join(sourceFolder, file), async (err, dirFiles) => {
-            console.log(dirFiles, '===dirFiles')
-            
-            if (dirFiles && dirFiles.length > 0) {
-              console.log("Entered in last DIrecotries")
-              for await (let lastFile of dirFiles) {
-                
-                await createFolderIfNotExists(`${compressedFolder}/${file}/${lastFile}`);
-                fs.readdir(path.join(sourceFolder, file, lastFile), async (err, endFiles) => {
-                  console.log(endFiles, '====endFiles')
-                  if (endFiles && endFiles.length > 0) {
-                    for await (let endLastFile of endFiles) {
-                      const filePath = path.join(sourceFolder, file, lastFile, endLastFile);
-                      console.log(filePath, '====filePathllll')
+          console.log(path.extname(file).toLowerCase(), '=path.extname(file).toLowerCase()1111')
+          if (![".jpg", ".jpeg", ".png", ".pdf", ".avif"].includes(path.extname(file).toLowerCase())) {
+            console.log("Entered")
 
-                      // Check if it's an image file (jpg/jpeg)
-                      const compressedFilePath = path.join(compressedFolder, file, lastFile, endLastFile); // Same file name in compressed folder
-                      if (path.extname(endLastFile).toLowerCase() === '.jpg' || path.extname(endLastFile).toLowerCase() === '.jpeg') {
 
-                        console.log(compressedFilePath, '====compressedFilePath')
+            await createFolderIfNotExists(`${compressedFolder}/${file}`)
+            fs.readdir(path.join(sourceFolder, file), async (err, dirFiles) => {
+              // console.log(dirFiles, '===dirFiles')
 
-                        try {
-                          // Compress and save the image
-                          await sharp(filePath)
-                            .jpeg({ quality: 40 }) // Set the quality to 40 (adjust as needed)
-                            .toFile(compressedFilePath);
+              if (dirFiles && dirFiles.length > 0) {
+                // console.log("Entered in last DIrecotries")
+                for await (let lastFile of dirFiles) {
+                  console.log(path.extname(lastFile).toLowerCase(), '=path.extname(lastFile).toLowerCase()1111')
+                  if (![".jpg", ".jpeg", ".png", ".pdf", ".avif"].includes(path.extname(lastFile).toLowerCase())) {
+                    console.log("Entered")
+                    await createFolderIfNotExists(`${compressedFolder}/${file}/${lastFile}`);
+                    fs.readdir(path.join(sourceFolder, file, lastFile), async (err, endFiles) => {
+                      // console.log(endFiles, '====endFiles')
+                      if (endFiles && endFiles.length > 0) {
+                        for await (let endLastFile of endFiles) {
+                          const filePath = path.join(sourceFolder, file, lastFile, endLastFile);
+                          // console.log(filePath, '====filePathllll')
 
-                          console.log(`Compressed and saved: ${file}`);
-                          successCount++; // Increment success count
-                        } catch (compressError) {
-                          console.error(`Error compressing ${file}:`, compressError.message);
-                          // If there is an error, copy the original file to the compressed folder
-                          await fsAsync.copyFile(filePath, compressedFilePath);
-                          console.log(`Original file copied to compressed folder: ${file}`);
-                          skippedCount++; // Increment skipped count
+                          // Check if it's an image file (jpg/jpeg)
+                          const compressedFilePath = path.join(compressedFolder, file, lastFile, endLastFile); // Same file name in compressed folder
+                          if (path.extname(endLastFile).toLowerCase() === '.jpg' || path.extname(endLastFile).toLowerCase() === '.jpeg') {
+
+                            // console.log(compressedFilePath, '====compressedFilePath')
+
+                            try {
+                              // Compress and save the image
+                              await sharp(filePath)
+                                .jpeg({ quality: 40 }) // Set the quality to 40 (adjust as needed)
+                                .toFile(compressedFilePath);
+
+                              console.log(`Compressed and saved: ${file}`);
+                              successCount++; // Increment success count
+                            } catch (compressError) {
+                              console.error(`Error compressing ${file}:`, compressError.message);
+                              // If there is an error, copy the original file to the compressed folder
+                              await fsAsync.copyFile(filePath, compressedFilePath);
+                              console.log(`Original file copied to compressed folder: ${file}`);
+                              skippedCount++; // Increment skipped count
+                            }
+                          } else {
+                            await fsAsync.copyFile(filePath, compressedFilePath);
+
+                          }
                         }
-                      }else{
-                        await fsAsync.copyFile(filePath, compressedFilePath);
-
                       }
-                    }
+                    })
+                  } else {
+                    const filePath = path.join(sourceFolder, file, lastFile);
+                    console.log(filePath, '====filePathllll')
+
+                    // Check if it's an image file (jpg/jpeg)
+                    const compressedFilePath = path.join(compressedFolder, file, lastFile); // Same file name in compressed folder
+                    await fsAsync.copyFile(filePath, compressedFilePath);
                   }
-                })
+                }
               }
-            }
-          });
+            });
+          } else {
+            const filePath = path.join(sourceFolder, file);
+            console.log(filePath, '====filePathllll')
+
+            // Check if it's an image file (jpg/jpeg)
+            const compressedFilePath = path.join(compressedFolder, file); // Same file name in compressed folder
+            await fsAsync.copyFile(filePath, compressedFilePath);
+          }
         }
       }
     });
