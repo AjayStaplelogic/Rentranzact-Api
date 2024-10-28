@@ -238,9 +238,9 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
     editProperty(req, res)
   },
 )
-console.log(path.resolve(__dirname, '../../../uploads/property'))
-const sourceFolder = path.resolve(__dirname, '../../../uploads/property');
-const compressedFolder = path.resolve(__dirname, '../../../uploads/property_compressed');
+console.log(path.resolve('/uploads'))
+const sourceFolder = path.resolve('/uploads');
+const compressedFolder = path.resolve('/uploads');
 
 // import sharp from 'sharp';
 // import path from "path";
@@ -263,7 +263,7 @@ async function compressImagesInFolder() {
   try {
     console.log("COmpressed function")
     // Ensure the compressed folder exists
-    await createFolderIfNotExists(compressedFolder);
+    // await createFolderIfNotExists(compressedFolder);
 
     // Get all files from the source folder
     const files = await fs.readdir(sourceFolder);
