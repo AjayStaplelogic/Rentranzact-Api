@@ -10,6 +10,9 @@ import { getAdmins } from "../services/user.service.mjs"
 import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
+import { Admin } from "../../admin/models/admin.model.mjs";
+
+
 
 async function addPropertyService(
   PropertyID,
@@ -21,7 +24,7 @@ async function addPropertyService(
   req
 ) {
 
-  console.log(`[Add PropertyService]`)
+  // console.log(`[Add PropertyService]`)
   let { email } = body;
   const role = req?.user?.data?.role;
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
@@ -103,35 +106,40 @@ async function addPropertyService(
   }
 
   const property = await Property.create(Property_);
-  console.log(`[Property Created]`);
+  // console.log(`[Property Created]`);
   if (property) {
 
     // Sending notification to admin for approval
-    const admins = await getAdmins();
-    if (admins && admins.length > 0) {
-      for await (const admin of admins) {
-        const notification_payload = {};
-        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
-        notification_payload.notificationHeading = "New Property Added";
-        notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} added a new property`;
-        notification_payload.landlordID = property.landlord_id;
-        notification_payload.propertyID = property._id;
-        notification_payload.send_to = admin._id;
-        notification_payload.property_manager_id = property.property_manager_id;
-        notification_payload.is_send_to_admin = true;
-        const create_notification = await Notification.create(notification_payload);
-        if (create_notification) {
-          if (admin && admin.fcmToken) {
-            const metadata = {
-              "propertyID": property._id.toString(),
-              "redirectTo": "property",
+    // const admins = await getAdmins();
+    Admin.find({ role: "superAdmin" }).then((admins) => {
+      if (admins && admins.length > 0) {
+        for (const admin of admins) {
+          const notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+          notification_payload.notificationHeading = "New Property Added";
+          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} added a new property`;
+          notification_payload.landlordID = property.landlord_id;
+          notification_payload.propertyID = property._id;
+          notification_payload.send_to = admin._id;
+          notification_payload.property_manager_id = property.property_manager_id;
+          notification_payload.is_send_to_admin = true;
+          Notification.create(notification_payload).then((create_notification) => {
+            if (create_notification) {
+              if (create_notification) {
+                if (admin && admin.fcmToken) {
+                  const metadata = {
+                    "propertyID": property._id.toString(),
+                    "redirectTo": "property",
+                  }
+                  sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+                }
+              }
             }
-            sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-          }
+          });
         }
       }
-    }
-    console.log(`[Property Created][Finished]`);
+    })
+    // console.log(`[Property Created][Finished]`);
 
     return {
       data: property,
@@ -820,6 +828,20 @@ async function deletePropertyService(userID, propertyID) {
 
 
 }
+
+
+const notification_payload = {};
+notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+notification_payload.notificationHeading = "111111New Property Added";
+notification_payload.notificationBody = `added a new property`;
+notification_payload.landlordID = "66a21b414ee1be84903a0076";
+notification_payload.propertyID = "66a21b414ee1be84903a0076";
+notification_payload.send_to = "66a21b414ee1be84903a0076";
+notification_payload.property_manager_id = "66a21b414ee1be84903a0076";
+notification_payload.is_send_to_admin = true;
+// Notification.create(notification_payload).then((create_notification)=>{
+//   console.log(create_notification)
+// });
 
 export {
   deletePropertyService,

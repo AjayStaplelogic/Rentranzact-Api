@@ -56,30 +56,32 @@ const storage = multer.diskStorage({
     const compressedFolder = path.join(propertyFolder, "images", "compressed")
 
 
+  
     // Create the directories if they don't exist
-    if (!fs.existsSync(propertyFolder)) {
+    if (!fs.existsSync(propertyFolder)) {                  // commented this code to avoid checking before demo call
       fs.mkdirSync(propertyFolder, { recursive: true });
     }
-    if (!fs.existsSync(imagesFolder)) {
-      fs.mkdirSync(imagesFolder);
-    }
-    if (!fs.existsSync(documentsFolder)) {
-      fs.mkdirSync(documentsFolder);
-    }
-    if (!fs.existsSync(videosFolder)) {
-      fs.mkdirSync(videosFolder);
-    }
+    // if (!fs.existsSync(imagesFolder)) {
+    //   fs.mkdirSync(imagesFolder);
+    // }
+    // if (!fs.existsSync(documentsFolder)) {
+    //   fs.mkdirSync(documentsFolder);
+    // }
+    // if (!fs.existsSync(videosFolder)) {
+    //   fs.mkdirSync(videosFolder);
+    // }
 
-    if (!fs.existsSync(thumbnailFolder)) {
-      fs.mkdirSync(thumbnailFolder);
-    }
+    // if (!fs.existsSync(thumbnailFolder)) {
+    //   fs.mkdirSync(thumbnailFolder);
+    // }
 
-    if (!fs.existsSync(compressedFolder)) {
-      fs.mkdirSync(compressedFolder);
-    }
+    // if (!fs.existsSync(compressedFolder)) {
+    //   fs.mkdirSync(compressedFolder);
+    // }
 
     // Determine subfolder based on file type
     let destinationFolder = propertyFolder;
+
     if (file.mimetype.startsWith("image/")) {
       destinationFolder = imagesFolder;
     } else if (
@@ -186,8 +188,9 @@ router.post(
           thumbnail: relativePath2,
           compressed: compressedPathDisplay
         });
+
         // Create and save the thumbnail
-        await createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
+        createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
         await compressImages(file.path, compressedPath)
       } else if (file.mimetype.startsWith("video/")) {
         req.videos.push({ id: uuidv4(), url: relativePath });
@@ -196,8 +199,6 @@ router.post(
       }
 
       console.log(`[File Uploaded Count] : [${count}]`)
-
-
     });
 
     addProperty(req, res);
