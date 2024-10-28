@@ -316,12 +316,17 @@ async function compressImagesInFolder() {
                             } catch (compressError) {
                               console.error(`Error compressing ${file}:`, compressError.message);
                               // If there is an error, copy the original file to the compressed folder
-                              await fsAsync.copyFile(filePath, compressedFilePath);
-                              console.log(`Original file copied to compressed folder: ${file}`);
-                              skippedCount++; // Increment skipped count
+
+                              fs.copyFile(filePath, compressedFilePath, (err, file) => {
+                                console.log(`Original file copied to compressed folder: ${file}`);
+                                skippedCount++; // Increment skipped count
+                              });
                             }
                           } else {
-                            await fsAsync.copyFile(filePath, compressedFilePath);
+                            fs.copyFile(filePath, compressedFilePath, (err, file) => {
+                              console.log(`Original file copied to compressed folder: ${file}`);
+                              skippedCount++; // Increment skipped count
+                            });
 
                           }
                         }
@@ -333,7 +338,10 @@ async function compressImagesInFolder() {
 
                     // Check if it's an image file (jpg/jpeg)
                     const compressedFilePath = path.join(compressedFolder, file, lastFile); // Same file name in compressed folder
-                    await fsAsync.copyFile(filePath, compressedFilePath);
+                    fs.copyFile(filePath, compressedFilePath, (err, file) => {
+                      console.log(`Original file copied to compressed folder: ${file}`);
+                      skippedCount++; // Increment skipped count
+                    });
                   }
                 }
               }
@@ -344,7 +352,10 @@ async function compressImagesInFolder() {
 
             // Check if it's an image file (jpg/jpeg)
             const compressedFilePath = path.join(compressedFolder, file); // Same file name in compressed folder
-            await fsAsync.copyFile(filePath, compressedFilePath);
+            await fs.copyFile(filePath, compressedFilePath, (err, file) => {
+              console.log(`Original file copied to compressed folder: ${file}`);
+              skippedCount++; // Increment skipped count
+            });
           }
         }
       }
@@ -360,8 +371,11 @@ async function compressImagesInFolder() {
 
 
 
-
-compressImagesInFolder()
+try {
+  compressImagesInFolder()
+} catch (error) {
+  
+}
 export default router;
 
 
