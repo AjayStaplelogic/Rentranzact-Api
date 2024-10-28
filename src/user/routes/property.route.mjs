@@ -50,7 +50,7 @@ const storage = multer.diskStorage({
     const imagesFolder = path.join(propertyFolder, "images");
     const documentsFolder = path.join(propertyFolder, "documents");
     const videosFolder = path.join(propertyFolder, "videos");
-    
+
 
     const thumbnailFolder = path.join(propertyFolder, "images", "thumbnails")
     const compressedFolder = path.join(propertyFolder, "images", "compressed")
@@ -176,9 +176,19 @@ router.post(
 
         const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
         const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
-        req.images.push({ id: uuidv4(), url: relativePath, thumbnail: relativePath2 });
+        const compressedPath = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'compressed', randomFileName);
+        const compressedPathDisplay = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "compressed", randomFileName)
+
+        req.images.push({
+          id: uuidv4(),
+          //  url: relativePath, 
+          url: compressedPathDisplay,
+          thumbnail: relativePath2,
+          compressed: compressedPathDisplay
+        });
         // Create and save the thumbnail
         await createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
+        await compressImages(file.path, compressedPath)
       } else if (file.mimetype.startsWith("video/")) {
         req.videos.push({ id: uuidv4(), url: relativePath });
       } else if (file.mimetype.startsWith("application/")) {
@@ -245,12 +255,14 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
         const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
         const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
         const compressedPath = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'compressed', randomFileName);
+        const compressedPathDisplay = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "compressed", randomFileName)
 
         req.images.push({
           id: uuidv4(),
-          url: relativePath,
+          // url: relativePath,
+          url: compressedPathDisplay,
           thumbnail: relativePath2,
-          compressed: compressedPath
+          compressed: compressedPathDisplay
         });
         // console.log(req.images, '=======req.images111')
 
