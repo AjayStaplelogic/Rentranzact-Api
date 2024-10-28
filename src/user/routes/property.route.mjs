@@ -61,23 +61,23 @@ const storage = multer.diskStorage({
     if (!fs.existsSync(propertyFolder)) {                  // commented this code to avoid checking before demo call
       fs.mkdirSync(propertyFolder, { recursive: true });
     }
-    // if (!fs.existsSync(imagesFolder)) {
-    //   fs.mkdirSync(imagesFolder);
-    // }
-    // if (!fs.existsSync(documentsFolder)) {
-    //   fs.mkdirSync(documentsFolder);
-    // }
-    // if (!fs.existsSync(videosFolder)) {
-    //   fs.mkdirSync(videosFolder);
-    // }
+    if (!fs.existsSync(imagesFolder)) {
+      fs.mkdirSync(imagesFolder);
+    }
+    if (!fs.existsSync(documentsFolder)) {
+      fs.mkdirSync(documentsFolder);
+    }
+    if (!fs.existsSync(videosFolder)) {
+      fs.mkdirSync(videosFolder);
+    }
 
-    // if (!fs.existsSync(thumbnailFolder)) {
-    //   fs.mkdirSync(thumbnailFolder);
-    // }
+    if (!fs.existsSync(thumbnailFolder)) {
+      fs.mkdirSync(thumbnailFolder);
+    }
 
-    // if (!fs.existsSync(compressedFolder)) {
-    //   fs.mkdirSync(compressedFolder);
-    // }
+    if (!fs.existsSync(compressedFolder)) {
+      fs.mkdirSync(compressedFolder);
+    }
 
     // Determine subfolder based on file type
     let destinationFolder = propertyFolder;
