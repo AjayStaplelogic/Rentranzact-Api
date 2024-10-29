@@ -329,7 +329,7 @@ async function rechargeWallet(body) {
 
     if (userDetail) {
         if (body.paymentMethod === "stripe") {
-            const { amount, status, created, id } = body.data.object;
+            const { amount, status, created, id } = body.data.object;            
             payload = {
                 amount,
                 status,
@@ -372,12 +372,12 @@ async function rechargeWallet(body) {
 
         } else if (body.paymentMethod === "paystack") {
             console.log("Paystack Wallet")
-            const amount = body.data.amount;
+            const amount = Number(body.data.amount/100);
             const status = body.data.status;
             const createdAt = body.data.paid_at;
             const created = moment(createdAt).unix();
             const id = body?.data?.id;
-
+            
             payload = {
                 amount,
                 status,
