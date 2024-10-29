@@ -51,7 +51,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         userID = body.data.metadata.userID;
         propertyID = body.data.metadata.propertyID;
-        notificationID = body.data.notificationID;
+        notificationID = body.data.metadata.notificationID;
 
         //   const { userID, propertyID, notificationID } = body.data.object.metadata;
         // const { amount, status, created, id } = body.data.object;
