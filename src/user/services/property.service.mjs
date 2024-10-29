@@ -780,7 +780,13 @@ async function leavePropertyService(userID, propertyID) {
 
   console.log(propertyID, "--=-=-=-=")
 
-  const data = await Property.findByIdAndUpdate(propertyID, { renterID: "", rented: false, rent_period_start: "", rent_period_end: "" })
+  const data = await Property.findByIdAndUpdate(propertyID, {
+    renterID: null,
+    rented: false,
+    rent_period_start: "",
+    rent_period_end: "",
+    payment_count: 0
+  })
 
   return {
     data: data,
