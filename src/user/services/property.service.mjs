@@ -786,7 +786,32 @@ async function leavePropertyService(userID, propertyID) {
     rent_period_start: "",
     rent_period_end: "",
     payment_count: 0
-  })
+  });
+
+  if (data) {
+    User.findById(data.landlord_id).then(async (landlordDetails) => {
+      if (landlordDetails) {
+        let notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.notificationHeading = `The Renter at ${data?.propertyName ?? ""} has officially vacated the property`;
+        notification_payload.notificationBody = `The Renter has officially vacated the property and now it's available for rent`;
+        notification_payload.renterID = data?.renterID;
+        notification_payload.landlordID = data?.landlord_id;
+        notification_payload.propertyID = data?._id;
+        notification_payload.send_to = landlordDetails?._id;
+        let create_notification = await Notification.create(notification_payload);
+        if (create_notification) {
+          if (landlordDetails && landlordDetails.fcmToken) {
+            const metadata = {
+              "propertyID": data._id.toString(),
+              "redirectTo": "property_view",
+            }
+            await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
+          }
+        }
+      }
+    })
+  }
 
   return {
     data: data,
@@ -835,19 +860,6 @@ async function deletePropertyService(userID, propertyID) {
 
 }
 
-
-const notification_payload = {};
-notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
-notification_payload.notificationHeading = "111111New Property Added";
-notification_payload.notificationBody = `added a new property`;
-notification_payload.landlordID = "66a21b414ee1be84903a0076";
-notification_payload.propertyID = "66a21b414ee1be84903a0076";
-notification_payload.send_to = "66a21b414ee1be84903a0076";
-notification_payload.property_manager_id = "66a21b414ee1be84903a0076";
-notification_payload.is_send_to_admin = true;
-// Notification.create(notification_payload).then((create_notification)=>{
-//   console.log(create_notification)
-// });
 
 export {
   deletePropertyService,
