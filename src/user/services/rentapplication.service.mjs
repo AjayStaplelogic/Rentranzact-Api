@@ -551,6 +551,8 @@ async function updateRentApplications(body, id) {
           const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
             applicationStatus: status,
             cancelReason: reason
+          }, {
+            new : true
           });
 
           if (data) {
@@ -558,7 +560,7 @@ async function updateRentApplications(body, id) {
             let notification_payload = {};
             notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
             notification_payload.notificationHeading = "Rent Application Cancelled";
-            notification_payload.notificationBody = `Your rent application has beed cancelled by landlord`;
+            notification_payload.notificationBody = `Your rent application has been cancelled by landlord, Reason : ${data?.cancelReason ?? "N/A"}`;
             notification_payload.renterID = data.renterID;
             notification_payload.landlordID = data.landlordID;
             notification_payload.renterApplicationID = data._id;
