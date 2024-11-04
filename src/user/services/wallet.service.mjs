@@ -1,4 +1,6 @@
 import Stripe from "stripe";
+import ConnectedAccounts from "../models/connectedAccounts.model.mjs";
+import { User } from "../models/user.model.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 async function addInWalletService(body) {
@@ -10,11 +12,31 @@ async function addInWalletService(body) {
 
 
   return {
-    data: {  clientSecret: paymentIntent},
+    data: { clientSecret: paymentIntent },
     message: "logged in successfully",
     status: true,
-    statusCode: 200 
+    statusCode: 200
   };
 }
 
 export { addInWalletService };
+
+
+export const updateWalletPointsFromWebhook = (event) => {
+  if (event?.account) {
+    ConnectedAccounts.findOne({
+      connect_acc_id: event.account,
+      isDeleted: false
+    }).then(account => {
+      if (account?.user_id) {
+        if (event?.data?.object) {
+          User.findByIdAndUpdate(account?.user_id, {
+            walletPoints: event?.data?.object?.available[0]?.amount
+          }).then((updatedUser) => {
+            console.log(updatedUser, '====updatedUser')
+          })
+        }
+      }
+    });
+  }
+}

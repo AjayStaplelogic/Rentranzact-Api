@@ -5,7 +5,7 @@ import { addStripeTransaction, rechargeWallet, addStripeTransactionForOld } from
 import * as AccountSerivices from "../services/account.service.mjs";
 import * as PayoutServices from "../services/payout.service.mjs";
 import * as CommonHelpers from "../helpers/common.helper.mjs";
-
+import * as WalletServices from "../services/wallet.service.mjs";
 
 async function stripe(req, res) {
 
@@ -53,6 +53,11 @@ async function stripe(req, res) {
             console.log("Payout case meet")
             PayoutServices.updateStatusFromWebhook(body)
             break;
+
+        case "balance.available":
+            WalletServices.updateWalletPointsFromWebhook(body);
+            break;
+
     }
 
     res.json({ received: true });
