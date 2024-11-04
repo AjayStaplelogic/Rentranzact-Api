@@ -792,7 +792,7 @@ async function leavePropertyService(userID, propertyID) {
     User.findById(data.landlord_id).then(async (landlordDetails) => {
       if (landlordDetails) {
         let notification_payload = {};
-        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rate_to_renter;
         notification_payload.notificationHeading = `The Renter at ${data?.propertyName ?? ""} has officially vacated the property`;
         notification_payload.notificationBody = `The Renter has officially vacated the property and now it's available for rent`;
         notification_payload.renterID = data?.renterID;
