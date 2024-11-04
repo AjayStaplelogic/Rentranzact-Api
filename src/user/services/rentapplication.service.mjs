@@ -517,8 +517,10 @@ async function updateRentApplications(body, id) {
             const renterDetails = await User.findById(data.renterID);
             let notification_payload = {};
             notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
-            notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
-            notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+            // notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
+            // notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+            notification_payload.notificationHeading = "Congratulations, your rent application have been approved";
+            notification_payload.notificationBody = "You can now proceed to make payment";
             notification_payload.renterID = data.renterID;
             notification_payload.landlordID = data.landlordID;
             notification_payload.renterApplicationID = data._id;
