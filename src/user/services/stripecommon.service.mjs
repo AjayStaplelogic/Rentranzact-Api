@@ -122,13 +122,13 @@ export const createAccount = async (user) => {
         tos_acceptance: {
             service_agreement: 'recipient',
         },
-        settings: {
-            payouts: {
-                schedule: {
-                    interval: "manual"
-                }
-            }
-        },
+        // settings: {
+        //     payouts: {
+        //         schedule: {
+        //             interval: "manual"
+        //         }
+        //     }
+        // },
         metadata: {
             user_id: user._id,
         },
@@ -139,8 +139,8 @@ export const createAccount = async (user) => {
 
 // console.log(createAccount(
 //     {
-//         email: "Testing6@yopmail.com",
-//         fullName: "TEST ACCOUNT 6",
+//         email: "Testing7@yopmail.com",
+//         fullName: "TEST ACCOUNT 7",
 //     }
 // ))
 
@@ -166,7 +166,7 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
 
 }
 
-// console.log(createAccountLink("acct_1QAQWXIXrnpy9Q28"))
+// console.log(createAccountLink("acct_1QHgPvIWkutNVKz6"))
 
 /**
  * @description To transfer amount from one account to another
@@ -217,7 +217,7 @@ export const getBalance = async (acc_id = null) => {
  * @param {object} metadata meta data to receive in webhook for updating payout data in db
  * @returns { payout | object} payout object from stripe containing payout data
  */
-export const payout = async (account_id, external_acc_id, currency, amount, description = "", metadata = null) => {
+export const payout = async (acc_id, external_acc_id, currency, amount, description = "", metadata = null) => {
 
     // const balance = await stripe.balance.retrieve({
     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
@@ -235,7 +235,7 @@ export const payout = async (account_id, external_acc_id, currency, amount, desc
         metadata: metadata ?? {}
     },
         {
-            stripeAccount: account_id,
+            stripeAccount: acc_id,
         }
     );
 
@@ -243,7 +243,7 @@ export const payout = async (account_id, external_acc_id, currency, amount, desc
     return payout;
 }
 
-// console.log(payout("ba_1Q9govINmaZ2kbt0sOtCObcc"))
+// console.log(payout("acct_1QHgPvIWkutNVKz6","ba_1QHgSKIWkutNVKz6QSR4vEee", "NGN", 1))
 
 
 export const deleteAccount = async (acc_id) => {
@@ -271,3 +271,22 @@ export const deleteAccount = async (acc_id) => {
 //     return topup;
 // }
 // console.log(topUp())
+
+
+export const createPaymentMethod = async () => {
+    const paymentMethod = await stripe.paymentMethods.create({
+        type: 'us_bank_account',
+        us_bank_account: {
+            account_holder_type: 'individual',
+            account_number: '000123456789',
+            routing_number: '110000000',
+        },
+        billing_details: {
+            name: 'John Doe',
+        },
+    });
+
+    console.log(paymentMethod, '=====paymentMethod')
+    return paymentMethod;
+}
+

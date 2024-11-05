@@ -271,8 +271,8 @@ const propertySchema = new mongoose.Schema(
     approval_status: {
       type: String,
       enum: Object.values(ApprovalStatus),
-      // default: ApprovalStatus.PENDING
-      default: ApprovalStatus.APPROVED    // just for demo, set pending after demo
+      default: ApprovalStatus.PENDING
+      // default: ApprovalStatus.APPROVED    // just for demo, set pending after demo
     }
   },
   { timestamps: true }
