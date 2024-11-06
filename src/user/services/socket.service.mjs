@@ -7,7 +7,7 @@ const connected_users = [];
 const io = new Server();
 
 io.use(async (socket, next) => {
-    console.log(`[Socket Handshake]`)
+    // console.log(`[Socket Handshake]`)
     // console.log(socket.handshake)
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
@@ -63,8 +63,8 @@ io.use(async (socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    console.log(`[socket connected][socket Id] : ${socket.id}`)
-    console.log(`[socket connected][user_id] : ${socket.user_id}`)
+    // console.log(`[socket connected][socket Id] : ${socket.id}`)
+    // console.log(`[socket connected][user_id] : ${socket.user_id}`)
 
     chatService.user_online(socket, connected_users);
     chatService.join_multiple_rooms(socket);
