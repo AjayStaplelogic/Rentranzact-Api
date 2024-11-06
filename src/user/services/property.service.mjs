@@ -879,12 +879,10 @@ async function getRentalBreakUp(propertyDetails) {
   breakdown.landlord_earning = rent;
   breakdown.service_charge = propertyDetails.servicesCharges;
   breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-  breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
   breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
   breakdown.insurance = 0;    // variable declaration for future use
   breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
 
-  breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
   if (propertyDetails.payment_count === 0) {
     breakdown.service_charge = propertyDetails.servicesCharges > 0 ? propertyDetails.servicesCharges : 0;
     breakdown.total_amount += breakdown.service_charge;
@@ -895,6 +893,11 @@ async function getRentalBreakUp(propertyDetails) {
     breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
   }
 
+  if (propertyDetails.is_legal_partner) {
+    breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+  }
+
+  breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
   return breakdown;
 }
 
