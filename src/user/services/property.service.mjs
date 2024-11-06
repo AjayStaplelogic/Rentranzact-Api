@@ -895,6 +895,7 @@ function getRentalBreakUp(propertyDetails) {
   }
 
   breakdown.total_amount += rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
+  breakdown.total_amount = Math.round(breakdown.total_amount);
   return breakdown;
 }
 
