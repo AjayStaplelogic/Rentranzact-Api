@@ -15,7 +15,7 @@ import { EPaymentType } from "../enums/wallet.enum.mjs";
 import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
-
+import * as PropertyServices from "../services/property.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -210,43 +210,44 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-        async function rentalBreakdown(propertyID) {
+        // async function rentalBreakdown(propertyID) {
 
-            const property = await Property.findById(propertyID);
+        //     const property = await Property.findById(propertyID);
 
-            const data = {
-                service_charge: 0,
-                rent: 0,
-                insurance: 0,
-                agency_fee: 0,
-                legal_Fee: 0,
-                caution_deposite: 0,
-                total_amount: 0,
-                agent_fee: 0,
-                rtz_fee: 0
-            }
+        //     const data = {
+        //         service_charge: 0,
+        //         rent: 0,
+        //         insurance: 0,
+        //         agency_fee: 0,
+        //         legal_Fee: 0,
+        //         caution_deposite: 0,
+        //         total_amount: 0,
+        //         agent_fee: 0,
+        //         rtz_fee: 0
+        //     }
 
-            let rent = Number(property.rent);
-            data.rent = property.rent;
-            data.service_charge = property.servicesCharges;
-            data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-            data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-            data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-            data.insurance = 0;    // variable declaration for future use
-            data.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
-            data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
-
-
-            if (property.property_manager_id) {
-                data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-            }
-
-            return data
-        }
-
-        let breakdown = await rentalBreakdown(propertyID)
+        //     let rent = Number(property.rent);
+        //     data.rent = property.rent;
+        //     data.service_charge = property.servicesCharges;
+        //     data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+        //     data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+        //     data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+        //     data.insurance = 0;    // variable declaration for future use
+        //     data.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
+        //     data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
 
 
+        //     if (property.property_manager_id) {
+        //         data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+        //     }
+
+        //     return data
+        // }
+
+        // let breakdown = await rentalBreakdown(propertyID)
+
+
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
         const data = new Transaction({
             wallet: false,
             renterID: userID,
@@ -294,7 +295,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
         }
         return {
             data: [],
@@ -329,7 +330,7 @@ async function rechargeWallet(body) {
 
     if (userDetail) {
         if (body.paymentMethod === "stripe") {
-            const { amount, status, created, id } = body.data.object;            
+            const { amount, status, created, id } = body.data.object;
             payload = {
                 amount,
                 status,
@@ -360,24 +361,24 @@ async function rechargeWallet(body) {
             const data_ = new Transaction(transaction_payload)
 
             data_.save()
-            if (status === "succeeded") {
-                const data__ = await User.findByIdAndUpdate(
-                    userID,
-                    { $inc: { walletPoints: amount } },
-                    { new: true }
-                );
+            // if (status === "succeeded") {
+            //     const data__ = await User.findByIdAndUpdate(
+            //         userID,
+            //         { $inc: { walletPoints: amount } },
+            //         { new: true }
+            //     );
 
-            }
+            // }
 
 
         } else if (body.paymentMethod === "paystack") {
             console.log("Paystack Wallet")
-            const amount = Number(body.data.amount/100);
+            const amount = Number(body.data.amount / 100);
             const status = body.data.status;
             const createdAt = body.data.paid_at;
             const created = moment(createdAt).unix();
             const id = body?.data?.id;
-            
+
             payload = {
                 amount,
                 status,
@@ -410,15 +411,15 @@ async function rechargeWallet(body) {
             data_.save()
             console.log(status, '====status');
 
-            if (status === "success") {
+            // if (status === "success") {
 
-                const data__ = await User.findByIdAndUpdate(
-                    userID,
-                    { $inc: { walletPoints: amount } },
-                    { new: true }
-                );
-                console.log(data__, '====data__');
-            }
+            //     const data__ = await User.findByIdAndUpdate(
+            //         userID,
+            //         { $inc: { walletPoints: amount } },
+            //         { new: true }
+            //     );
+            //     console.log(data__, '====data__');
+            // }
 
 
         }
@@ -428,6 +429,9 @@ async function rechargeWallet(body) {
             payload.payment_type = EPaymentType.rechargeWallet
             let add_wallet = await Wallet.create(payload);
             console.log("add_wallet=----", add_wallet, '====add_wallet')
+            if (add_wallet) {
+                TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
+            }
 
         }
     }
@@ -629,39 +633,42 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
 
-    async function rentalBreakdown(propertyID) {
+    // async function rentalBreakdown(propertyID) {
 
-        const property = await Property.findById(propertyID);
+    //     const property = await Property.findById(propertyID);
 
-        const data = {
-            service_charge: 0,
-            rent: 0,
-            insurance: 0,
-            agency_fee: 0,
-            legal_Fee: 0,
-            caution_deposite: 0,
-            total_amount: 0,
-            agent_fee: 0
-        }
+    //     const data = {
+    //         service_charge: 0,
+    //         rent: 0,
+    //         insurance: 0,
+    //         agency_fee: 0,
+    //         legal_Fee: 0,
+    //         caution_deposite: 0,
+    //         total_amount: 0,
+    //         agent_fee: 0
+    //     }
 
-        let rent = Number(property.rent);
-        data.rent = property.rent;
-        data.service_charge = property.servicesCharges;
-        data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-        data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-        data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-        data.insurance = 0;    // variable declaration for future use
-        data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
+    //     let rent = Number(property.rent);
+    //     data.rent = property.rent;
+    //     data.service_charge = property.servicesCharges;
+    //     data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+    //     data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+    //     data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+    //     data.insurance = 0;    // variable declaration for future use
+    //     data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
 
 
-        if (property.property_manager_id) {
-            data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        }
+    //     if (property.property_manager_id) {
+    //         data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+    //     }
 
-        return data
-    }
+    //     return data
+    // }
 
-    let breakdown = await rentalBreakdown(propertyID)
+    // let breakdown = await rentalBreakdown(propertyID)
+
+    let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+
 
 
     const data = new Transaction({
@@ -697,7 +704,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     // Requesting Admin for transfer admin account to landlord account
     if (propertyDetails?.landlord_id) {
-        TransferServices.makeTransferForPropertyRent(propertyDetails, null, amount);
+        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
     }
 
     return {
