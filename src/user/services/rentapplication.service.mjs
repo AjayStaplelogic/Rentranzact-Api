@@ -172,7 +172,8 @@ async function addRentApplicationService(body, user) {
       kinContactNumber: contactNumber,
       kinEmail: emailID,
     }
-    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);
+    // const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);     // uncomment this code after client recharge for smile identity verification
+    const verifyStatus = true;  // Remove this code after client recharge for smile identity verification
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
@@ -226,57 +227,59 @@ async function addRentApplicationService(body, user) {
           }
         }
 
-        await User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
-        const landlordDetails = await User.findById(landlord.landlord_id)
-        if (landlordDetails) {
-          let notification_payload = {};
-          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
-          notification_payload.notificationHeading = "Rent Application Update";
-          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
-          notification_payload.renterID = renterID;
-          notification_payload.landlordID = landlord.landlord_id;
-          notification_payload.renterApplicationID = data._id;
-          notification_payload.propertyID = landlord._id;
-          notification_payload.send_to = landlordDetails._id;
-          notification_payload.amount = landlord.rent;
-          let create_notification = await Notification.create(notification_payload);
-          if (create_notification) {
-            if (landlordDetails && landlordDetails.fcmToken) {
-              const metadata = {
-                "propertyID": landlord._id.toString(),
-                "redirectTo": "rentApplication",
-                "rentApplication": create_notification.renterApplicationID
+        User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
+        User.findById(landlord.landlord_id).then(async (landlordDetails) => {
+          if (landlordDetails) {
+            let notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+            notification_payload.notificationHeading = "Rent Application Update";
+            notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+            notification_payload.renterID = renterID;
+            notification_payload.landlordID = landlord.landlord_id;
+            notification_payload.renterApplicationID = data._id;
+            notification_payload.propertyID = landlord._id;
+            notification_payload.send_to = landlordDetails._id;
+            notification_payload.amount = landlord.rent;
+            let create_notification = await Notification.create(notification_payload);
+            if (create_notification) {
+              if (landlordDetails && landlordDetails.fcmToken) {
+                const metadata = {
+                  "propertyID": landlord._id.toString(),
+                  "redirectTo": "rentApplication",
+                  "rentApplication": create_notification.renterApplicationID
+                }
+                sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
               }
-              await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
             }
           }
-        }
+        })
 
-        const propertyManagerDetails = await User.findById(landlord.property_manager_id)
-        if (propertyManagerDetails) {
-          let notification_payload = {};
-          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
-          notification_payload.notificationHeading = "Rent Application Update";
-          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
-          notification_payload.renterID = renterID;
-          notification_payload.landlordID = landlord?.landlord_id;
-          notification_payload.renterApplicationID = data._id;
-          notification_payload.propertyID = landlord._id;
-          notification_payload.send_to = propertyManagerDetails._id;
-          notification_payload.property_manager_id = propertyManagerDetails._id;
-          notification_payload.amount = landlord.rent;
-          let create_notification = await Notification.create(notification_payload);
-          if (create_notification) {
-            if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
-              const metadata = {
-                "propertyID": landlord._id.toString(),
-                "redirectTo": "rentApplication",
-                "rentApplication": create_notification.renterApplicationID
+        await User.findById(landlord.property_manager_id).then(async (propertyManagerDetails) => {
+          if (propertyManagerDetails) {
+            let notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+            notification_payload.notificationHeading = "Rent Application Update";
+            notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+            notification_payload.renterID = renterID;
+            notification_payload.landlordID = landlord?.landlord_id;
+            notification_payload.renterApplicationID = data._id;
+            notification_payload.propertyID = landlord._id;
+            notification_payload.send_to = propertyManagerDetails._id;
+            notification_payload.property_manager_id = propertyManagerDetails._id;
+            notification_payload.amount = landlord.rent;
+            let create_notification = await Notification.create(notification_payload);
+            if (create_notification) {
+              if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
+                const metadata = {
+                  "propertyID": landlord._id.toString(),
+                  "redirectTo": "rentApplication",
+                  "rentApplication": create_notification.renterApplicationID
+                }
+                await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.PROPERTY_MANAGER)
               }
-              await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.PROPERTY_MANAGER)
             }
           }
-        }
+        })
 
         return {
           data: data,
@@ -554,7 +557,7 @@ async function updateRentApplications(body, id) {
             applicationStatus: status,
             cancelReason: reason
           }, {
-            new : true
+            new: true
           });
 
           if (data) {
