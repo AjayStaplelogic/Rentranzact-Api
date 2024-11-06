@@ -256,7 +256,53 @@ const rentApplicationSchema = new mongoose.Schema(
     expectedStaysDurationType: {
       type: String,
       enum: Object.values(ExpectedStaysDurationType)
-    }
+    },
+
+
+    /** Update when rent application accepted for future payment or static records */
+    service_charge: {
+      type: Number,
+      default: 0,
+    },
+    rent: {
+      type: Number,
+      default: 0,
+    },
+    insurance: {
+      type: Number,
+      default: 0,
+    },
+    legal_Fee: {
+      type: Number,
+      default: 0,
+    },
+    caution_deposite: {
+      type: Number,
+      default: 0,
+    },
+    total_amount: {
+      type: Number,
+      default: 0,
+    },
+    agency_fee: {
+      type: Number,
+      default: 0,
+    },
+    agent_fee: {
+      type: Number,
+      default: 0,
+    },
+    rtz_fee: {
+      type: Number,
+      default: 0,
+    },
+    landlord_earning: {
+      type: Number,
+      default: 0,
+    },
+  
+    /** End of Updating keys when rent application accepted for future payment or static records */
+
   },
 
   { timestamps: true }

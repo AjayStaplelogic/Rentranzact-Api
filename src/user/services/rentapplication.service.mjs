@@ -10,6 +10,7 @@ import { User } from "../models/user.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import assert from "assert";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
+import * as PropertyServices from "../services/property.service.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -487,62 +488,53 @@ async function updateRentApplications(body, id) {
           };
         }
         if (RentApplicationStatus.ACCEPTED === status) {
+          const breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
           const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
-            applicationStatus: status
+            applicationStatus: status,
+            rent : breakdown?.rent ?? 0,
+            insurance : breakdown?.insurance ?? 0,
+            legal_Fee : breakdown?.legal_Fee ?? 0,
+            caution_deposite : breakdown?.caution_deposite ?? 0,
+            total_amount : breakdown?.total_amount ?? 0,
+            agency_fee : breakdown?.agency_fee ?? 0,
+            agent_fee : breakdown?.agent_fee ?? 0,
+            rtz_fee : breakdown?.rtz_fee ?? 0,
+            landlord_earning : breakdown?.landlord_earning ?? 0,
           },
             { new: true });
 
           const propertyDetails = await Property.findById(data.propertyID);
-          const landlordDetails = await User.findById(data.landlordID);
-          const propertyManagerDetails = await User.findById(data.pmID);
-
-          let currentDate = moment().format('Do MMM YYYY');
-
-          // console.log("propertyID", data.propertyID, "renterid", id, "landlord details ", landlordDetails, "property details", propertyDetails, "timestamp", currentDate)
-
-          // let title = `Your rent is due to ${landlordDetails.fullName}`;
-          // let notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
-
-
-          // const newNotification = new Notification({ amount: propertyDetails.rent, propertyID: data.propertyID, renterID: data.renterID, notificationHeading: title, notificationBody: notificationBody, renterApplicationID: rentApplicationID, landlordID: landlordDetails._id })
-
-          // const metadata = { "amount": propertyDetails.rent.toString(), "propertyID": data.propertyID.toString(), "redirectTo": "payRent", "rentApplication": rentApplicationID }
-
-          // const renterDetails = await User.findById(data.renterID);
-          // if (renterDetails && renterDetails.fcmToken) {
-          //   const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
-
-          // }
-
-          // await newNotification.save()
-
           if (data) {
-            const renterDetails = await User.findById(data.renterID);
-            let notification_payload = {};
-            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
-            // notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
-            // notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
-            notification_payload.notificationHeading = "Congratulations, your rent application have been approved";
-            notification_payload.notificationBody = "You can now proceed to make payment";
-            notification_payload.renterID = data.renterID;
-            notification_payload.landlordID = data.landlordID;
-            notification_payload.renterApplicationID = data._id;
-            notification_payload.propertyID = data.propertyID;
-            notification_payload.send_to = renterDetails._id;
-            notification_payload.property_manager_id = data.pmID;
-            notification_payload.amount = propertyDetails.rent;
-            notification_payload.show_pay_now = true;
-            let create_notification = await Notification.create(notification_payload);
-            if (create_notification) {
-              if (renterDetails && renterDetails.fcmToken) {
-                const metadata = {
-                  "amount": propertyDetails.rent.toString(),
-                  "propertyID": data.propertyID.toString(),
-                  "redirectTo": "payRent",
-                  "rentApplication": create_notification.renterApplicationID.toString(),
+            if (breakdown?.total_amount > 0) {
+              User.findById(data.renterID).then(async (renterDetails) => {
+                let notification_payload = {};
+                notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
+                // notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
+                // notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
+                notification_payload.notificationHeading = "Congratulations, your rent application have been approved";
+                notification_payload.notificationBody = "You can now proceed to make payment";
+                notification_payload.renterID = data.renterID;
+                notification_payload.landlordID = data.landlordID;
+                notification_payload.renterApplicationID = data._id;
+                notification_payload.propertyID = data.propertyID;
+                notification_payload.send_to = renterDetails._id;
+                notification_payload.property_manager_id = data.pmID;
+                // notification_payload.amount = propertyDetails.rent;
+                notification_payload.amount = breakdown.total_amount;
+                notification_payload.show_pay_now = true;
+                let create_notification = await Notification.create(notification_payload);
+                if (create_notification) {
+                  if (renterDetails && renterDetails.fcmToken) {
+                    const metadata = {
+                      "amount": propertyDetails.rent.toString(),
+                      "propertyID": data.propertyID.toString(),
+                      "redirectTo": "payRent",
+                      "rentApplication": create_notification.renterApplicationID.toString(),
+                    }
+                    sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
+                  }
                 }
-                await sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
-              }
+              });
             }
           }
 
