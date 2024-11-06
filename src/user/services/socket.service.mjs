@@ -223,8 +223,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        console.log(`[Listener Event]-[disconnected]`);
-        console.log(`[socket disconnected] : ${socket.id}`);
+        // console.log(`[Listener Event]-[disconnected]`);
+        // console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
         io.emit("user-offline", {        // sending to all client about user logout/offline
             status: true,
@@ -246,9 +246,9 @@ io.on("connection_error", (err) => {
 });
 
 io.on("close", (socket) => {
-    console.log(`[socket closed] : ${socket.id}`);
+    // console.log(`[socket closed] : ${socket.id}`);
     chatService.user_online(socket, connected_users);
-    console.log(connected_users)
+    // console.log(connected_users)
 });
 
 export default io;
