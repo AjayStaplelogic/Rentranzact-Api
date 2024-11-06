@@ -873,7 +873,7 @@ function getRentalBreakUp(propertyDetails) {
   };
   const rent = Number(propertyDetails.rent);
   breakdown.rent = rent;
-  breakdown.landlord_earning = rent;
+  breakdown.landlord_earning += rent;
   breakdown.service_charge = propertyDetails.servicesCharges;
   breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
   breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
@@ -894,7 +894,7 @@ function getRentalBreakUp(propertyDetails) {
     breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
   }
 
-  breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
+  breakdown.total_amount += rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
   return breakdown;
 }
 
