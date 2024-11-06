@@ -290,3 +290,35 @@ export const createPaymentMethod = async () => {
     return paymentMethod;
 }
 
+export const createBankToken = async () => {
+
+    const token = await stripe.tokens.create({
+        bank_account: {
+            country: 'NG',
+            currency: 'NGN',
+            account_holder_name: 'Jenny Rosen',
+            account_holder_type: 'individual',
+            account_number: '1111111112',
+            routing_number: "AAAANGLAXXX"
+        },
+    });
+
+    console.log(token, '=====token');
+    return token;
+}
+
+// console.log(createBankToken(), '=====createBankToken()')
+
+export const createExternalAccount = async (acc_id, external_acc_id) => {
+    const externalAccount = await stripe.accounts.createExternalAccount(
+        acc_id,
+        {
+            external_account: external_acc_id
+        }
+    );
+
+    console.log(externalAccount, '=====externalAccount');
+    return externalAccount;
+}
+
+// console.log(createExternalAccount("acct_1QHgPvIWkutNVKz6", "btok_1QHhdMIqUp9zeP6EWsXvA4gr"), '=====createExternalAccount()')

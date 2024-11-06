@@ -16,7 +16,7 @@ export const makeTransferForPropertyRent = async (property_data = null, property
 
     if (amount > 0) {
         const transfer_payload = {
-            transfer_type : ETRANSFER_TYPE.rentPayment,
+            transfer_type: ETRANSFER_TYPE.rentPayment,
             is_from_admin: true,
             to: property_data?.landlord_id,
             property_id: property_data._id,
@@ -36,5 +36,24 @@ export const makeTransferForPropertyRent = async (property_data = null, property
 
 export const createTransferInDB = async (payload) => {
     return await Transfers.create(payload);
+}
+
+export const makeTransferForWalletPayment = async (user_id, amount = 0) => {
+    if (amount > 0 && user_id) {
+        const transfer_payload = {
+            transfer_type: ETRANSFER_TYPE.rechargeWallet,
+            is_from_admin: true,
+            to: user_id,
+            amount: amount,
+            from_currency: "USD",
+            to_currency: "NGN",
+        }
+
+        console.log(transfer_payload, '====transfer_payload')
+
+        return await createTransferInDB(transfer_payload);
+    }
+
+    return false;
 }
 
