@@ -861,6 +861,44 @@ async function deletePropertyService(userID, propertyID) {
 }
 
 
+async function getRentalBreakUp(propertyDetails) {
+  const breakdown = {
+    service_charge: 0,
+    rent: 0,
+    insurance: 0,
+    legal_Fee: 0,
+    caution_deposite: 0,
+    total_amount: 0,
+    agency_fee: 0,
+    agent_fee: 0,
+    rtz_fee: 0,
+    landlord_earning: 0
+  };
+  const rent = Number(propertyDetails.rent);
+  breakdown.rent = rent;
+  breakdown.landlord_earning = rent;
+  breakdown.service_charge = propertyDetails.servicesCharges;
+  breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+  breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+  breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+  breakdown.insurance = 0;    // variable declaration for future use
+  breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
+
+  breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
+  if (propertyDetails.payment_count === 0) {
+    breakdown.service_charge = propertyDetails.servicesCharges > 0 ? propertyDetails.servicesCharges : 0;
+    breakdown.total_amount += breakdown.service_charge;
+    breakdown.landlord_earning += breakdown.service_charge;
+  }
+
+  if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
+    breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
+  }
+
+  return breakdown;
+}
+
+
 export {
   deletePropertyService,
   getMyProperties,
@@ -871,5 +909,6 @@ export {
   getPropertyByID,
   addFavoriteProperties,
   searchPropertyByString,
-  leavePropertyService
+  leavePropertyService,
+  getRentalBreakUp
 };
