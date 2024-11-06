@@ -503,7 +503,7 @@ async function updateRentApplications(body, id) {
           },
             { new: true });
 
-          const propertyDetails = await Property.findById(data.propertyID);
+          // const propertyDetails = await Property.findById(data.propertyID);
           if (data) {
             if (breakdown?.total_amount > 0) {
               User.findById(data.renterID).then(async (renterDetails) => {
