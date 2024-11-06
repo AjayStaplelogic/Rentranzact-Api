@@ -357,28 +357,30 @@ async function getPropertyByID(id, userID) {
   // console.log(data, "----dataa of property")
   const dataMerge = {};
 
-  dataMerge.rental_breakdown = {
-    service_charge: 0,
-    rent: 0,
-    insurance: 0,
-    agency_fee: 0,
-    legal_Fee: 0,
-    caution_deposite: 0,
-    total_amount: 0
-  }
+  // dataMerge.rental_breakdown = {
+  //   service_charge: 0,
+  //   rent: 0,
+  //   insurance: 0,
+  //   agency_fee: 0,
+  //   legal_Fee: 0,
+  //   caution_deposite: 0,
+  //   total_amount: 0
+  // }
 
-  if (data.servicesCharges > 0) {
-    dataMerge.rental_breakdown.service_charge = data.servicesCharges;
-  }
-  if (data.rent > 0) {
-    dataMerge.rental_breakdown.rent = data.rent;
-    let rent = Number(data.rent);
-    dataMerge.rental_breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-    dataMerge.rental_breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-    dataMerge.rental_breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-    dataMerge.rental_breakdown.insurance = 0;    // variable declaration for future use
-    dataMerge.rental_breakdown.total_amount = rent + dataMerge.rental_breakdown.insurance + dataMerge.rental_breakdown.agency_fee + dataMerge.rental_breakdown.legal_Fee + dataMerge.rental_breakdown.caution_deposite;
-  }
+  // if (data.servicesCharges > 0) {
+  //   dataMerge.rental_breakdown.service_charge = data.servicesCharges;
+  // }
+  // if (data.rent > 0) {
+  //   dataMerge.rental_breakdown.rent = data.rent;
+  //   let rent = Number(data.rent);
+  //   dataMerge.rental_breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
+  //   dataMerge.rental_breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
+  //   dataMerge.rental_breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+  //   dataMerge.rental_breakdown.insurance = 0;    // variable declaration for future use
+  //   dataMerge.rental_breakdown.total_amount = rent + dataMerge.rental_breakdown.insurance + dataMerge.rental_breakdown.agency_fee + dataMerge.rental_breakdown.legal_Fee + dataMerge.rental_breakdown.caution_deposite;
+  // }
+
+  dataMerge.rental_breakdown = getRentalBreakUp(data);
 
   dataMerge.propertyData = data;
 
