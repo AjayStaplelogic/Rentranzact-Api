@@ -855,15 +855,10 @@ async function deletePropertyService(userID, propertyID) {
     };
 
   }
-
-
-
-
-
 }
 
 
-async function getRentalBreakUp(propertyDetails) {
+function getRentalBreakUp(propertyDetails) {
   const breakdown = {
     service_charge: 0,
     rent: 0,
