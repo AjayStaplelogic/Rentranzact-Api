@@ -158,10 +158,12 @@ export const updateTransferStatus = async (req, res) => {
                         get_transfer.from_currency,
                         Number(get_transfer.amount)
                     )
+                    console.log(converted_currency, '=====converted_currency')
+
                     if (converted_currency && converted_currency.amount > 0) {
                         const initiate_transfer = await StripeCommonServices.transferFunds(
                             get_connected_account.connect_acc_id,
-                            converted_currency.amount,
+                            Number(converted_currency.amount),
                             get_transfer?.from_currency
                         );
 
@@ -170,6 +172,7 @@ export const updateTransferStatus = async (req, res) => {
                             payload.connect_acc_id = get_connected_account._id;
                             payload.transfer_id = initiate_transfer.id;
                             payload.conversion_rate = converted_currency.rate;
+                            payload.status = ETRANSFER_STATUS.transferred;
                             let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                             if (update_transfer) {
                                 return sendResponse(res, null, "Transfered successfully", true, 200);
