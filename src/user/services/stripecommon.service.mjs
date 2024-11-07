@@ -177,7 +177,7 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
  */
 export const transferFunds = async (acc_id, amount, currency) => {
     const transfer = await stripe.transfers.create({
-        amount: Number(amount),
+        amount: Number(amount) * 100,
         currency: currency.toUpperCase(),    // USD, NGN
         destination: acc_id,
     });
@@ -186,7 +186,7 @@ export const transferFunds = async (acc_id, amount, currency) => {
     return transfer;
 }
 
-// console.log(transferFunds("acct_1Q9gmYINmaZ2kbt0"))
+// console.log(transferFunds("acct_1QINeeIod42BvpdP", 59.84, "USD"))
 
 /**
  * @description Get current balance in stripe account
