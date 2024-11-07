@@ -10,6 +10,11 @@ const schema = new Schema({
         type: String,
         select : false
     },
+    connect_acc_id: {            
+        type: mongoose.Types.ObjectId,
+        ref: 'connectedaccounts',
+        index: true
+    },
     account_id: {            
         type: mongoose.Types.ObjectId,
         ref: 'accounts',
