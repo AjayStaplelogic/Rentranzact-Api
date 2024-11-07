@@ -231,7 +231,7 @@ async function addRentApplicationService(body, user) {
         console.log(renterID, '========renterID');
         console.log(user_update_payload, '========user_update_payload');
         User.findByIdAndUpdate(renterID, user_update_payload, { new: true }).then((updatedUser) => {
-          console.log(updatedUser, '========updatedUser');
+          console.log(updatedUser, '========updatedUser 11111');
         })
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
           if (landlordDetails) {
@@ -285,6 +285,7 @@ async function addRentApplicationService(body, user) {
             }
           }
         })
+        console.log('=======Rent Application End ========');
 
         return {
           data: data,

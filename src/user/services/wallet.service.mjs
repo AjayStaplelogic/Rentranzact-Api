@@ -31,9 +31,9 @@ export const updateWalletPointsFromWebhook = (event) => {
       if (account?.user_id) {
         if (event?.data?.object) {
           User.findByIdAndUpdate(account?.user_id, {
-            walletPoints: event?.data?.object?.available[0]?.amount
+            walletPoints: (event?.data?.object?.available[0]?.amount / 100)
           }).then((updatedUser) => {
-            console.log(updatedUser, '====updatedUser')
+            // console.log(updatedUser, '====updatedUser')
           })
         }
       }
