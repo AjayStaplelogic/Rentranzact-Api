@@ -280,7 +280,7 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
     editProperty(req, res)
   },
 )
-console.log(path.resolve(__dirname, '../../../uploads'))
+// console.log(path.resolve(__dirname, '../../../uploads'))
 const sourceFolder = path.resolve(__dirname, '../../../uploads');
 const compressedFolder = path.resolve(__dirname, '../../../property_compressed');
 

@@ -15,6 +15,10 @@ import {
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import { Admin } from "../../admin/models/admin.model.mjs";
+import { ApprovalStatus } from "../enums/property.enums.mjs";
+import { Notification } from "../models/notification.model.mjs";
+import sendNotification from "../helpers/sendNotification.mjs";
 
 async function addProperty(req, res) {
   // console.log(`[Inside add property controller]`)
@@ -474,9 +478,9 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
-    console.log(req.body.images, '========req.body.images');
-    console.log(req.images, '========req.images');
-    console.log(req.files, '========req.files');
+    // console.log(req.body.images, '========req.body.images');
+    // console.log(req.images, '========req.images');
+    // console.log(req.files, '========req.files');
 
 
     if (req.files && req.files.length > 0) {
@@ -532,8 +536,37 @@ async function editProperty(req, res) {
     req.body.landlord_id = landlord_id;
     req.body.property_manager_id = property_manager_id ?? null;
     req.body.name = name;
+    req.body.approval_status = ApprovalStatus.PENDING;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
+      Admin.find({ role: "superAdmin" }).then((admins) => {
+        if (admins && admins.length > 0) {
+          for (const admin of admins) {
+            const notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+            notification_payload.notificationHeading = `${req?.user?.data?.fullName ?? ""} updated property`;
+            notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} updated property. Please review the property`;
+            notification_payload.landlordID = property.landlord_id;
+            notification_payload.propertyID = property._id;
+            notification_payload.send_to = admin._id;
+            notification_payload.property_manager_id = property.property_manager_id;
+            notification_payload.is_send_to_admin = true;
+            Notification.create(notification_payload).then((create_notification) => {
+              if (create_notification) {
+                if (create_notification) {
+                  if (admin && admin.fcmToken) {
+                    const metadata = {
+                      "propertyID": property._id.toString(),
+                      "redirectTo": "property",
+                    }
+                    sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+                  }
+                }
+              }
+            });
+          }
+        }
+      })
       return sendResponse(res, property, 'property updated successfully', true, 200);
     }
     return sendResponse(res, null, "Invalid Id", false, 400);

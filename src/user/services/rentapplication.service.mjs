@@ -228,7 +228,11 @@ async function addRentApplicationService(body, user) {
           }
         }
 
-        User.findByIdAndUpdate(renterID, user_update_payload, { new: true })
+        console.log(renterID, '========renterID');
+        console.log(user_update_payload, '========user_update_payload');
+        User.findByIdAndUpdate(renterID, user_update_payload, { new: true }).then((updatedUser) => {
+          console.log(updatedUser, '========updatedUser');
+        })
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
           if (landlordDetails) {
             let notification_payload = {};
@@ -491,15 +495,15 @@ async function updateRentApplications(body, id) {
           const breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
           const data = await rentApplication.findByIdAndUpdate(rentApplicationID, {
             applicationStatus: status,
-            rent : breakdown?.rent ?? 0,
-            insurance : breakdown?.insurance ?? 0,
-            legal_Fee : breakdown?.legal_Fee ?? 0,
-            caution_deposite : breakdown?.caution_deposite ?? 0,
-            total_amount : breakdown?.total_amount ?? 0,
-            agency_fee : breakdown?.agency_fee ?? 0,
-            agent_fee : breakdown?.agent_fee ?? 0,
-            rtz_fee : breakdown?.rtz_fee ?? 0,
-            landlord_earning : breakdown?.landlord_earning ?? 0,
+            rent: breakdown?.rent ?? 0,
+            insurance: breakdown?.insurance ?? 0,
+            legal_Fee: breakdown?.legal_Fee ?? 0,
+            caution_deposite: breakdown?.caution_deposite ?? 0,
+            total_amount: breakdown?.total_amount ?? 0,
+            agency_fee: breakdown?.agency_fee ?? 0,
+            agent_fee: breakdown?.agent_fee ?? 0,
+            rtz_fee: breakdown?.rtz_fee ?? 0,
+            landlord_earning: breakdown?.landlord_earning ?? 0,
           },
             { new: true });
 
