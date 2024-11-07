@@ -37,6 +37,20 @@ export const getAllTransfers = async (req, res) => {
                 $match: query
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "to",
+                    foreignField: "_id",
+                    as: "to_detail"
+                }
+            },
+            {
+                $unwind : {
+                    path : "$to_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     id: "$_id",
                     createdAt: "$createdAt",
@@ -50,6 +64,7 @@ export const getAllTransfers = async (req, res) => {
                     amount: "$amount",
                     property_name: "$property_name",
                     property_images: "$property_images",
+                    to_name : "$to_detail.fullName"
                 }
             },
             {
