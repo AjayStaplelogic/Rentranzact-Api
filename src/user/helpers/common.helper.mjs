@@ -10,12 +10,12 @@ export const convert_currency = async (from, to, amount) => {
     console.log()
     // return await CC.convert(6300000);
     return {
-        amount: await CC.convert(6300000),
+        amount: await CC.convert(amount),
         rate: await CC.rates()
     }
 }
 
-// console.log(await convert_currency("NGN", "USD", 6300000))
+// console.log(await convert_currency("NGN", "USD", 100300))
 
 /**
  * @description This function is used to convert str to object, we need this because from react native we are unable to send meta data
