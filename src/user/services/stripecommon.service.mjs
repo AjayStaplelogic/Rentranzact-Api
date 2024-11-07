@@ -322,3 +322,53 @@ export const createExternalAccount = async (acc_id, external_acc_id) => {
 }
 
 // console.log(createExternalAccount("acct_1QHgPvIWkutNVKz6", "btok_1QHhdMIqUp9zeP6EWsXvA4gr"), '=====createExternalAccount()')
+
+
+export const createPaymentIntent = async () => {
+    // const paymentIntent = await stripe.paymentIntents.create({
+    //     amount: 1000,
+    //     currency: "usd",
+    //     // payment_method: "pm_1GqjFvD0D9kK8xi3",
+    //     confirmation_method: "manual",
+    //     confirm: true,
+    //     transfer_group: "ORDER_12345",
+    //     on_behalf_of: "acct_1QINeeIod42BvpdP",
+    //     transfer_data: {
+    //         "destination": "acct_1MjOBYIqUp9zeP6E",  // Directing the payment to the connected account
+    //     },
+    //     // automatic_payment_methods: {
+    //     //     enabled: true,
+    //     // },
+    // });
+
+    // console.log(paymentIntent, '=====paymentIntent')
+    // return paymentIntent;
+
+
+    // const transfer = await stripe.transfers.create({
+    //     amount: 10,
+    //     currency: 'usd',  // Set the currency to match the balance of the connected account
+    //     destination: "acct_1MjOBYIqUp9zeP6E",  // This is the connected account ID from where funds will be transferred
+    //     // source_type: 'bank_account',  // This specifies that we are transferring from the account balance
+    //     transfer_group: 'ORDER_12345', // Optional: Helps to track the transfer (can be any string)
+    //   }, {
+    //     stripeAccount: "acct_1QINeeIod42BvpdP", // Specify the connected account for Custom/Express accounts
+    //   });
+
+    //   console.log(transfer, '====transfer')
+
+    //   return transfer;
+
+
+
+    // const charge = await stripe.charges.create({
+    //     amount: 1500*100,
+    //     currency: 'NGN',
+    //     source: 'acct_1QINeeIod42BvpdP',
+    //   });
+    //   console.log(charge, '====charge')
+    //   return charge;
+
+}
+
+// console.log(await createPaymentIntent(), '=====createPaymentIntent()')
