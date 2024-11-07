@@ -202,3 +202,18 @@ export const updateExternalAccountFromWebhook = async (event) => {
         });
     }
 }
+
+/**
+ * @description Fetch primary account of user
+ * @param {string | import("mongoose").ObjectId} user_id Id of user
+ * @returns {object | Accounts} Account object from database
+ */
+export const getUserConnectedAccount = async (user_id) => {
+    return await ConnectedAccounts.findOne({
+        user_id: user_id,
+        isDeleted: false
+    }, {
+        connect_acc_id : 1
+    })
+}
+

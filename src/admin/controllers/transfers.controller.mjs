@@ -151,8 +151,8 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                const get_primary_account = await AccountServices.getPrimaryAccount(get_recipient._id);
-                if (get_primary_account) {
+                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                if (get_connected_account) {
                     const converted_currency = await CommonHelpers.convert_currency(
                         get_transfer.to_currency,
                         get_transfer.from_currency,
@@ -160,14 +160,14 @@ export const updateTransferStatus = async (req, res) => {
                     )
                     if (converted_currency && converted_currency.amount > 0) {
                         const initiate_transfer = await StripeCommonServices.transferFunds(
-                            get_primary_account.external_acc_id,
+                            get_connected_account.connect_acc_id,
                             converted_currency.amount,
                             get_transfer?.from_currency
                         );
 
                         if (initiate_transfer?.id) {
                             payload.destination = initiate_transfer.destination;
-                            payload.account_id = get_primary_account._id;
+                            payload.connect_acc_id = get_connected_account._id;
                             payload.transfer_id = initiate_transfer.id;
                             payload.conversion_rate = converted_currency.rate;
                             let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
