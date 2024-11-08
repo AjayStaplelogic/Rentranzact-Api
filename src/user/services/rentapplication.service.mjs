@@ -173,8 +173,8 @@ async function addRentApplicationService(body, user) {
       kinContactNumber: contactNumber,
       kinEmail: emailID,
     }
-    // const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);     // uncomment this code after client recharge for smile identity verification
-    const verifyStatus = true;  // Remove this code after client recharge for smile identity verification
+    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);     // uncomment this code after client recharge for smile identity verification
+    // const verifyStatus = true;  // Remove this code after client recharge for smile identity verification
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;

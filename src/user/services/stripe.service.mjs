@@ -75,7 +75,7 @@ async function addToWallet(body, userID) {
 
     const { amount, wallet, payment_card_id } = body;
     let payload = {
-        amount: amount*100,
+        amount: amount * 100,
         currency: 'ngn',
         automatic_payment_methods: {
             enabled: true,
