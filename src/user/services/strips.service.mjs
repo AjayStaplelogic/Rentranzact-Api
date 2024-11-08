@@ -330,7 +330,8 @@ async function rechargeWallet(body) {
 
     if (userDetail) {
         if (body.paymentMethod === "stripe") {
-            const { amount, status, created, id } = body.data.object;
+            let { amount, status, created, id } = body.data.object;
+            amount = Number(amount / 100);
             payload = {
                 amount,
                 status,
