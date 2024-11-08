@@ -7,7 +7,7 @@ export const convert_currency = async (from, to, amount) => {
         to: to,
         amount: amount
     });
-    console.log()
+    console.log(await CC.rates(), '=====await CC.rates()')
     // return await CC.convert(6300000);
     return {
         amount: await CC.convert(amount),
