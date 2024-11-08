@@ -19,6 +19,7 @@ import { Admin } from "../../admin/models/admin.model.mjs";
 import { ApprovalStatus } from "../enums/property.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 
 async function addProperty(req, res) {
   // console.log(`[Inside add property controller]`)

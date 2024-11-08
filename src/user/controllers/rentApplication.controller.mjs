@@ -119,6 +119,7 @@ async function editRentApplication(req, res) {
             employerName: update_application.employerName,
             employerAddress: update_application.employerAddress,
             employmentStatus: update_application.employmentStatus,
+            occupation: update_application.occupation
           }
         };
         user_update_payload.fullName = update_application.firstName;
@@ -303,7 +304,7 @@ async function getLastApplication(req, res) {
     const data = await rentApplication.findOne({
       renterID: req.user.data._id,
       applicationStatus: { $nin: [RentApplicationStatus.CANCELED, RentApplicationStatus.WITHDRAW] }
-    }).sort({createdAt : -1}).lean().exec();
+    }).sort({ createdAt: -1 }).lean().exec();
     const renter = req.user.data;
 
     if (data) {
