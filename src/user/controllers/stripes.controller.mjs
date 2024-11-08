@@ -55,6 +55,7 @@ async function stripe(req, res) {
             break;
 
         case "balance.available":
+            console.log("Balance available case meet")
             WalletServices.updateWalletPointsFromWebhook(body);
             break;
 
