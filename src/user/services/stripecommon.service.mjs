@@ -176,8 +176,10 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
  * @returns {transfer} transfer object from stripe
  */
 export const transferFunds = async (acc_id, amount, currency) => {
+    console.log(amount, '===amount')
+    console.log( Math.round(Number(amount) * 100), '=== Math.round(Number(amount) * 100)')
     const transfer = await stripe.transfers.create({
-        amount: Number(amount) * 100,
+        amount: Math.round(Number(amount) * 100),
         currency: currency.toUpperCase(),    // USD, NGN
         destination: acc_id,
     });
