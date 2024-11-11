@@ -24,6 +24,7 @@ export const getAllTransfers = async (req, res) => {
         if (search) {
             query.$or = [
                 { property_name: { $regex: search, $options: 'i' } },
+                { to_name: { $regex: search, $options: 'i' } },
             ]
         }
 
@@ -90,11 +91,9 @@ export const getAllTransfers = async (req, res) => {
                             $limit: Number(count)
                         },
                     ],
-
                 }
             }
-
-        ]
+        ];
 
         let data = await Transfers.aggregate(pipeline);
         return sendResponse(res, data, "success", true, 200);
