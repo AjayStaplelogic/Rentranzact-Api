@@ -268,10 +268,8 @@ async function socialSignup(body) {
 
       const user = await User.findOne({
         email: email,
-        socialPlatform: socialPlatform,
+        // socialPlatform: socialPlatform,
       });
-
-
 
       // console.log(user, "0-----user");
 
@@ -334,7 +332,7 @@ async function socialSignup(body) {
     } else {
       const user = await User.findOne({
         email: email,
-        socialPlatform: socialPlatform,
+        // socialPlatform: socialPlatform,
       });
 
 
@@ -407,7 +405,7 @@ async function socialSignup(body) {
     } else {
       const user = await User.findOne({
         email: email,
-        socialPlatform: socialPlatform,
+        // socialPlatform: socialPlatform,
       });
 
 
