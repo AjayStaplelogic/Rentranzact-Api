@@ -290,7 +290,7 @@ async function nearbyProperies(body, userID) {
       query.rented = rented === 'true' ? true : false;
     }
 
-    console.log(query, '====query')
+    // console.log(query, '====query')
 
     const data = await Property.find(query).sort(sort_query);
 
@@ -685,7 +685,7 @@ async function getMyProperties(role, id, req) {
       }
     ]);
   } else if (role === UserRoles.PROPERTY_MANAGER) {
-    console.log(query, '=====query');
+    // console.log(query, '=====query');
     data = await Property.aggregate([
       {
         $match: query

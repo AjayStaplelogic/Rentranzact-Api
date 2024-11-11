@@ -335,8 +335,6 @@ async function socialSignup(body) {
         // socialPlatform: socialPlatform,
       });
 
-
-
       if (user) {
         await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
