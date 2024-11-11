@@ -1,6 +1,6 @@
-// models/User.js
-
 import mongoose from "mongoose";
+import { InspectionStatus } from "../enums/inspection.enums.mjs"
+
 // Define the schema for the User model
 const inspectionSchema = new mongoose.Schema(
   {
@@ -30,7 +30,8 @@ const inspectionSchema = new mongoose.Schema(
     inspectionStatus: {
       type: String,
       default: "initiated",
-      Enum : ["initiated", "accepted","completed", "canceled" ]
+      // Enum : ["initiated", "accepted","completed", "canceled" ]
+      enum: Object.values(InspectionStatus)
     },
     cancelReason: {
       type: String,
@@ -60,38 +61,38 @@ const inspectionSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    propertyName : {
-      type : String,
-      required : true
-    } ,
-    images : {
+    propertyName: {
+      type: String,
+      required: true
+    },
+    images: {
       type: Array,
-      required : true 
+      required: true
     },
-    landlordName : {
-     type : String,
-    //  required : true
+    landlordName: {
+      type: String,
+      //  required : true
     },
-    landlordEmail : {
-      type : String,
+    landlordEmail: {
+      type: String,
       // required: true
     },
-    addressText : {
-      type : String,
+    addressText: {
+      type: String,
       required: true
     },
     id: {
       type: String,
       required: false
-  },
-  fullDay: {
-    type: Boolean,
-    default : false
-},
-acceptedBy : {
-  type : mongoose.Types.ObjectId,
-  ref : "users"
-}
+    },
+    fullDay: {
+      type: Boolean,
+      default: false
+    },
+    acceptedBy: {
+      type: mongoose.Types.ObjectId,
+      ref: "users"
+    }
 
 
   },
