@@ -253,45 +253,50 @@ async function addToWallet(body) {
         if (status === "successful") {
             User.findById(userID).then(async (userDetail) => {
                 if (userDetail) {
-                    let payload = {
-                        amount,
-                        status,
-                        createdAt: created,
-                        type: "CREDIT",
-                        userID,
-                        intentID: id,
-                        payment_type: EPaymentType.rechargeWallet
-                    }
-
-                    let add_wallet = await Wallet.create(payload);
-                    console.log(add_wallet, '===add_wallet')
-                    if (add_wallet) {
-                        // let update_user = await User.findByIdAndUpdate(userID, {
-                        //     $inc: { walletPoints: amount }
-                        // });
-
-                        let transaction_payload = {
-                            wallet: true,
-                            amount: amount,
-                            status: status,
-                            date: created,
-                            intentID: id,
+                    const transfer = await TransferServices.transferForWalletRecharge(
+                        userDetail._id,
+                        "USD",
+                        "NGN",
+                        amount
+                    )
+                    if (transfer) {
+                        let payload = {
+                            amount,
+                            status,
+                            createdAt: created,
                             type: "CREDIT",
-                            payment_mode: "flutterwave",
-                            transaction_type: ETRANSACTION_TYPE.rechargeWallet
-                        };
-
-                        if (userDetail.role === UserRoles.LANDLORD) {
-                            transaction_payload.landlordID = userDetail._id;
-                        } else if (userDetail.role === UserRoles.RENTER) {
-                            transaction_payload.renterID = userDetail._id;
-                        } else if (userDetail.role === UserRoles.PROPERTY_MANAGER) {
-                            transaction_payload.pmID = userDetail._id;
+                            userID,
+                            intentID: id,
+                            payment_type: EPaymentType.rechargeWallet
                         }
 
-                        let create_transaction = await Transaction.create(transaction_payload);
+                        let add_wallet = await Wallet.create(payload);
+                        console.log(add_wallet, '===add_wallet')
+                        if (add_wallet) {
+                            let transaction_payload = {
+                                wallet: true,
+                                amount: amount,
+                                status: status,
+                                date: created,
+                                intentID: id,
+                                type: "CREDIT",
+                                payment_mode: "flutterwave",
+                                transaction_type: ETRANSACTION_TYPE.rechargeWallet,
+                                receiver_id: userDetail._id
+                            };
 
-                        TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
+                            if (userDetail.role === UserRoles.LANDLORD) {
+                                transaction_payload.landlordID = userDetail._id;
+                            } else if (userDetail.role === UserRoles.RENTER) {
+                                transaction_payload.renterID = userDetail._id;
+                            } else if (userDetail.role === UserRoles.PROPERTY_MANAGER) {
+                                transaction_payload.pmID = userDetail._id;
+                            }
+
+                            let create_transaction = await Transaction.create(transaction_payload);
+
+                            // TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
+                        }
                     }
                 }
             });

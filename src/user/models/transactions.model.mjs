@@ -75,6 +75,11 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(ETRANSACTION_TYPE)
     },
+    
+    receiver_id : {
+      type: mongoose.Types.ObjectId,
+      ref: "users"
+    }
   },
   { timestamps: true }
 );
