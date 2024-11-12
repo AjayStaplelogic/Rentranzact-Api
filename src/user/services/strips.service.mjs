@@ -311,7 +311,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 async function rechargeWallet(body) {
     console.log("Recharge wallet function")
     let userID;
-    console.log(body.data.metadata, '====body.data.metadata');
+    console.log(body.paymentMethod, '====body.paymentMethod');
 
     let transfer_amount = 0;
     if (body.paymentMethod === "stripe") {
@@ -336,6 +336,7 @@ async function rechargeWallet(body) {
                 "NGN",
                 transfer_amount
             )
+            console.log(transfer, '====transfer')
             if (transfer) {
                 if (body.paymentMethod === "stripe") {
                     let { amount, status, created, id } = body.data.object;
@@ -430,20 +431,20 @@ async function rechargeWallet(body) {
                 payload.payment_type = EPaymentType.rechargeWallet
                 let add_wallet = await Wallet.create(payload);
                 console.log("add_wallet=----", add_wallet, '====add_wallet')
-                if (add_wallet) {
-                    TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
-                }
+                // if (add_wallet) {
+                    // TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
+                // }
 
             }
         }
     });
 
-    return {
-        data: [],
-        message: "success",
-        status: true,
-        statusCode: 200,
-    }
+    // return {
+    //     data: [],
+    //     message: "success",
+    //     status: true,
+    //     statusCode: 200,
+    // }
 }
 
 async function addStripeTransactionForOld(body, renterApplicationID) {
