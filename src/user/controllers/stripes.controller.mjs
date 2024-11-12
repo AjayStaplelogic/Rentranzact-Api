@@ -18,7 +18,7 @@ async function stripe(req, res) {
 
         if (wallet === "true") {
             const data = await rechargeWallet(body);
-            sendResponse(res, data.data, data.message, data.status, data.statusCode);
+            // sendResponse(res, data.data, data.message, data.status, data.statusCode);
         } else {
 
             const { propertyID } = body.data.object.metadata;
@@ -26,10 +26,10 @@ async function stripe(req, res) {
             console.log("payment count ===>", property.payment_count)
             if (property.payment_count === 0) {
                 const data = await addStripeTransaction(body, renterApplicationID);
-                sendResponse(res, data.data, data.message, data.status, data.statusCode);
+                // sendResponse(res, data.data, data.message, data.status, data.statusCode);
             } else {
                 const data = await addStripeTransactionForOld(body, renterApplicationID);
-                sendResponse(res, data.data, data.message, data.status, data.statusCode);
+                // sendResponse(res, data.data, data.message, data.status, data.statusCode);
             }
         }
     }
