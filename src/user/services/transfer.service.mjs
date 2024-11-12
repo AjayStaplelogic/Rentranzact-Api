@@ -1,5 +1,5 @@
 import Transfers from "../models/transfers.model.mjs";
-import { ETRANSFER_TYPE } from "../enums/transfer.enums.mjs";
+import { ETRANSFER_STATUS, ETRANSFER_TYPE } from "../enums/transfer.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import * as AccountServices from "../services/account.service.mjs";
 import * as CommonHelpers from "../helpers/common.helper.mjs";
