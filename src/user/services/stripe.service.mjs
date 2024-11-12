@@ -35,7 +35,8 @@ async function payRentService(body, userID) {
             wallet: wallet,
             renterApplicationID: renterApplicationID,
             notificationID: notificationID
-        }
+        },
+        on_behalf_of : "acct_1QHgPvIWkutNVKz6"
     }
 
     if (payment_card_id) {
