@@ -313,137 +313,136 @@ async function rechargeWallet(body) {
     let userID;
     console.log(body.data.metadata, '====body.data.metadata');
 
+    let transfer_amount = 0;
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
+        transfer_amount = Number(body?.data?.object?.amount / 100);
     }
 
     if (body.paymentMethod === "paystack") {
         userID = body.data.metadata.userID;
+        transfer_amount = Number(body?.data?.amount / 100)
     }
 
-    const userDetail = await User.findById(userID);
-    console.log(userDetail, '====userDetail');
-    console.log(body.paymentMethod, '====body.paymentMethod');
+    User.findById(userID).then(async (userDetail) => {
+        let payload = {}
+        console.log(userDetail, '====userDetail');
+        console.log(body.paymentMethod, '====body.paymentMethod');
+
+        if (userDetail) {
+            const transfer = await TransferServices.transferForWalletRecharge(
+                userDetail._id,
+                "USD",
+                "NGN",
+                transfer_amount
+            )
+            if (transfer) {
+                if (body.paymentMethod === "stripe") {
+                    let { amount, status, created, id } = body.data.object;
+                    amount = Number(amount / 100);
+                    payload = {
+                        amount,
+                        status,
+                        createdAt: created,
+                        type: "CREDIT",
+                        userID,
+                        intentID: id
+                    }
+
+                    let transaction_payload = {
+                        wallet: true,
+                        amount: amount,
+                        status: status,
+                        date: created,
+                        intentID: id,
+                        type: "CREDIT",
+                        payment_mode: body.paymentMethod,
+                        transaction_type: ETRANSACTION_TYPE.rechargeWallet,
+                        receiver_id: userDetail._id
+                    };
+
+                    if (UserRoles.LANDLORD === userDetail?.role) {
+                        transaction_payload.landlordID = userDetail._id;
+                    } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
+                        transaction_payload.pmID = userDetail._id;
+                    } else if (UserRoles.RENTER === userDetail?.role) {
+                        transaction_payload.renterID = userDetail._id;
+                    }
+                    const data_ = new Transaction(transaction_payload)
+                    data_.save()
+                } else if (body.paymentMethod === "paystack") {
+                    console.log("Paystack Wallet")
+                    const amount = Number(body.data.amount / 100);
+                    const status = body.data.status;
+                    const createdAt = body.data.paid_at;
+                    const created = moment(createdAt).unix();
+                    const id = body?.data?.id;
+
+                    payload = {
+                        amount,
+                        status,
+                        createdAt: created.toString(),
+                        type: "CREDIT",
+                        userID,
+                        intentID: id
+                    }
+
+                    const transaction_payload = {
+                        wallet: true,
+                        amount: amount,
+                        status: status,
+                        date: created,
+                        intentID: id,
+                        type: "CREDIT",
+                        payment_mode: body.paymentMethod,
+                        transaction_type: ETRANSACTION_TYPE.rechargeWallet,
+                        receiver_id: userDetail._id
+                    }
+
+                    if (UserRoles.LANDLORD === userDetail?.role) {
+                        transaction_payload.landlordID = userDetail._id;
+                    } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
+                        transaction_payload.pmID = userDetail._id;
+                    } else if (UserRoles.RENTER === userDetail?.role) {
+                        transaction_payload.renterID = userDetail._id;
+                    }
+                    const data_ = new Transaction(transaction_payload)
+
+                    data_.save()
+                    console.log(status, '====status');
+
+                    // if (status === "success") {
+
+                    //     const data__ = await User.findByIdAndUpdate(
+                    //         userID,
+                    //         { $inc: { walletPoints: amount } },
+                    //         { new: true }
+                    //     );
+                    //     console.log(data__, '====data__');
+                    // }
 
 
-    let payload = {}
-
-    if (userDetail) {
-        if (body.paymentMethod === "stripe") {
-            let { amount, status, created, id } = body.data.object;
-            amount = Number(amount / 100);
-            payload = {
-                amount,
-                status,
-                createdAt: created,
-                type: "CREDIT",
-                userID,
-                intentID: id
+                }
             }
 
-            let transaction_payload = {
-                wallet: true,
-                amount: amount,
-                status: status,
-                date: created,
-                intentID: id,
-                type: "CREDIT",
-                payment_mode: body.paymentMethod,
-                transaction_type: ETRANSACTION_TYPE.rechargeWallet
-            };
+            console.log("payload=----", payload, '====payload')
+            if (Object.keys(payload).length > 0) {
+                payload.payment_type = EPaymentType.rechargeWallet
+                let add_wallet = await Wallet.create(payload);
+                console.log("add_wallet=----", add_wallet, '====add_wallet')
+                if (add_wallet) {
+                    TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
+                }
 
-            if (UserRoles.LANDLORD === userDetail?.role) {
-                transaction_payload.landlordID = userDetail._id;
-            } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
-                transaction_payload.pmID = userDetail._id;
-            } else if (UserRoles.RENTER === userDetail?.role) {
-                transaction_payload.renterID = userDetail._id;
             }
-            const data_ = new Transaction(transaction_payload)
-
-            data_.save()
-            // if (status === "succeeded") {
-            //     const data__ = await User.findByIdAndUpdate(
-            //         userID,
-            //         { $inc: { walletPoints: amount } },
-            //         { new: true }
-            //     );
-
-            // }
-
-
-        } else if (body.paymentMethod === "paystack") {
-            console.log("Paystack Wallet")
-            const amount = Number(body.data.amount / 100);
-            const status = body.data.status;
-            const createdAt = body.data.paid_at;
-            const created = moment(createdAt).unix();
-            const id = body?.data?.id;
-
-            payload = {
-                amount,
-                status,
-                createdAt: created.toString(),
-                type: "CREDIT",
-                userID,
-                intentID: id
-            }
-
-            const transaction_payload = {
-                wallet: true,
-                amount: amount,
-                status: status,
-                date: created,
-                intentID: id,
-                type: "CREDIT",
-                payment_mode: body.paymentMethod,
-                transaction_type: ETRANSACTION_TYPE.rechargeWallet
-            }
-
-            if (UserRoles.LANDLORD === userDetail?.role) {
-                transaction_payload.landlordID = userDetail._id;
-            } else if (UserRoles.PROPERTY_MANAGER === userDetail?.role) {
-                transaction_payload.pmID = userDetail._id;
-            } else if (UserRoles.RENTER === userDetail?.role) {
-                transaction_payload.renterID = userDetail._id;
-            }
-            const data_ = new Transaction(transaction_payload)
-
-            data_.save()
-            console.log(status, '====status');
-
-            // if (status === "success") {
-
-            //     const data__ = await User.findByIdAndUpdate(
-            //         userID,
-            //         { $inc: { walletPoints: amount } },
-            //         { new: true }
-            //     );
-            //     console.log(data__, '====data__');
-            // }
-
-
         }
-
-        console.log("payload=----", payload, '====payload')
-        if (Object.keys(payload).length > 0) {
-            payload.payment_type = EPaymentType.rechargeWallet
-            let add_wallet = await Wallet.create(payload);
-            console.log("add_wallet=----", add_wallet, '====add_wallet')
-            if (add_wallet) {
-                TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
-            }
-
-        }
-    }
+    });
 
     return {
-
         data: [],
         message: "success",
         status: true,
         statusCode: 200,
-
     }
 }
 

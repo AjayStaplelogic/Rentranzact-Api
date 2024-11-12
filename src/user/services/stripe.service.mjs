@@ -26,18 +26,16 @@ async function payRentService(body, userID) {
     let payload = {
         amount: amount,
         currency: 'NGN',
-        // automatic_payment_methods: {
-        //     enabled: true,
-        // },
+        automatic_payment_methods: {
+            enabled: true,
+        },
         metadata: {
             propertyID: propertyID,
             userID: userID,
             wallet: wallet,
             renterApplicationID: renterApplicationID,
             notificationID: notificationID
-        },
-        on_behalf_of : "acct_1QHgPvIWkutNVKz6",
-        payment_method_types: ['card']
+        }
     }
 
     if (payment_card_id) {
