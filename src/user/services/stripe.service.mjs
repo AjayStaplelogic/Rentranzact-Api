@@ -25,7 +25,7 @@ async function payRentService(body, userID) {
 
     let payload = {
         amount: amount,
-        currency: 'ngn',
+        currency: 'NGN',
         automatic_payment_methods: {
             enabled: true,
         },
