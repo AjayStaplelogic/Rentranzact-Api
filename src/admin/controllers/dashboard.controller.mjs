@@ -4,6 +4,8 @@ import { getDashboardStats } from "../services/dashboard.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import { UserRoles } from "../../user/enums/role.enums.mjs";
+import { Transaction } from "../../user/models/transactions.model.mjs";
+import { ETRANSACTION_TYPE } from "../../user/enums/common.mjs";
 
 
 async function dashboard(req, res) {
@@ -168,10 +170,64 @@ const getUserOnboardingStatsPercentage = async (req, res) => {
 
   }
 }
+const getRevenueStats = async (req, res) => {
+  try {
+    let { year } = req.query;
+    if (!year) {
+      year = moment().format('YYYY');
+    }
 
+    const query = {
+      transaction_type: ETRANSACTION_TYPE.rentPayment
+    };
+
+    const query2 = {
+      year: Number(year),
+    };
+
+    const pipeline = [
+      {
+        $match: query
+      },
+      {
+        $project: {
+          _id: "$_id",
+          amount: "$amount",
+          year: { $year: "$createdAt" },
+          month: { $month: "$createdAt" },
+        }
+      },
+      {
+        $match: query2
+      },
+      {
+        $group: {
+          _id: {
+            year: "$year",
+            month: "$month",
+          },
+          year: { $first: "$year" },
+          month: { $first: "$month" },
+          total_revenue: { $sum: "$amount" },
+        }
+      },
+      {
+        $unset: ["_id"]
+      },
+    ];
+
+    const data = await Transaction.aggregate(pipeline);
+    sendResponse(res, data, "success", true, 200);
+
+  } catch (error) {
+    sendResponse(res, null, error.message, false, 400);
+
+  }
+}
 export {
   dashboard,
   getUserOnboardingStats,
-  getUserOnboardingStatsPercentage
+  getUserOnboardingStatsPercentage,
+  getRevenueStats
 
 };
