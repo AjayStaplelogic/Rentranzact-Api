@@ -202,11 +202,13 @@ export const getBalance = async (acc_id = null) => {
     }
     const balance = await stripe.balance.retrieve(query);
     console.log(balance, '===balance')
+    console.log(JSON.stringify(balance), '===JSON.stringify(balance)')
+
     return balance;
 }
 
 
-// console.log(getBalance("acct_1Q9gmYINmaZ2kbt0"))
+// console.log(getBalance("acct_1QINeeIod42BvpdP"))
 
 /**
  * 
