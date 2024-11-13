@@ -97,9 +97,81 @@ const getUserOnboardingStats = async (req, res) => {
 
   }
 }
+const getUserOnboardingStatsPercentage = async (req, res) => {
+  try {
+    const query = {
+      deleted: false
+    };
+
+    const pipeline = [
+      {
+        $match: query
+      },
+      {
+        $project: {
+          _id: "$_id",
+          landlord_count: {
+            $cond: {
+              if: { $eq: ["$role", UserRoles.LANDLORD] },
+              then: 1,
+              else: 0
+            }
+          },
+          renter_count: {
+            $cond: {
+              if: { $eq: ["$role", UserRoles.RENTER] },
+              then: 1,
+              else: 0
+            }
+          },
+          pm_count: {
+            $cond: {
+              if: { $eq: ["$role", UserRoles.PROPERTY_MANAGER] },
+              then: 1,
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          landlord_count: { $sum: "$landlord_count" },
+          renter_count: { $sum: "$renter_count" },
+          pm_count: { $sum: "$pm_count" },
+          total_count: { $sum: 1 },
+        }
+      },
+      {
+        $project: {
+          landlord_per: {
+            $multiply: [100, { $divide: ["$landlord_count", "$total_count"] }]
+          },
+          renter_per: {
+            $multiply: [100, { $divide: ["$renter_count", "$total_count"] }]
+          },
+          pm_per: {
+            $multiply: [100, { $divide: ["$pm_count", "$total_count"] }]
+          },
+        }
+      },
+      {
+        $unset: ["_id"]
+      },
+    ];
+
+    const data = await User.aggregate(pipeline);
+    sendResponse(res, data, "success", true, 200);
+
+  } catch (error) {
+    sendResponse(res, null, error.message, false, 400);
+
+  }
+}
 
 export {
   dashboard,
-  getUserOnboardingStats
+  getUserOnboardingStats,
+  getUserOnboardingStatsPercentage
 
 };
