@@ -4,6 +4,8 @@ import * as PayoutValidations from "../validations/payout.validation.mjs"
 import { validator } from "../helpers/schema-validator.mjs";
 import * as StripeCommonServices from "../services/stripecommon.service.mjs";
 import * as AccountServices from "../services/account.service.mjs";
+import * as WalletServices from "../services/wallet.service.mjs";
+
 import { Types } from "mongoose";
 const ObjectId = Types.ObjectId;
 
@@ -59,6 +61,7 @@ export const createPayout = async (req, res) => {
 
                 const payoutData = await Payouts.create(payout_payload);
                 if (payoutData) {
+                    WalletServices.fetchBalanceAndUpdateWalletPoints(payoutData.user_id, account.connect_acc_id,)
                     return sendResponse(res, null, "Payout created successfully", true, 200);
                 }
                 return sendResponse(res, null, "Failed to create payout", false, 400);
