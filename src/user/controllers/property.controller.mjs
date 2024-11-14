@@ -579,6 +579,54 @@ async function editProperty(req, res) {
   }
 }
 
+async function getAllPropertiesDropdown(req, res) {
+  try {
+    let { search, sortBy } = req.query;
+    const query = {};
+    if (search) {
+      query.$or = [
+        { propertyName: { $regex: search, $options: 'i' } },
+      ]
+    }
+    let field = "propertyName";
+    let order = "desc";
+    let sort_query = {};
+    if (sortBy) {
+      field = sortBy.split(' ')[0];
+      order = sortBy.split(' ')[1];
+    }
+    sort_query[field] = order == "desc" ? -1 : 1;
+
+    switch (req?.user?.data?.role) {
+      case UserRoles.PROPERTY_MANAGER:
+        query.property_manager_id = `${req?.user?.data?._id}`;
+        break;
+      case UserRoles.LANDLORD:
+        query.landlord_id = `${req?.user?.data?._id}`;
+        break;
+      default:
+        return sendResponse(res, [], "Unauthorized", false, 401);
+    }
+
+    const pipeline = [
+      {
+        $match: query
+      },
+      {
+        $project: {
+          createdAt: "$createdAt",
+          propertyName: "$propertyName",
+          images: "$images",
+        }
+      }
+    ]
+    const data = await Property.aggregate(pipeline);
+    return sendResponse(res, data, "success", true, 200);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 500);
+  }
+}
+
 export {
   getPropertyListByPmID,
   addProperty,
@@ -594,5 +642,6 @@ export {
   getPropertyManagerList,
   getPropertyManagerDetails,
   teminatePM,
-  editProperty
+  editProperty,
+  getAllPropertiesDropdown
 };

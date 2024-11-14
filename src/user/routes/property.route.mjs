@@ -18,7 +18,8 @@ import {
   getPropertyManagerDetails,
   getPropertyListByPmID,
   teminatePM,
-  editProperty
+  editProperty,
+  getAllPropertiesDropdown
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -280,6 +281,9 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
     editProperty(req, res)
   },
 )
+
+router.get("/properties/dropdown", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getAllPropertiesDropdown)
+
 // console.log(path.resolve(__dirname, '../../../uploads'))
 const sourceFolder = path.resolve(__dirname, '../../../uploads');
 const compressedFolder = path.resolve(__dirname, '../../../property_compressed');
