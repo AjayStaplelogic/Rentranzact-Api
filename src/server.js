@@ -30,6 +30,7 @@ import userContactUsRoutes from "./user/routes/contactus.route.mjs";
 import userCommissionRoutes from "./user/routes/commissions.route.mjs";
 import userAccountsRoutes from "./user/routes/accounts.route.mjs";
 import userPayouts from "./user/routes/payout.route.mjs";
+import userInviteRoutes from "./user/routes/invite.route.mjs"
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -125,6 +126,7 @@ app.use("/api", userContactUsRoutes)
 app.use("/api", userCommissionRoutes)
 app.use("/api", userAccountsRoutes);
 app.use("/api", userPayouts);
+app.use("/api", userInviteRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)
