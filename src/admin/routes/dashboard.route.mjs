@@ -5,7 +5,8 @@ import {
     dashboard, 
     getUserOnboardingStats,
     getUserOnboardingStatsPercentage,
-    getRevenueStats
+    getRevenueStats,
+    getFinancialPerformanceStats
 } from '../controllers/dashboard.controller.mjs';
 
 
@@ -14,6 +15,8 @@ router.get('/dashboard' , dashboard);
 router.get('/dashboard/user-onboarded/stats' , getUserOnboardingStats);
 router.get('/dashboard/user-onboarded/stats/per' , getUserOnboardingStatsPercentage);
 router.get('/dashboard/revenue/stats' , getRevenueStats);
+router.get('/dashboard/financial-performance/stats' , getFinancialPerformanceStats);
+
 
 
 export default router;
