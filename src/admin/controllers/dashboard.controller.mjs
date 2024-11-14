@@ -224,10 +224,91 @@ const getRevenueStats = async (req, res) => {
 
   }
 }
+const getFinancialPerformanceStats = async (req, res) => {
+  try {
+    let { start_date, end_date } = req.query;
+    const query = {
+      transaction_type: ETRANSACTION_TYPE.rentPayment
+    };
+
+    if (start_date && end_date) {
+      query.createdAt = {
+        $gte: new Date(Number(start_date) * 1000),
+        $lt: new Date(Number(end_date) * 1000)
+      };
+    }
+
+    const pipeline = [
+      {
+        $match: query
+      },
+      {
+        $project: {
+          _id: "$_id",
+          caution_fee: {
+            $cond: {
+              if: { $gt: ["$allCharges.caution_deposite", 0] },
+              then: "$allCharges.caution_deposite",
+              else: 0
+            }
+          },
+          rent_fee: {
+            $cond: {
+              if: { $gt: ["$allCharges.rent", 0] },
+              then: "$allCharges.rent",
+              else: 0
+            }
+          },
+          legal_fee: {
+            $cond: {
+              if: { $gt: ["$allCharges.legal_Fee", 0] },
+              then: "$allCharges.legal_Fee",
+              else: 0
+            }
+          },
+          service_charge: {
+            $cond: {
+              if: { $gt: ["$allCharges.service_charge", 0] },
+              then: "$allCharges.service_charge",
+              else: 0
+            }
+          },
+          agency_fee: {
+            $cond: {
+              if: { $gt: ["$allCharges.agency_fee", 0] },
+              then: "$allCharges.agency_fee",
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          caution_fee: { $sum: "$caution_fee" },
+          rent_fee: { $sum: "$rent_fee" },
+          legal_fee: { $sum: "$legal_fee" },
+          service_charge: { $sum: "$service_charge" },
+          agency_fee: { $sum: "$agency_fee" },
+        }
+      },
+      {
+        $unset: ["_id"]
+      },
+    ];
+
+    const data = await Transaction.aggregate(pipeline);
+    sendResponse(res, data, "success", true, 200);
+
+  } catch (error) {
+    sendResponse(res, null, error.message, false, 400);
+
+  }
+}
 export {
   dashboard,
   getUserOnboardingStats,
   getUserOnboardingStatsPercentage,
-  getRevenueStats
-
+  getRevenueStats,
+  getFinancialPerformanceStats
 };
