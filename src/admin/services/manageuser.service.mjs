@@ -3,15 +3,15 @@ import { UserRoles } from "../../user/enums/role.enums.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import pkg from "bcrypt";
 import activityLog from "../helpers/activityLog.mjs";
+import * as referralService from "../../user/services/referral.service.mjs";
 
 async function addUserByAdmin(body) {
 
   let { password, role, email } = body;
 
-  const isUser = await User.exists({ role: role, email: email })
+  const isUser = await User.exists({ email: email, deleted : false })
 
   if (isUser) {
-
     return {
       data: [],
       message: "user already exist",
@@ -33,17 +33,11 @@ async function addUserByAdmin(body) {
     });
 
     body.password = hashedPassword;
-
-
-
+    body.myCode = await referralService.generateMyCode(8);
     const data = new User(body);
     data.save();
 
-
-
     await activityLog(data._id, `created new user ${data.fullName}`)
-
-
     return {
       data: data,
       message: "user created",
@@ -51,10 +45,7 @@ async function addUserByAdmin(body) {
       statusCode: 201,
     };
   }
-
 }
-
-
 
 async function getUsersList(body, pageNo, pageSize) {
   const { role } = body;
@@ -62,7 +53,7 @@ async function getUsersList(body, pageNo, pageSize) {
 
 
 
-  const data = await User.find({ role: role }).skip(skip).limit(pageSize);
+  const data = await User.find({ role: role, deleted : false }).skip(skip).limit(pageSize);
 
 
   const count = await User.countDocuments({
@@ -90,7 +81,6 @@ async function getUserByID(id) {
   };
 }
 
-
 async function deleteUserService(id) {
 
   const data = await User.findByIdAndUpdate(id,{    // changed this because earlier there was no checks mantained
@@ -99,7 +89,7 @@ async function deleteUserService(id) {
 
   await activityLog(data._id, `deleted a user ${data.fullName}`)
   return {
-    data: data,
+    data: null,
     message: `deleted user successfully`,
     status: true,
     statusCode: 201,
@@ -107,7 +97,6 @@ async function deleteUserService(id) {
 
 
 }
-
 
 async function searchUsersService(text, role) {
 
@@ -135,7 +124,6 @@ async function searchUsersService(text, role) {
   };
 
 }
-
 
 async function changeStatus(id) {
   const data = await User.findById(id);
