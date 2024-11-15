@@ -616,7 +616,6 @@ async function getAllPropertiesDropdown(req, res) {
         $project: {
           createdAt: "$createdAt",
           propertyName: "$propertyName",
-          images: "$images",
         }
       }
     ]

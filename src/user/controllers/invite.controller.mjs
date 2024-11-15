@@ -19,7 +19,7 @@ export const inviteRenter = async (req, res) => {
                 property_id: property?._id,
                 address: property?.address?.addressText ?? "",
                 about_property: property?.aboutProperty ?? ""
-            })
+            });
 
             return sendResponse(res, null, "Success", true, 200);
         }
