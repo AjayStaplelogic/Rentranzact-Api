@@ -1,6 +1,7 @@
 // models/User.js
 import { generateOTP } from "../helpers/otpGenerator.mjs";
 import mongoose from "mongoose";
+import { EACCOUNT_STATUS } from "../enums/user.enum.mjs"
 // Define the schema for the User model
 const userSchema = new mongoose.Schema(
   {
@@ -43,7 +44,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    myCode: {     
+    myCode: {
       type: String,
     },
     referralCode: {
@@ -101,8 +102,12 @@ const userSchema = new mongoose.Schema(
     },
     account_status: {
       type: String,
-      enum: ["active", "suspended", "blacklisted"],
-      default: "active"
+      enum: Object.values(EACCOUNT_STATUS),
+      default: EACCOUNT_STATUS.active
+    },
+    activatedAt: {
+      type: Date,
+      default: new Date()
     },
     suspendedAt: {
       type: Date
@@ -155,7 +160,7 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    terms_n_condition : {
+    terms_n_condition: {
       type: Boolean,
       default: false,
     }
