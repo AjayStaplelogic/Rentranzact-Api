@@ -8,6 +8,12 @@ import { ApprovalStatus } from "../../user/enums/property.enums.mjs"
 import { Notification } from "../../user/models/notification.model.mjs";
 import sendNotification from "../../user/helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
+import { LeaseAggrements } from "../../user/models/leaseAggrements.model.mjs";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 
 async function properties(req, res) {
 
