@@ -27,7 +27,7 @@ async function leaseAggrements(req, res) {
 
   const { filters } = req.query;
 
-  const data = await leaseAggrementsList(filters);
+  const data = await leaseAggrementsList(req);
 
   sendResponse(
     res,
@@ -400,6 +400,27 @@ async function updatePropertyApprovalStatus(req, res) {
 
   }
 }
+
+async function deleteAggrementByID(req, res) {
+  const { id } = req.params;
+
+  const data = await LeaseAggrements.findByIdAndDelete(id)
+  const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
+
+  if (data) {
+    const match = data?.url?.match(regex);
+    if (match) {
+      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
+      try {
+        fs.unlinkSync(filePath)
+      } catch (error) {
+        console.log(error, '====error');
+      }
+    }
+  }
+
+  return sendResponse(res, null, 'Deleted successfully', true, 200);
+}
 export {
   properties,
   property,
@@ -408,5 +429,6 @@ export {
   updateProperty,
   getAllPropertyList,
   editProperty,
-  updatePropertyApprovalStatus
+  updatePropertyApprovalStatus,
+  deleteAggrementByID
 }

@@ -8,7 +8,8 @@ import {
     updateProperty,
     getAllPropertyList,
     editProperty,
-    updatePropertyApprovalStatus
+    updatePropertyApprovalStatus,
+    deleteAggrementByID
 } from "../controllers/properties.controller.mjs"
 import { generateRandomFileName } from "../../user/helpers/randomNameGenerator.mjs";
 import multer from "multer";
@@ -152,8 +153,9 @@ router.put("/property/edit",
     },
 )
 
-
 router.put("/property/approval-status", updatePropertyApprovalStatus);
+router.delete("/lease-aggerment/:id",  deleteAggrementByID)
+
 
 
 

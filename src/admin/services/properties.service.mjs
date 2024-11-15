@@ -4,25 +4,26 @@ import { ObjectId } from 'bson';
 import { Inspection } from "../../user/models/inspection.model.mjs";
 import { InspectionStatus } from "../../user/enums/inspection.enums.mjs";
 
-async function leaseAggrementsList(filters) {
+async function leaseAggrementsList(req) {
+  let { filters, search } = req.query;
+  const query = {};
   if (filters) {
-    const data = await LeaseAggrements.find({ uploadedBy: filters })
-    return {
-      data: data,
-      message: `successfully fetched  list`,
-      status: true,
-      statusCode: 201,
-    };
-  } else {
-    const data = await LeaseAggrements.find()
-    return {
-      data: data,
-      message: `successfully fetched  list`,
-      status: true,
-      statusCode: 201,
-    };
+    query.uploadedBy = filters
   }
 
+  if (search) {
+    query.$or = [
+      { propertyName: { $regex: search, $options: 'i' } },
+    ]
+  }
+  
+  const data = await LeaseAggrements.find(query)
+  return {
+    data: data,
+    message: `successfully fetched  list`,
+    status: true,
+    statusCode: 201,
+  };
 }
 
 async function getPropertiesList() {
