@@ -97,7 +97,7 @@ export const transferForWalletRecharge = async (user_id, from_currency = "USD", 
                 const balance = await StripeCommonServices.getBalance(get_connected_account.connect_acc_id);
                 if (balance) {
                     User.findByIdAndUpdate(user_id, {
-                        walletPoints: (balance.available[0]?.amount / 100)
+                        walletPoints: ((balance.available[0]?.amount + balance.pending[0]?.amount) / 100)
                     })
                     .then((updatedUser) => {
                             console.log(updatedUser, '====updatedUser Wallet')
