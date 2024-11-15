@@ -51,13 +51,10 @@ async function getUsersList(body, pageNo, pageSize) {
   const { role } = body;
   const skip = (pageNo - 1) * pageSize;
 
-
-
   const data = await User.find({ role: role, deleted : false }).skip(skip).limit(pageSize);
-
-
   const count = await User.countDocuments({
-    role: role
+    role: role,
+    deleted : false
   })
 
 
@@ -99,10 +96,7 @@ async function deleteUserService(id) {
 }
 
 async function searchUsersService(text, role) {
-
-
   const regex = new RegExp(text, "ig");
-
   const data = await User.aggregate([
     {
       $match: {
@@ -112,6 +106,7 @@ async function searchUsersService(text, role) {
           { email: regex },
           { phone: regex }
         ],
+        deleted : false
       },
     },
   ]);
