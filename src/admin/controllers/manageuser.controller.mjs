@@ -1,6 +1,7 @@
 import { User } from "../../user/models/user.model.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus } from "../services/manageuser.service.mjs";
+import { EACCOUNT_STATUS } from "../../user/enums/user.enum.mjs";
 
 async function addUser(req, res) {
   const { body } = req;
@@ -112,11 +113,14 @@ async function updateAccountStatus(req, res) {
     }
 
     let payload = {};
-    if (account_status === "suspended") {
-      payload.account_status = "suspended";
+    if (account_status === EACCOUNT_STATUS.active) {
+      payload.account_status = EACCOUNT_STATUS.active;
+      payload.activatedAt = new Date();
+    } else if (account_status === EACCOUNT_STATUS.suspended) {
+      payload.account_status = EACCOUNT_STATUS.suspended;
       payload.suspendedAt = new Date();
-    } else if (account_status === "blacklisted") {
-      payload.account_status = "blacklisted";
+    } else if (account_status === EACCOUNT_STATUS.blacklisted) {
+      payload.account_status = EACCOUNT_STATUS.blacklisted;
       payload.blacklistedAt = new Date();
     } else {
       return sendResponse(res, null, "Invalid account status", false, 400);

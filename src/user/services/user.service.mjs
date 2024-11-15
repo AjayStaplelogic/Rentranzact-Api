@@ -1,6 +1,4 @@
 import { User } from "../models/user.model.mjs";
-import { Tokens } from "../models/tokens.model.mjs";
-import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
 import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import { Referral } from "../models/referrals.model.mjs";
 import pkg from "bcrypt";
@@ -15,23 +13,42 @@ import { LeaseAggrements } from "../models/leaseAggrements.model.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import fs from "fs";
 import path from "path";
-import { dirname } from 'path';
 import { generateOTP } from '../helpers/otpGenerator.mjs'
 import { forgot_password_email } from '../emails/onboarding.emails.mjs'
-import { generate_token } from "../helpers/tokens.mjs";
 import { ObjectId } from 'bson';
 import { Transaction } from "../models/transactions.model.mjs";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { Admin } from "../../admin/models/admin.model.mjs";
 import * as referralService from "../services/referral.service.mjs";
+import { EACCOUNT_STATUS } from "../enums/user.enum.mjs";
 
 async function loginUser(body) {
   const { email, password, fcmToken } = body;
 
-  const user = await User.findOne({ email: email });
+  const user = await User.findOne({ email: email, deleted: false });
 
   if (user) {
+    if (user.account_status === EACCOUNT_STATUS.blacklisted) {
+      return {
+        data: null,
+        message: "Your account has been blacklisted. Please contact your administrator.",
+        status: false,
+        statusCode: 401,
+        accessToken: "",
+      };
+    }
+
+    if (user.account_status === EACCOUNT_STATUS.suspended) {
+      return {
+        data: null,
+        message: "Your account has been suspended. Please contact your administrator.",
+        status: false,
+        statusCode: 401,
+        accessToken: "",
+      };
+    }
+
     const isPasswordValid = await new Promise((resolve, reject) => {
       pkg.compare(password, user.password, function (err, hash) {
         if (err) {
@@ -118,7 +135,7 @@ async function loginUser(body) {
 }
 
 async function addUser(body) {
-  const userExist = await User.findOne({ email: body.email });
+  const userExist = await User.findOne({ email: body.email, deleted : false });
 
   if (userExist) {
     return {
@@ -236,6 +253,34 @@ async function socialSignup(body) {
 
   const { socialPlatform, email, email_verified, name, picture, exp, fcmToken, referralCode } = body;
 
+
+  const user = await User.findOne({
+    email: email,
+    deleted : false,
+  });
+
+  if(user){
+    if (user.account_status === EACCOUNT_STATUS.blacklisted) {
+      return {
+        data: null,
+        message: "Your account has been blacklisted. Please contact your administrator.",
+        status: false,
+        statusCode: 401,
+        accessToken: "",
+      };
+    }
+  
+    if (user.account_status === EACCOUNT_STATUS.suspended) {
+      return {
+        data: null,
+        message: "Your account has been suspended. Please contact your administrator.",
+        status: false,
+        statusCode: 401,
+        accessToken: "",
+      };
+    }
+  }
+  
   if (referralCode) {
     const validCode = await referralService.isMyCodeExistsInUsers(referralCode);
     if (!validCode) {
@@ -247,6 +292,8 @@ async function socialSignup(body) {
       };
     }
   }
+
+
 
 
   if (socialPlatform === "google") {
@@ -266,10 +313,10 @@ async function socialSignup(body) {
     } else {
       //token is not expired
 
-      const user = await User.findOne({
-        email: email,
-        // socialPlatform: socialPlatform,
-      });
+      // const user = await User.findOne({
+      //   email: email,
+      //   // socialPlatform: socialPlatform,
+      // });
 
       // console.log(user, "0-----user");
 
@@ -330,10 +377,10 @@ async function socialSignup(body) {
         statusCode: 401,
       };
     } else {
-      const user = await User.findOne({
-        email: email,
-        // socialPlatform: socialPlatform,
-      });
+      // const user = await User.findOne({
+      //   email: email,
+      //   // socialPlatform: socialPlatform,
+      // });
 
       if (user) {
         await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
@@ -401,10 +448,10 @@ async function socialSignup(body) {
         statusCode: 401,
       };
     } else {
-      const user = await User.findOne({
-        email: email,
-        // socialPlatform: socialPlatform,
-      });
+      // const user = await User.findOne({
+      //   email: email,
+      //   // socialPlatform: socialPlatform,
+      // });
 
 
       if (user) {
@@ -471,20 +518,6 @@ async function forgotPasswordService(email) {
   const user = await User.findOne({ email: email }).lean().exec();
 
   if (user) {
-
-    // let create_token = await Tokens.findOneAndUpdate({
-    //   user_id: user._id,
-    //   type: "reset-password"
-    // },
-    //   {
-    //     user_id: user._id,
-    //     type: "reset-password",
-    //     token: generate_token()
-    //   },
-    //   {
-    //     upsert: true,
-    //     new: true
-    //   });
     let otp = generateOTP();
     let update_user = await User.findByIdAndUpdate(user._id, { otp: otp }, { new: true });
     if (update_user) {
