@@ -88,9 +88,9 @@ async function getPropertiesList() {
 }
 
 async function getPropertyByID(id) {
+  // console.log(`[Admin Get Property By ID] ${id}`);
   const id1 = new ObjectId(id)
   const data = await Property.aggregate([
-
     {
 
       $match: {
@@ -112,11 +112,58 @@ async function getPropertyByID(id) {
         as: "landlord_info",
 
       }
-    }
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: { renter_ID: { $toObjectId: "$renterID" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$renter_ID"] }
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              fullName: 1, // Include fullName field from users collection
+              countryCode: 1,
+              phone: 1,
+              picture: 1,
+              email: 1
+            }
+          }
+        ],
+        as: "renterInfo",
+
+      }
+    },
+    {
+      $lookup: {
+        from: "users",
+        let: { renter_ID: { $toObjectId: "$property_manager_id" } },
+        pipeline: [
+          {
+            $match: {
+              $expr: { $eq: ["$_id", "$$renter_ID"] }
+            }
+          },
+          {
+            $project: {
+              _id: 1,
+              fullName: 1, // Include fullName field from users collection
+              countryCode: 1,
+              phone: 1,
+              picture: 1,
+              email: 1
+            }
+          }
+        ],
+        as: "property_manager",
+      }
+    },
   ])
 
-
-  // console.log(data,"=====data by id")
   return {
     data: data,
     message: `successfully fetched  list`,

@@ -145,7 +145,7 @@ router.put("/property/edit",
             } else if (file.mimetype.startsWith("video/")) {
                 req.videos.push({ id: uuidv4(), url: relativePath });
             } else if (file.mimetype.startsWith("application/")) {
-                req.documents.push({ id: uuidv4(), url: relativePath });
+                req.documents.push({ id: uuidv4(), url: relativePath, original_name :  file.originalname});
             }
 
         });
