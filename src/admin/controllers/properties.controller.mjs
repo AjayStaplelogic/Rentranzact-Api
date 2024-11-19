@@ -100,7 +100,22 @@ async function updateProperty(req, res) {
 async function getAllPropertyList(req, res) {
   try {
     console.log(`[Admin Property List]`)
-    let { category, type, latitude, longitude, radius, search, city, sortBy, rented, inDemand, approval_status } = req.query;
+    let {
+      category,
+      type,
+      latitude,
+      longitude,
+      radius,
+      search,
+      city,
+      sortBy,
+      rented,
+      inDemand,
+      approval_status,
+      renterID,
+      landlord_id,
+      property_manager_id,
+    } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
@@ -138,6 +153,18 @@ async function getAllPropertyList(req, res) {
 
     if (approval_status) {
       query.approval_status = { $in: approval_status.split(',') };
+    }
+
+    if (renterID) {
+      query.renterID = renterID;
+    }
+
+    if (landlord_id) {
+      query.landlord_id = landlord_id;
+    }
+
+    if (property_manager_id) {
+      query.property_manager_id = property_manager_id;
     }
 
     let pipeline = [
