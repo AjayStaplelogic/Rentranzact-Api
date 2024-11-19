@@ -227,7 +227,10 @@ async function getAllPropertyList(req, res) {
           property_mananger_name: "$property_mananger_details.fullName",
           property_mananger_image: "$property_mananger_details.picture",
           property_mananger_phone: "$property_mananger_details.phone",
-          approval_status : "$approval_status"
+          approval_status : "$approval_status",
+          rent_period_start : "$rent_period_start",
+          rent_period_end : "$rent_period_end",
+          rentType : "$rentType",
         }
       },
       {
