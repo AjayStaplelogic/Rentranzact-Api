@@ -23,7 +23,7 @@ async function userList(req, res) {
   const pageNo = parseInt(req.query.pageNo);
   const pageSize = parseInt(req.query.pageSize);
 
-  const data = await getUsersList(body, pageNo, pageSize);
+  const data = await getUsersList( req);
 
   sendResponse(
     res,

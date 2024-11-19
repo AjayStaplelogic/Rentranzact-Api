@@ -9,7 +9,7 @@ async function addUserByAdmin(body) {
 
   let { password, role, email } = body;
 
-  const isUser = await User.exists({ email: email, deleted : false })
+  const isUser = await User.exists({ email: email, deleted: false })
 
   if (isUser) {
     return {
@@ -47,16 +47,26 @@ async function addUserByAdmin(body) {
   }
 }
 
-async function getUsersList(body, pageNo, pageSize) {
-  const { role } = body;
+async function getUsersList(req) {
+  let { search } = req.query;
+  const { role } = req.body;
+  const pageNo = parseInt(req.query.pageNo);
+  const pageSize = parseInt(req.query.pageSize);
   const skip = (pageNo - 1) * pageSize;
+  const query = {
+    deleted: false,
+  };
+  if (role) {
+    query.role = role;
+  }
 
-  const data = await User.find({ role: role, deleted : false }).skip(skip).limit(pageSize);
-  const count = await User.countDocuments({
-    role: role,
-    deleted : false
-  })
+  if (search) {
+    query.fullName = { $regex: search, $options: 'i' };
+    query.email = { $regex: search, $options: 'i' };
+  }
 
+  const data = await User.find(query).skip(skip).limit(pageSize);
+  const count = await User.countDocuments(query)
 
   return {
     data: data,
@@ -80,8 +90,8 @@ async function getUserByID(id) {
 
 async function deleteUserService(id) {
 
-  const data = await User.findByIdAndUpdate(id,{    // changed this because earlier there was no checks mantained
-    deleted : true
+  const data = await User.findByIdAndUpdate(id, {    // changed this because earlier there was no checks mantained
+    deleted: true
   });
 
   await activityLog(data._id, `deleted a user ${data.fullName}`)
@@ -106,7 +116,7 @@ async function searchUsersService(text, role) {
           { email: regex },
           { phone: regex }
         ],
-        deleted : false
+        deleted: false
       },
     },
   ]);
