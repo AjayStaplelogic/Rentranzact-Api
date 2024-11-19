@@ -1,10 +1,7 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { getTransactionService } from "../services/transaction.service.mjs";
 import { Transaction } from "../../user/models/transactions.model.mjs";
 
-
 async function getTransaction(req, res) {
-
   try {
     let { search, sortBy, status, type } = req.query;
     let page = Number(req.query.page || 1);
@@ -28,6 +25,7 @@ async function getTransaction(req, res) {
         { property_name: { "$regex": search, "$options": "i" } },
         { landlord_name: { "$regex": search, "$options": "i" } },
         { type: { "$regex": search, "$options": "i" } },
+        { renter: { "$regex": search, "$options": "i" } },
       ]
     }
 
@@ -150,11 +148,6 @@ async function getTransaction(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 
-
-  // const data = await getTransactionService();
-
-
-  // sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
 
