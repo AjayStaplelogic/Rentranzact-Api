@@ -28,6 +28,7 @@ async function getTransaction(req, res) {
         { property_name: { "$regex": search, "$options": "i" } },
         { landlord_name: { "$regex": search, "$options": "i" } },
         { type: { "$regex": search, "$options": "i" } },
+        { renter: { "$regex": search, "$options": "i" } },
       ]
     }
 
