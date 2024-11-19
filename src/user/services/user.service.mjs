@@ -198,7 +198,7 @@ async function myProfileDetails(id, role) {
 
   const data = await User.findOne({
     _id: id,
-    role: role
+    // role: role
   });
 
 
