@@ -37,8 +37,10 @@ const verifySignature = (body, signature) => {
     return signature === digest;
 };
 
+
 export const twawToWebhook = async (req, res) => {
     try {
+        console.log(req.rawBody, '=====req.rawBody')
         console.log(req.headers, '====req.headers')
         console.log(req.body, '====req.body')
         // console.log(req.query, '====req.query')
