@@ -1,13 +1,56 @@
 import { Admin } from "../../admin/models/admin.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
+const WEBHOOK_SECRET = '59491282da45bc3177b8d18c9a249e63be6b1d05b453e4f09520f87369d2d6209d1d9181360ea79341834cfa9f071660';
+const crypto = require('crypto');
 
+const getRawBody = (req) => {
+    return new Promise((resolve, reject) => {
+        let rawBody = '';
 
-export const twawToWebhook = (req, res) => {
+        req.on('data', (chunk) => {
+            rawBody += chunk; // Accumulate the body data
+        });
+
+        req.on('end', () => {
+            resolve(rawBody); // Resolve the body when done
+        });
+
+        req.on('error', (err) => {
+            reject(err); // Reject the promise on error
+        });
+    });
+}
+
+const verifySignature = (body, signature) => {
+    const digest = crypto
+        .createHmac('sha1', WEBHOOK_SECRET)
+        .update(body)
+        .digest('hex');
+    return signature === digest;
+};
+
+export const twawToWebhook = async (req, res) => {
     try {
         console.log(req.headers, '====req.headers')
         console.log(req.body, '====req.body')
         console.log(req.query, '====req.query')
+
+        // Manually read the raw body as a Buffer
+        const rawBody = await getRawBody(req);
+
+        // Get the signature from the request headers
+        const signature = req.headers['x-tawk-signature'];
+
+        // Verify the signature
+        if (!verifySignature(rawBody, signature)) {
+            return res.status(400).send('Invalid signature');
+        }
+
+        // Process the valid webhook data (parse as JSON here)
+        const data = JSON.parse(rawBody);
+        console.log('Received webhook data:', data, '====data');
+
         switch (req.body.event) {
             case "chat:start":
                 Admin.find({ role: "superAdmin" }).then((admins) => {
@@ -46,6 +89,8 @@ export const twawToWebhook = (req, res) => {
         //    io.emit('attachedmanual', { hello: 'world Testing socket' });
 
 
+        // Send a success response
+        res.status(200).send('Webhook received successfully');
 
     } catch (error) {
         console.error("Error while converting Twitch API data to Slack webhook payload:", error);
