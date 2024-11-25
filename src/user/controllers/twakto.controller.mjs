@@ -45,9 +45,11 @@ export const twawToWebhook = async (req, res) => {
 
         // Verify the signature
         if (!verifySignature(rawBody, signature)) {
+            console.log('Verification failed')
             return res.status(400).send('Invalid signature');
         }
 
+        console.log("[Verification successful]")
         // Process the valid webhook data (parse as JSON here)
         const data = JSON.parse(rawBody);
         console.log('Received webhook data:', data, '====data');
