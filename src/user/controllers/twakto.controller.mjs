@@ -3,7 +3,7 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
 const WEBHOOK_SECRET = process.env.TWAK_TO_WEBHOOK_SECRET;
 console.log(WEBHOOK_SECRET, '=======WEBHOOK_SECRET')
-const crypto = require('crypto');
+import crypto from "crypto"
 
 const getRawBody = (req) => {
     return new Promise((resolve, reject) => {
