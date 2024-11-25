@@ -6,6 +6,7 @@ console.log(WEBHOOK_SECRET, '=======WEBHOOK_SECRET')
 import crypto from "crypto"
 
 const getRawBody = (req) => {
+    console.log("Get  Raw Body Function")
     return new Promise((resolve, reject) => {
         let rawBody = '';
 
@@ -14,6 +15,7 @@ const getRawBody = (req) => {
         });
 
         req.on('end', () => {
+            console.log(rawBody, '====rawBody 111')
             resolve(rawBody); // Resolve the body when done
         });
 
@@ -24,6 +26,8 @@ const getRawBody = (req) => {
 }
 
 const verifySignature = (body, signature) => {
+    console.log("Verify Signature Function")
+
     const digest = crypto
         .createHmac('sha1', WEBHOOK_SECRET)
         .update(body)
@@ -35,13 +39,18 @@ export const twawToWebhook = async (req, res) => {
     try {
         console.log(req.headers, '====req.headers')
         console.log(req.body, '====req.body')
-        console.log(req.query, '====req.query')
+        // console.log(req.query, '====req.query')
 
         // Manually read the raw body as a Buffer
         const rawBody = await getRawBody(req);
+        console.log(rawBody, '====rawBody 2222')
+
 
         // Get the signature from the request headers
         const signature = req.headers['x-tawk-signature'];
+        console.log(signature, '====signature 2222')
+
+        console.log(verifySignature(rawBody, signature), '===verifySignature(rawBody, signature)')
 
         // Verify the signature
         if (!verifySignature(rawBody, signature)) {
