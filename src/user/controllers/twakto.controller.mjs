@@ -1,7 +1,8 @@
 import { Admin } from "../../admin/models/admin.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
-const WEBHOOK_SECRET = '59491282da45bc3177b8d18c9a249e63be6b1d05b453e4f09520f87369d2d6209d1d9181360ea79341834cfa9f071660';
+const WEBHOOK_SECRET = process.env.TWAK_TO_WEBHOOK_SECRET;
+console.log(WEBHOOK_SECRET, '=======WEBHOOK_SECRET')
 const crypto = require('crypto');
 
 const getRawBody = (req) => {

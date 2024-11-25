@@ -10,6 +10,7 @@ GOOGLE_CLIENT_ID = 550090857989-qqjf9m568ab1d41g6ih3rvqktimuo8d2.apps.googleuser
 ADMIN_JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_prod_admin
 FRONTEND_URL = https://rentranzact.com
 BACKEND_URL = https://api.rentranzact.com
+TWAK_TO_WEBHOOK_SECRET = 59491282da45bc3177b8d18c9a249e63be6b1d05b453e4f09520f87369d2d6209d1d9181360ea79341834cfa9f071660
 
 
 
