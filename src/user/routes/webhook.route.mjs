@@ -7,7 +7,14 @@ import * as twakToController from "../controllers/twakto.controller.mjs"
 router.post('/flutterwave', flutterwave);
 router.post('/stripe', stripe)
 router.post('/paystack', paystack)
-router.post('/twak-to', express.raw({ type: 'application/json' }), twakToController.twawToWebhook)
+router.post('/twak-to', express.raw({ 
+    type: 'application/json',
+    verify: function (req, res, buf) {
+        console.log(buf, "=======buf")
+        req.rawBody = buf;
+    }
+
+}), twakToController.twawToWebhook)
 router.post('/electricity', test)
 
 async function test(req, res) {

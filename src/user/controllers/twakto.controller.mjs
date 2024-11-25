@@ -32,18 +32,22 @@ const verifySignature = (body, signature) => {
         .createHmac('sha1', WEBHOOK_SECRET)
         .update(body)
         .digest('hex');
+
+    console.log(digest, '=====digest-signature', signature)
     return signature === digest;
 };
 
+
 export const twawToWebhook = async (req, res) => {
     try {
+        console.log(req.rawBody, '=====req.rawBody')
         console.log(req.headers, '====req.headers')
         console.log(req.body, '====req.body')
         // console.log(req.query, '====req.query')
 
         // Manually read the raw body as a Buffer
         // const rawBody = await getRawBody(req);
-        
+
         // Convert the raw body Buffer to a string
         const rawBody = req.body.toString();
         console.log(rawBody, '====rawBody 2222')
