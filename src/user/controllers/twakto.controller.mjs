@@ -42,7 +42,10 @@ export const twawToWebhook = async (req, res) => {
         // console.log(req.query, '====req.query')
 
         // Manually read the raw body as a Buffer
-        const rawBody = await getRawBody(req);
+        // const rawBody = await getRawBody(req);
+        
+        // Convert the raw body Buffer to a string
+        const rawBody = req.body.toString();
         console.log(rawBody, '====rawBody 2222')
 
 
