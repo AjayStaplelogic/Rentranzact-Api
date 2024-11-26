@@ -3,14 +3,6 @@ const router = express.Router();
 import { flutterwave } from '../controllers/flutterwave.controller.mjs';
 import { paystack, stripe } from '../controllers/stripes.controller.mjs';
 import * as twakToController from "../controllers/twakto.controller.mjs"
-import bodyParser from 'body-parser';
-
-router.use(bodyParser.json({
-    type: 'application/json',
-    verify: function (req, res, buf) {
-        req.rawBody = buf;
-    }
-}));
 
 router.post('/flutterwave', flutterwave);
 router.post('/stripe', stripe)
