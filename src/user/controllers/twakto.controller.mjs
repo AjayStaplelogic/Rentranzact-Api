@@ -49,7 +49,7 @@ export const twawToWebhook = async (req, res) => {
         // const rawBody = await getRawBody(req);
 
         // Convert the raw body Buffer to a string
-        // const rawBody = req.body.toString();
+        const rawBody = JSON.stringify(req.body);
         // console.log(rawBody, '====rawBody 2222')
 
 
@@ -57,13 +57,14 @@ export const twawToWebhook = async (req, res) => {
         const signature = req.headers['x-tawk-signature'];
         console.log(signature, '====signature 2222')
 
-        console.log(verifySignature(req.rawBody, signature), '===verifySignature(rawBody, signature)')
+        console.log(verifySignature(rawBody, signature), '===verifySignature(rawBody, signature)')
 
         // Verify the signature
-        if (!verifySignature(req.rawBody, signature)) {
+        if (!verifySignature(rawBody, signature)) {
             console.log("********************************************");
             console.log('Verification failed')
             console.log("********************************************");
+
             // return res.status(400).send('Invalid signature');
         }
 
