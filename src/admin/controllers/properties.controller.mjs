@@ -471,7 +471,7 @@ async function addProperty(req, res) {
 
     let { email } = body;
     let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
-
+    
     let arr = JSON.parse("[" + trimmedStr + "]");
     const Property_ = {
       propertyID: req.PropertyID,
@@ -483,7 +483,7 @@ async function addProperty(req, res) {
       rent: Number(body.rent),
       propertyName: body.propertyName,
       email: email.toLowerCase().trim(),
-      name: name ?? "",
+      name: body.name ?? "",
       rentType: body.rentType,
       city: body.city || "",
       carpetArea: Number(body.carpetArea) || 0,
