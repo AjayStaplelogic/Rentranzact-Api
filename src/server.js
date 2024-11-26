@@ -199,6 +199,8 @@ io.attach(server, {
   }
 });
 
+app.set('io', io);
+
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

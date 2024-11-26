@@ -227,10 +227,10 @@ async function getAllPropertyList(req, res) {
           property_mananger_name: "$property_mananger_details.fullName",
           property_mananger_image: "$property_mananger_details.picture",
           property_mananger_phone: "$property_mananger_details.phone",
-          approval_status : "$approval_status",
-          rent_period_start : "$rent_period_start",
-          rent_period_end : "$rent_period_end",
-          rentType : "$rentType",
+          approval_status: "$approval_status",
+          rent_period_start: "$rent_period_start",
+          rent_period_end: "$rent_period_end",
+          rentType: "$rentType",
         }
       },
       {
@@ -458,6 +458,78 @@ async function deleteAggrementByID(req, res) {
 
   return sendResponse(res, null, 'Deleted successfully', true, 200);
 }
+
+async function addProperty(req, res) {
+  try {
+    const { body } = req;
+
+    const files = req.files;
+
+    if (!files || files.length === 0) {
+      return res.status(400).send("No files uploaded.");
+    }
+
+    let { email } = body;
+    let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
+
+    let arr = JSON.parse("[" + trimmedStr + "]");
+    const Property_ = {
+      propertyID: req.PropertyID,
+      images: req.images,
+      documents: req.documents,
+      videos: req.videos,
+      category: body.category,
+      address: JSON.parse(body.address),
+      rent: Number(body.rent),
+      propertyName: body.propertyName,
+      email: email.toLowerCase().trim(),
+      name: name ?? "",
+      rentType: body.rentType,
+      city: body.city || "",
+      carpetArea: Number(body.carpetArea) || 0,
+      age_of_construction: body.age_of_construction,
+      aboutProperty: body.aboutProperty,
+      type: body.type,
+      furnishingType: body.furnishingType,
+      landmark: body.landmark || "",
+      superArea: body.superArea || "",
+      availability: Number(body.availability),
+      communityType: body.communityType || "",
+      landlord_id: req.body.landlord_id ?? null,
+      property_manager_id: req.body.property_manager_id ?? null,
+      servicesCharges: Number(body.servicesCharges) || 0,
+      amenities: arr,
+      number_of_rooms: Number(body.number_of_rooms) || 0,
+      postedByAdmin: true,
+      building_number: body.building_number || "",
+      street_name: body.street_name || "",
+      estate_name: body.estate_name || "",
+      state: body.state || "",
+      country: body.country || "",
+      servicing: body.servicing || "",
+      total_space_for_rent: body.total_space_for_rent || 0,
+      total_administrative_offices: body.total_administrative_offices || 0,
+      is_legal_partner: body.is_legal_partner || false,
+      serviceChargeDuration: body.serviceChargeDuration || "",
+      approval_status: ApprovalStatus.APPROVED
+    };
+
+    if (body.type != "Open Space") {
+      Property_["bedrooms"] = body.bedrooms
+      Property_["number_of_floors"] = body.number_of_floors
+      Property_["number_of_bathrooms"] = body.number_of_bathrooms
+    }
+
+    const property = await Property.create(Property_);
+    // console.log(`[Property Created]`);
+    if (property) {
+      return sendResponse(res, property, "property created successfully", true, 201);
+    }
+    return sendResponse(res, null, "Unable to add property", false, 400);
+  } catch (error) {
+    return sendResponse(res, null, error.message, false, 400);
+  }
+}
 export {
   properties,
   property,
@@ -467,5 +539,6 @@ export {
   getAllPropertyList,
   editProperty,
   updatePropertyApprovalStatus,
-  deleteAggrementByID
+  deleteAggrementByID,
+  addProperty
 }

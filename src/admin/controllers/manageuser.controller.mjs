@@ -19,12 +19,7 @@ async function addUser(req, res) {
 }
 
 async function userList(req, res) {
-  const { body } = req;
-  const pageNo = parseInt(req.query.pageNo);
-  const pageSize = parseInt(req.query.pageSize);
-
-  const data = await getUsersList( req);
-
+  const data = await getUsersList(req);
   sendResponse(
     res,
     data.data,
@@ -139,7 +134,9 @@ async function updateAccountStatus(req, res) {
 async function getAllUsersDropdown(req, res) {
   try {
     let { role, search, sortBy } = req.query;
-    const query = {};
+    const query = {
+      deleted: false
+    };
     if (role) { query.role = role };
     if (search) {
       query.$or = [
