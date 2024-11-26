@@ -14,6 +14,7 @@ async function getEmployeeService(pageNo, pageSize, req) {
     query.$or = [
       { fullName: { $regex: search, $options: 'i' } },
       { email: { $regex: search, $options: 'i' } },
+      { phone: { $regex: search, $options: 'i' } },
     ]
   }
 
