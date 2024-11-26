@@ -82,12 +82,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on("join-room", async (data) => {
-        console.log(`[Listener Event]-[join-room]`);
+        // console.log(`[Listener Event]-[join-room]`);
         let room = await chatService.get_room_by_id(data.room_id);
-        console.log(room, "====room")
+        // console.log(room, "====room")
         if (room) {
             let members = room?.user_ids;
-            console.log(members, "====members")
+            // console.log(members, "====members")
 
             let room_id = `${room?._id}`
             if (members && members.length > 0) {
@@ -95,15 +95,15 @@ io.on('connection', (socket) => {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
                     if (socket_ids && socket_ids.length > 0) {
                         for (let socket_id of socket_ids) {
-                            console.log(`[socket_id] ${socket_id}`)
-                            console.log(`[room_id] ${room_id}`);
+                            // console.log(`[socket_id] ${socket_id}`)
+                            // console.log(`[room_id] ${room_id}`);
                             io.in(socket_id).socketsJoin(room_id);
                         }
                     }
                 }
             }
-            console.log(room_id, '====room_id,', typeof (room_id))
-            console.log(socket.rooms, '======socket.rooms1111')
+            // console.log(room_id, '====room_id,', typeof (room_id))
+            // console.log(socket.rooms, '======socket.rooms1111')
             io.in(room_id).emit("join-room", {        // sending to current user only
                 status: true,
                 statusCode: 200,
@@ -113,7 +113,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("join-private-room", async (data) => {
-        console.log(`[Listener Event]-[join-private-room]`);
+        // console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
             let members = room?.room?.user_ids;
@@ -123,8 +123,8 @@ io.on('connection', (socket) => {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
                     if (socket_ids && socket_ids.length > 0) {
                         for (let socket_id of socket_ids) {
-                            console.log(`[socket_id] ${socket_id}`)
-                            console.log(`[room_id] ${room_id}`);
+                            // console.log(`[socket_id] ${socket_id}`)
+                            // console.log(`[room_id] ${room_id}`);
                             io.in(socket_id).socketsJoin(room_id);
                         }
                     }
@@ -139,13 +139,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on("new-message", async (data) => {
-        console.log(`[Listener Event]-[new-message]`);
-        console.log(data, '====data new Message')
+        // console.log(`[Listener Event]-[new-message]`);
+        // console.log(data, '====data new Message')
         let message = await chatService.send_message(socket, data)
         let get_room = await chatService.get_room_by_id(data.room_id);
-        console.log(message, '====message')
-        console.log(get_room, '====get_room')
-        console.log(socket.rooms, '======socket.rooms')
+        // console.log(message, '====message')
+        // console.log(get_room, '====get_room')
+        // console.log(socket.rooms, '======socket.rooms')
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
@@ -160,7 +160,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("read-message", async (data) => {
-        console.log(`[Listener Event]-[read-message]`);
+        // console.log(`[Listener Event]-[read-message]`);
         let message = await chatService.read_message(socket, data);
         if (message) {
             socket.to(`${message.room_id}`).emit("read-message", {
@@ -172,7 +172,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("typing", async (data) => {
-        console.log(`[Listener Event]-[typing]`);
+        // console.log(`[Listener Event]-[typing]`);
         data.user_id = socket.user_id;
         // data.typing = true;      // it will come from frontend
         socket.to(data.room_id).emit("typing", {
@@ -183,7 +183,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("delete-message", async (data) => {
-        console.log(`[Listener Event]-[delete-message]`);
+        // console.log(`[Listener Event]-[delete-message]`);
         let delete_message = await chatService.delete_message(data.message_id);
         if (delete_message) {
             io.in(`${delete_message.room_id}`).emit("delete-message", {
@@ -208,8 +208,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on('user-offline', () => {
-        console.log(`[Listener Event]-[user-offline]`);
-        console.log(`[socket disconnected] : ${socket.id}`);
+        // console.log(`[Listener Event]-[user-offline]`);
+        // console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
         io.emit("user-offline", {        // sending to all client about user logout/offline
             status: true,
