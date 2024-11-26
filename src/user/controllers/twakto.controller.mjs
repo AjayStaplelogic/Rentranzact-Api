@@ -41,34 +41,36 @@ const verifySignature = (body, signature) => {
 export const twawToWebhook = async (req, res) => {
     try {
         console.log(req.rawBody, '=====req.rawBody')
-        console.log(req.headers, '====req.headers')
-        console.log(req.body, '====req.body')
+        // console.log(req.headers, '====req.headers')
+        // console.log(req.body, '====req.body')
         // console.log(req.query, '====req.query')
 
         // Manually read the raw body as a Buffer
         // const rawBody = await getRawBody(req);
 
         // Convert the raw body Buffer to a string
-        const rawBody = req.body.toString();
-        console.log(rawBody, '====rawBody 2222')
+        // const rawBody = req.body.toString();
+        // console.log(rawBody, '====rawBody 2222')
 
 
         // Get the signature from the request headers
         const signature = req.headers['x-tawk-signature'];
         console.log(signature, '====signature 2222')
 
-        console.log(verifySignature(rawBody, signature), '===verifySignature(rawBody, signature)')
+        console.log(verifySignature(req.rawBody, signature), '===verifySignature(rawBody, signature)')
 
         // Verify the signature
-        if (!verifySignature(rawBody, signature)) {
+        if (!verifySignature(req.rawBody, signature)) {
+            console.log("********************************************");
             console.log('Verification failed')
+            console.log("********************************************");
             // return res.status(400).send('Invalid signature');
         }
 
         console.log("[Verification successful]")
         // Process the valid webhook data (parse as JSON here)
-        const data = JSON.parse(rawBody);
-        console.log('Received webhook data:', data, '====data');
+        // const data = JSON.parse(rawBody);
+        // console.log('Received webhook data:', data, '====data');
 
         // switch (req.body.event) {
         //     case "chat:start":
