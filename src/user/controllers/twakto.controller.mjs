@@ -70,36 +70,36 @@ export const twawToWebhook = async (req, res) => {
         const data = JSON.parse(rawBody);
         console.log('Received webhook data:', data, '====data');
 
-        switch (req.body.event) {
-            case "chat:start":
-                Admin.find({ role: "superAdmin" }).then((admins) => {
-                    if (admins && admins.length > 0) {
-                        for (const admin of admins) {
-                            const notification_payload = {};
-                            notification_payload.redirect_to = "";
-                            notification_payload.notificationHeading = `${req?.body?.visitor?.name ?? ""} started a new chat`;
-                            notification_payload.notificationBody = `${req?.body?.message?.text ?? ""}`;
-                            notification_payload.send_to = admin._id;
-                            notification_payload.is_send_to_admin = true;
-                            Notification.create(notification_payload).then((create_notification) => {
-                                if (create_notification) {
-                                    if (create_notification) {
-                                        if (admin && admin.fcmToken) {
-                                            const metadata = {
-                                                "redirectTo": "nowhere",
-                                            }
-                                            sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-                                        }
-                                    }
-                                }
-                            });
-                        }
-                    }
-                })
-                break;
-            case "chat:end":
-                break;
-        }
+        // switch (req.body.event) {
+        //     case "chat:start":
+        //         Admin.find({ role: "superAdmin" }).then((admins) => {
+        //             if (admins && admins.length > 0) {
+        //                 for (const admin of admins) {
+        //                     const notification_payload = {};
+        //                     notification_payload.redirect_to = "";
+        //                     notification_payload.notificationHeading = `${req?.body?.visitor?.name ?? ""} started a new chat`;
+        //                     notification_payload.notificationBody = `${req?.body?.message?.text ?? ""}`;
+        //                     notification_payload.send_to = admin._id;
+        //                     notification_payload.is_send_to_admin = true;
+        //                     Notification.create(notification_payload).then((create_notification) => {
+        //                         if (create_notification) {
+        //                             if (create_notification) {
+        //                                 if (admin && admin.fcmToken) {
+        //                                     const metadata = {
+        //                                         "redirectTo": "nowhere",
+        //                                     }
+        //                                     sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+        //                                 }
+        //                             }
+        //                         }
+        //                     });
+        //                 }
+        //             }
+        //         })
+        //         break;
+        //     case "chat:end":
+        //         break;
+        // }
 
 
         // global.io.broadcast.emit('news', { hello: 'world Testing socket' });
