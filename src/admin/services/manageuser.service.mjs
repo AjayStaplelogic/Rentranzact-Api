@@ -4,6 +4,7 @@ import { User } from "../../user/models/user.model.mjs";
 import pkg from "bcrypt";
 import activityLog from "../helpers/activityLog.mjs";
 import * as referralService from "../../user/services/referral.service.mjs";
+import CreditScores from "../../user/models/creditscore.model.mjs";
 
 async function addUserByAdmin(body) {
 
@@ -95,7 +96,15 @@ async function deleteUserService(id) {
 
   const data = await User.findByIdAndUpdate(id, {    // changed this because earlier there was no checks mantained
     deleted: true
+  }, {
+    new: true
   });
+
+  if (data?.deleted) {
+    CreditScores.deleteMany({
+      user: id
+    })
+  }
 
   await activityLog(data._id, `deleted a user ${data.fullName}`)
   return {

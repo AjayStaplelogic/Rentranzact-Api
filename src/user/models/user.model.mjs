@@ -163,6 +163,12 @@ const userSchema = new mongoose.Schema(
     terms_n_condition: {
       type: Boolean,
       default: false,
+    },
+    credit_score: {
+      type: Number
+    },
+    credit_rating: {
+      type: String
     }
   },
 
