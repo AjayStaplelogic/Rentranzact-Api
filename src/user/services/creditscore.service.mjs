@@ -59,7 +59,7 @@ export const addUpdateScore = async (user_id, scoreObj) => {
         upsert: true
     })
     if (updatedScore) {
-        updateScoreInUserProfile(updatedScore.user_id, updatedScore.ficoScore, updatedScore.rating);
+        updateScoreInUserProfile(updatedScore.user_id, updatedScore.ficoScore, updatedScore.rating, updatedScore.reasons);
         return updatedScore;
     }
 }
@@ -68,13 +68,16 @@ export const addUpdateScore = async (user_id, scoreObj) => {
  * @description Updates the score and rating in user profile
  * @param {string} user_id Valid if of user from db
  * @param {number} score returned by the credit score API
- * @param {string} rating returned by the credit score API 
+ * @param {string} rating returned by the credit score API
+ * @param {string} reasons returned by the credit score API 
  * @returns {void} Nothing
  */
-export const updateScoreInUserProfile = async (user_id, score, rating) => {
+export const updateScoreInUserProfile = async (user_id, score, rating, reasons) => {
     User.findByIdAndUpdate(user_id, {
         credit_score: score,
-        credit_rating: rating
+        credit_rating: rating,
+        // reasons: reasons,
+        credit_score_fetched_at: new Date()
     }, {
         new: true
     }).then((data) => {
@@ -88,23 +91,19 @@ export const updateScoreInUserProfile = async (user_id, score, rating) => {
  * @returns {void} nothing
  */
 export const updateScoreWithCron = (days = 30) => {
-    try {
-        const last_fetched_at = new Date(new Date() - days * 24 * 60 * 60 * 1000);
-        CreditScores.find({
-            last_fetched_at: {
-                $lt: last_fetched_at
-            }
-        }).then(score => {
-            if (score?.length > 0) {
-                score.forEach(async (sc) => {
-                    const creditScore = await getCreditScore(sc.bvn);
-                    if (creditScore) {
-                        addUpdateScore(sc.user_id, creditScore);
-                    }
-                });
-            }
-        })
-    } catch (error) {
-        console.log(error, '====error')
-    }
+    const last_fetched_at = new Date(new Date() - days * 24 * 60 * 60 * 1000);
+    CreditScores.find({
+        last_fetched_at: {
+            $lt: last_fetched_at
+        }
+    }).then(score => {
+        if (score?.length > 0) {
+            score.forEach(async (sc) => {
+                const creditScore = await getCreditScore(sc.bvn);
+                if (creditScore) {
+                    addUpdateScore(sc.user_id, creditScore);
+                }
+            });
+        }
+    })
 }
