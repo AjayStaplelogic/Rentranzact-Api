@@ -33,6 +33,9 @@ const schema = new Schema({
     ficoScore: {
         type: Number,
     },
+    total_delinquent_facilities: {
+        type: Number,
+    },
     rating: {
         type: String,
     },
