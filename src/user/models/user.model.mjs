@@ -169,6 +169,9 @@ const userSchema = new mongoose.Schema(
     },
     credit_rating: {
       type: String
+    },
+    credit_score_fetched_at: {
+      type: Date,
     }
   },
 

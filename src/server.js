@@ -55,6 +55,7 @@ import adminContactUsRoutes from "./admin/routes/contactus.route.mjs"
 import adminTransferRoutes from "./admin/routes/transfer.route.mjs";
 import adminNotificationRoutes from "./admin/routes/notification.route.mjs"
 
+import cron from "./bootstrap/cron.js";
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -84,6 +85,7 @@ const corsOptions = {
 
 app.use(cors());
 
+cron();
 // app.use(cors(corsOptions));
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
