@@ -353,35 +353,8 @@ async function nearbyProperies(body, userID) {
 
 async function getPropertyByID(id, userID) {
   const data = await Property.findById(id);
-
-  // console.log(data, "----dataa of property")
   const dataMerge = {};
-
-  // dataMerge.rental_breakdown = {
-  //   service_charge: 0,
-  //   rent: 0,
-  //   insurance: 0,
-  //   agency_fee: 0,
-  //   legal_Fee: 0,
-  //   caution_deposite: 0,
-  //   total_amount: 0
-  // }
-
-  // if (data.servicesCharges > 0) {
-  //   dataMerge.rental_breakdown.service_charge = data.servicesCharges;
-  // }
-  // if (data.rent > 0) {
-  //   dataMerge.rental_breakdown.rent = data.rent;
-  //   let rent = Number(data.rent);
-  //   dataMerge.rental_breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-  //   dataMerge.rental_breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-  //   dataMerge.rental_breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-  //   dataMerge.rental_breakdown.insurance = 0;    // variable declaration for future use
-  //   dataMerge.rental_breakdown.total_amount = rent + dataMerge.rental_breakdown.insurance + dataMerge.rental_breakdown.agency_fee + dataMerge.rental_breakdown.legal_Fee + dataMerge.rental_breakdown.caution_deposite;
-  // }
-
   dataMerge.rental_breakdown = getRentalBreakUp(data);
-
   dataMerge.propertyData = data;
 
   // IF property have landlord then sending landlord details
@@ -405,32 +378,36 @@ async function getPropertyByID(id, userID) {
   // If property is on rent, then sending renter details
   if (data.rented) {
     const renter = await User.findById(data.renterID);
-    const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
-
-    dataMerge.renterInfo = {
-      _id,
-      fullName,
-      picture,
-      verified,
-      role,
-      countryCode,
-      phone
+    if(renter){
+      const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
+      dataMerge.renterInfo = {
+        _id,
+        fullName,
+        picture,
+        verified,
+        role,
+        countryCode,
+        phone
+      }
     }
   }
 
   // If property have property manager then sending property manager details
+  console.log(data.property_manager_id,'=====property_manager_id')
   if (data.property_manager_id) {
     const propertyManager = await User.findById(data.property_manager_id);
-    const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
-    dataMerge.property_manager = {
-      _id,
-      fullName,
-      picture,
-      verified,
-      role,
-      countryCode,
-      phone
-    };
+    if(propertyManager){
+      const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
+      dataMerge.property_manager = {
+        _id,
+        fullName,
+        picture,
+        verified,
+        role,
+        countryCode,
+        phone
+      };
+    }
   }
 
   if (userID) {
