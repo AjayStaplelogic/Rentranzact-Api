@@ -12,8 +12,6 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import { Admin } from "../../admin/models/admin.model.mjs";
 
-
-
 async function addPropertyService(
   PropertyID,
   images,
@@ -125,14 +123,12 @@ async function addPropertyService(
           notification_payload.is_send_to_admin = true;
           Notification.create(notification_payload).then((create_notification) => {
             if (create_notification) {
-              if (create_notification) {
-                if (admin && admin.fcmToken) {
-                  const metadata = {
-                    "propertyID": property._id.toString(),
-                    "redirectTo": "property",
-                  }
-                  sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+              if (admin && admin.fcmToken) {
+                const metadata = {
+                  "propertyID": property._id.toString(),
+                  "redirectTo": "property",
                 }
+                sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
               }
             }
           });
@@ -378,7 +374,7 @@ async function getPropertyByID(id, userID) {
   // If property is on rent, then sending renter details
   if (data.rented) {
     const renter = await User.findById(data.renterID);
-    if(renter){
+    if (renter) {
       const { _id, fullName, picture, verified, role, countryCode, phone } = renter;
       dataMerge.renterInfo = {
         _id,
@@ -393,10 +389,10 @@ async function getPropertyByID(id, userID) {
   }
 
   // If property have property manager then sending property manager details
-  console.log(data.property_manager_id,'=====property_manager_id')
+  console.log(data.property_manager_id, '=====property_manager_id')
   if (data.property_manager_id) {
     const propertyManager = await User.findById(data.property_manager_id);
-    if(propertyManager){
+    if (propertyManager) {
       const { _id, fullName, picture, verified, role, countryCode, phone } = propertyManager;
       dataMerge.property_manager = {
         _id,
