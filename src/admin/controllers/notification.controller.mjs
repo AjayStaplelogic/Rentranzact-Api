@@ -6,10 +6,12 @@ import * as NotificationValidations from "../validations/notification.validation
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import { UserRoles } from "../../user/enums/role.enums.mjs";
 import * as NotificationServices from "../services/notification.service.mjs";
+import mongoose from "mongoose";
+const ObjectId = mongoose.Types.ObjectId;
 
 async function getAllNotifications(req, res) {
   try {
-    let { propertyID, search, sortBy, read } = req.query;
+    let { propertyID, search, sortBy, read, send_to } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
     let query = {};
@@ -30,6 +32,10 @@ async function getAllNotifications(req, res) {
       } else {
         query["read"] = false;
       }
+    }
+
+    if (send_to) {
+      query["send_to"] = ObjectId(send_to);
     }
 
     let field = "createdAt";
