@@ -4,6 +4,8 @@ import { User } from "../../user/models/user.model.mjs"
 import { Property } from "../../user/models/property.model.mjs"
 import * as NotificationValidations from "../validations/notification.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
+import { UserRoles } from "../../user/enums/role.enums.mjs";
+import * as NotificationServices from "../services/notification.service.mjs";
 
 async function getAllNotifications(req, res) {
   try {
@@ -186,7 +188,7 @@ async function readUnreadNotification(req, res) {
     const { isError, errors } = validator(req.body, NotificationValidations.readUnreadNotification);
     if (isError) {
       let errorMessage = errors[0].replace(/['"]/g, "")
-      return sendResponse(res, [], errorMessage, false, 403);
+      return sendResponse(res, [], errorMessage, false, 422);
     }
 
     let notification = await Notification.findByIdAndUpdate(req.body.id, req.body, { new: true });
@@ -195,6 +197,39 @@ async function readUnreadNotification(req, res) {
     }
     return sendResponse(res, {}, "Invalid Id", false, 400);
   } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
+async function manualCreateNotification(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, NotificationValidations.manualCreateNotification);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 422);
+    }
+
+    const user_roles = [];
+    const admin_roles = [];
+    for await (let role of req.body.roles) {
+      if (Object.values(UserRoles).includes(role)) {
+        user_roles.push(role);
+        continue;
+      }
+
+      admin_roles.push(role);
+    }
+
+    let notification_content = {
+      notificationHeading: req.body.notificationHeading,
+      notificationBody: req.body.notificationBody
+    }
+
+    user_roles?.length > 0 ? NotificationServices.sendNotificationsToRoles(user_roles, false, notification_content) : null;
+    admin_roles?.length > 0 ? NotificationServices.sendNotificationsToRoles(admin_roles, true, notification_content) : null;
+
+    return sendResponse(res, null, "Notification sent successfully", true, 200);
+  } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 422);
   }
 }
@@ -202,5 +237,6 @@ async function readUnreadNotification(req, res) {
 export {
   getAllNotifications,
   getNotificationById,
-  readUnreadNotification
+  readUnreadNotification,
+  manualCreateNotification
 };
