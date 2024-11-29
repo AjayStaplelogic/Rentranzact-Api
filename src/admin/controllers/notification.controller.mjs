@@ -2,6 +2,8 @@ import { sendResponse } from "../../user/helpers/sendResponse.mjs";
 import { Notification } from "../../user/models/notification.model.mjs"
 import { User } from "../../user/models/user.model.mjs"
 import { Property } from "../../user/models/property.model.mjs"
+import * as NotificationValidations from "../validations/notification.validation.mjs"
+import { validator } from "../../user/helpers/schema-validator.mjs";
 
 async function getAllNotifications(req, res) {
   try {
@@ -131,7 +133,7 @@ async function getAllNotifications(req, res) {
     let get_notifications = await Notification.aggregate(pipeline);
     return sendResponse(res, get_notifications, "success", true, 200);
   } catch (error) {
-    return sendResponse(res, {}, `${error}`, false, 500);
+    return sendResponse(res, {}, `${error}`, false, 400);
   }
 }
 
@@ -179,4 +181,26 @@ async function getNotificationById(req, res) {
   }
 }
 
-export { getAllNotifications, getNotificationById };
+async function readUnreadNotification(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, NotificationValidations.readUnreadNotification);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+
+    let notification = await Notification.findByIdAndUpdate(req.body.id, req.body, { new: true });
+    if (notification) {
+      return sendResponse(res, null, `Notification marked as ${req.body.read ? "read" : "unread"}`, true, 200);
+    }
+    return sendResponse(res, {}, "Invalid Id", false, 400);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 422);
+  }
+}
+
+export {
+  getAllNotifications,
+  getNotificationById,
+  readUnreadNotification
+};
