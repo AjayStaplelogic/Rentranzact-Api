@@ -222,6 +222,32 @@ io.on('connection', (socket) => {
         })
     });
 
+    socket.on('nofitication-count', async (data) => {
+        console.log(`[Listener Event]-[nofitication-count']`);
+        // console.log(`[socket disconnected] : ${socket.id}`)
+        console.log(data, '======data');
+        const count = await chatService.unread_notification_count(data.user_id)
+        console.log(count, '======count');
+        let socket_ids = await chatService.get_user_socket_ids(connected_users, data.user_id);
+        console.log(socket_ids, '======socket_ids');
+
+        if (socket_ids && socket_ids.length > 0) {
+            for (let socket_id of socket_ids) {
+                // console.log(`[socket_id] ${socket_id}`)
+                io.in(socket_id).emit("nofitication-count", {
+                    status: true,
+                    statusCode: 200,
+                    data: count
+                })
+                socket.to(socket_id).emit("nofitication-count", {
+                    status: true,
+                    statusCode: 200,
+                    data: data
+                })
+            }
+        }
+    });
+
     socket.on('disconnect', () => {
         // console.log(`[Listener Event]-[disconnected]`);
         // console.log(`[socket disconnected] : ${socket.id}`);

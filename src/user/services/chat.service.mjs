@@ -1,6 +1,7 @@
 import ChatRooms from "../models/chatRooms.model.mjs"
 import mongoose from "mongoose";
 import Messages from "../models/messages.model.mjs";
+import { Notification } from "../models/notification.model.mjs";
 
 const ObjectId = mongoose.Types.ObjectId;
 
@@ -152,8 +153,8 @@ export const get_room_by_id = async (id) => {
             }
         },
         {
-            $addFields : {
-                user_ids : "$user_details._id"
+            $addFields: {
+                user_ids: "$user_details._id"
             }
         },
         {
@@ -279,5 +280,11 @@ export const delete_message = async (message_id) => {
         }
         return message;
     }
+}
 
+export const unread_notification_count = async (user_id) => {
+    return Notification.countDocuments({
+        send_to: user_id,
+        read: false
+    })
 }

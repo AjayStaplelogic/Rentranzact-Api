@@ -554,14 +554,17 @@ async function editProperty(req, res) {
             notification_payload.is_send_to_admin = true;
             Notification.create(notification_payload).then((create_notification) => {
               if (create_notification) {
-                if (create_notification) {
-                  if (admin && admin.fcmToken) {
-                    const metadata = {
-                      "propertyID": property._id.toString(),
-                      "redirectTo": "property",
-                    }
-                    sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+                const io = req.app.get('io');   // Fetching global io object
+                    io.emit('nofitication-count', {
+                      user_id : admin._id
+                    });
+
+                if (admin && admin.fcmToken) {
+                  const metadata = {
+                    "propertyID": property._id.toString(),
+                    "redirectTo": "property",
                   }
+                  sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
                 }
               }
             });
