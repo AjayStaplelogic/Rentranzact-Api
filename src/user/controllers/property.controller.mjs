@@ -554,10 +554,16 @@ async function editProperty(req, res) {
             notification_payload.is_send_to_admin = true;
             Notification.create(notification_payload).then((create_notification) => {
               if (create_notification) {
-                const io = req.app.get('io');   // Fetching global io object
-                    io.emit('nofitication-count', {
-                      user_id : admin._id
-                    });
+                try {
+                  const io = req.app.get('io');   // Fetching global io object
+                  console.log(io, '=====io')
+                  io.emit('nofitication-count', {
+                    user_id: admin._id
+                  });
+                  
+                } catch (error) {
+                  console.log(error, '====error io emit')
+                }
 
                 if (admin && admin.fcmToken) {
                   const metadata = {
