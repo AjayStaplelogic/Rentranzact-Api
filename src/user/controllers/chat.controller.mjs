@@ -284,7 +284,7 @@ export const getMessages = async (req, res) => {
                     reciever_id: "$reciever_id",
                     is_sender_admin: "$is_sender_admin",
                     is_reciever_admin: "$is_reciever_admin",
-                    is_read: "$is_read",
+                    read: "$read",
                     is_deleted: "$is_deleted",
                     read_at: "$read_at",
                     admin_id: "$admin_id",
