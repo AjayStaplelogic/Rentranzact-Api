@@ -2,6 +2,7 @@ import { User } from "../../user/models/user.model.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import { Notification } from "../../user/models/notification.model.mjs";
 import sendNotification from "../../user/helpers/sendNotification.mjs";
+import { controllerEvents } from "../../user/services/socket.service.mjs"
 
 
 const sendNotifications = async (roleModel, roles, notification_content, is_admin) => {
@@ -27,6 +28,7 @@ const sendNotifications = async (roleModel, roles, notification_content, is_admi
                 // Create notification
                 const create_notification = await Notification.create(notification_payload);
                 if (create_notification) {
+                    controllerEvents.notification_count(userOrAdmin._id)
                     if (userOrAdmin?.fcmToken) {
                         const metadata = { redirectTo: "" }; // Adjust metadata as needed
                         sendNotification(userOrAdmin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, userOrAdmin.role);

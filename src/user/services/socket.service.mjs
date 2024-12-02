@@ -276,7 +276,7 @@ io.on("close", (socket) => {
  */
 const sendNotificationCount = async (user_id) => {
     const unread_count = await chatService.unread_notification_count(user_id)
-    const socket_ids = await chatService.get_user_socket_ids(connected_users, user_id);
+    const socket_ids = await chatService.get_user_socket_ids(connected_users, `${user_id}`);
     if (socket_ids && socket_ids.length > 0) {
         for (let socket_id of socket_ids) {
             io.to(socket_id).emit("notification-count", {

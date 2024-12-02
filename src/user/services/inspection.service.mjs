@@ -7,6 +7,7 @@ import moment from "moment";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
+import * as NotificationService from "./notification.service.mjs";
 
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id, _id } = body;
@@ -72,17 +73,23 @@ async function createInspection(body, renterID) {
       notification_payload.inspection_id = data._id;
       notification_payload.propertyID = data.propertyID;
       notification_payload.send_to = landlordDetails._id;
-      let create_notification = await Notification.create(notification_payload);
-      if (create_notification) {
-        if (landlordDetails && landlordDetails.fcmToken) {
-          const metadata = {
-            "propertyID": data.propertyID.toString(),
-            "redirectTo": "inspection",
-            "inspection_id": create_notification.inspection_id,
-          }
-          sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-        }
+      const metadata = {
+        "propertyID": data.propertyID.toString(),
+        "redirectTo": "inspection",
+        "inspection_id": data._id,
       }
+      NotificationService.createNotification(notification_payload, metadata, landlordDetails)
+      // let create_notification = await Notification.create(notification_payload);
+      // if (create_notification) {
+      //   if (landlordDetails && landlordDetails.fcmToken) {
+      //     const metadata = {
+      //       "propertyID": data.propertyID.toString(),
+      //       "redirectTo": "inspection",
+      //       "inspection_id": create_notification.inspection_id,
+      //     }
+      //     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+      //   }
+      // }
     }
 
     if (property_manger_details) {
@@ -96,17 +103,26 @@ async function createInspection(body, renterID) {
       notification_payload.propertyID = data.propertyID;
       notification_payload.send_to = property_manger_details?._id;
       notification_payload.property_manager_id = property_manger_details?._id;
-      let create_notification = await Notification.create(notification_payload);
-      if (create_notification) {
-        if (property_manger_details && property_manger_details.fcmToken) {
-          const metadata = {
+
+                const metadata = {
             "propertyID": data.propertyID.toString(),
             "redirectTo": "inspection",
-            "inspection_id": create_notification.inspection_id,
+            "inspection_id": data._id,
           }
-          sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-        }
-      }
+
+          NotificationService.createNotification(notification_payload, metadata, property_manger_details)
+
+      // let create_notification = await Notification.create(notification_payload);
+      // if (create_notification) {
+      //   if (property_manger_details && property_manger_details.fcmToken) {
+      //     const metadata = {
+      //       "propertyID": data.propertyID.toString(),
+      //       "redirectTo": "inspection",
+      //       "inspection_id": create_notification.inspection_id,
+      //     }
+      //     sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
+      //   }
+      // }
     }
 
     return {
@@ -297,19 +313,23 @@ async function updateInspectionStatus(body, id) {
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
 
-  let create_notification = await Notification.create(notification_payload);
-  if (create_notification) {
-    User.findById(create_notification.send_to).then((send_to_details) => {
-      if (send_to_details && send_to_details.fcmToken) {
-        const metadata = {
-          "propertyID": data.propertyID.toString(),
-          "redirectTo": "inspection",
-          "inspection_id": create_notification.inspection_id,
-        }
-        sendNotification(send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, send_to_details.role)
-      }
-    })
+  const metadata = {
+    "propertyID": data.propertyID.toString(),
+    "redirectTo": "inspection",
+    "inspection_id": data._id,
   }
+
+  NotificationService.createNotification(notification_payload, metadata, false)
+
+  // let create_notification = await Notification.create(notification_payload);
+  // if (create_notification) {
+  //   User.findById(create_notification.send_to).then((send_to_details) => {
+  //     if (send_to_details && send_to_details.fcmToken) {
+
+  //       sendNotification(send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, send_to_details.role)
+  //     }
+  //   })
+  // }
   // console.log(notificationBody, "----notificationBody")
 
   // const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
@@ -356,17 +376,26 @@ async function inspectionEditService(body) {
               notification_payload.inspection_id = data._id;
               notification_payload.propertyID = data.propertyID;
               notification_payload.send_to = landlordDetails._id;
-              let create_notification = await Notification.create(notification_payload);
-              if (create_notification) {
-                if (landlordDetails && landlordDetails.fcmToken) {
-                  const metadata = {
-                    "propertyID": data.propertyID.toString(),
-                    "redirectTo": "inspection",
-                    "inspection_id": create_notification.inspection_id,
-                  }
-                  sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-                }
+
+              const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "inspection",
+                "inspection_id": data._id,
               }
+            
+              NotificationService.createNotification(notification_payload, metadata, landlordDetails)
+
+              // let create_notification = await Notification.create(notification_payload);
+              // if (create_notification) {
+              //   if (landlordDetails && landlordDetails.fcmToken) {
+              //     const metadata = {
+              //       "propertyID": data.propertyID.toString(),
+              //       "redirectTo": "inspection",
+              //       "inspection_id": create_notification.inspection_id,
+              //     }
+              //     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
+              //   }
+              // }
             }
           })
         }
@@ -384,17 +413,27 @@ async function inspectionEditService(body) {
               notification_payload.propertyID = data.propertyID;
               notification_payload.send_to = property_manger_details?._id;
               notification_payload.property_manager_id = property_manger_details?._id;
-              let create_notification = await Notification.create(notification_payload);
-              if (create_notification) {
-                if (property_manger_details && property_manger_details.fcmToken) {
-                  const metadata = {
-                    "propertyID": data.propertyID.toString(),
-                    "redirectTo": "inspection",
-                    "inspection_id": create_notification.inspection_id,
-                  }
-                  sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-                }
+
+              const metadata = {
+                "propertyID": data.propertyID.toString(),
+                "redirectTo": "inspection",
+                "inspection_id": data._id,
               }
+            
+              NotificationService.createNotification(notification_payload, metadata, property_manger_details)
+
+
+              // let create_notification = await Notification.create(notification_payload);
+              // if (create_notification) {
+              //   if (property_manger_details && property_manger_details.fcmToken) {
+              //     const metadata = {
+              //       "propertyID": data.propertyID.toString(),
+              //       "redirectTo": "inspection",
+              //       "inspection_id": create_notification.inspection_id,
+              //     }
+              //     sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
+              //   }
+              // }
             }
           })
         }
