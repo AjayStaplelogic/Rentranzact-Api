@@ -2,7 +2,9 @@ import { Admin } from "../../admin/models/admin.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
 const WEBHOOK_SECRET = process.env.TWAK_TO_WEBHOOK_SECRET;
-import crypto from "crypto"
+import crypto from "crypto";
+import * as chatService from "../services/chat.service.mjs";
+
 
 const verifySignature = (body, signature) => {
     console.log("Verify Signature Function")
@@ -19,30 +21,18 @@ const verifySignature = (body, signature) => {
 
 export const twawToWebhook = async (req, res) => {
     try {
-        // console.log(req.rawBody, '=====req.rawBody')
-        // console.log(req.headers, '====req.headers')
-        // console.log(req.body, '====req.body')
-        // console.log(req.query, '====req.query')
-
         // Convert the raw body Buffer to a string
         const rawBody = JSON.stringify(req.body);
-        // console.log(rawBody, '====rawBody 2222')
 
         // Get the signature from the request headers
         const signature = req.headers['x-tawk-signature'];
-        console.log(signature, '====signature 2222')
 
-        console.log(verifySignature(rawBody, signature), '===verifySignature(rawBody, signature)')
 
         // Verify the signature
         if (!verifySignature(rawBody, signature)) {
-            console.log("********************************************");
-            console.log('Verification failed')
-            console.log("********************************************");
             return res.status(400).send('Invalid signature');
         }
 
-        console.log("[Verification successful]")
 
         switch (req.body.event) {
             case "chat:start":
@@ -77,11 +67,24 @@ export const twawToWebhook = async (req, res) => {
 
 
         // global.io.broadcast.emit('news', { hello: 'world Testing socket' });
-        //    const io = req.app.get('io');
-        //    console.log(io, '==io')
-        //    io.emit('attachedmanual', { hello: 'world Testing socket' });
+        // const io = req.app.get('io');
+        // // console.log(io, '==io')
+        // let socket_ids = await chatService.get_user_socket_ids(data.connected_users, "66a21b414ee1be84903a0076");
+        // console.log(socket_ids, '==socket_ids')
+        // if (socket_ids && socket_ids.length > 0) {
+        //     for (let socket_id of socket_ids) {
+        //         // console.log(`[socket_id] ${socket_id}`)
+        //         io.to(socket_id).emit("notification-count", {
+        //             status: true,
+        //             statusCode: 200,
+        //             data: "data"
+        //         })
+        //         io.emit('notification-count', { hello: 'world Testing socket' });
+        //     }
+        // }
 
 
+        // controllerEvents.notification_count("66a21b414ee1be84903a0076")
         // Send a success response
         res.status(200).send('Webhook received successfully');
 
