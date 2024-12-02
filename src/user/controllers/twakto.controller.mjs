@@ -3,8 +3,8 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { Notification } from "../models/notification.model.mjs";
 const WEBHOOK_SECRET = process.env.TWAK_TO_WEBHOOK_SECRET;
 import crypto from "crypto";
-import * as chatService from "../services/chat.service.mjs";
-
+import * as NotificationService from "../services/notification.service.mjs"
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 
 const verifySignature = (body, signature) => {
     console.log("Verify Signature Function")
@@ -40,23 +40,29 @@ export const twawToWebhook = async (req, res) => {
                     if (admins && admins.length > 0) {
                         for (const admin of admins) {
                             const notification_payload = {};
-                            notification_payload.redirect_to = "";
+                            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.tawk_to_dashboard;
                             notification_payload.notificationHeading = `${req?.body?.visitor?.name ?? ""} started a new chat`;
                             notification_payload.notificationBody = `${req?.body?.message?.text ?? ""}`;
                             notification_payload.send_to = admin._id;
                             notification_payload.is_send_to_admin = true;
-                            Notification.create(notification_payload).then((create_notification) => {
-                                if (create_notification) {
-                                    if (create_notification) {
-                                        if (admin && admin.fcmToken) {
-                                            const metadata = {
-                                                "redirectTo": "nowhere",
-                                            }
-                                            sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-                                        }
-                                    }
-                                }
-                            });
+
+                            const metadata = {
+                                "redirectTo": ENOTIFICATION_REDIRECT_PATHS.tawk_to_dashboard
+                            }
+                            NotificationService.createNotification(notification_payload, metadata, admin);
+
+                            // Notification.create(notification_payload).then((create_notification) => {
+                            //     if (create_notification) {
+                            //         if (create_notification) {
+                            //             if (admin && admin.fcmToken) {
+                            //                 const metadata = {
+                            //                     "redirectTo": "nowhere",
+                            //                 }
+                            //                 sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+                            //             }
+                            //         }
+                            //     }
+                            // });
                         }
                     }
                 })
