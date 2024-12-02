@@ -224,14 +224,16 @@ io.on('connection', (socket) => {
 
     socket.on('notification-count', async (data) => {
         console.log(`[Listener Event]-[nofitication-count']`);
-        const count = await chatService.unread_notification_count(data.user_id)
+        const unread_count = await chatService.unread_notification_count(data.user_id)
         let socket_ids = await chatService.get_user_socket_ids(connected_users, data.user_id);
         if (socket_ids && socket_ids.length > 0) {
             for (let socket_id of socket_ids) {
                 io.in(socket_id).emit("notification-count", {
                     status: true,
                     statusCode: 200,
-                    data: count
+                    data: {
+                        unread_count: unread_count
+                    }
                 });
             }
         }
