@@ -1,11 +1,11 @@
-import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { getNotificationService } from "../services/notification.service.mjs";
 import { Notification } from "../models/notification.model.mjs"
 import { UserRoles } from '../enums/role.enums.mjs';
 import { User } from "../models/user.model.mjs"
 import { Property } from "../models/property.model.mjs"
-
+import * as NotificationValidations from "../validations/notification.validation.mjs"
+import { validator } from "../../user/helpers/schema-validator.mjs";
 
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
@@ -202,4 +202,35 @@ async function getNotificationById(req, res) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
-export { getNotification, getAllNotifications, getNotificationById };
+
+async function readUnreadNotification(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, NotificationValidations.readUnreadNotification);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 422);
+    }
+
+    let notification = await Notification.findOneAndUpdate({
+      _id: req.body.id,
+      send_to: req.user.data._id,
+    },
+      req.body
+    );
+
+    if (notification) {
+      return sendResponse(res, null, `Notification marked as ${req.body.read ? "read" : "unread"}`, true, 200);
+    }
+    return sendResponse(res, {}, "Invalid Id", false, 400);
+  } catch (error) {
+    return sendResponse(res, {}, `${error}`, false, 400);
+  }
+}
+
+
+export {
+  getNotification,
+  getAllNotifications,
+  getNotificationById,
+  readUnreadNotification
+};
