@@ -13,6 +13,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import * as NotificationService from "../../user/services/notification.service.mjs";
 
 
 async function properties(req, res) {
@@ -417,16 +418,23 @@ async function updatePropertyApprovalStatus(req, res) {
           notification_payload.send_to = property?.property_manager_id;
         }
         const get_send_to_details = await User.findById(notification_payload?.send_to);
-        const create_notification = await Notification.create(notification_payload);
-        if (create_notification) {
-          if (get_send_to_details && get_send_to_details.fcmToken) {
-            const metadata = {
-              "propertyID": update_property._id.toString(),
-              "redirectTo": "property",
-            }
-            sendNotification(get_send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, get_send_to_details.role)
-          }
+        const metadata = {
+          "propertyID": update_property._id.toString(),
+          "redirectTo": "property",
         }
+
+        NotificationService.createNotification(notification_payload, metadata, get_send_to_details);
+
+        // const create_notification = await Notification.create(notification_payload);
+        // if (create_notification) {
+        //   if (get_send_to_details && get_send_to_details.fcmToken) {
+        //     const metadata = {
+        //       "propertyID": update_property._id.toString(),
+        //       "redirectTo": "property",
+        //     }
+        //     sendNotification(get_send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, get_send_to_details.role)
+        //   }
+        // }
         return sendResponse(res, {}, 'property status updated successfully', true, 200);
       }
     }
@@ -471,7 +479,7 @@ async function addProperty(req, res) {
 
     let { email } = body;
     let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
-    
+
     let arr = JSON.parse("[" + trimmedStr + "]");
     const Property_ = {
       propertyID: req.PropertyID,

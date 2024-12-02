@@ -214,7 +214,7 @@ export const send_message = async (socket, data) => {
 }
 
 export const get_user_socket_ids = (connected_users, user_id) => {
-    console.log(connected_users.filter(user => user.user_id === user_id), '=======connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)')
+    // console.log(connected_users.filter(user => user.user_id === user_id), '=======connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)')
     return connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)
 }
 
