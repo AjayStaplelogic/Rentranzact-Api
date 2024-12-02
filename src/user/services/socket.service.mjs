@@ -7,7 +7,7 @@ const connected_users = [];
 const io = new Server();
 
 io.use(async (socket, next) => {
-    // console.log(`[Socket Handshake]`)
+    console.log(`[Socket Handshake]`)
     // console.log(socket.handshake)
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
@@ -222,28 +222,17 @@ io.on('connection', (socket) => {
         })
     });
 
-    socket.on('nofitication-count', async (data) => {
+    socket.on('notification-count', async (data) => {
         console.log(`[Listener Event]-[nofitication-count']`);
-        // console.log(`[socket disconnected] : ${socket.id}`)
-        console.log(data, '======data');
         const count = await chatService.unread_notification_count(data.user_id)
-        console.log(count, '======count');
         let socket_ids = await chatService.get_user_socket_ids(connected_users, data.user_id);
-        console.log(socket_ids, '======socket_ids');
-
         if (socket_ids && socket_ids.length > 0) {
             for (let socket_id of socket_ids) {
-                // console.log(`[socket_id] ${socket_id}`)
-                io.in(socket_id).emit("nofitication-count", {
+                io.in(socket_id).emit("notification-count", {
                     status: true,
                     statusCode: 200,
                     data: count
-                })
-                socket.to(socket_id).emit("nofitication-count", {
-                    status: true,
-                    statusCode: 200,
-                    data: data
-                })
+                });
             }
         }
     });
@@ -276,5 +265,31 @@ io.on("close", (socket) => {
     chatService.user_online(socket, connected_users);
     // console.log(connected_users)
 });
+
+
+/**
+ * @description Fetch unread notification count from Db and emit event to user
+ * @param {String} user_id Fetch and emit to that user
+ * @return {void} Nothing
+ */
+const sendNotificationCount = async (user_id) => {
+    const unread_count = await chatService.unread_notification_count(user_id)
+    const socket_ids = await chatService.get_user_socket_ids(connected_users, user_id);
+    if (socket_ids && socket_ids.length > 0) {
+        for (let socket_id of socket_ids) {
+            io.to(socket_id).emit("notification-count", {
+                status: true,
+                statusCode: 200,
+                data: {
+                    unread_count: unread_count
+                }
+            })
+        }
+    }
+}
+
+export const controllerEvents = {
+    notification_count: sendNotificationCount
+}
 
 export default io;

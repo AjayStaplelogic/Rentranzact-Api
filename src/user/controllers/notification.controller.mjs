@@ -5,7 +5,8 @@ import { UserRoles } from '../enums/role.enums.mjs';
 import { User } from "../models/user.model.mjs"
 import { Property } from "../models/property.model.mjs"
 import * as NotificationValidations from "../validations/notification.validation.mjs"
-import { validator } from "../../user/helpers/schema-validator.mjs";
+import { validator } from "../helpers/schema-validator.mjs";
+import { controllerEvents } from "../services/socket.service.mjs"
 
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
@@ -219,6 +220,7 @@ async function readUnreadNotification(req, res) {
     );
 
     if (notification) {
+      controllerEvents.notification_count(`${notification.send_to}`)
       return sendResponse(res, null, `Notification marked as ${req.body.read ? "read" : "unread"}`, true, 200);
     }
     return sendResponse(res, {}, "Invalid Id", false, 400);

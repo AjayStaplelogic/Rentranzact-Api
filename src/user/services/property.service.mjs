@@ -11,6 +11,7 @@ import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import { Admin } from "../../admin/models/admin.model.mjs";
+import * as NotificationService from "./notification.service.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -121,17 +122,23 @@ async function addPropertyService(
           notification_payload.send_to = admin._id;
           notification_payload.property_manager_id = property.property_manager_id;
           notification_payload.is_send_to_admin = true;
-          Notification.create(notification_payload).then((create_notification) => {
-            if (create_notification) {
-              if (admin && admin.fcmToken) {
-                const metadata = {
-                  "propertyID": property._id.toString(),
-                  "redirectTo": "property",
-                }
-                sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-              }
-            }
-          });
+          const metadata = {
+            "propertyID": property._id.toString(),
+            "redirectTo": "property",
+          }
+          NotificationService.createNotification(notification_payload, metadata, admin)
+
+          // Notification.create(notification_payload).then((create_notification) => {
+          //   if (create_notification) {
+          //     if (admin && admin.fcmToken) {
+          //       const metadata = {
+          //         "propertyID": property._id.toString(),
+          //         "redirectTo": "property",
+          //       }
+          //       sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+          //     }
+          //   }
+          // });
         }
       }
     })

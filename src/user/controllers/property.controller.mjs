@@ -20,6 +20,7 @@ import { ApprovalStatus } from "../enums/property.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
+import * as NotificationService from "../services/notification.service.mjs";
 
 async function addProperty(req, res) {
   // console.log(`[Inside add property controller]`)
@@ -552,28 +553,20 @@ async function editProperty(req, res) {
             notification_payload.send_to = admin._id;
             notification_payload.property_manager_id = property.property_manager_id;
             notification_payload.is_send_to_admin = true;
-            Notification.create(notification_payload).then((create_notification) => {
-              if (create_notification) {
-                try {
-                  const io = req.app.get('io');   // Fetching global io object
-                  console.log(io, '=====io')
-                  io.emit('nofitication-count', {
-                    user_id: admin._id
-                  });
-                  
-                } catch (error) {
-                  console.log(error, '====error io emit')
-                }
+            const metadata = {
+              "propertyID": property._id.toString(),
+              "redirectTo": "property",
+            }
+            NotificationService.createNotification(notification_payload, metadata, admin)
 
-                if (admin && admin.fcmToken) {
-                  const metadata = {
-                    "propertyID": property._id.toString(),
-                    "redirectTo": "property",
-                  }
-                  sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-                }
-              }
-            });
+            // Notification.create(notification_payload).then((create_notification) => {
+            //   if (create_notification) {
+            //     if (admin && admin.fcmToken) {
+ 
+            //       sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
+            //     }
+            //   }
+            // });
           }
         }
       })

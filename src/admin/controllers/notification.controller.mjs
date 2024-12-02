@@ -8,6 +8,7 @@ import { UserRoles } from "../../user/enums/role.enums.mjs";
 import * as NotificationServices from "../services/notification.service.mjs";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
+import { controllerEvents } from "../../user/services/socket.service.mjs"
 
 async function getAllNotifications(req, res) {
   try {
@@ -199,6 +200,7 @@ async function readUnreadNotification(req, res) {
 
     let notification = await Notification.findByIdAndUpdate(req.body.id, req.body, { new: true });
     if (notification) {
+      controllerEvents.notification_count(`${notification.send_to}`);
       return sendResponse(res, null, `Notification marked as ${req.body.read ? "read" : "unread"}`, true, 200);
     }
     return sendResponse(res, {}, "Invalid Id", false, 400);
