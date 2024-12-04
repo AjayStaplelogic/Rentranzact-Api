@@ -1,6 +1,7 @@
 import activityLog from "../helpers/activityLog.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import pkg from "bcrypt";
+import { addEmployeeEmail } from '../emails/onboarding.emails.mjs'
 
 async function getEmployeeService(pageNo, pageSize, req) {
 
@@ -37,7 +38,7 @@ async function getEmployeeService(pageNo, pageSize, req) {
 
 async function addEmployeeService(body) {
 
-  const userExist = await Admin.findOne({ email: body.email.toLowerCase(), isDeleted  : false });
+  const userExist = await Admin.findOne({ email: body.email.toLowerCase().trim(), isDeleted: false });
 
   if (userExist) {
     return {
@@ -67,19 +68,18 @@ async function addEmployeeService(body) {
   const admin = new Admin(body);
 
   await admin.save();
+  addEmployeeEmail({
+    email: admin.email,
+    fullName: admin.fullName,
+    password: password,
+  })
 
   await activityLog(admin._id, `created new employee ${admin.fullName}`)
 
   return {
     data: admin,
-    message: "admin created successfully.",
-    statusCode: 201,
-  };
-
-  return {
-    data: data,
-    message: `successfully fetched employee list`,
     status: true,
+    message: "admin created successfully.",
     statusCode: 201,
   };
 }
@@ -88,3 +88,4 @@ export {
   getEmployeeService,
   addEmployeeService
 }
+
