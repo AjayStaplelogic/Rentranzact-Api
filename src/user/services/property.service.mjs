@@ -113,7 +113,7 @@ async function addPropertyService(
       User.findById(property.property_manager_id).then(property_manager => {
         PropertyEmails.assignPMToProperty({
           email: property_manager.email,
-          property_id: property._id.toString,
+          property_id: property._id,
           property_manager_name: property_manager.fullName,
           landlord_name: req?.user?.data?.fullName,
           property_name: property.propertyName,
