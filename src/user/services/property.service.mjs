@@ -12,6 +12,7 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import { Admin } from "../../admin/models/admin.model.mjs";
 import * as NotificationService from "./notification.service.mjs";
+import * as PropertyEmails from "../emails/property.email.mjs";
 
 async function addPropertyService(
   PropertyID,
@@ -107,6 +108,18 @@ async function addPropertyService(
   const property = await Property.create(Property_);
   // console.log(`[Property Created]`);
   if (property) {
+
+    if (property.property_manager_id) {   // property have property manager then informing him via email
+      User.findById(property.property_manager_id).then(property_manager => {
+        PropertyEmails.assignPMToProperty({
+          email: property_manager.email,
+          property_id: property._id.toString,
+          property_manager_name: property_manager.fullName,
+          landlord_name: req?.user?.data?.fullName,
+          property_name: property.propertyName,
+        })
+      })
+    }
 
     // Sending notification to admin for approval
     // const admins = await getAdmins();
