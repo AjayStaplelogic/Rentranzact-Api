@@ -67,7 +67,7 @@ async function stripe(req, res) {
 async function paystack(req, res) {
 
     // const testSecretKey = "sk_test_853a8821768ec289d7692eaadf8e920edf7afb70";
-    // console.log(req.body, "-------------Pay Stack")
+    console.log(req.body, "-------------Pay Stack")
     let { body } = req;
     // body = JSON.parse(JSON.stringify(body));
     body.paymentMethod = "paystack"
@@ -79,7 +79,7 @@ async function paystack(req, res) {
         // console.log(metadata, '======metadata111');
         delete body.metadata;
         body.data.metadata = metadata;
-        // console.log(body.metadata, '======body.metadata222');
+        console.log(body.data.metadata, '======body.metadata222');
 
         // const hash = createHmac('sha512', testSecretKey).update(JSON.stringify(req.body)).digest('hex');
         if (true) {

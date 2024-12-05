@@ -480,10 +480,10 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
-    // console.log(req.body.images, '========req.body.images');
-    // console.log(req.images, '========req.images');
-    // console.log(req.files, '========req.files');
-
+    const get_property = await Property.findById(id);
+    if (!get_property) {
+      return sendResponse(res, {}, 'Property not found', false, 404);
+    }
 
     if (req.files && req.files.length > 0) {
       req.body.images = req.body.images || [];
@@ -541,6 +541,21 @@ async function editProperty(req, res) {
     req.body.approval_status = ApprovalStatus.PENDING;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
+
+
+      if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id) {   // property have property manager then informing him via email
+        User.findById(property.property_manager_id).then(property_manager => {
+          PropertyEmails.assignPMToProperty({
+            email: property_manager.email,
+            property_id: property._id.toString,
+            property_manager_name: property_manager.fullName,
+            landlord_name: req?.user?.data?.fullName,
+            property_name: property.propertyName,
+          })
+        })
+      }
+
+
       Admin.find({ role: "superAdmin" }).then((admins) => {
         if (admins && admins.length > 0) {
           for (const admin of admins) {
@@ -562,7 +577,7 @@ async function editProperty(req, res) {
             // Notification.create(notification_payload).then((create_notification) => {
             //   if (create_notification) {
             //     if (admin && admin.fcmToken) {
- 
+
             //       sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
             //     }
             //   }

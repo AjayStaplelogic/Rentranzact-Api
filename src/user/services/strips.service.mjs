@@ -481,7 +481,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         // const { amount, status, created, id } = body.data.object;
         let createdAt = body.data.paid_at;
 
-        amount = body.data.amount;
+        amount = (body.data.amount)/100;
         status = body.data.status;
         created = moment(createdAt).unix();
         id = body.data.id;
