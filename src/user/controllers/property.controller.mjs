@@ -21,6 +21,7 @@ import { Notification } from "../models/notification.model.mjs";
 import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
+import * as PropertyEmails from "../emails/property.email.mjs";
 
 async function addProperty(req, res) {
   // console.log(`[Inside add property controller]`)
