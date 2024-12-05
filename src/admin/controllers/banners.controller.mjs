@@ -123,6 +123,7 @@ export const getAllBanners = async (req, res) => {
                     title: "$title",
                     media: "$media",
                     content: "$content",
+                    page:"$page"
                 }
             },
             {
