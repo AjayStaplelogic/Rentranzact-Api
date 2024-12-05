@@ -40,7 +40,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         //   const { userID, propertyID, notificationID } = body.data.object.metadata;
         // const { amount, status, created, id } = body.data.object;
-        amount = body.data.object.amount;
+        amount = Number(body.data.object.amount/100);
         status = body.data.object.status;
         created = body.data.object.created;
         id = body.data.object.id;
@@ -57,7 +57,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         // const { amount, status, created, id } = body.data.object;
         let createdAt = body.data.paid_at;
 
-        amount = body.data.amount;
+        amount = Number(body.data.amount/100);
         status = body.data.status;
         created = moment(createdAt).unix();
         id = body?.data?.id;
@@ -464,7 +464,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         //   const { userID, propertyID, notificationID } = body.data.object.metadata;
         // const { amount, status, created, id } = body.data.object;
-        amount = body.data.object.amount;
+        amount = Number(body.data.object.amount/100);
         status = body.data.object.status;
         created = body.data.object.created;
         id = body.data.object.id;
@@ -481,7 +481,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         // const { amount, status, created, id } = body.data.object;
         let createdAt = body.data.paid_at;
 
-        amount = (body.data.amount)/100;
+        amount = Number(body.data.amount/100);
         status = body.data.status;
         created = moment(createdAt).unix();
         id = body.data.id;
