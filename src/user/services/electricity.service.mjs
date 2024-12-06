@@ -172,15 +172,15 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
 
                 if (initiatedPayment) {
                     Bills.findByIdAndUpdate(bill._id, {
-                        phone_number: initiatedPayment?.data?.phone_number ?? "",
-                        bill_amount: initiatedPayment?.data?.amount,
-                        network: initiatedPayment?.data?.network ?? "",
-                        code: initiatedPayment?.data?.code ?? "",
-                        tx_ref: initiatedPayment?.data?.tx_ref ?? "",
-                        reference: initiatedPayment?.data?.reference ?? "",
-                        batch_reference: initiatedPayment?.data?.batch ?? "",
-                        recharge_token: initiatedPayment?.data?.recharge_token ?? "",
-                        fee: initiatedPayment?.data?.fee,
+                        phone_number: initiatedPayment?.phone_number ?? "",
+                        bill_amount: initiatedPayment?.amount,
+                        network: initiatedPayment?.network ?? "",
+                        code: initiatedPayment?.code ?? "",
+                        tx_ref: initiatedPayment?.tx_ref ?? "",
+                        reference: initiatedPayment?.reference ?? "",
+                        batch_reference: initiatedPayment?.batch ?? "",
+                        recharge_token: initiatedPayment?.recharge_token ?? "",
+                        fee: initiatedPayment?.fee,
                         transaction_id: webhook_obj.id,
                         meter_number: meta_data.meter_number
                     },
