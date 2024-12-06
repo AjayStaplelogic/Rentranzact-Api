@@ -85,12 +85,12 @@ export const editBanner = async (req, res) => {
 
 export const getAllBanners = async (req, res) => {
     try {
-        let { search, status, sortBy, exclude_id } = req.query;
+        let { search, status, sortBy, exclude_id,page_name } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
         if (status) { query.status = status; };
-
+        if (page_name) { query.page = page_name; };
         let skip = Number(page - 1) * count;
         if (search) {
             query.$or = [
