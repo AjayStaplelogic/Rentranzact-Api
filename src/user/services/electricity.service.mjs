@@ -160,25 +160,25 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                 amount_charge_to_cust: webhook_obj.amount,
                 bill_amount: meta_data.amount,
             }).then(async (bill) => {
-                const initiatePayment = await initiatePayment({
+                const initiatedPayment = await initiatePayment({
                     country_code: meta_data?.country_code ?? "NG",
                     customer: meta_data.meter_number,
-                    amount: meta_data.amount,
+                    amount: Number(meta_data.amount),
                     biller_code: meta_data.biller_code,
                     item_code: meta_data.item_code,
                 });
 
-                if (initiatePayment) {
+                if (initiatedPayment) {
                     Bills.findByIdAndUpdate(bill._id, {
-                        phone_number: initiatePayment?.phone_number ?? "",
-                        bill_amount: initiatePayment?.amount,
-                        network: initiatePayment?.network ?? "",
-                        code: initiatePayment?.code ?? "",
-                        tx_ref: initiatePayment?.tx_ref ?? "",
-                        reference: initiatePayment?.reference ?? "",
-                        batch_reference: initiatePayment?.batch ?? "",
-                        recharge_token: initiatePayment?.recharge_token ?? "",
-                        fee: initiatePayment?.fee,
+                        phone_number: initiatedPayment?.data?.phone_number ?? "",
+                        bill_amount: initiatedPayment?.data?.amount,
+                        network: initiatedPayment?.data?.network ?? "",
+                        code: initiatedPayment?.data?.code ?? "",
+                        tx_ref: initiatedPayment?.data?.tx_ref ?? "",
+                        reference: initiatedPayment?.data?.reference ?? "",
+                        batch_reference: initiatedPayment?.data?.batch ?? "",
+                        recharge_token: initiatedPayment?.data?.recharge_token ?? "",
+                        fee: initiatedPayment?.data?.fee,
                         transaction_id: webhook_obj.id,
                         meter_number: meta_data.meter_number
                     },
@@ -194,11 +194,13 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                         })
                 }
             }).catch((error) => {
+                console.log(error, '=====error initiate bill payment 11')
                 // logic to refund for charge created before
                 createBillRefund(webhook_obj.id, null, meta_data.meter_number);
             })
         })
     } catch (error) {
+        console.log(error, '=====error initiate bill payment 22')
         // Logic to refund for charge created before
         createBillRefund(webhook_obj.id, null, meta_data.meter_number);
     }
@@ -250,15 +252,15 @@ export const createRefund = async (transaction_id, amount = 0) => {
 // console.log(await createRefund("8238271"))
 
 export const createBillRefund = async (transaction_id, bill_id, meter_number) => {
-    const verifyTransaction = await verifyTransaction(transaction_id);  // Verify transaction in flutterwave before initiating refunds
-    if (verifyTransaction) {
+    const verifiedTransaction = await verifyTransaction(transaction_id);  // Verify transaction in flutterwave before initiating refunds
+    if (verifiedTransaction) {
         const createRefund = await createRefund(transaction_id);
         if (createRefund) {
             const payload = {
                 gateway_type: Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,
                 type: ERefundfor.bill_payment,
                 bill_id: bill_id ?? null,
-                user_id: verifyTransaction?.data?.meta?.user_id,
+                user_id: verifiedTransaction?.data?.meta?.user_id,
                 refund_id: createRefund?.data?.id,
                 account_id: createRefund?.data?.account_id,
                 tx_id: createRefund?.data?.tx_id,
