@@ -95,7 +95,7 @@ export const initiatePayment = ({
         reference: uuidv4()
     }
     console.log(payload, '=======payload inititated')
-    const url = `${flutterWaveBaseUrl}/v3/billers/${biller_code}/items/${item_code}`;
+    const url = `${flutterWaveBaseUrl}/v3/billers/${biller_code}/items/${item_code}/payment`;
     return new Promise((resolve, reject) => {
         axios.post(url, payload, config)
             .then(response => resolve(response?.data))
