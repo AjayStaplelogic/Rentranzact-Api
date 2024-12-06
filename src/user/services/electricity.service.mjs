@@ -99,6 +99,7 @@ export const initiatePayment = ({
         axios.post(url, payload, config)
             .then(response => resolve(response?.data))
             .catch(error => {
+                console.log(error, '======Error When original initialization of bill payment')
                 reject(new Error(error?.response?.data?.message ?? error))
             });
     })
@@ -163,7 +164,7 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                 const initiatedPayment = await initiatePayment({
                     country_code: meta_data?.country_code ?? "NG",
                     customer: meta_data.meter_number,
-                    amount: Number(meta_data.amount),
+                    amount: meta_data.amount,
                     biller_code: meta_data.biller_code,
                     item_code: meta_data.item_code,
                 });
@@ -172,15 +173,15 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
 
                 if (initiatedPayment) {
                     Bills.findByIdAndUpdate(bill._id, {
-                        phone_number: initiatedPayment?.phone_number ?? "",
-                        bill_amount: initiatedPayment?.amount,
-                        network: initiatedPayment?.network ?? "",
-                        code: initiatedPayment?.code ?? "",
-                        tx_ref: initiatedPayment?.tx_ref ?? "",
-                        reference: initiatedPayment?.reference ?? "",
-                        batch_reference: initiatedPayment?.batch ?? "",
-                        recharge_token: initiatedPayment?.recharge_token ?? "",
-                        fee: initiatedPayment?.fee,
+                        phone_number: initiatedPayment?.data?.phone_number ?? "",
+                        bill_amount: initiatedPayment?.data?.amount,
+                        network: initiatedPayment?.data?.network ?? "",
+                        code: initiatedPayment?.data?.code ?? "",
+                        tx_ref: initiatedPayment?.data?.tx_ref ?? "",
+                        reference: initiatedPayment?.data?.reference ?? "",
+                        batch_reference: initiatedPayment?.data?.batch ?? "",
+                        recharge_token: initiatedPayment?.data?.recharge_token ?? "",
+                        fee: initiatedPayment?.data?.fee,
                         transaction_id: webhook_obj.id,
                         meter_number: meta_data.meter_number
                     },
@@ -193,6 +194,10 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                                 amount: updatedBill.amount_charge_to_cust,
                                 meter_number: meta_data.meter_number
                             });
+                        }).catch(error=>{
+                            console.log(error, '=====error initiate bill payment 11')
+                            // logic to refund for charge created before
+                            createBillRefund(webhook_obj.id, bill._id, meta_data.meter_number);
                         })
                 }
             }).catch((error) => {
