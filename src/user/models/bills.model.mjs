@@ -8,6 +8,9 @@ const schema = new Schema({
         ref: "users",
         index: true
     },
+    meter_number: {                       
+        type: String,
+    },
     phone_number: {                       
         type: String,
     },
@@ -48,6 +51,15 @@ const schema = new Schema({
     },
     transaction_id : {  // Transaction id when charging to customer
         type: String
+    },
+    refund_status : {
+        type : String,
+        default : "initiated"
+    },
+    refund_id : {
+        type: mongoose.Types.ObjectId,
+        ref: "refunds",
+        index: true
     }
 }, {
     timestamps: true,
