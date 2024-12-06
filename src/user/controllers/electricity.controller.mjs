@@ -72,23 +72,24 @@ export const payElectricityBill = async (req, res) => {
             const platform_fee_percentage = 10;
             const platform_fee = (req.body.amount * platform_fee_percentage) / 100;
             const createCharge = await ElectricityService.createCharge({
-                amount: req.body.amount + platform_fee,
+                amount: Number(req.body.amount) + Number(platform_fee),
                 customer_email: req?.user?.data?.email,
                 customer_phone_number: req?.user?.data?.phone ?? "",
                 customer_name: req?.user?.data?.fullname,
                 meta_data: {
                     type: "initiated-bill-payment",
                     user_id: `${req?.user?.data?._id}`,
-                    meter_number: validate_bill.customer,
+                    meter_number: validate_bill?.data?.customer,
                     amount: req.body.amount,
-                    biller_code: validate_bill.biller_code,
-                    item_code: validate_bill.product_code,
+                    biller_code: validate_bill?.data?.biller_code,
+                    item_code: validate_bill?.data?.product_code,
                 }
             });
 
+            console.log(createCharge, '====createCharge')
             if (createCharge) {
                 const resData = {
-                    url: createCharge.link
+                    url: createCharge?.data?.link
                 }
                 return sendResponse(res, resData, "Payment initiated successfully", true, 200);
             }
