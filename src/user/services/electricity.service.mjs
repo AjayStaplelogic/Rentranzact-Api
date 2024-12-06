@@ -168,6 +168,8 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                     item_code: meta_data.item_code,
                 });
 
+                console.log(initiatedPayment, '=========initiatedPayment')
+
                 if (initiatedPayment) {
                     Bills.findByIdAndUpdate(bill._id, {
                         phone_number: initiatedPayment?.data?.phone_number ?? "",
