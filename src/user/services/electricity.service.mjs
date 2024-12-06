@@ -4,6 +4,9 @@ import { v4 as uuidv4 } from "uuid";
 import Bills from "../models/bills.model.mjs";
 import * as electricityEmails from "../emails/electricity.emails.mjs";
 import { User } from "../models/user.model.mjs";
+import * as Constants from "../enums/common.mjs"
+import { ERefundfor } from "../enums/refunds.enum.mjs";
+import Refunds from "../models/refunds.model.mjs";
 
 const config = {
     headers: {
@@ -176,22 +179,28 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                         batch_reference: initiatePayment?.batch ?? "",
                         recharge_token: initiatePayment?.recharge_token ?? "",
                         fee: initiatePayment?.fee,
-                        transaction_id: webhook_obj.id
-                    }).then(() => {
-                        electricityEmails.electricityBillInitiated({
-                            email: user.email,
-                            fullName: user.fullName,
-                            amount: webhook_obj.amount,
-                            meter_number: meta_data.meter_number
-                        });
-                    })
+                        transaction_id: webhook_obj.id,
+                        meter_number: meta_data.meter_number
+                    },
+                        {
+                            new: true
+                        }).then((updatedBill) => {
+                            electricityEmails.electricityBillInitiated({
+                                email: user.email,
+                                fullName: user.fullName,
+                                amount: updatedBill.amount_charge_to_cust,
+                                meter_number: meta_data.meter_number
+                            });
+                        })
                 }
             }).catch((error) => {
                 // logic to refund for charge created before
+                createBillRefund(webhook_obj.id, null, meta_data.meter_number);
             })
         })
     } catch (error) {
         // Logic to refund for charge created before
+        createBillRefund(webhook_obj.id, null, meta_data.meter_number);
     }
 }
 
@@ -238,11 +247,83 @@ export const createRefund = async (transaction_id, amount = 0) => {
     })
 }
 
-// console.log(await create_refund("8240284"))
+// console.log(await createRefund("8238271"))
 
-export const createBillRefund = async (webhook_obj) => {
-    const verifyTransaction = await verifyTransaction(webhook_obj.id);  // Verify transaction in flutterwave before initiating refunds
+export const createBillRefund = async (transaction_id, bill_id, meter_number) => {
+    const verifyTransaction = await verifyTransaction(transaction_id);  // Verify transaction in flutterwave before initiating refunds
     if (verifyTransaction) {
-        const createRefund = await createRefund(webhook_obj.id);
+        const createRefund = await createRefund(transaction_id);
+        if (createRefund) {
+            const payload = {
+                gateway_type: Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,
+                type: ERefundfor.bill_payment,
+                bill_id: bill_id ?? null,
+                user_id: verifyTransaction?.data?.meta?.user_id,
+                refund_id: createRefund?.data?.id,
+                account_id: createRefund?.data?.account_id,
+                tx_id: createRefund?.data?.tx_id,
+                flw_ref: createRefund?.data?.flw_ref,
+                wallet_id: createRefund?.data?.wallet_id,
+                amount_refunded: createRefund?.data?.amount_refunded,
+                status: createRefund?.data?.status,
+                destination: createRefund?.data?.destination,
+                comments: createRefund?.data?.comments,
+                reference: createRefund?.data?.reference,
+                fee: createRefund?.data?.fee
+            }
+
+            Refunds.create(payload).then(refund_data => {
+                User.findById(refund_data.user_id).then(user => {
+                    electricityEmails.electricityBillRefundInitiated({
+                        email: user.email,
+                        fullName: user.fullName,
+                        amount: refund_data.amount_refunded,
+                        meter_number: meter_number
+                    });
+                    if (refund_data.bill_id) {
+                        Bills.findByIdAndUpdate(refund_data.bill_id, {
+                            refund_id: refund_data._id
+                        }).then(update_bill => {
+                        })
+                    }
+                })
+            })
+        }
     }
+}
+
+export const updateBillStatusFromWebhook = async (webhook_obj) => {
+    Bills.findOneAndUpdate({
+        reference: webhook_obj?.data?.flw_ref
+    }, {
+        status: webhook_obj?.data?.status
+    }, {
+        new: true
+    }).then(bill => {
+        User.findById(bill.user_id)
+            .then(user => {
+                const payload = {
+                    email: user.email,
+                    fullName: user.fullName,
+                    amount: bill.amount_charge_to_cust,
+                    meter_number: webhook_obj?.data?.customer
+                };
+
+                switch (bill.status) {
+                    case "successful":
+                        electricityEmails.electricityBillPaid(payload)
+                        break;
+
+                    case "failed":
+                        electricityEmails.electricityBillFailed(payload);
+
+                        // Bellow write a code for refund
+                        createBillRefund(bill.transaction_id, bill._id, bill.meter_number);
+                        break;
+
+                    default:
+                        break;
+                }
+            })
+    })
 }

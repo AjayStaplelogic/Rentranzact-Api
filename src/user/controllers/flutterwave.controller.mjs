@@ -1,30 +1,29 @@
-import { sendResponse } from "../helpers/sendResponse.mjs";
 import { addFlutterwaveTransaction, addToWallet, addFlutterwaveTransactionForOld } from "../services/flutterwave.service.mjs";
 import { Property } from "../models/property.model.mjs";
-// import * as ElectricityService from "../services/electricity.service.mjs";
+import * as ElectricityService from "../services/electricity.service.mjs";
 
 async function flutterwave(req, res) {
   const { body } = req;
   console.log(req.body, "=========boddyyyy Flutterwave webhook")
-  // switch (req.body["event.type"]) {
-  //   case 'CARD_TRANSACTION':
-  //     const meta_data = req.body.meta_data;
-  //     switch (meta_data.type) {
-  //       case 'initiated-bill-payment':
-  //         break;
-  //       default:
-  //         break;
-  //     }
-  //     return res.status(200).end();
-  //     break;
+  switch (req.body["event.type"]) {
+    case 'CARD_TRANSACTION':
+      const meta_data = req.body.meta_data;
+      switch (meta_data.type) {
+        case 'initiated-bill-payment':
+          ElectricityService.initiateBillPaymentFromWebhook(req.body);
+          return res.status(200).end();
+          break;
+        default:
+          break;
+      }
+      break;
 
-  //   case 'SingleBillPayment':        // Use to handle electricity bill payment
-  //     ElectricityService.updateBillStatusFromWebhook(req.body);
-  //     break;
-  //   default:
-  //     break;
-
-  // }
+    case 'SingleBillPayment':        // Use to handle electricity bill payment
+      ElectricityService.updateBillStatusFromWebhook(req.body);
+      break;
+    default:
+      break;
+  }
   const { meta_data } = body;
   let { wallet } = meta_data
   if (wallet === "true") {
