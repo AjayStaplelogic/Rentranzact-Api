@@ -7,6 +7,8 @@ import authorizer from '../middleware/authorizer.middleware.mjs';
 router.get("/electricity/billers", authorizer([UserRoles.RENTER]), electricity.getAllBillers);
 router.get("/electricity/billers/bills", authorizer([UserRoles.RENTER]), electricity.getAllBillerBills);
 router.post("/electricity/billers/bills/validate", authorizer([UserRoles.RENTER]), electricity.payElectricityBill); 
+router.get("/electricity/bill-history", authorizer([UserRoles.RENTER]), electricity.getBillHistory); 
+
 
 
 
