@@ -52,10 +52,6 @@ const schema = new Schema({
     transaction_id : {  // Transaction id when charging to customer
         type: String
     },
-    refund_status : {
-        type : String,
-        default : "initiated"
-    },
     refund_id : {
         type: mongoose.Types.ObjectId,
         ref: "refunds",
