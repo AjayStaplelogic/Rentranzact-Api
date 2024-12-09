@@ -20,6 +20,7 @@ async function flutterwave(req, res) {
 
     case 'SingleBillPayment':        // Use to handle electricity bill payment
       ElectricityService.updateBillStatusFromWebhook(req.body);
+      return res.status(200).end();
       break;
     default:
       break;
