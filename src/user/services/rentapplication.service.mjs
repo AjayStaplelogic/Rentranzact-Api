@@ -214,7 +214,7 @@ async function addRentApplicationService(body, user) {
           user_update_payload.fullName.concat(' ', data.lastName)
         }
 
-        if (!isKinSame) {
+        // if (!isKinSame) {
           user_update_payload.kinDetails = {
             first_name: data.kinFirstName,
             last_name: data.kinLastName,
@@ -228,7 +228,7 @@ async function addRentApplicationService(body, user) {
             relationshipKin: data.relationshipKin,
             identificationType: data.verifcationType,
           }
-        }
+        // }
 
         User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
