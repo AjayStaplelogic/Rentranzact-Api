@@ -202,7 +202,7 @@ async function addRentApplicationService(body, user) {
             employerName: data.employerName,
             employerAddress: data.employerAddress,
             employmentStatus: data.employmentStatus,
-            occupation : data.occupation
+            occupation: data.occupation
           }
         };
         user_update_payload.fullName = data.firstName;
@@ -215,22 +215,24 @@ async function addRentApplicationService(body, user) {
         }
 
         // if (!isKinSame) {
-          user_update_payload.kinDetails = {
-            first_name: data.kinFirstName,
-            last_name: data.kinLastName,
-            middle_name: data.kinMiddleName,
-            bvn: data.bvn,
-            dob: data.kinDOB,
-            nin: data.nin,
-            voter_id: data.voter_id,
-            kinContactNumber: data.kinContactNumber,
-            kinEmail: data.kinEmail,
-            relationshipKin: data.relationshipKin,
-            identificationType: data.verifcationType,
-          }
+        user_update_payload.kinDetails = {
+          first_name: data.kinFirstName,
+          last_name: data.kinLastName,
+          middle_name: data.kinMiddleName,
+          bvn: data.bvn,
+          dob: data.kinDOB,
+          nin: data.nin,
+          voter_id: data.voter_id,
+          kinContactNumber: data.kinContactNumber,
+          kinEmail: data.kinEmail,
+          relationshipKin: data.relationshipKin,
+          identificationType: data.verifcationType,
+        }
         // }
+        console.log(user_update_payload, '==========user_update_payload', renterID);
 
-        User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
+       const updatedRenter = await User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
+       console.log(updatedRenter, '==========updatedRenter',)
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
           if (landlordDetails) {
             let notification_payload = {};
@@ -278,7 +280,7 @@ async function addRentApplicationService(body, user) {
             notification_payload.send_to = propertyManagerDetails._id;
             notification_payload.property_manager_id = propertyManagerDetails._id;
             notification_payload.amount = landlord.rent;
-            
+
             const metadata = {
               "propertyID": landlord._id.toString(),
               "redirectTo": "rentApplication",
@@ -548,7 +550,7 @@ async function updateRentApplications(body, id) {
                   "rentApplication": data._id.toString()
                 }
                 NotificationService.createNotification(notification_payload, metadata, renterDetails)
-    
+
                 // let create_notification = await Notification.create(notification_payload);
                 // if (create_notification) {
                 //   if (renterDetails && renterDetails.fcmToken) {
@@ -638,7 +640,7 @@ async function updateRentApplications(body, id) {
                 "rentApplication": data._id.toString()
               }
               NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-  
+
 
               // let create_notification = await Notification.create(notification_payload);
               // if (create_notification) {
