@@ -44,4 +44,12 @@ async function flutterwave(req, res) {
   return res.status(200).end();
 }
 
-export { flutterwave };
+async function flutterwaveRefundsWehook(req, res) {
+  // Implement your refund webhook logic here
+  console.log("Flutterwave refund webhook triggered")
+  const { id } = req.body;
+
+  return res.status(200).end();
+
+}
+export { flutterwave, flutterwaveRefundsWehook };

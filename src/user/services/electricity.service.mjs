@@ -7,6 +7,8 @@ import { User } from "../models/user.model.mjs";
 import * as Constants from "../enums/common.mjs"
 import { ERefundfor } from "../enums/refunds.enum.mjs";
 import Refunds from "../models/refunds.model.mjs";
+import * as NotificationService from "../services/notification.service.mjs"
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 
 const config = {
     headers: {
@@ -195,7 +197,7 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                                 amount: updatedBill.amount_charge_to_cust,
                                 meter_number: meta_data.meter_number
                             });
-                        }).catch(error=>{
+                        }).catch(error => {
                             console.log(error, '=====error initiate bill payment 11')
                             // logic to refund for charge created before
                             createBillRefund(webhook_obj.id, bill._id, meta_data.meter_number);
@@ -243,7 +245,14 @@ export const verifyTransaction = (transaction_id) => {
 export const createRefund = async (transaction_id, amount = 0) => {
     const url = `${flutterWaveBaseUrl}/v3/transactions/${transaction_id}/refund`;
     const payload = {
-        comments: "Bill payment refund"
+        comments: "Bill payment refund",
+        callbackurl: `${process.env.BACKEND_URL}/api/webhook/flutterwave/refunds`,
+        meta_data: {
+            user_id: "123456789",
+            amount: "testing",
+            bill_id: "123456789",
+            meter_number: "123456789"
+        }
     }
     if (amount > 0) {                 // In Case of partial refund
         payload.amount = amount
@@ -257,29 +266,29 @@ export const createRefund = async (transaction_id, amount = 0) => {
     })
 }
 
-// console.log(await createRefund("8238271"))
+// console.log(await createRefund("8260339"))
 
 export const createBillRefund = async (transaction_id, bill_id, meter_number) => {
     const verifiedTransaction = await verifyTransaction(transaction_id);  // Verify transaction in flutterwave before initiating refunds
     if (verifiedTransaction) {
-        const createRefund = await createRefund(transaction_id);
-        if (createRefund) {
+        const createdRefund = await createRefund(transaction_id);
+        if (createdRefund) {
             const payload = {
                 gateway_type: Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,
                 type: ERefundfor.bill_payment,
                 bill_id: bill_id ?? null,
                 user_id: verifiedTransaction?.data?.meta?.user_id,
-                refund_id: createRefund?.data?.id,
-                account_id: createRefund?.data?.account_id,
-                tx_id: createRefund?.data?.tx_id,
-                flw_ref: createRefund?.data?.flw_ref,
-                wallet_id: createRefund?.data?.wallet_id,
-                amount_refunded: createRefund?.data?.amount_refunded,
-                status: createRefund?.data?.status,
-                destination: createRefund?.data?.destination,
-                comments: createRefund?.data?.comments,
-                reference: createRefund?.data?.reference,
-                fee: createRefund?.data?.fee
+                refund_id: createdRefund?.data?.id,
+                account_id: createdRefund?.data?.account_id,
+                tx_id: createdRefund?.data?.tx_id,
+                flw_ref: createdRefund?.data?.flw_ref,
+                wallet_id: createdRefund?.data?.wallet_id,
+                amount_refunded: createdRefund?.data?.amount_refunded,
+                status: createdRefund?.data?.status,
+                destination: createdRefund?.data?.destination,
+                comments: createdRefund?.data?.comments,
+                reference: createdRefund?.data?.reference,
+                fee: createdRefund?.data?.fee
             }
 
             Refunds.create(payload).then(refund_data => {
@@ -320,8 +329,19 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
                 };
 
                 switch (bill.status) {
-                    case "successful":
-                        electricityEmails.electricityBillPaid(payload)
+                    case "success":
+                        electricityEmails.electricityBillPaid(payload);
+                        // Sending notification to payer
+                        var notification_payload = {};
+                        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.electricity_bill_view;
+                        notification_payload.notificationHeading = "Electricity Bill Paid";
+                        notification_payload.notificationBody = `Your electricity Bill of ${bill.amount_charge_to_cust} has been successfully paid`;
+                        notification_payload.send_to = user._id;
+                        var metadata = {
+                            "redirectTo": "electricity_bill_view",
+                        }
+
+                        NotificationService.createNotification(notification_payload, metadata, null);
                         break;
 
                     case "failed":
@@ -329,6 +349,18 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
 
                         // Bellow write a code for refund
                         createBillRefund(bill.transaction_id, bill._id, bill.meter_number);
+
+                        // Sending notification to payer
+                        var notification_payload = {};
+                        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.electricity_bill_view;
+                        notification_payload.notificationHeading = "Electricity Bill Payment Failed";
+                        notification_payload.notificationBody = `Your electricity Bill of ${bill.amount_charge_to_cust} has been failed. Refund will be initiated shortly`;
+                        notification_payload.send_to = user._id;
+                        var metadata = {
+                            "redirectTo": "electricity_bill_view",
+                        }
+
+                        NotificationService.createNotification(notification_payload, metadata, null);
                         break;
 
                     default:
@@ -336,4 +368,30 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
                 }
             })
     })
+}
+
+export const updateBillRefundStatus = (refund_data) => {
+    // Your code here to update bill refund status
+    Bills.findOneAndUpdate({
+        _id: refund_data.bill_id,
+        isDeleted: false,
+    }, {
+        refund_id: refund_data._id,
+        refund_status: refund_data.status
+    },
+        {
+            new: true
+        }
+    ).then((bill_data) => {
+        User.findById(bill_data.user_id).then(user => {
+            electricityEmails.electricityBillRefundCompleted({
+                email: user.email,
+                fullName: user.fullName,
+                amount: refund_data.amount_refunded,
+                meter_number: bill_data.meter_number,
+                status : refund_data.status
+            });
+        })
+    })
+
 }
