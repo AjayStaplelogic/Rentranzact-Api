@@ -293,6 +293,12 @@ export const createBillRefund = async (transaction_id, bill_id, meter_number) =>
 
             Refunds.create(payload).then(refund_data => {
                 User.findById(refund_data.user_id).then(user => {
+                    electricityEmails.electricityBillFailed({
+                        email: user.email,
+                        fullName: user.fullName,
+                        amount: refund_data.amount_refunded,
+                        meter_number: meter_number
+                    });
                     electricityEmails.electricityBillRefundInitiated({
                         email: user.email,
                         fullName: user.fullName,
@@ -302,7 +308,7 @@ export const createBillRefund = async (transaction_id, bill_id, meter_number) =>
                     if (refund_data.bill_id) {
                         Bills.findByIdAndUpdate(refund_data.bill_id, {
                             refund_id: refund_data._id,
-                            status : "fail",
+                            status: "fail",
                         }).then(update_bill => {
                         })
                     }
