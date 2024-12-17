@@ -301,7 +301,8 @@ export const createBillRefund = async (transaction_id, bill_id, meter_number) =>
                     });
                     if (refund_data.bill_id) {
                         Bills.findByIdAndUpdate(refund_data.bill_id, {
-                            refund_id: refund_data._id
+                            refund_id: refund_data._id,
+                            status : "fail",
                         }).then(update_bill => {
                         })
                     }
