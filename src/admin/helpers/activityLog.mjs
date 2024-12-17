@@ -8,3 +8,4 @@ async function activityLog(empID, body) {
 }
 
 export default activityLog;
+

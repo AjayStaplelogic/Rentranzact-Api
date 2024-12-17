@@ -72,33 +72,11 @@ export const payElectricityBill = async (req, res) => {
 
         const validate_bill = await ElectricityService.validateBill(req.body.item_code, req.body.biller_code, req.body.meter_number);
         if (validate_bill) {
-            // const platform_fee_percentage = 10;
-            // const platform_fee = (req.body.amount * platform_fee_percentage) / 100;
-            // const createCharge = await ElectricityService.createCharge({
-            //     amount: Number(req.body.amount) + Number(platform_fee),
-            //     customer_email: req?.user?.data?.email,
-            //     customer_phone_number: req?.user?.data?.phone ?? "",
-            //     customer_name: req?.user?.data?.fullname,
-            //     meta_data: {
-            //         type: "initiated-bill-payment",
-            //         user_id: `${req?.user?.data?._id}`,
-            //         meter_number: validate_bill?.data?.customer,
-            //         amount: req.body.amount,
-            //         biller_code: validate_bill?.data?.biller_code,
-            //         item_code: validate_bill?.data?.product_code,
-            //     }
-            // });
-
-            // console.log(createCharge, '====createCharge')
-            // if (createCharge) {
-            //     const resData = {
-            //         url: createCharge?.data?.link
-            //     }
-                return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
-            // }
-            // throw "Unable to create payment request. Please try again later.";
+            return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
         }
-        throw "Invalid bill information";
+        // throw "Invalid bill information";
+        return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
+
     } catch (error) {
         console.log(error, '======error')
         return sendResponse(res, null, error.message, false, 400);

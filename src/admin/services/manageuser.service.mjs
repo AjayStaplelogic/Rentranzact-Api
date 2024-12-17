@@ -5,10 +5,11 @@ import pkg from "bcrypt";
 import activityLog from "../helpers/activityLog.mjs";
 import * as referralService from "../../user/services/referral.service.mjs";
 import CreditScores from "../../user/models/creditscore.model.mjs";
+import { Admin } from "../models/admin.model.mjs";
 
 async function addUserByAdmin(body) {
 
-  let { password, role, email } = body;
+  let { password, role, email, current_user_id } = body;
 
   const isUser = await User.exists({ email: email, deleted: false })
 
@@ -38,7 +39,10 @@ async function addUserByAdmin(body) {
     const data = new User(body);
     data.save();
 
-    await activityLog(data._id, `created new user ${data.fullName}`)
+    // await activityLog(data._id, `created new user ${data.fullName}`)
+
+    activityLog(current_user_id, `added a ${data.role} `)
+
     return {
       data: data,
       message: "user created",
@@ -92,7 +96,7 @@ async function getUserByID(id) {
   };
 }
 
-async function deleteUserService(id) {
+async function deleteUserService(id, current_user_id) {
 
   const data = await User.findByIdAndUpdate(id, {    // changed this because earlier there was no checks mantained
     deleted: true
@@ -106,7 +110,8 @@ async function deleteUserService(id) {
     })
   }
 
-  await activityLog(data._id, `deleted a user ${data.fullName}`)
+  // await activityLog(data._id, `deleted a user ${data.fullName}`);
+  activityLog(current_user_id, `deleted a ${data.role} name ${data.fullName} `);
   return {
     data: null,
     message: `deleted user successfully`,
