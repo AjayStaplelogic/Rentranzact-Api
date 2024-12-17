@@ -1,20 +1,32 @@
-PORT = 8080
-SAVE_LOGS = false
-DATABASE_URL = mongodb://mongo_db:27017/Rentranzact
-
-JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_dev
-JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_dev
+PORT = 3003
+SAVE_LOGS = true
+DATABASE_URL =  mongodb://18.228.56.44:27020/Rentranzact
+JWT_ACCESS_TOKEN_SECRET = rentranzact_access_secret_for_prod
+JWT_REFRESH_TOKEN_SECRET = rentranzact_refresh_token_secret_for_prod
 SALT = 10
 STRIPE_SECRET_KEY = sk_test_51MjOBYIqUp9zeP6EgD6MynDrUfFBhueJSuCIBIxFFmDiszXyxkU41nVCiDD91DIjrp12lqqKi69Rd6mqg3X3tPcb00H8G4idhL
-HOST_URL = http://localhost:8080/
+HOST_URL = https://api.rentranzact.com/
 GOOGLE_CLIENT_ID = 550090857989-qqjf9m568ab1d41g6ih3rvqktimuo8d2.apps.googleusercontent.com
-ADMIN_JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_dev_admin
+ADMIN_JWT_ACCESS_TOKEN_SECRET = rentranzact_access_token_secret_for_prod_admin
+FRONTEND_URL = https://rentranzact.com
+BACKEND_URL = https://api.rentranzact.com
+TWAK_TO_WEBHOOK_SECRET = 59491282da45bc3177b8d18c9a249e63be6b1d05b453e4f09520f87369d2d6209d1d9181360ea79341834cfa9f071660
+CREDIT_SCORE_BASE_URL = https://api.creditchek.africa/v1
+CREDIT_SCORE_PUBLIC_KEY = 1QAexV2tTU1eU9CXOyAlHzQdKfQ8o09hrMV4MoL2wKBIqhP2/3lmByPLT5MTnbLD
+FLUTTERWAVE_SECRET = FLWSECK_TEST-34f1b09b58795ca89732c7f5278452af-X
 
 //sendgrid credentials
-  USERNAME = apikey
-  PASSWORD = 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
-  SMTP = smtp.sendgrid.net
-  SENDGRID_PORT = 587
-  FROM = rentranzact@yopmail.com
-  REPLY = rentranzact@yopmail.com
+  // USERNAME = apikey
+  // PASSWORD = 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
+  // SMTP = smtp.sendgrid.net
+  // SENDGRID_PORT = 587
+  // FROM = rentranzact@yopmail.com
+  // REPLY = rentranzact@yopmail.com
 
+  //Nodemailer Gmail credentials
+  USERNAME = rentranzactltd@gmail.com
+  PASSWORD = hgkvlroftyulldmy
+  SMTP = gmail
+  SENDGRID_PORT = 587
+  FROM = rentranzactltd@gmail.com
+  REPLY = rentranzactltd@gmail.com

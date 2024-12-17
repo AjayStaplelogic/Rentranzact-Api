@@ -14,6 +14,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import * as NotificationService from "../../user/services/notification.service.mjs";
+import { Admin } from "../models/admin.model.mjs";
 
 
 async function properties(req, res) {
@@ -385,7 +386,7 @@ async function updatePropertyApprovalStatus(req, res) {
       return sendResponse(res, [], errorMessage, false, 403);
     }
 
-    const { id, status } = req.body;
+    const { id, status, current_user_id } = req.body;
 
     if (!id || !status) {
       return sendResponse(res, {}, 'id and status are required', false, 400);
@@ -424,6 +425,9 @@ async function updatePropertyApprovalStatus(req, res) {
         }
 
         NotificationService.createNotification(notification_payload, metadata, get_send_to_details);
+
+
+        activityLog(current_user_id, `reviewed property and changed status to ${update_property?.approval_status} `);
 
         // const create_notification = await Notification.create(notification_payload);
         // if (create_notification) {

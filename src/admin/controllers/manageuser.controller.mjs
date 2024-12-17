@@ -49,8 +49,9 @@ async function user(req, res) {
 
 async function deleteUser(req, res) {
   const { id } = req.params;
+  const { current_user_id } = req.query;
 
-  const data = await deleteUserService(id);
+  const data = await deleteUserService(id, current_user_id);
 
   sendResponse(
     res,
