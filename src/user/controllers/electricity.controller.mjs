@@ -74,12 +74,13 @@ export const payElectricityBill = async (req, res) => {
         if (validate_bill) {
             return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
         }
-        // throw "Invalid bill information";
-        return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
+        throw "Invalid bill information";
 
     } catch (error) {
         console.log(error, '======error')
-        return sendResponse(res, null, error.message, false, 400);
+        // return sendResponse(res, null, error.message, false, 400);
+        return sendResponse(res, null, error.message, true, 200);
+
     }
 }
 
