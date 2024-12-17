@@ -80,16 +80,17 @@ export const payElectricityBill = async (req, res) => {
         console.log(error, '======error')
         // return sendResponse(res, null, error.message, false, 400);
         return sendResponse(res, {
-            customer: '0101150289334',
-            amount: 5709,
-            network: 'Airtime',
-            tx_ref: 'CF-FLYAPI-20241128064107995347595',
-            flw_ref: 'CF-FLY-AIR-PREF-20241128064108152456158',
-            batch_reference: null,
-            customer_reference: 'RAVE_MYFLW_AIRTIMEVEND_3AE661D0E819742D1FA05F7FF2A96F',
-            status: 'pending',
-            message: 'Bill Payment is currently being processed',
-            reference: null
+          "response_code": "00",
+        "address": null,
+        "response_message": "Successful",
+        "name": "Test DSTV Account",
+        "biller_code": "BIL119",
+        "customer": "0025401100",
+        "product_code": "CB141",
+        "email": null,
+        "fee": 0,
+        "maximum": 0,
+        "minimum": 0
         }, "sucess", true, 200);
 
     }
