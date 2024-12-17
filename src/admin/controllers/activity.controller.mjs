@@ -51,12 +51,33 @@ export const getAllActivityLogs = async(req, res) =>{
                 $match: query
             },
             {
+                $lookup: {
+                    from: "admins",
+                    localField: "empID",
+                    foreignField: "_id",
+                    as: "employee"
+                }
+            },
+            {
+                $unwind : {
+                    path: "$employee",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     id: "$_id",
                     createdAt: "$createdAt",
                     updatedAt: "$updatedAt",
                     empID: "$empID",
-                    body: "$body",
+                    // body: "$body",
+                    body : {
+                        $concat : [
+                            "$employee.fullName",
+                            " - ",
+                            "$body"
+                        ]
+                    }
                 }
             },
             {
