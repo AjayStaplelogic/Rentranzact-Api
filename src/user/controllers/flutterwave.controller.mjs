@@ -1,6 +1,8 @@
 import { addFlutterwaveTransaction, addToWallet, addFlutterwaveTransactionForOld } from "../services/flutterwave.service.mjs";
 import { Property } from "../models/property.model.mjs";
 import * as ElectricityService from "../services/electricity.service.mjs";
+import * as RefundService from "../services/refund.service.mjs";
+import * as Constants from "../enums/common.mjs"
 
 async function flutterwave(req, res) {
   const { body } = req;
@@ -46,8 +48,13 @@ async function flutterwave(req, res) {
 
 async function flutterwaveRefundsWehook(req, res) {
   // Implement your refund webhook logic here
-  console.log("Flutterwave refund webhook triggered")
-  const { id } = req.body;
+  console.log("Flutterwave refund webhook triggered");
+  console.log("*********************************************")
+  console.log(req.body, '==============req.body')
+  console.log("*********************************************")
+
+  // const { id } = req.body;
+  RefundService.updateRefundStatusFromWebhook(Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,  req.body)
 
   return res.status(200).end();
 
