@@ -15,6 +15,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import * as NotificationService from "../../user/services/notification.service.mjs";
 import { Admin } from "../models/admin.model.mjs";
+import activityLog from "../helpers/activityLog.mjs";
 
 
 async function properties(req, res) {
