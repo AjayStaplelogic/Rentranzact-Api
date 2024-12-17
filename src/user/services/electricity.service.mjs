@@ -377,7 +377,8 @@ export const updateBillRefundStatus = (refund_data) => {
         isDeleted: false,
     }, {
         refund_id: refund_data._id,
-        refund_status: refund_data.status
+        refund_status: refund_data.status,
+        status: "fail"
     },
         {
             new: true
@@ -389,7 +390,7 @@ export const updateBillRefundStatus = (refund_data) => {
                 fullName: user.fullName,
                 amount: refund_data.amount_refunded,
                 meter_number: bill_data.meter_number,
-                status : refund_data.status
+                status: refund_data.status
             });
         })
     })
