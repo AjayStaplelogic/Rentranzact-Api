@@ -244,7 +244,9 @@ export const updateApprovalStatus = async (req, res) => {
                     return sendResponse(res, null, "Transfer status already in requested status", false, 403);
                 }
 
-                const payload = {};
+                const payload = {
+                    status : status
+                };
                 switch (status) {
                     case ETRANSFER_STATUS.approvedByEmp:
                         payload.approvedByEmpAt = new Date();
