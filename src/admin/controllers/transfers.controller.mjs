@@ -212,7 +212,7 @@ export const updateTransferStatus = async (req, res) => {
 
 export const updateApprovalStatus = async (req, res) => {
     try {
-        const { isError, errors } = validator(req.body, TransferValidations.updateTransferStatus);
+        const { isError, errors } = validator(req.body, TransferValidations.updateApprovalStatus);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
             return sendResponse(res, [], errorMessage, false, 403);
