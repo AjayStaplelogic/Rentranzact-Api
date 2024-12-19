@@ -77,6 +77,12 @@ const schema = new Schema({
     rejectedAt: {
         type: Date
     },
+    approvedByEmpAt: {
+        type: Date
+    },
+    rejectedByEmpAt: {
+        type: Date
+    },
     property_name: {
         type: String
     },

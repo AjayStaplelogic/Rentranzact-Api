@@ -7,6 +7,8 @@ export const ETRANSFER_TYPE = {
 
 export const ETRANSFER_STATUS = {
     pending: "pending",
+    approvedByEmp : "approved-by-emp",
+    rejectedByEmp: "rejected-by-emp",
     transferred: "transferred",
     rejected: "rejected"
 }
