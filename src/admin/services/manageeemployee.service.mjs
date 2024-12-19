@@ -37,7 +37,6 @@ async function getEmployeeService(pageNo, pageSize, req) {
 }
 
 async function addEmployeeService(body) {
-  const { current_user_id } = req.body;
   const userExist = await Admin.findOne({ email: body.email.toLowerCase().trim(), isDeleted: false });
 
   if (userExist) {
