@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ReviewTypeEnum, EReviewStatus } from "../enums/review.enum.mjs"
+import { ReviewTypeEnum, EReviewStatus, EReviewReportStatus } from "../enums/review.enum.mjs"
 
 const reviewSchema = new mongoose.Schema({
     type: {
@@ -86,14 +86,21 @@ const reviewSchema = new mongoose.Schema({
         type: String,
         // enum: ["pending", "accepted", "rejected"],
         enum: Object.values(EReviewStatus),
-        default: EReviewStatus.accepted 
+        default: EReviewStatus.accepted
     },
     accepted_at: {
         type: Date
     },
     rejected_at: {
         type: Date
-    }
+    },
+    report_status: {         
+        type: String,
+        enum: Object.values(EReviewReportStatus),
+    },
+    reported_at: {
+        type: Date
+    },
 }, {
     timestamps: true,
     toJSON: true,

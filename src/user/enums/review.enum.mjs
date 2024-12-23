@@ -18,3 +18,9 @@ export const EReviewStatus = {
     accepted: "accepted",
     rejected: "rejected"
 }
+
+export const EReviewReportStatus = {
+    reported: "reported",
+    accepted: "accepted",
+    rejected: "rejected"
+}
