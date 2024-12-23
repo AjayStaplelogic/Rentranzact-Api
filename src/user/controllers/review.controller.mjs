@@ -3,7 +3,7 @@ import { Reviews } from "../models/reviews.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import * as ReviewServices from "../services/review.service.mjs";
 import mongoose from "mongoose";
-import { ReviewTypeEnum } from "../enums/review.enum.mjs";
+import { EReviewReportStatus, ReviewTypeEnum } from "../enums/review.enum.mjs";
 
 export const addUpdateReview = async (req, res) => {
     try {
@@ -64,8 +64,7 @@ export const addUpdateReview = async (req, res) => {
 
 export const getAllReviews = async (req, res) => {
     try {
-        // console.log("[Review Listing]")
-        let { type, user_id, property_id, landloard_id, review_to_id, search, rating, status, sortBy } = req.query;
+        let { type, user_id, property_id, landloard_id, review_to_id, search, rating, status, sortBy, report_status } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = { isDeleted: false };
@@ -77,6 +76,7 @@ export const getAllReviews = async (req, res) => {
         if (review_to_id) { query.review_to_id = new mongoose.Types.ObjectId(review_to_id) };
         if (rating) { query.rating = Number(rating) }
         if (status) { query.status = status };
+        if (report_status) { query.report_status = report_status };
         let skip = Number(page - 1) * count;
         if (search) {
             query2.$or = [
@@ -302,6 +302,66 @@ export const deleteReview = async (req, res) => {
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);
 
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const updateReportStatus = async (req, res) => {
+    try {
+        let { id, report_status } = req.body;
+        if (!id) {
+            return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        if (!report_status) {
+            return sendResponse(res, {}, "Status reqired", false, 400);
+        }
+
+        if (!Object.values(EReviewReportStatus).includes(report_status)) {
+            return sendResponse(res, {}, "Invalid status", false, 400);
+        }
+
+        const get_review = await Reviews.findOne({
+            _id: id,
+            isDeleted: false,
+        });
+
+        if (get_review) {
+            if (get_review.report_status === report_status) {
+                return sendResponse(res, {}, "Review already has this status", false, 400);
+            }
+
+            if ([EReviewReportStatus.accepted, EReviewReportStatus.rejected].includes(get_review.report_status)) {
+                return sendResponse(res, {}, "Review reported has been finanlised, Can't update further", false, 400);
+            }
+
+            let update_payload = {
+                report_status: report_status
+            };
+
+            switch (report_status) {
+                case EReviewReportStatus.reported:
+                    update_payload.reported_at = new Date();
+                    break;
+                case EReviewReportStatus.accepted:
+                    update_payload.accepted_at = new Date();
+                    break;
+                case EReviewReportStatus.rejected:
+                    update_payload.rejected_at = new Date();
+                    break;
+            }
+
+            let update_review = await Reviews.findOneAndUpdate({
+                _id: id,
+                isDeleted: false
+            }, update_payload, { new: true });
+
+            if (update_review) {
+                return sendResponse(res, {}, "success", true, 200);
+            }
+        }
+        return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
     }

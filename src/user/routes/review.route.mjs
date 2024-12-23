@@ -10,6 +10,8 @@ router.get('/reviews', reviewController.getAllReviews);
 router.get('/review', reviewController.getReviewById);
 router.put('/review/change-status', reviewController.changeReviewStatus);
 router.delete('/review', reviewController.deleteReview);
+router.put('/review/report/update-status', reviewController.updateReportStatus);
+
 
 
 export default router;
