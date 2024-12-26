@@ -345,7 +345,6 @@ export const updateReportStatus = async (req, res) => {
 
             let update_payload = {
                 report_status: report_status,
-                updated_by: req.user.data._id
             };
 
             switch (report_status) {
