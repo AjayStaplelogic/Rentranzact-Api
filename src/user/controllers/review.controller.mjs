@@ -326,7 +326,7 @@ export const updateReportStatus = async (req, res) => {
         const get_review = await Reviews.findOne({
             _id: id,
             isDeleted: false,
-            landloard_id: req.user.data._id
+            // landloard_id: req.user.data._id
         });
 
         if (get_review) {
