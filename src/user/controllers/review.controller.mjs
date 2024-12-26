@@ -310,7 +310,7 @@ export const deleteReview = async (req, res) => {
 
 export const updateReportStatus = async (req, res) => {
     try {
-        let { id, report_status } = req.body;
+        let { id, report_status, report_reason } = req.body;
         if (!id) {
             return sendResponse(res, {}, "Id required", false, 400);
         }
@@ -326,9 +326,14 @@ export const updateReportStatus = async (req, res) => {
         const get_review = await Reviews.findOne({
             _id: id,
             isDeleted: false,
+            landloard_id: req.user.data._id
         });
 
         if (get_review) {
+            if (get_review.type != ReviewTypeEnum.property) {
+                return sendResponse(res, {}, "Only property reviews can be reported", false, 400);
+            }
+
             if (get_review.report_status === report_status) {
                 return sendResponse(res, {}, "Review already has this status", false, 400);
             }
@@ -338,12 +343,14 @@ export const updateReportStatus = async (req, res) => {
             }
 
             let update_payload = {
-                report_status: report_status
+                report_status: report_status,
+                updated_by: req.user.data._id
             };
 
             switch (report_status) {
                 case EReviewReportStatus.reported:
                     update_payload.reported_at = new Date();
+                    update_payload.report_reason = report_reason ?? "";
                     break;
                 case EReviewReportStatus.accepted:
                     update_payload.accepted_at = new Date();
@@ -356,7 +363,7 @@ export const updateReportStatus = async (req, res) => {
             let update_review = await Reviews.findOneAndUpdate({
                 _id: id,
                 isDeleted: false
-            }, update_payload, { new: true });
+            }, update_payload);
 
             if (update_review) {
                 return sendResponse(res, {}, "success", true, 200);

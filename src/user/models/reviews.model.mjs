@@ -84,7 +84,6 @@ const reviewSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        // enum: ["pending", "accepted", "rejected"],
         enum: Object.values(EReviewStatus),
         default: EReviewStatus.accepted
     },
@@ -101,6 +100,9 @@ const reviewSchema = new mongoose.Schema({
     reported_at: {
         type: Date
     },
+    report_reason : {
+        type: String
+    }
 }, {
     timestamps: true,
     toJSON: true,
