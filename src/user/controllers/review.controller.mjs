@@ -177,7 +177,8 @@ export const getAllReviews = async (req, res) => {
                     review_to_id: "$review_to_id",
                     review_to_name: "$review_to_details.fullName",
                     review_to_image: "$review_to_details.picture",
-                    report_status: "$report_status"
+                    report_status: "$report_status",
+                    report_reason: "$report_reason"
                 }
             },
             {
@@ -344,7 +345,6 @@ export const updateReportStatus = async (req, res) => {
 
             let update_payload = {
                 report_status: report_status,
-                updated_by: req.user.data._id
             };
 
             switch (report_status) {
