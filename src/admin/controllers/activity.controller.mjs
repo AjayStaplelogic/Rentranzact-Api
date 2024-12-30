@@ -20,21 +20,22 @@ const ObjectId = mongoose.Types.ObjectId;
 
 // export { activity }
 
-export const getAllActivityLogs = async(req, res) =>{
+export const getAllActivityLogs = async (req, res) => {
     try {
         let { search, sortBy, empID } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
+        let query2 = {};
 
         let skip = Number(page - 1) * count;
         if (search) {
-            query.$or = [
+            query2.$or = [
                 { body: { $regex: search, $options: 'i' } },
             ]
         }
 
-        if(empID){
+        if (empID) {
             query.empID = new ObjectId(empID);
         }
 
@@ -59,7 +60,7 @@ export const getAllActivityLogs = async(req, res) =>{
                 }
             },
             {
-                $unwind : {
+                $unwind: {
                     path: "$employee",
                     preserveNullAndEmptyArrays: true
                 }
@@ -71,14 +72,20 @@ export const getAllActivityLogs = async(req, res) =>{
                     updatedAt: "$updatedAt",
                     empID: "$empID",
                     // body: "$body",
-                    body : {
-                        $concat : [
+                    body: {
+                        $concat: [
                             "$employee.fullName",
+                            " (",
+                            "$employee.role",
+                            ")",
                             " - ",
                             "$body"
                         ]
                     }
                 }
+            },
+            {
+                $match: query2
             },
             {
                 $facet: {

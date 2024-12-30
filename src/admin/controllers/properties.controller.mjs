@@ -428,7 +428,7 @@ async function updatePropertyApprovalStatus(req, res) {
         NotificationService.createNotification(notification_payload, metadata, get_send_to_details);
 
 
-        activityLog(current_user_id, `reviewed property and changed status to ${update_property?.approval_status} `);
+        activityLog(current_user_id, `reviewed the property "${update_property?.propertyName ?? ""}" and changed status to ${update_property?.approval_status} `);
 
         // const create_notification = await Notification.create(notification_payload);
         // if (create_notification) {
