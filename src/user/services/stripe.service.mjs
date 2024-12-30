@@ -24,7 +24,7 @@ async function payRentService(body, userID) {
     console.log(typeof wallet, "--------wallet typeof ")
 
     let payload = {
-        amount: amount,
+        amount: amount * 100,
         currency: 'NGN',
         automatic_payment_methods: {
             enabled: true,
