@@ -13,3 +13,10 @@ export const updateApprovalStatus = Joi.object().keys({
     description: Joi.string().optional().allow(""),
 });
 
+
+export const updateInitiateApprovalStatus = Joi.object().keys({
+    id: Joi.string().required(),
+    status: Joi.string().required().valid(ETRANSFER_STATUS.initiated, ETRANSFER_STATUS.initiateRejected),
+    description: Joi.string().optional().allow(""),
+});
+
