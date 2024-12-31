@@ -100,7 +100,7 @@ export const getAllTransfers = async (req, res) => {
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
-}
+};
 
 export const getTransferById = async (req, res) => {
     try {
@@ -121,7 +121,7 @@ export const getTransferById = async (req, res) => {
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
-}
+};
 
 export const updateTransferStatus = async (req, res) => {
     try {
@@ -209,7 +209,6 @@ export const updateTransferStatus = async (req, res) => {
     }
 };
 
-
 export const updateApprovalStatus = async (req, res) => {
     try {
         const { isError, errors } = validator(req.body, TransferValidations.updateApprovalStatus);
@@ -263,6 +262,71 @@ export const updateApprovalStatus = async (req, res) => {
                     let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                     if (update_transfer) {
                         return sendResponse(res, null, "Approval status updated successfully", true, 200);
+                    }
+                }
+                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+            }
+            return sendResponse(res, null, "Invalid recipient", false, 400);
+        }
+        return sendResponse(res, null, "Data not found", false, 404);
+    } catch (error) {
+        return sendResponse(res, null, `${error}`, false, 400)
+    }
+};
+
+export const updateInitiateApprovalStatus = async (req, res) => {
+    try {
+        const { isError, errors } = validator(req.body, TransferValidations.updateInitiateApprovalStatus);
+        if (isError) {
+            let errorMessage = errors[0].replace(/['"]/g, "")
+            return sendResponse(res, [], errorMessage, false, 403);
+        }
+
+        const { id, status } = req.body;
+
+        const get_transfer = await Transfers.findOne({
+            _id: id,
+            isDeleted: false
+        });
+
+        if (get_transfer) {
+
+            const get_recipient = await User.findOne({
+                _id: get_transfer.to
+            });
+            if (get_recipient) {
+
+                if ([ETRANSFER_STATUS.rejectedByEmp, ETRANSFER_STATUS.rejected, ETRANSFER_STATUS.initiateRejected].includes(get_transfer.status)) {
+                    return sendResponse(res, null, "Transfer already rejected", false, 403);
+                }
+
+                if ([ETRANSFER_STATUS.transferred,  ETRANSFER_STATUS.approvedByEmp].includes(get_transfer.status)) {
+                    return sendResponse(res, null, "Already transfered and approved", false, 403);
+                }
+
+                if (get_transfer.status === status) {
+                    return sendResponse(res, null, "Transfer status already in requested status", false, 403);
+                }
+
+                const payload = {
+                    status : status
+                };
+                // switch (status) {
+                //     case ETRANSFER_STATUS.initiated:
+                //         payload.approvedByEmpAt = new Date();
+                //         break;
+                //     case ETRANSFER_STATUS.rejectedByEmp:
+                //         payload.rejectedByEmpAt = new Date();
+                //         break;
+                //     default:
+                //         return sendResponse(res, null, "Invalid status", false, 400);
+                // }
+
+                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                if (get_connected_account) {
+                    let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                    if (update_transfer) {
+                        return sendResponse(res, null, "Updated successfully", true, 200);
                     }
                 }
                 return sendResponse(res, null, "Recipient Account Not Found", false, 400);

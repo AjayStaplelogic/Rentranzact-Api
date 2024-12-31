@@ -7,6 +7,7 @@ router.get('/transfers', TransferController.getAllTransfers);
 router.get('/transfer', TransferController.getTransferById);
 router.put('/transfer/update-status', TransferController.updateTransferStatus);
 router.put('/transfer/update-approval', TransferController.updateApprovalStatus);
+router.put('/transfer/initiate-approval', TransferController.updateInitiateApprovalStatus);
 
 
 
