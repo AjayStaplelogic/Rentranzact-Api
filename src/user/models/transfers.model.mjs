@@ -8,24 +8,24 @@ const schema = new Schema({
     },
     description: {
         type: String,
-        select : false
+        select: false
     },
-    connect_acc_id: {            
+    connect_acc_id: {
         type: mongoose.Types.ObjectId,
         ref: 'connectedaccounts',
         index: true
     },
-    account_id: {            
+    account_id: {
         type: mongoose.Types.ObjectId,
         ref: 'accounts',
         index: true
     },
-    from: {            
+    from: {
         type: mongoose.Types.ObjectId,
         ref: 'users',
         index: true
     },
-    is_from_admin: {   
+    is_from_admin: {
         type: Boolean,
         default: false
     },
@@ -51,15 +51,15 @@ const schema = new Schema({
     status: {           // When admin perform any action
         type: String,
         enum: Object.values(ETRANSFER_STATUS),
-        default : ETRANSFER_STATUS.pending
+        default: ETRANSFER_STATUS.pending
     },
     transfer_id: {
         type: String,
-        select : false
+        select: false
     },
     destination: {
         type: String,
-        select : false
+        select: false
     },
     reversed: {
         type: Boolean,
@@ -92,13 +92,36 @@ const schema = new Schema({
     property_images: {
         type: Array
     },
-    conversion_rate : {
+    conversion_rate: {
         type: Number
     },
     isDeleted: {
         type: Boolean,
         default: false
     },
+    initiatedAt: {
+        type: Date
+    },
+    initiateRejectedAt: {
+        type: Date
+    },
+    initiatedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'admins'
+    },
+    initiateRejectedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'admins'
+    },
+    approvedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'admins'
+    },
+    rejectedBy: {
+        type: mongoose.Types.ObjectId,
+        ref: 'admins'
+    },
+
 }, {
     timestamps: true,
     toJSON: true,

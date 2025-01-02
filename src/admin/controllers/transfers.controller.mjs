@@ -52,6 +52,20 @@ export const getAllTransfers = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "admins",
+                    localField: "approvedBy",
+                    foreignField: "_id",
+                    as: "approvedBy_detail"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$approvedBy_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     id: "$_id",
                     createdAt: "$createdAt",
@@ -65,7 +79,8 @@ export const getAllTransfers = async (req, res) => {
                     amount: "$amount",
                     property_name: "$property_name",
                     property_images: "$property_images",
-                    to_name: "$to_detail.fullName"
+                    to_name: "$to_detail.fullName",
+                    approvedBy_name: "$approvedBy_detail.fullName",
                 }
             },
             {
@@ -217,7 +232,7 @@ export const updateApprovalStatus = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        const { id, status } = req.body;
+        const { id, status, current_user_id } = req.body;
 
         const get_transfer = await Transfers.findOne({
             _id: id,
@@ -244,14 +259,16 @@ export const updateApprovalStatus = async (req, res) => {
                 }
 
                 const payload = {
-                    status : status
+                    status: status
                 };
                 switch (status) {
                     case ETRANSFER_STATUS.approvedByEmp:
                         payload.approvedByEmpAt = new Date();
+                        payload.approvedBy = current_user_id;
                         break;
                     case ETRANSFER_STATUS.rejectedByEmp:
                         payload.rejectedByEmpAt = new Date();
+                        payload.rejectedBy = current_user_id;
                         break;
                     default:
                         return sendResponse(res, null, "Invalid status", false, 400);
@@ -282,7 +299,7 @@ export const updateInitiateApprovalStatus = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        const { id, status } = req.body;
+        const { id, status, current_user_id } = req.body;
 
         const get_transfer = await Transfers.findOne({
             _id: id,
@@ -300,7 +317,7 @@ export const updateInitiateApprovalStatus = async (req, res) => {
                     return sendResponse(res, null, "Transfer already rejected", false, 403);
                 }
 
-                if ([ETRANSFER_STATUS.transferred,  ETRANSFER_STATUS.approvedByEmp].includes(get_transfer.status)) {
+                if ([ETRANSFER_STATUS.transferred, ETRANSFER_STATUS.approvedByEmp].includes(get_transfer.status)) {
                     return sendResponse(res, null, "Already transfered and approved", false, 403);
                 }
 
@@ -309,18 +326,20 @@ export const updateInitiateApprovalStatus = async (req, res) => {
                 }
 
                 const payload = {
-                    status : status
+                    status: status
                 };
-                // switch (status) {
-                //     case ETRANSFER_STATUS.initiated:
-                //         payload.approvedByEmpAt = new Date();
-                //         break;
-                //     case ETRANSFER_STATUS.rejectedByEmp:
-                //         payload.rejectedByEmpAt = new Date();
-                //         break;
-                //     default:
-                //         return sendResponse(res, null, "Invalid status", false, 400);
-                // }
+                switch (status) {
+                    case ETRANSFER_STATUS.initiated:
+                        payload.initiatedAt = new Date();
+                        payload.initiatedBy = current_user_id;
+                        break;
+                    case ETRANSFER_STATUS.initiateRejected:
+                        payload.initiateRejectedAt = new Date();
+                        payload.initiateRejectedBy = current_user_id;
+                        break;
+                    default:
+                        return sendResponse(res, null, "Invalid status", false, 400);
+                }
 
                 const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
                 if (get_connected_account) {
