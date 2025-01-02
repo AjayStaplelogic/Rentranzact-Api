@@ -374,3 +374,66 @@ export const updateReportStatus = async (req, res) => {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 }
+
+export const updateRecommendStatus = async (req, res) => {
+    try {
+        let { id, report_status } = req.body;
+        if (!id) {
+            return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        if (!report_status) {
+            return sendResponse(res, {}, "Status reqired", false, 400);
+        }
+
+        if (![EReviewReportStatus.recommended, EReviewReportStatus.recommendRejected].includes(report_status)) {
+            return sendResponse(res, {}, "Invalid status", false, 400);
+        }
+
+        const get_review = await Reviews.findOne({
+            _id: id,
+            isDeleted: false,
+        });
+
+        if (get_review) {
+   
+
+            if (get_review.report_status === report_status) {
+                return sendResponse(res, {}, "Review already has this status", false, 400);
+            }
+
+            if ([EReviewReportStatus.accepted, EReviewReportStatus.rejected, EReviewReportStatus.recommended, EReviewReportStatus.recommendRejected].includes(get_review.report_status)) {
+                return sendResponse(res, {}, "Review reported has been finanlised, Can't update further", false, 400);
+            }
+
+            let update_payload = {
+                report_status: report_status,
+            };
+
+            // switch (report_status) {
+            //     case EReviewReportStatus.reported:
+            //         update_payload.reported_at = new Date();
+            //         update_payload.report_reason = report_reason ?? "";
+            //         break;
+            //     case EReviewReportStatus.accepted:
+            //         update_payload.accepted_at = new Date();
+            //         break;
+            //     case EReviewReportStatus.rejected:
+            //         update_payload.rejected_at = new Date();
+            //         break;
+            // }
+
+            let update_review = await Reviews.findOneAndUpdate({
+                _id: id,
+                isDeleted: false
+            }, update_payload);
+
+            if (update_review) {
+                return sendResponse(res, {}, "success", true, 200);
+            }
+        }
+        return sendResponse(res, {}, "Invalid Id", false, 400);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}

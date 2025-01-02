@@ -11,6 +11,8 @@ router.get('/review', reviewController.getReviewById);
 router.put('/review/change-status', reviewController.changeReviewStatus);
 router.delete('/review', reviewController.deleteReview);
 router.put('/review/report/update-status', reviewController.updateReportStatus);
+router.put('/review/report/recommend-status', reviewController.updateRecommendStatus);
+
 
 
 
