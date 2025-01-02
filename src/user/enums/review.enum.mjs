@@ -20,6 +20,8 @@ export const EReviewStatus = {
 }
 
 export const EReviewReportStatus = {
+    recommended: "recommended",
+    recommendRejected: "recommendRejected",
     reported: "reported",
     accepted: "accepted",
     rejected: "rejected"
