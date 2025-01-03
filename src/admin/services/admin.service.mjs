@@ -50,7 +50,8 @@ async function loginAdmin(body) {
           },
           {
             $project: {
-              _id: 0, // Exclude the default MongoDB _id field
+              // _id: 0, // Exclude the default MongoDB _id field
+              id : "$_id",
               email: 1, // Include the email field from the Admin collection
               role: 1, // Include other fields from Admin collection
               fullName: 1, // Include other fields from Admin collection
