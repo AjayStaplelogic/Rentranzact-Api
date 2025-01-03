@@ -18,7 +18,9 @@ export const getAllTransfers = async (req, res) => {
         let query = {
             isDeleted: false
         };
-        if (status) { query.status = status; };
+        if (status) {
+            query.status = { $in: status.split(",") };
+        };
 
         let skip = Number(page - 1) * count;
         if (search) {
@@ -81,8 +83,8 @@ export const getAllTransfers = async (req, res) => {
                     property_images: "$property_images",
                     to_name: "$to_detail.fullName",
                     approvedBy_name: "$approvedBy_detail.fullName",
-                    initiatedAt : "$initiatedAt",
-                    initiateRejectedAt : "$initiateRejectedAt",
+                    initiatedAt: "$initiatedAt",
+                    initiateRejectedAt: "$initiateRejectedAt",
                 }
             },
             {
