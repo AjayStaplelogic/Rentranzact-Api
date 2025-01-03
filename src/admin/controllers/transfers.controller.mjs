@@ -81,6 +81,8 @@ export const getAllTransfers = async (req, res) => {
                     property_images: "$property_images",
                     to_name: "$to_detail.fullName",
                     approvedBy_name: "$approvedBy_detail.fullName",
+                    initiatedAt : "$initiatedAt",
+                    initiateRejectedAt : "$initiateRejectedAt",
                 }
             },
             {
