@@ -4,6 +4,13 @@ import { Admin } from "../models/admin.model.mjs";
 import { EADMINROLES } from "../enums/permissions.enums.mjs";
 import * as NotificationService from "../../user/services/notification.service.mjs";
 
+/**
+ * To send notifications to the admin users when transfer data updated
+ * 
+ * @param {object} transferData object containing the transfer data
+ * @param {string} updatedBy id of the admin user who updated the transfer data
+ * @returns {void} nothing
+ */
 export const sendTransferNotifications = async (transferData, updatedBy) => {
     Admin.findById(updatedBy).then(async get_updated_by_details => {
         const notification_payload = {};
@@ -13,6 +20,7 @@ export const sendTransferNotifications = async (transferData, updatedBy) => {
         notification_payload.notificationHeading = "";
         notification_payload.notificationBody = ``;
         notification_payload.transfer_id = transferData?._id ?? null;
+        notification_payload.is_send_to_admin = true;
 
         const query = {
             isDeleted: false
