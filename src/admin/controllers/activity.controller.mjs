@@ -1,3 +1,4 @@
+import moment from "moment-timezone";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import { Activity } from "../models/activity.model.mjs";
 import mongoose from "mongoose";
@@ -22,7 +23,7 @@ const ObjectId = mongoose.Types.ObjectId;
 
 export const getAllActivityLogs = async (req, res) => {
     try {
-        let { search, sortBy, empID } = req.query;
+        let { search, sortBy, empID, start_date, end_date, timezone } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -47,6 +48,24 @@ export const getAllActivityLogs = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
+
+        timezone = timezone ?? "UTC"
+
+        if (start_date && end_date) {
+            query.createdAt = {
+                $gte: moment(start_date).tz(timezone, true).startOf("day").toDate(),
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (start_date && !end_date) {
+            query.createdAt = {
+                $gte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (!start_date && end_date) {
+            query.createdAt = {
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        }
+        
         let pipeline = [
             {
                 $match: query
@@ -72,15 +91,35 @@ export const getAllActivityLogs = async (req, res) => {
                     updatedAt: "$updatedAt",
                     empID: "$empID",
                     // body: "$body",
+                    "employee.fullName": "$employee.fullName",
                     body: {
-                        $concat: [
-                            "$employee.fullName",
-                            " (",
-                            "$employee.role",
-                            ")",
-                            " - ",
-                            "$body"
-                        ]
+                        $cond: {
+                            if: {
+                                $and: {
+                                    $eq: [{ $type: "$employee.fullName" }, "string"],
+                                    $eq: [{ $type: "$employee.role" }, "string"],
+                                }
+                            },
+                            then: {
+                                $concat: [
+                                    "$employee.fullName",
+                                    " (",
+                                    "$employee.role",
+                                    ")",
+                                    " - ",
+                                    "$body"
+                                ]
+                            },
+                            else: "$body"
+                        },
+                        // $concat: [
+                        //     "$employee.fullName",
+                        //     " (",
+                        //     "$employee.role",
+                        //     ")",
+                        //     " - ",
+                        //     "$body"
+                        // ]
                     }
                 }
             },
