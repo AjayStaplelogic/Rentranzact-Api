@@ -7,6 +7,7 @@ import * as StripeCommonServices from "../../user/services/stripecommon.service.
 import * as AccountServices from "../../user/services/account.service.mjs";
 import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
 import { User } from "../../user/models/user.model.mjs";
+import * as TransferService from "../services/transfer.service.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -282,6 +283,7 @@ export const updateApprovalStatus = async (req, res) => {
                 if (get_connected_account) {
                     let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                     if (update_transfer) {
+                        TransferService.sendTransferNotifications(update_transfer, current_user_id);
                         return sendResponse(res, null, "Approval status updated successfully", true, 200);
                     }
                 }
@@ -349,6 +351,7 @@ export const updateInitiateApprovalStatus = async (req, res) => {
                 if (get_connected_account) {
                     let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                     if (update_transfer) {
+                        TransferService.sendTransferNotifications(update_transfer, current_user_id);
                         return sendResponse(res, null, "Updated successfully", true, 200);
                     }
                 }

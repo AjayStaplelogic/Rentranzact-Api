@@ -8,4 +8,5 @@ export const ENOTIFICATION_REDIRECT_PATHS = {
     rate_to_landlord : "rate_to_landlord",
     tawk_to_dashboard : "tawk_to_dashboard",
     electricity_bill_view : "electricity_bill_view",
+    transfer_view : "transfer_view",
 }
