@@ -61,7 +61,12 @@ const notificationSchema = new mongoose.Schema(
         },
         redirect_to: {         // Check the path from notification redirect path enum
             type: String,
-        }
+        },
+        transfer_id: {
+            type: mongoose.Types.ObjectId,
+            ref: 'transfers',
+        },
+
     },
     { timestamps: true }
 );
