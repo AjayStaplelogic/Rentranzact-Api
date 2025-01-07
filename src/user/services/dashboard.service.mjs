@@ -25,8 +25,20 @@ async function getDashboardStats(user) {
         { $sort: { createdAt: -1 } },
         { $limit: 1 }
     ]);
-
-    const totalIncome = await Transaction.find({ landlordID: user._id, status: "succeeded" });
+    const totalIncome = await Transaction.find({
+        landlordID: user._id,
+        status: {
+            $in: [
+                "succeeded",
+                "success",
+                "successful"
+            ]
+        },
+        createdAt: {
+            $gte: moment().startOf('year').toDate(),
+            $lte: moment().endOf('year').toDate()
+        }
+    });
 
     // const recentTransaction = await Transaction.find({landlordID : user._id}).sort({createdAt : -1}).limit(3).select('amount property renter date')
 
@@ -64,12 +76,10 @@ async function getDashboardStats(user) {
 
     let data = [{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }];
 
-    //  console.log(totalIncome)
 
     totalIncome.map((i) => {
         const date = moment.unix(i.date);
         const month = date.month() + 1;
-
         for (let obj of data) {
             if (obj?.hasOwnProperty(month)) {
                 obj[month] += i.amount;
@@ -116,18 +126,28 @@ async function getDashboardStatsPM(user) {
         { $limit: 1 }
     ]);
 
-    const totalIncome = await Transaction.find({ pmID: user._id, status: "succeeded" });
+    const totalIncome = await Transaction.find({
+        pmID: user._id,
+        status: {
+            $in: [
+                "succeeded",
+                "success",
+                "successful"
+            ]
+        },
+        createdAt: {
+            $gte: moment().startOf('year').toDate(),
+            $lte: moment().endOf('year').toDate()
+        }
+    });
 
     const recentTransaction = await Transaction.find({ pmID: user._id }).sort({ createdAt: -1 }).limit(3).select('amount property renter date')
 
     let data = [{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }];
 
-    //  console.log(totalIncome)
-
     totalIncome.map((i) => {
         const date = moment.unix(i.date);
         const month = date.month() + 1;
-
         for (let obj of data) {
             if (obj?.hasOwnProperty(month)) {
                 obj[month] += i.amount;
