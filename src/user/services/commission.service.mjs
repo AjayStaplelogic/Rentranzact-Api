@@ -11,9 +11,6 @@ import Commissions from "../models/commissions.model.mjs"
  */
 export const rentCommissionToPM = async (propertyObj = null, property_id = null, rent = 0) => {
     try {
-        console.log("Inside Rent Commission Function")
-        // console.log(propertyDetails, '====propertyDetails')
-
         if ((!propertyObj || propertyObj._id) && property_id) {     // IF proprty details not comming then fetching it from id
             propertyObj = await Property.findById(property_id);
         }
@@ -46,6 +43,5 @@ export const rentCommissionToPM = async (propertyObj = null, property_id = null,
             }
         }
     } catch (error) {
-        console.log(error, '===Error in rent Commission');
     }
 }

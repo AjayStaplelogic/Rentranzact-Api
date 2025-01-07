@@ -187,13 +187,9 @@ async function getMyTransaction(userID, role, req) {
       status: true,
       statusCode: 200,
     };
-
   }
 }
-
-
 async function transactionByIdService(id) {
-
   let data = await Transaction.aggregate([
     {
       $match: {
@@ -294,9 +290,7 @@ async function transactionByIdService(id) {
     status: true,
     statusCode: 200,
   };
-
 }
-
 
 export {
   getMyTransaction,

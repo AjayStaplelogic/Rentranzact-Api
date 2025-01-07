@@ -34,8 +34,6 @@ export const getBillers = (category_code = "CABLEBILLS", country_code = "NG") =>
     })
 }
 
-// console.log(await getBillers())
-
 /**
  * @description To get all the bills of a biller from flutterwave
  * @param {string} biller_code The biller code whose bills need to be fetched 
@@ -65,7 +63,6 @@ export const validateBill = (item_code, biller_code, customer) => {   // custome
         axios.get(url, config)
             .then(response => resolve(response?.data))
             .catch(error => {
-                console.log(error, '====error validate');
                 reject(new Error(error?.response?.data?.message ?? error))
             });
     })
@@ -96,13 +93,11 @@ export const initiatePayment = ({
         amount: amount,
         reference: uuidv4()
     }
-    console.log(payload, '=======payload inititated')
     const url = `${flutterWaveBaseUrl}/v3/billers/${biller_code}/items/${item_code}/payment`;
     return new Promise((resolve, reject) => {
         axios.post(url, payload, config)
             .then(response => resolve(response?.data))
             .catch(error => {
-                console.log(error, '======Error When original initialization of bill payment')
                 reject(new Error(error?.response?.data?.message ?? error))
             });
     })
@@ -172,8 +167,6 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                     item_code: meta_data.item_code,
                 });
 
-                console.log(initiatedPayment, '=========initiatedPayment')
-
                 if (initiatedPayment) {
                     Bills.findByIdAndUpdate(bill._id, {
                         phone_number: initiatedPayment?.data?.phone_number ?? "",
@@ -198,19 +191,16 @@ export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
                                 meter_number: meta_data.meter_number
                             });
                         }).catch(error => {
-                            console.log(error, '=====error initiate bill payment 11')
                             // logic to refund for charge created before
                             createBillRefund(webhook_obj.id, bill._id, meta_data.meter_number);
                         })
                 }
             }).catch((error) => {
-                console.log(error, '=====error initiate bill payment 11')
                 // logic to refund for charge created before
                 createBillRefund(webhook_obj.id, null, meta_data.meter_number);
             })
         })
     } catch (error) {
-        console.log(error, '=====error initiate bill payment 22')
         // Logic to refund for charge created before
         createBillRefund(webhook_obj.id, null, meta_data.meter_number);
     }
@@ -232,8 +222,6 @@ export const verifyTransaction = (transaction_id) => {
             });
     })
 }
-
-// console.log(await verifyTransaction("8240284"))
 
 /**
  * Initiate refund on flutterwave
@@ -266,12 +254,19 @@ export const createRefund = async (transaction_id, amount = 0) => {
     })
 }
 
-// console.log(await createRefund("8260339"))
-
+/**
+ * 
+ * When Bill payment failed from flutterwave end due to any reason then refunding the amount to user
+ * 
+ * @param {string} transaction_id Flutterwave transaction id whose refund will be returned
+ * @param {string} bill_id Bill id whose refund will be returned saved in DB
+ * @param {string} meter_number Meter number or customer used in bill
+ * @returns {void} Nothing
+ */
 export const createBillRefund = async (transaction_id, bill_id, meter_number) => {
     const verifiedTransaction = await verifyTransaction(transaction_id);  // Verify transaction in flutterwave before initiating refunds
     if (verifiedTransaction) {
-        const createdRefund = await createRefund(transaction_id);
+        const createdRefund = await createRefund(transaction_id);   // Creating refund from flutterwave
         if (createdRefund) {
             const payload = {
                 gateway_type: Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,
@@ -291,22 +286,22 @@ export const createBillRefund = async (transaction_id, bill_id, meter_number) =>
                 fee: createdRefund?.data?.fee
             }
 
-            Refunds.create(payload).then(refund_data => {
+            Refunds.create(payload).then(refund_data => {       // If refund is initialized from flutterwave then saving data in DB
                 User.findById(refund_data.user_id).then(user => {
-                    electricityEmails.electricityBillFailed({
+                    electricityEmails.electricityBillFailed({   // Sending email to customer for bill failure
                         email: user.email,
                         fullName: user.fullName,
                         amount: refund_data.amount_refunded,
                         meter_number: meter_number
                     });
-                    electricityEmails.electricityBillRefundInitiated({
+                    electricityEmails.electricityBillRefundInitiated({  // Sending email to customer for refund initiated
                         email: user.email,
                         fullName: user.fullName,
                         amount: refund_data.amount_refunded,
                         meter_number: meter_number
                     });
                     if (refund_data.bill_id) {
-                        Bills.findByIdAndUpdate(refund_data.bill_id, {
+                        Bills.findByIdAndUpdate(refund_data.bill_id, {      // Updating refund id in bill to reflect to customer
                             refund_id: refund_data._id,
                             status: "fail",
                         }).then(update_bill => {
@@ -318,6 +313,12 @@ export const createBillRefund = async (transaction_id, bill_id, meter_number) =>
     }
 }
 
+/**
+ * When bill status updated on stripe, Updating it in the DB
+ * 
+ * @param {object} webhook_obj Flutter bill status webhook object
+ * @returns {void}  Nothing
+ */
 export const updateBillStatusFromWebhook = async (webhook_obj) => {
     Bills.findOneAndUpdate({
         reference: webhook_obj?.data?.flw_ref
@@ -337,7 +338,7 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
 
                 switch (bill.status) {
                     case "success":
-                        electricityEmails.electricityBillPaid(payload);
+                        electricityEmails.electricityBillPaid(payload);         // If Bill paid successfully then sending email notification to user
                         // Sending notification to payer
                         var notification_payload = {};
                         notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.electricity_bill_view;
@@ -348,11 +349,11 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
                             "redirectTo": "electricity_bill_view",
                         }
 
-                        NotificationService.createNotification(notification_payload, metadata, null);
+                        NotificationService.createNotification(notification_payload, metadata, null); // Creating system notification
                         break;
 
                     case "failed":
-                        electricityEmails.electricityBillFailed(payload);
+                        electricityEmails.electricityBillFailed(payload);       // If payment faild then sending bill payment failed email notification to user
 
                         // Bellow write a code for refund
                         createBillRefund(bill.transaction_id, bill._id, bill.meter_number);
@@ -367,7 +368,7 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
                             "redirectTo": "electricity_bill_view",
                         }
 
-                        NotificationService.createNotification(notification_payload, metadata, null);
+                        NotificationService.createNotification(notification_payload, metadata, null); // Creating system notification
                         break;
 
                     default:
@@ -377,6 +378,12 @@ export const updateBillStatusFromWebhook = async (webhook_obj) => {
     })
 }
 
+/**
+ * When bill refund is successful then updating bill refund status in DB
+ * 
+ * @param {object} refund_data Object containing refund data from db
+ * @returns { void} Nothing
+ */
 export const updateBillRefundStatus = (refund_data) => {
     // Your code here to update bill refund status
     Bills.findOneAndUpdate({
@@ -392,7 +399,7 @@ export const updateBillRefundStatus = (refund_data) => {
         }
     ).then((bill_data) => {
         User.findById(bill_data.user_id).then(user => {
-            electricityEmails.electricityBillRefundCompleted({
+            electricityEmails.electricityBillRefundCompleted({      // After successful updating sending email notification to user for successful refund
                 email: user.email,
                 fullName: user.fullName,
                 amount: refund_data.amount_refunded,
@@ -401,5 +408,4 @@ export const updateBillRefundStatus = (refund_data) => {
             });
         })
     })
-
 }

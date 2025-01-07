@@ -1,4 +1,4 @@
-import { RentBreakDownPer, RentType } from "../enums/property.enums.mjs";
+import {  RentType } from "../enums/property.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
@@ -17,21 +17,14 @@ import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
-
     const { status, amount, createdAt, id, meta_data } = body;
-
     const momentObject = moment(createdAt);
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
-
     const { wallet, propertyID, userID, notificationID } = meta_data;
-
     const renterDetails = await User.findById(userID)
-
     const propertyDetails = await Property.findById(propertyID);
-
     const landlordDetails = await User.findById(propertyDetails.landlord_id);
-
     if (propertyDetails) {
         let lease_end_timestamp = "";
         if (["commercial", "residential"].includes(propertyDetails.category)) {
@@ -41,15 +34,10 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         }
 
         let newCount = propertyDetails.payment_count > -1 ? propertyDetails.payment_count + 1 : 1;
-
         if (propertyDetails.rentType === RentType.MONTHLY) {
-
             const originalDate = moment.unix(created);
-
             const oneMonthLater = originalDate.add(1, 'months');
-
             const timestampOneMonthLater = oneMonthLater.unix();
-
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -73,9 +61,6 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             })
 
             addRenterHistory.save()
-
-            console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(created);
@@ -107,11 +92,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 pmID: propertyDetails?.property_manager_id,
             });
 
-            console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
-
-
             addRenterHistory.save()
-
         } else if (propertyDetails.rentType === RentType.YEARLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(created);
@@ -121,8 +102,6 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
             // Get the Unix timestamp of one year later
             const timestampOneYearLater = oneYearLater.unix();
-
-            console.log(timestampOneYearLater, "-----timestampOneYearLater")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -147,37 +126,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             addRenterHistory.save()
         }
 
-        // Calculating rental breakdown
-        // let breakdown = {
-        //     service_charge: 0,
-        //     rent: 0,
-        //     insurance: 0,
-        //     agency_fee: 0,
-        //     legal_Fee: 0,
-        //     caution_deposite: 0,
-        //     total_amount: 0,
-        //     agent_fee: 0
-        // }
-
-        // let rent = Number(propertyDetails.rent);
-        // breakdown.rent = propertyDetails.rent;
-        // breakdown.service_charge = propertyDetails.servicesCharges;
-        // breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;      // = agent_fee + rtz_fee or 10% of rent
-        // breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-        // breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-        // breakdown.insurance = 0;    // variable declaration for future use
-        // breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        // breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
-
-        // breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
-
-        // if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-        //     breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        // }
-
         let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
-
-
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -201,7 +150,6 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             changePayload.landlordID = landlordDetails._id;
         }
 
-
         const data = new Transaction(changePayload)
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED });
 
@@ -211,7 +159,6 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         }
 
         data.save()
-
 
         // If landlord have referral code then transfering referral bonus to their parent or referrer
         if (landlordDetails?.referralCode) {
@@ -241,7 +188,6 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         status: true,
         statusCode: 200,
     };
-
 }
 
 async function addToWallet(body) {
@@ -271,7 +217,6 @@ async function addToWallet(body) {
                         }
 
                         let add_wallet = await Wallet.create(payload);
-                        console.log(add_wallet, '===add_wallet')
                         if (add_wallet) {
                             let transaction_payload = {
                                 wallet: true,
@@ -294,47 +239,30 @@ async function addToWallet(body) {
                             }
 
                             let create_transaction = await Transaction.create(transaction_payload);
-
-                            // TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
                         }
                     }
                 }
             });
         }
     } catch (error) {
-        console.log(error, '===Error Add TO Wallet Flutter Wave');
     }
-
 }
 
 async function addFlutterwaveTransactionForOld(body) {
-
     const { status, amount, createdAt, id, meta_data } = body;
-
     const momentObject = moment(createdAt);
-
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
-
     const { propertyID, userID, notificationID } = meta_data;
-
     const renterDetails = await User.findById(userID)
-
     const propertyDetails = await Property.findById(propertyID);
-
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
-
     if (propertyDetails) {
         let newCount = propertyDetails.payment_count > -1 ? propertyDetails.payment_count + 1 : 1;
-
         if (propertyDetails.rentType === RentType.MONTHLY) {
-
             const originalDate = moment.unix(propertyDetails.rent_period_due);
-
             const oneMonthLater = originalDate.add(1, 'months');
-
             const timestampOneMonthLater = oneMonthLater.unix();
-
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -355,10 +283,6 @@ async function addFlutterwaveTransactionForOld(body) {
             })
 
             addRenterHistory.save()
-
-
-            console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(propertyDetails.rent_period_due);
@@ -386,13 +310,7 @@ async function addFlutterwaveTransactionForOld(body) {
                 renterActive: true,
                 pmID: propertyDetails?.property_manager_id,
             })
-
-
-            console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
-
-
             addRenterHistory.save()
-
         } else if (propertyDetails.rentType === RentType.YEARLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(propertyDetails.rent_period_due);
@@ -403,7 +321,6 @@ async function addFlutterwaveTransactionForOld(body) {
             // Get the Unix timestamp of one year later
             const timestampOneYearLater = oneYearLater.unix();
 
-            console.log(timestampOneYearLater, "-----timestampOneYearLater")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -424,35 +341,7 @@ async function addFlutterwaveTransactionForOld(body) {
             })
             addRenterHistory.save()
         }
-
-        // Calculating rental breakdown
-        // let breakdown = {
-        //     service_charge: 0,
-        //     rent: 0,
-        //     insurance: 0,
-        //     agency_fee: 0,
-        //     legal_Fee: 0,
-        //     caution_deposite: 0,
-        //     total_amount: 0,
-        //     agent_fee: 0
-        // }
-
-        // let rent = Number(propertyDetails.rent);
-        // breakdown.rent = propertyDetails.rent;
-        // breakdown.service_charge = propertyDetails.servicesCharges;
-        // breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-        // breakdown.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-        // breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-        // breakdown.insurance = 0;    // variable declaration for future use
-        // breakdown.total_amount = rent + breakdown.insurance + breakdown.agency_fee + breakdown.legal_Fee + breakdown.caution_deposite;
-
-
-        // if (propertyDetails.property_manager_id) {
-        //     breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        // }
-
         let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
-
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -477,9 +366,7 @@ async function addFlutterwaveTransactionForOld(body) {
         }
 
         const data = new Transaction(changePayload)
-        // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
         if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-            console.log("Reached to Function scope")
             await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
         }
         data.save()

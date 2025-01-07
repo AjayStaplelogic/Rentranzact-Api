@@ -6,6 +6,14 @@ import * as CommonHelpers from "../helpers/common.helper.mjs";
 import * as StripeCommonServices from "../services/stripecommon.service.mjs";
 import { User } from "../models/user.model.mjs";
 
+/**
+ * To make transfer request to admin from landlord when renter pays rent 
+ * 
+ * @param {object} property_data Object containing property data, can also be null
+ * @param {string} property_id, If property_data is null then send it's property id
+ * @param {number} amount rent amount to be transferred
+ * @returns {object} Newly created transfer object
+ */
 export const makeTransferForPropertyRent = async (property_data = null, property_id = null, amount = 0) => {
     if (!property_data) {       // If property data is not provided then fetching it will property_id
         if (!property_id) {     // If property id is also not provided then returned false
@@ -38,10 +46,24 @@ export const makeTransferForPropertyRent = async (property_data = null, property
     return false;
 }
 
+/**
+ * To create a transfer in a database
+ * 
+ * @param {object} payload transfer object to be created in DB 
+ * @returns {object} Newly created transfer object
+ */
 export const createTransferInDB = async (payload) => {
     return await Transfers.create(payload);
 }
 
+/**
+ * 
+ * When user recharges their wallet then sending transfer request to admin
+ * 
+ * @param {string} user_id Id of the receiver user
+ * @param {number} amount Amount to transfer
+ * @returns {Object} Newly created transfer object from DB
+ */
 export const makeTransferForWalletPayment = async (user_id, amount = 0) => {
     if (amount > 0 && user_id) {
         const transfer_payload = {
@@ -53,26 +75,32 @@ export const makeTransferForWalletPayment = async (user_id, amount = 0) => {
             to_currency: "NGN",
         }
 
-        console.log(transfer_payload, '====transfer_payload')
-
         return await createTransferInDB(transfer_payload);
     }
 
     return false;
 }
 
+/**
+ * When user recharges their wallet then transferring amount to their account
+ * 
+ * @param {string} user_id Id of the user who initiated recharge their wallet
+ * @param {string} from_currency Admin currency or currency of the account from which transfer is received
+ * @param {string} to_currency Currency of the benificiary account to which transfer is received 
+ * @param {number} amount Amount to be transferred
+ * @returns {Object | boolean} Transfer object or false if transfer is unsuccessful
+ */
 export const transferForWalletRecharge = async (user_id, from_currency = "USD", to_currency = "NGN", amount) => {
-    const get_connected_account = await AccountServices.getUserConnectedAccount(user_id);
+    const get_connected_account = await AccountServices.getUserConnectedAccount(user_id);       // Checking user have their connected stripe account or not
     if (get_connected_account) {
-        const converted_currency = await CommonHelpers.convert_currency(
+        const converted_currency = await CommonHelpers.convert_currency(    // Stripe does not support USD TO NGN transfer, so we converted NGN to USD, and then tranferring amount in USD
             to_currency,
             from_currency,
             Number(amount)
         )
 
-        console.log(converted_currency, '=====converted_currency');
         if (converted_currency && converted_currency.amount > 0) {
-            const initiate_transfer = await StripeCommonServices.transferFunds(
+            const initiate_transfer = await StripeCommonServices.transferFunds(         // Inititating stripe transfer to benificiary account
                 get_connected_account.connect_acc_id,
                 Number(converted_currency.amount),
                 from_currency
@@ -92,14 +120,14 @@ export const transferForWalletRecharge = async (user_id, from_currency = "USD", 
                     transfer_id: initiate_transfer.id,
                 };
 
-                const transfer = new Transfers(payload);
+                const transfer = new Transfers(payload);        // Creating transfer entry in DB if stripe transfer successful
                 transfer.save();
-                const balance = await StripeCommonServices.getBalance(get_connected_account.connect_acc_id);
+                const balance = await StripeCommonServices.getBalance(get_connected_account.connect_acc_id); // After transfer fetching balance of connected account
                 if (balance) {
-                    User.findByIdAndUpdate(user_id, {
+                    User.findByIdAndUpdate(user_id, {           // Updating user data with balance available in connected account
                         walletPoints: ((balance.available[0]?.amount + balance.pending[0]?.amount) / 100)
                     })
-                    .then((updatedUser) => {
+                        .then((updatedUser) => {
                             console.log(updatedUser, '====updatedUser Wallet')
                         })
                 }

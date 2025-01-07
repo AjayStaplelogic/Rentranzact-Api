@@ -20,7 +20,6 @@ import * as PropertyServices from "../services/property.service.mjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function addStripeTransaction(body, renterApplicationID) {
-
     let userID;
     let propertyID;
     let notificationID;
@@ -29,44 +28,27 @@ async function addStripeTransaction(body, renterApplicationID) {
     let created;
     let id;
 
-    // console.log(body.paymentMethod, "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx paymentMethod")
-    console.log(body, "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXBODY")
-    // console.log(body.data.object.metadata, "---------------meta")
-
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
         propertyID = body.data.object.metadata.propertyID;
         notificationID = body.data.object.metadata.notificationID;
-
-        //   const { userID, propertyID, notificationID } = body.data.object.metadata;
-        // const { amount, status, created, id } = body.data.object;
-        amount = Number(body.data.object.amount/100);
+        amount = Number(body.data.object.amount / 100);
         status = body.data.object.status;
         created = body.data.object.created;
         id = body.data.object.id;
-
-
     }
-    if (body.paymentMethod === "paystack") {
 
+    if (body.paymentMethod === "paystack") {
         userID = body.data.metadata.userID;
         propertyID = body.data.metadata.propertyID;
         notificationID = body.data.metadata.notificationID;
-
-        //   const { userID, propertyID, notificationID } = body.data.object.metadata;
-        // const { amount, status, created, id } = body.data.object;
         let createdAt = body.data.paid_at;
 
-        amount = Number(body.data.amount/100);
+        amount = Number(body.data.amount / 100);
         status = body.data.status;
         created = moment(createdAt).unix();
         id = body?.data?.id;
-
     }
-    console.log(notificationID, "xxxxxxxxxxxxxxxxxxxxxxxNotification ID")
-
-    // await Notification.findByIdAndDelete(notificationID).then((Res) => console.log(Res, "====ress")).catch((err) => console.log(err, "===errr"))
-
 
     const propertyDetails = await Property.findById(propertyID);
     if (propertyDetails) {
@@ -78,22 +60,10 @@ async function addStripeTransaction(body, renterApplicationID) {
         }
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
-
             let newCount = propertyDetails.payment_count + 1;
-
-
-            console.log(newCount, "--new count 1")
-
             const originalDate = moment.unix(created.toString());
-
-
             const oneMonthLater = originalDate.add(1, 'months');
-
             const timestampOneMonthLater = oneMonthLater.unix();
-
-
-            console.log(timestampOneMonthLater, "====TIMESTAMPE ONE MONTH LASTER")
-
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -116,27 +86,15 @@ async function addStripeTransaction(body, renterApplicationID) {
                 renterActive: true
             })
 
-
             addRenterHistory.save()
-
-            // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
-
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             let newCount = propertyDetails.payment_count + 1;
             const originalDate = moment.unix(created.toString());
-
-
             // Add one year to the original date
             const oneQuaterLater = originalDate.add(3, 'months');
-
-
-
             // Get the Unix timestamp of one year later
             const timestampOneQuaterLater = oneQuaterLater.unix();
-
-            console.log(newCount, "-----new count", timestampOneQuaterLater, "----timestamppppp ")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -159,19 +117,11 @@ async function addStripeTransaction(body, renterApplicationID) {
                 renterActive: true,
             })
 
-
-
-            // console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
-
-
             addRenterHistory.save()
-
-
         } else if (propertyDetails.rentType === RentType.YEARLY) {
             let newCount = propertyDetails.payment_count + 1;
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(created.toString());
-
 
             // Add one year to the original date
             const oneYearLater = originalDate.add(1, 'years');
@@ -179,8 +129,6 @@ async function addStripeTransaction(body, renterApplicationID) {
             // Get the Unix timestamp of one year later
             const timestampOneYearLater = oneYearLater.unix();
 
-
-            // console.log(timestampOneYearLater, "-----timestampOneYearLater")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -203,50 +151,10 @@ async function addStripeTransaction(body, renterApplicationID) {
                 renterActive: true
             })
             addRenterHistory.save()
-
         }
 
         const renterDetails = await User.findById(userID);
-
         const landlordDetails = await User.findById(propertyDetails.landlord_id)
-
-        // async function rentalBreakdown(propertyID) {
-
-        //     const property = await Property.findById(propertyID);
-
-        //     const data = {
-        //         service_charge: 0,
-        //         rent: 0,
-        //         insurance: 0,
-        //         agency_fee: 0,
-        //         legal_Fee: 0,
-        //         caution_deposite: 0,
-        //         total_amount: 0,
-        //         agent_fee: 0,
-        //         rtz_fee: 0
-        //     }
-
-        //     let rent = Number(property.rent);
-        //     data.rent = property.rent;
-        //     data.service_charge = property.servicesCharges;
-        //     data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-        //     data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-        //     data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-        //     data.insurance = 0;    // variable declaration for future use
-        //     data.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
-        //     data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
-
-
-        //     if (property.property_manager_id) {
-        //         data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-        //     }
-
-        //     return data
-        // }
-
-        // let breakdown = await rentalBreakdown(propertyID)
-
-
         let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
         const data = new Transaction({
             wallet: false,
@@ -266,7 +174,6 @@ async function addStripeTransaction(body, renterApplicationID) {
             allCharges: breakdown,
             transaction_type: ETRANSACTION_TYPE.rentPayment
         })
-
 
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
@@ -302,17 +209,12 @@ async function addStripeTransaction(body, renterApplicationID) {
             message: "success",
             status: true,
             statusCode: 200,
-
         }
-
     }
 }
 
 async function rechargeWallet(body) {
-    console.log("Recharge wallet function")
     let userID;
-    console.log(body.paymentMethod, '====body.paymentMethod');
-
     let transfer_amount = 0;
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
@@ -326,9 +228,6 @@ async function rechargeWallet(body) {
 
     User.findById(userID).then(async (userDetail) => {
         let payload = {}
-        console.log(userDetail, '====userDetail');
-        console.log(body.paymentMethod, '====body.paymentMethod');
-
         if (userDetail) {
             const transfer = await TransferServices.transferForWalletRecharge(
                 userDetail._id,
@@ -336,7 +235,6 @@ async function rechargeWallet(body) {
                 "NGN",
                 transfer_amount
             )
-            console.log(transfer, '====transfer')
             if (transfer) {
                 if (body.paymentMethod === "stripe") {
                     let { amount, status, created, id } = body.data.object;
@@ -410,45 +308,18 @@ async function rechargeWallet(body) {
                     const data_ = new Transaction(transaction_payload)
 
                     data_.save()
-                    console.log(status, '====status');
-
-                    // if (status === "success") {
-
-                    //     const data__ = await User.findByIdAndUpdate(
-                    //         userID,
-                    //         { $inc: { walletPoints: amount } },
-                    //         { new: true }
-                    //     );
-                    //     console.log(data__, '====data__');
-                    // }
-
-
                 }
             }
 
-            console.log("payload=----", payload, '====payload')
             if (Object.keys(payload).length > 0) {
                 payload.payment_type = EPaymentType.rechargeWallet
                 let add_wallet = await Wallet.create(payload);
-                console.log("add_wallet=----", add_wallet, '====add_wallet')
-                // if (add_wallet) {
-                    // TransferServices.makeTransferForWalletPayment(add_wallet.userID, add_wallet.amount);
-                // }
-
             }
         }
     });
-
-    // return {
-    //     data: [],
-    //     message: "success",
-    //     status: true,
-    //     statusCode: 200,
-    // }
 }
 
 async function addStripeTransactionForOld(body, renterApplicationID) {
-
     let userID;
     let propertyID;
     let notificationID;
@@ -461,67 +332,31 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         userID = body.data.object.metadata.userID;
         propertyID = body.data.object.metadata.propertyID;
         notificationID = body.data.object.notificationID;
-
-        //   const { userID, propertyID, notificationID } = body.data.object.metadata;
-        // const { amount, status, created, id } = body.data.object;
-        amount = Number(body.data.object.amount/100);
+        amount = Number(body.data.object.amount / 100);
         status = body.data.object.status;
         created = body.data.object.created;
         id = body.data.object.id;
-
-
     }
     if (body.paymentMethod === "paystack") {
-
         userID = body.data.metadata.userID;
         propertyID = body.data.metadata.propertyID;
         notificationID = body.data.metadata.notificationID;
-
-        //   const { userID, propertyID, notificationID } = body.data.object.metadata;
-        // const { amount, status, created, id } = body.data.object;
         let createdAt = body.data.paid_at;
 
-        amount = Number(body.data.amount/100);
+        amount = Number(body.data.amount / 100);
         status = body.data.status;
         created = moment(createdAt).unix();
         id = body.data.id;
-
     }
-
-
-
-
-    // const { userID, propertyID, notificationID } = body.data.object.metadata;
-    // await Notification.findByIdAndDelete(notificationID);
-
-    // const { amount, status, created, id } = body.data.object;
 
     const propertyDetails = await Property.findById(propertyID);
 
-    console.log(propertyDetails, "=====peroperty detailsss")
 
     if (propertyDetails.rentType === RentType.MONTHLY) {
-
-        console.log(propertyDetails.payment_count, "------------> payment count");
-
-        console.log(propertyDetails.rent_period_due, "------------> payment rent paid due");
-
         const originalDate = moment.unix(propertyDetails.rent_period_due);
-
-        console.log(originalDate, "------------> originalDate");
-
         const oneMonthLater = originalDate.add(1, 'months');
-
-        console.log(oneMonthLater, "------------> oneMonthLater");
-
         const timestampOneMonthLater = oneMonthLater.unix();
-
-        console.log(timestampOneMonthLater, "------------> timestampOneMonthLater");
-
         let newCount = propertyDetails.payment_count + 1;
-
-        console.log(newCount, "------------> newCount");
-
 
         const updateProperty = await Property.findByIdAndUpdate(propertyID, {
             rented: true,
@@ -530,8 +365,6 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             payment_count: newCount,
             inDemand: false        // setting this to false because when property is rented then should remove from in demand
         })
-
-        console.log(updateProperty, "---------------> updateProperty")
 
         const addRenterHistory = new RentingHistory({
             pmID: propertyDetails?.property_manager_id,
@@ -546,8 +379,6 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         addRenterHistory.save()
 
-        // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
     } else if (propertyDetails.rentType === RentType.QUATERLY) {
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(propertyDetails.rent_period_due);
@@ -557,11 +388,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
         // Get the Unix timestamp of one year later
         const timestampOneQuaterLater = oneQuaterLater.unix();
-
-
         let newCount = propertyDetails.payment_count + 1;
-
-
         const updateProperty = await Property.findByIdAndUpdate(propertyID, {
             rented: true,
             renterID: userID,
@@ -570,7 +397,6 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             inDemand: false        // setting this to false because when property is rented then should remove from in demand
         })
 
-        console.log(updateProperty, "======updarteeeee")
         const addRenterHistory = new RentingHistory({
             pmID: propertyDetails?.property_manager_id,
             renterID: userID,
@@ -581,32 +407,18 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             propertyID: propertyID,
             renterActive: true
         })
-
-
-
-        console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
-
-
         addRenterHistory.save()
 
     } else if (propertyDetails.rentType === RentType.YEARLY) {
-        console.log(propertyDetails.rent_period_due, '=========propertyDetails.rent_period_due')
         // Convert timestamp to a Moment.js object
         const originalDate = moment.unix(propertyDetails.rent_period_due);
-        console.log(originalDate, '=========originalDate')
 
         // Add one year to the original date
         const oneYearLater = originalDate.add(1, 'years');
-        console.log(oneYearLater, '=========oneYearLater')
-
 
         // Get the Unix timestamp of one year later
         const timestampOneYearLater = oneYearLater.unix();
-
         let newCount = propertyDetails.payment_count + 1;
-
-        console.log(timestampOneYearLater, "-----timestampOneYearLater")
-
         const updateProperty = await Property.findByIdAndUpdate(propertyID, {
             rented: true,
             renterID: userID,
@@ -615,7 +427,6 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             inDemand: false        // setting this to false because when property is rented then should remove from in demand
         })
 
-        console.log(updateProperty, "======updarteeeee Yearly")
         const addRenterHistory = new RentingHistory({
             pmID: propertyDetails?.property_manager_id,
             renterID: userID,
@@ -633,45 +444,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     const renterDetails = await User.findById(userID);
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
-
-    // async function rentalBreakdown(propertyID) {
-
-    //     const property = await Property.findById(propertyID);
-
-    //     const data = {
-    //         service_charge: 0,
-    //         rent: 0,
-    //         insurance: 0,
-    //         agency_fee: 0,
-    //         legal_Fee: 0,
-    //         caution_deposite: 0,
-    //         total_amount: 0,
-    //         agent_fee: 0
-    //     }
-
-    //     let rent = Number(property.rent);
-    //     data.rent = property.rent;
-    //     data.service_charge = property.servicesCharges;
-    //     data.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-    //     data.legal_Fee = (rent * RentBreakDownPer.LEGAL_FEE_PERCENT) / 100;
-    //     data.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
-    //     data.insurance = 0;    // variable declaration for future use
-    //     data.total_amount = rent + data.insurance + data.agency_fee + data.legal_Fee + data.caution_deposite;
-
-
-    //     if (property.property_manager_id) {
-    //         data.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
-    //     }
-
-    //     return data
-    // }
-
-    // let breakdown = await rentalBreakdown(propertyID)
-
     let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
-
-
-
     const data = new Transaction({
         wallet: false,
         renterID: userID,
@@ -690,9 +463,6 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         allCharges: breakdown,
         transaction_type: ETRANSACTION_TYPE.rentPayment
     })
-
-
-    // await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
     // Adding commission for property manager
     if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord

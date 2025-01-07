@@ -16,13 +16,8 @@ import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-
 async function payRentService(body, userID) {
-
     const { amount, propertyID, wallet, renterApplicationID, notificationID, payment_card_id } = body;
-
-    console.log(typeof wallet, "--------wallet typeof ")
-
     let payload = {
         amount: amount * 100,
         currency: 'NGN',
@@ -58,21 +53,15 @@ async function payRentService(body, userID) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create(payload);
-
     return {
         data: { client_secret: paymentIntent.client_secret },
         message: "client secret created successfully",
         status: true,
         statusCode: 200,
     };
-
-
-
-
 }
 
 async function addToWallet(body, userID) {
-
     const { amount, wallet, payment_card_id } = body;
     let payload = {
         amount: amount * 100,
@@ -85,7 +74,6 @@ async function addToWallet(body, userID) {
             userID: userID
         }
     };
-    // console.log(amount, wallet  , "=======amopunt wallet ")
 
     if (payment_card_id) {
         let get_card = await Cards.findOne({
@@ -107,8 +95,6 @@ async function addToWallet(body, userID) {
     }
 
     const paymentIntent = await stripe.paymentIntents.create(payload);
-    // console.log(paymentIntent , "=====PAYMENT INTENT  ")
-
     return {
         data: { client_secret: paymentIntent.client_secret },
         message: "client secret created successfully",
@@ -121,8 +107,6 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
     let { notificationID } = body;
     const data_ = await User.findByIdAndUpdate(userID, { $inc: { walletPoints: -amount } });
     const data1 = await User.findByIdAndUpdate(landlordID, { $inc: { walletPoints: amount } })
-
-    // const { amount, status, created, id } = body.data.object;
     const created = moment().unix();
     propertyDetails = await Property.findById(propertyID);
     if (propertyDetails) {
@@ -135,13 +119,9 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
 
         let newCount = propertyDetails.payment_count + 1;
         if (propertyDetails.rentType === RentType.MONTHLY) {
-
             const originalDate = moment.unix(created);
-
             const oneMonthLater = originalDate.add(1, 'months');
-
             const timestampOneMonthLater = oneMonthLater.unix();
-
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -165,9 +145,6 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             })
 
             addRenterHistory.save()
-
-            // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(created);
@@ -198,13 +175,7 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
                 propertyID: propertyID,
                 renterActive: true
             })
-
-
-            // console.log(timestampOneQuaterLater, "------------------timestampOneQuaterLater")
-
-
             addRenterHistory.save()
-
         } else if (propertyDetails.rentType === RentType.YEARLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(created);
@@ -364,9 +335,6 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
             })
 
             addRenterHistory.save()
-
-            // console.log(timestampOneMonthLater, "-------------timestampOneMonthLater")
-
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             const originalDate = moment.unix(propertyDetails.rent_period_due);
@@ -488,12 +456,10 @@ async function payViaWalletServiceForOld(propertyID, userID, propertyDetails, am
         }
     }
     return {
-
         data: [],
         message: "success",
         status: true,
         statusCode: 200,
-
     }
 }
 
