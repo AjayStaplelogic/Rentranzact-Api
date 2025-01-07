@@ -99,8 +99,6 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 }
 
                 const add_wallet = new Wallet(wallet_payload);
-                console.log(add_wallet, '====add_wallet')
-
 
                 const transaction_payload = {
                     wallet: true,
@@ -112,7 +110,6 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                     transaction_type: ETRANSACTION_TYPE.referralBonus
                 };
 
-
                 if (UserRoles.LANDLORD === benificiaryDetails?.role) {
                     transaction_payload.landlordID = benificiaryDetails._id;
                 } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
@@ -120,15 +117,10 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 } else if (UserRoles.RENTER === benificiaryDetails?.role) {
                     transaction_payload.renterID = benificiaryDetails._id;
                 }
-                console.log(transaction_payload, '====transaction_payload')
-
                 const create_transaction = new Transaction(transaction_payload);
                 new_referral_earnings.save();
                 add_wallet.save();
-                console.log(add_wallet, '====add_wallet  222')
-
                 create_transaction.save();
-                console.log(create_transaction, '====create_transaction  222')
                 if (add_wallet._id) {
                     await User.findByIdAndUpdate(add_wallet.userID, {
                         $inc: {
@@ -140,11 +132,16 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
             }
         }
     } catch (error) {
-        console.log(error, '====error from bonus to wallet')
     }
 
 }
 
+/**
+ * To calculate referral bonus amount
+ * 
+ * @param {number} rtz_fee Rentranzact fee from which referal bonus is calculated
+ * @returns {number} Referal bonus amount from rentrazact fee (RTZ Fee)
+ */
 export const calculateReferralAmountWithRTZFee = (rtz_fee = 0) => {
     return Number((rtz_fee * EBonusPer.referrer) / 100) || 0;
 }

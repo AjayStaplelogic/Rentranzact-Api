@@ -6,9 +6,7 @@ export const updateRefundStatusFromWebhook = (gateway_type = null, event,) => {
     try {
         const { id, status } = event;
         refundStatusUpdate(id, gateway_type, status);
-
     } catch (error) {
-        console.log(error);
     }
 }
 
@@ -28,7 +26,6 @@ export const refundStatusUpdate = async (gateway_type, refund_id, status) => {
         });
     }
     catch (error) {
-        console.log(error);
         throw error;
     }
 }

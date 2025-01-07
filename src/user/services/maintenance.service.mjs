@@ -14,7 +14,6 @@ async function addMaintenanceRequests(body) {
     body.landlordID = landlord_id || null;
     body.property_manager_id = property_manager_id || null;
     const data = new Maintenance(body);
-
     data.save()
 
     let renterDetails = await User.findById(data.renterID)
@@ -37,18 +36,6 @@ async function addMaintenanceRequests(body) {
                 "maintanence_id": data._id.toString(),
             }
             NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-
-            // let create_notification = await Notification.create(notification_payload);
-            // if (create_notification) {
-            //     if (landlordDetails && landlordDetails.fcmToken) {
-            //         const metadata = {
-            //             "propertyID": data.propertyID.toString(),
-            //             "redirectTo": "maintanence",
-            //             "maintanence_id": create_notification.maintanence_id.toString(),
-            //         }
-            //         sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-            //     }
-            // }
         }
     }
 
@@ -72,22 +59,8 @@ async function addMaintenanceRequests(body) {
                 "maintanence_id": data._id.toString(),
             }
             NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
-
-
-            // let create_notification = await Notification.create(notification_payload);
-            // if (create_notification) {
-            //     if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
-            //         const metadata = {
-            //             "propertyID": data.propertyID.toString(),
-            //             "redirectTo": "maintanence",
-            //             "maintanence_id": create_notification.maintanence_id.toString(),
-            //         }
-            //         sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-            //     }
-            // }
         }
     }
-
 
     return {
         data: data,
@@ -166,7 +139,6 @@ async function resolveMaintenanceRequests(id) {
     const data = await Maintenance.findByIdAndUpdate(id, { status: ManinenanceEnums.STATUS.RESOLVED, resolvedOn: Date.now() })
 
     const renterDetails = await User.findById(data.renterID);
-    // const landlordDetails = await User.findById(data.landlordID)
     const propertyDetails = await Property.findById(data.propertyID);
 
     let notification_payload = {};
@@ -186,26 +158,12 @@ async function resolveMaintenanceRequests(id) {
         "maintanence_id": data._id.toString(),
     }
     NotificationService.createNotification(notification_payload, metadata, renterDetails)
-
-
-    // let create_notification = await Notification.create(notification_payload);
-    // if (create_notification) {
-    //     if (renterDetails && renterDetails.fcmToken) {
-    //         const metadata = {
-    //             "propertyID": data.propertyID.toString(),
-    //             "redirectTo": "maintanence",
-    //             "maintanence_id": create_notification.maintanence_id.toString(),
-    //         }
-    //         sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
-    //     }
-    // }
     return {
         data: data,
         message: `Maintenance request from ${renterDetails.fullName} has been marked resolved, and a notification has been sent to  ${renterDetails.fullName}.`,
         status: true,
         statusCode: 201,
     };
-
 }
 
 async function addRemarkToRequest(landlordRemark, maintenanceID) {
@@ -232,20 +190,6 @@ async function addRemarkToRequest(landlordRemark, maintenanceID) {
         "maintanence_id": data._id.toString(),
     }
     NotificationService.createNotification(notification_payload, metadata, renterDetails)
-
-
-    // let create_notification = await Notification.create(notification_payload);
-    // if (create_notification) {
-    //     if (renterDetails && renterDetails.fcmToken) {
-    //         const metadata = {
-    //             "propertyID": data.propertyID.toString(),
-    //             "redirectTo": "maintanence",
-    //             "maintanence_id": create_notification.maintanence_id.toString(),
-    //         }
-    //         sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
-    //     }
-    // }
-
     return {
         data: data,
         message: "remark has been added successfully",
@@ -278,19 +222,6 @@ async function cancelMaintenanceRequests(id) {
             "maintanence_id": data._id.toString(),
         }
         NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-
-
-        // let create_notification = await Notification.create(notification_payload);
-        // if (create_notification) {
-        //     if (landlordDetails && landlordDetails.fcmToken) {
-        //         const metadata = {
-        //             "propertyID": data.propertyID.toString(),
-        //             "redirectTo": "maintanence",
-        //             "maintanence_id": create_notification.maintanence_id.toString(),
-        //         }
-        //         sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-        //     }
-        // }
     }
 
     const propertyManagerDetails = await User.findById(data.property_manager_id);
@@ -312,19 +243,6 @@ async function cancelMaintenanceRequests(id) {
             "maintanence_id": data._id.toString(),
         }
         NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
-
-
-        // let create_notification = await Notification.create(notification_payload);
-        // if (create_notification) {
-        //     if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
-        //         const metadata = {
-        //             "propertyID": data.propertyID.toString(),
-        //             "redirectTo": "maintanence",
-        //             "maintanence_id": create_notification.maintanence_id.toString(),
-        //         }
-        //         sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-        //     }
-        // }
     }
     return {
         data: data,

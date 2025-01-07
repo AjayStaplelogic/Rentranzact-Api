@@ -24,11 +24,9 @@ async function addPropertyService(
   req
 ) {
 
-  // console.log(`[Add PropertyService]`)
   let { email } = body;
   const role = req?.user?.data?.role;
   let trimmedStr = body.amenities.slice(1, -1); // Removes the first and last character (quotes)
-
   let arr = JSON.parse("[" + trimmedStr + "]");
   let landlord_id = role === UserRoles.LANDLORD ? id : null;
   let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
@@ -106,9 +104,7 @@ async function addPropertyService(
   }
 
   const property = await Property.create(Property_);
-  // console.log(`[Property Created]`);
   if (property) {
-
     if (property.property_manager_id) {   // property have property manager then informing him via email
       User.findById(property.property_manager_id).then(property_manager => {
         PropertyEmails.assignPMToProperty({
@@ -122,7 +118,6 @@ async function addPropertyService(
     }
 
     // Sending notification to admin for approval
-    // const admins = await getAdmins();
     Admin.find({ role: "superAdmin" }).then((admins) => {
       if (admins && admins.length > 0) {
         for (const admin of admins) {
@@ -140,23 +135,9 @@ async function addPropertyService(
             "redirectTo": "property",
           }
           NotificationService.createNotification(notification_payload, metadata, admin)
-
-          // Notification.create(notification_payload).then((create_notification) => {
-          //   if (create_notification) {
-          //     if (admin && admin.fcmToken) {
-          //       const metadata = {
-          //         "propertyID": property._id.toString(),
-          //         "redirectTo": "property",
-          //       }
-          //       sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-          //     }
-          //   }
-          // });
         }
       }
     })
-    // console.log(`[Property Created][Finished]`);
-
     return {
       data: property,
       message: "property created successfully",
@@ -175,7 +156,6 @@ async function addPropertyService(
 
 async function searchInProperty(body) {
   let { longitude, latitude, type, budget, maxDistance, approval_status } = body;
-
   if (!longitude || !latitude) {
     return "Longitude and latitude are required";
   }
@@ -222,8 +202,6 @@ async function searchInProperty(body) {
       statusCode: 200,
     };
   } catch (error) {
-    console.log(error);
-    // res.status(500).send("Error searching for properties: " + error.message);
   }
 }
 
@@ -258,7 +236,6 @@ async function filterProperies(body, id) {
   const data = await Property.find(filters).sort(sort_query)
   let modifiedProperties = data;
   if (id) {
-    // const favorite = await User.findById(id).select("favorite")
     if (favorite_arr && favorite_arr.length > 0) {
       modifiedProperties = data?.map(property => {
         const liked = favorite_arr.includes(property._id);
@@ -306,20 +283,13 @@ async function nearbyProperies(body, userID) {
       query.rented = rented === 'true' ? true : false;
     }
 
-    // console.log(query, '====query')
-
     const data = await Property.find(query).sort(sort_query);
-
     let modifiedProperties = data;
-
-
     if (userID) {
       const favorite = await User.findById(userID).select("favorite")
       if (favorite) {
         modifiedProperties = data.map(property => {
-
           const liked = favorite?.favorite.includes(property._id);
-
           return { ...property.toObject(), liked };
         });
       }
@@ -332,7 +302,6 @@ async function nearbyProperies(body, userID) {
       statusCode: 200,
     };
   } else {
-    console.log("HERE")
     let query = {
       approval_status: { $in: approval_status?.split(",") ?? [ApprovalStatus.ACCEPTED] }
     }
@@ -351,9 +320,7 @@ async function nearbyProperies(body, userID) {
       const favorite = await User.findById(userID).select("favorite")
       if (favorite) {
         modifiedProperties = data.map(property => {
-
           const liked = favorite?.favorite.includes(property._id);
-
           return { ...property.toObject(), liked };
         });
       }
@@ -409,7 +376,6 @@ async function getPropertyByID(id, userID) {
   }
 
   // If property have property manager then sending property manager details
-  console.log(data.property_manager_id, '=====property_manager_id')
   if (data.property_manager_id) {
     const propertyManager = await User.findById(data.property_manager_id);
     if (propertyManager) {
@@ -446,13 +412,8 @@ async function getPropertyByID(id, userID) {
 }
 
 async function addFavoriteProperties(propertyID, renterID) {
-
-  // console.log(propertyID, renterID, "===== propety ID renter ID")
   const favorite = await User.findOne({ _id: renterID, favorite: propertyID });
-
   const isFavorite = favorite !== null;
-
-
   if (isFavorite) {
     const data = await User.findByIdAndUpdate(
       renterID,
@@ -473,7 +434,6 @@ async function addFavoriteProperties(propertyID, renterID) {
       { $push: { favorite: propertyID } },
       { new: true }
     );
-    // console.log(data, "")
     return {
       data: data,
       message: "Property favorite successfully",
@@ -491,24 +451,12 @@ async function searchPropertyByString(search, userID) {
     ],
   };
 
-
   const results = await Property.find(query);
-
   const favorite = await User.findById(userID).select("favorite")
-
   const modifiedProperties = results?.map(property => {
-
-    // console.log(property, "===========propertyyyyy")
-
     const liked = favorite?.favorite.includes(property._id);
-
-    // console.log(property._id, "===========propertyyyyy id")
-
     return { ...property.toObject(), liked };
   });
-
-
-
 
   return {
     data: modifiedProperties,
@@ -519,7 +467,6 @@ async function searchPropertyByString(search, userID) {
 }
 
 async function getMyProperties(role, id, req) {
-
   let { rented, city, type, search } = req.query;
   let query = {}
 
@@ -615,7 +562,6 @@ async function getMyProperties(role, id, req) {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
                   { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
-                  // { kinIdentityCheck: { $eq: true } }      // Commented this code because kin verification functionaliy no longer exists
                 ]
               }
             },
@@ -678,7 +624,6 @@ async function getMyProperties(role, id, req) {
       }
     ]);
   } else if (role === UserRoles.PROPERTY_MANAGER) {
-    // console.log(query, '=====query');
     data = await Property.aggregate([
       {
         $match: query
@@ -698,7 +643,6 @@ async function getMyProperties(role, id, req) {
                 $and: [
                   { $expr: { $eq: ["$propertyIDObjectId", "$$propertyId"] } },
                   { applicationStatus: { $eq: RentApplicationStatus.PENDING } },
-                  // { kinIdentityCheck: { $eq: true } }
                 ]
               }
             },
@@ -759,22 +703,16 @@ async function getMyProperties(role, id, req) {
         }
       }
     ]);
-
   }
-
   return {
     data: data,
     message: "Search found",
     status: true,
     statusCode: 200,
   };
-
 }
 
 async function leavePropertyService(userID, propertyID) {
-
-  console.log(propertyID, "--=-=-=-=")
-
   const data = await Property.findByIdAndUpdate(propertyID, {
     renterID: null,
     rented: false,
@@ -818,13 +756,11 @@ async function leavePropertyService(userID, propertyID) {
 }
 
 async function deletePropertyService(userID, propertyID) {
-
   const data = await Inspection.find({
     landlordID: userID,
     inspectionStatus: InspectionStatus.ACCEPTED,
     propertyID: propertyID
   });
-  console.log(data.length, "-----data")
 
   if (data.length !== 0) {
     return {
@@ -837,7 +773,6 @@ async function deletePropertyService(userID, propertyID) {
   } else {
 
     const data = await Property.findByIdAndDelete(propertyID);
-
     await Inspection.deleteMany({ landlordID: userID })
 
     return {
@@ -846,7 +781,6 @@ async function deletePropertyService(userID, propertyID) {
       status: true,
       statusCode: 200,
     };
-
   }
 }
 
@@ -891,7 +825,6 @@ function getRentalBreakUp(propertyDetails) {
   breakdown.total_amount = Math.round(breakdown.total_amount);
   return breakdown;
 }
-
 
 export {
   deletePropertyService,

@@ -93,13 +93,8 @@ async function loginUser(body) {
               statusCode: 401,
               accessToken: "",
             };
-
           }
-
         }
-
-
-
       } else {
 
         let otp = generateOTP();
@@ -146,12 +141,7 @@ async function addUser(body) {
     };
   }
 
-  // const referralCode = generateReferralCode();
-
-  // body.referralCode = referralCode;
-
   let { password } = body;
-
   const salt = parseInt(process.env.SALT);
 
   const hashedPassword = await new Promise((resolve, reject) => {
@@ -165,20 +155,10 @@ async function addUser(body) {
   });
 
   body.password = hashedPassword;
-
-  // const saveInReferral = new Referral({ code: referralCode });
-
-  // await saveInReferral.save();
-
-
   body.myCode = await referralService.generateMyCode(8);
-  console.log(body.myCode, '====body.myCode')
   const user = new User(body);
-
   await user.save();
-
   const htmlTemplate = html(user.otp, user.fullName);
-
   sendMail(body.email, "OTP Verification", htmlTemplate);
 
   return {
@@ -195,15 +175,11 @@ async function validateCode(code) {
 }
 
 async function myProfileDetails(id, role) {
-
   const data = await User.findOne({
     _id: id,
-    // role: role
   });
 
-
   let data_ = data.toObject();
-
   return {
     data: data_,
     message: "fetched user details successfully",
@@ -224,14 +200,9 @@ async function applyReferralCode(code, userID) {
 
 async function verifyOtp(body) {
   const { otp, id, fcmToken } = body;
-
   const user = await User.findById(id);
-
   if (user?.otp === otp) {
-
     const user_ = await User.findByIdAndUpdate({ _id: id }, { verified: true, otp: "", fcmToken: fcmToken });
-
-
     return {
       data: user_,
       message: "otp verified successfully",
@@ -250,10 +221,7 @@ async function verifyOtp(body) {
 }
 
 async function socialSignup(body) {
-
   const { socialPlatform, email, email_verified, name, picture, exp, fcmToken, referralCode } = body;
-
-
   const user = await User.findOne({
     email: email,
     deleted : false,
@@ -293,14 +261,9 @@ async function socialSignup(body) {
     }
   }
 
-
-
-
   if (socialPlatform === "google") {
     const timestampMoment = moment.unix(exp);
-
     const currentMoment = moment();
-
     if (timestampMoment.isBefore(currentMoment)) {
       //token hase expired
 
@@ -311,15 +274,6 @@ async function socialSignup(body) {
         statusCode: 401,
       };
     } else {
-      //token is not expired
-
-      // const user = await User.findOne({
-      //   email: email,
-      //   // socialPlatform: socialPlatform,
-      // });
-
-      // console.log(user, "0-----user");
-
       if (user) {
         await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
@@ -345,9 +299,7 @@ async function socialSignup(body) {
         }
 
         userPayload.myCode = await referralService.generateMyCode(8);
-
         const newUser = new User(userPayload);
-
         newUser.save();
         await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
@@ -362,13 +314,9 @@ async function socialSignup(body) {
     }
   } else if (socialPlatform === "facebook") {
     const { expiresIn } = body;
-
     const currentMoment = moment();
-
     const expiresTimeStamp = currentMoment + expiresIn;
-
     const timestampMoment = moment.unix(expiresTimeStamp);
-
     if (timestampMoment.isBefore(currentMoment)) {
       return {
         data: [],
@@ -377,11 +325,6 @@ async function socialSignup(body) {
         statusCode: 401,
       };
     } else {
-      // const user = await User.findOne({
-      //   email: email,
-      //   // socialPlatform: socialPlatform,
-      // });
-
       if (user) {
         await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
@@ -408,8 +351,6 @@ async function socialSignup(body) {
 
         userPayload.myCode = await referralService.generateMyCode(8);
         const newUser = new User(userPayload);
-
-
         newUser.save();
         await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
@@ -423,10 +364,7 @@ async function socialSignup(body) {
       }
     }
   } else {
-    // console.log("login with apple");
-
     const { id_token, nonce, email, socialPlatform, name } = body;
-
     const appleIdTokenClaims = await appleSigninAuth.verifyIdToken(id_token, {
       /** sha256 hex hash of raw nonce */
       nonce: nonce ? crypto.createHash('sha256').update(nonce).digest('hex') : undefined,
@@ -448,12 +386,6 @@ async function socialSignup(body) {
         statusCode: 401,
       };
     } else {
-      // const user = await User.findOne({
-      //   email: email,
-      //   // socialPlatform: socialPlatform,
-      // });
-
-
       if (user) {
         await User.findByIdAndUpdate(user._id, { fcmToken: fcmToken })
         return {
@@ -479,9 +411,7 @@ async function socialSignup(body) {
         }
         userPayload.myCode = await referralService.generateMyCode(8);
         const newUser = new User(userPayload);
-
         newUser.save();
-
         await User.findByIdAndUpdate(newUser._id, { fcmToken: fcmToken })
 
         return {
@@ -493,30 +423,11 @@ async function socialSignup(body) {
         };
       }
     }
-
-    // appleIDtokencliams 
-    // {
-    //   iss: 'https://appleid.apple.com',
-    //   aud: 'com.rentranzact.mobile',
-    //   exp: 1721717184,
-    //   iat: 1721630784,
-    //   sub: '000146.68dacf49d0e946a99a8e02cf784efa7b.1818',
-    //   nonce: '1e4918cb32db603039286f280b06f1dd907f6f2b226dfa225f94373f0000935f',
-    //   c_hash: '8UUiOGEdhcAi83JevY4AfQ',
-    //   email: 'staplers.staplelogic@gmail.com',
-    //   email_verified: true,
-    //   auth_time: 1721630784,
-    //   nonce_supported: true
-    // } 
-
-
   }
 }
 
 async function forgotPasswordService(email) {
-
   const user = await User.findOne({ email: email }).lean().exec();
-
   if (user) {
     let otp = generateOTP();
     let update_user = await User.findByIdAndUpdate(user._id, { otp: otp }, { new: true });
@@ -552,12 +463,9 @@ async function forgotPasswordService(email) {
 }
 
 async function favouritesProperties(id, req) {
-
   let { search } = req.query;
   let query = {};
-
   const { favorite } = await User.findById(id).select("favorite")
-
   const data_ = favorite?.map((i) => {
     return new ObjectId(i)
   })
@@ -585,7 +493,6 @@ async function favouritesProperties(id, req) {
 async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
   if (role === UserRoles.RENTER) {
     const { landlord_id, propertyName } = await Property.findById(propertyID);
-
     const data = new LeaseAggrements({
       propertyName: propertyName,
       propertyID: propertyID,
@@ -597,8 +504,6 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
     })
 
     data.save();
-
-
     return {
       data: data,
       message: "successfully uploaded lease aggrement",
@@ -607,8 +512,6 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
     };
 
   } else if (role === UserRoles.LANDLORD) {
-
-
     const { renterID, propertyName, rented } = await Property.findById(propertyID);
     if (!rented) {
       return {
@@ -629,8 +532,6 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
     })
 
     data.save();
-
-
     return {
       data: data,
       message: "submitted lease aggrement successfully",
@@ -661,25 +562,17 @@ async function uploadLeaseAggrementService(propertyID, userID, role, dataUrl) {
     })
 
     data.save();
-
-
     return {
       data: data,
       message: "submitted lease aggrement successfully",
       status: true,
       statusCode: 201
     };
-
-
-
   }
-
-
 }
 
 async function getLeaseAggrementList(id, role) {
   if (role === UserRoles.RENTER) {
-
     const data = await LeaseAggrements.find({ renterID: id })
     return {
       data: data,
@@ -688,7 +581,6 @@ async function getLeaseAggrementList(id, role) {
       statusCode: 200
     };
   } else if (role === UserRoles.LANDLORD) {
-
     const data = await LeaseAggrements.find({ landlordID: id })
     return {
       data: data,
@@ -708,10 +600,7 @@ async function getLeaseAggrementList(id, role) {
 }
 
 async function getWalletDetails(id) {
-
-
   const { walletPoints, role, earned_rewards } = await User.findById(id);
-
   const results = await Wallet.aggregate([
     { $match: { userID: id } },
     {
@@ -721,9 +610,6 @@ async function getWalletDetails(id) {
       }
     }
   ]);
-
-  // console.log(results, "==-=-=-=-=-resultsss")
-
 
   const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
   const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
@@ -757,7 +643,6 @@ async function getWalletDetails(id) {
   let withdrawn_percentage = Number(Withdrawn) * 100 / total;
   let rent_collected_percentage = Number(RentCollected) * 100 / total;
   let earned_rewards_percentage = Number(EarnedRewards) * 100 / total;
-  // console.log(total, "==-=-=-=-=-total")
 
   return {
     data: {
@@ -779,27 +664,19 @@ async function getWalletDetails(id) {
 }
 
 async function deleteAggrementByID(userID, aggrementID, role) {
-
   if (role === UserRoles.RENTER) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
     const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
-
-    // console.log(data, "===data aaaaaaa")
     if (data) {
       const match = data?.url?.match(regex);
       if (match) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-
-        console.log(filePath, "=====pathid ")
         try {
           fs.unlinkSync(filePath)
         } catch (error) {
-          console.log(error, '====error');
         }
-        // console.log(filenameWithExtension);
       } else {
-        // console.log('Filename not found in URL');
       }
     }
 
@@ -819,16 +696,11 @@ async function deleteAggrementByID(userID, aggrementID, role) {
       if (match) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-
-        console.log(filePath, "=====pathid 22222 ")
         try {
           fs.unlinkSync(filePath)
         } catch (error) {
-          console.log(error, '====error22222');
         }
-        // console.log(filenameWithExtension);
       } else {
-        // console.log('Filename not found in URL');
       }
     }
     return {
@@ -849,16 +721,11 @@ async function deleteAggrementByID(userID, aggrementID, role) {
       if (match) {
         const filenameWithExtension = match[1];
         const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-
-        console.log(filePath, "=====pathid 22222 ")
         try {
           fs.unlinkSync(filePath)
         } catch (error) {
-          console.log(error, '====error22222');
         }
-        // console.log(filenameWithExtension);
       } else {
-        // console.log('Filename not found in URL');
       }
       return {
         data,

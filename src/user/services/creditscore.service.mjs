@@ -76,7 +76,6 @@ export const updateScoreInUserProfile = async (user_id, score, rating, reasons) 
     User.findByIdAndUpdate(user_id, {
         credit_score: score,
         credit_rating: rating,
-        // reasons: reasons,
         credit_score_fetched_at: new Date()
     }, {
         new: true

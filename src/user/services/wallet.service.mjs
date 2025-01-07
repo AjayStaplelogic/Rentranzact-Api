@@ -30,14 +30,12 @@ export const updateWalletPointsFromWebhook = (event) => {
             walletPoints: ((event?.data?.object?.available[0]?.amount + event?.data?.object?.pending[0]?.amount) / 100)
           })
             .then((updatedUser) => {
-              console.log(updatedUser, '====updatedUser Wallet')
             })
         }
       }
     });
   }
 }
-
 
 export const fetchBalanceAndUpdateWalletPoints = async (user_id, connect_acc_id) => {
   if (connect_acc_id) {
@@ -47,10 +45,8 @@ export const fetchBalanceAndUpdateWalletPoints = async (user_id, connect_acc_id)
         walletPoints: ((balance.available[0]?.amount + balance.pending[0]?.amount) / 100)
       })
         .then((updatedUser) => {
-          console.log(updatedUser, '====updatedUser for balance common function')
         })
     }
   }
 }
 
-// export { addInWalletService };

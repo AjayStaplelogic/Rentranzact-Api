@@ -6,15 +6,10 @@ import { Transaction } from "../models/transactions.model.mjs";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
 
 async function getDashboardStats(user) {
-
     const rented = await Property.find({ landlord_id: user._id, rented: true }).countDocuments();
-
     const vacant = await Property.find({ landlord_id: user._id, rented: false }).countDocuments();
-
     const maintenance = await Maintenance.find({ landlordID: user._id, status: "pending" }).countDocuments();
-
     const total = await Property.find({ landlord_id: user._id }).countDocuments()
-
     const mostRecentInspection = await Inspection.aggregate([
         {
             $match: {
@@ -39,8 +34,6 @@ async function getDashboardStats(user) {
             $lte: moment().endOf('year').toDate()
         }
     });
-
-    // const recentTransaction = await Transaction.find({landlordID : user._id}).sort({createdAt : -1}).limit(3).select('amount property renter date')
 
     const recentTransaction = await Transaction.aggregate([
         {
@@ -73,10 +66,7 @@ async function getDashboardStats(user) {
         }
     ])
 
-
     let data = [{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }];
-
-
     totalIncome.map((i) => {
         const date = moment.unix(i.date);
         const month = date.month() + 1;
@@ -106,15 +96,10 @@ async function getDashboardStats(user) {
 
 
 async function getDashboardStatsPM(user) {
-
     const rented = await Property.find({ property_manager_id: user._id, rented: true }).countDocuments();
-
     const vacant = await Property.find({ property_manager_id: user._id, rented: false }).countDocuments();
-
     const maintenance = await Maintenance.find({ property_manager_id: user._id, status: "pending" }).countDocuments();
-
     const total = await Property.find({ property_manager_id: user._id }).countDocuments()
-
     const mostRecentInspection = await Inspection.aggregate([
         {
             $match: {
@@ -142,9 +127,7 @@ async function getDashboardStatsPM(user) {
     });
 
     const recentTransaction = await Transaction.find({ pmID: user._id }).sort({ createdAt: -1 }).limit(3).select('amount property renter date')
-
     let data = [{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }];
-
     totalIncome.map((i) => {
         const date = moment.unix(i.date);
         const month = date.month() + 1;
@@ -169,7 +152,6 @@ async function getDashboardStatsPM(user) {
         status: true,
         statusCode: 201,
     };
-
 }
 
 

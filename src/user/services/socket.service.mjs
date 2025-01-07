@@ -7,12 +7,9 @@ const connected_users = [];
 const io = new Server();
 
 io.use(async (socket, next) => {
-    console.log(`[Socket Handshake]`)
-    // console.log(socket.handshake)
     if (!socket?.handshake?.headers["authorization"]) {
         return next(new Error('No headers provided'));
     }
-    // console.log(socket.handshake.headers, '===socket?.handshake?.headers')
 
     if (socket?.handshake?.headers["authorization"]) {
         let token_arr = socket?.handshake?.headers["authorization"].split(' ');
@@ -21,22 +18,15 @@ io.use(async (socket, next) => {
         }
         if (token_arr[0] == "Bearer" && token_arr[1]) {
             try {
-                // console.log(token_arr[1], '=====token_arr[1]====', process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
-                // console.log(token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET)
-                // console.log(socket?.handshake?.headers["admin-id"], '===socket?.handshake?.headers["admin-id"]')
                 if (token_arr[1] === process.env.ADMIN_JWT_ACCESS_TOKEN_SECRET) {
                     if (socket?.handshake?.headers["admin-id"]) {
                         socket["is_admin"] = true;
                         socket["admin_id"] = socket?.handshake?.headers["admin-id"]
                         socket["user_id"] = socket?.handshake?.headers["admin-id"]
-                        console.log("Reached To Next Function")
                         return next();
                     }
-                    // console.log("Reached The Error the next true function")
                     return next(new Error("Admin Id required"));
                 }
-
-                // console.log("Else Part, Not Entered In IF")
 
                 const decoded = jwt.verify(token_arr[1], process.env.JWT_ACCESS_TOKEN_SECRET);
                 if (decoded.data && decoded.data._id) {
@@ -63,47 +53,32 @@ io.use(async (socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    // console.log(`[socket connected][socket Id] : ${socket.id}`)
-    // console.log(`[socket connected][user_id] : ${socket.user_id}`)
-
     chatService.user_online(socket, connected_users);
     chatService.join_multiple_rooms(socket);
-    // console.log(connected_users)
-    // console.log(socket.rooms)
-
     io.emit("user-online", {        // sending to all client about user login
         status: true,
         statusCode: 200,
         data: {
             user_id: socket.user_id,
             is_admin: socket.is_admin,
-            // admin_id: socket.admin_id
         }
     });
 
     socket.on("join-room", async (data) => {
-        // console.log(`[Listener Event]-[join-room]`);
         let room = await chatService.get_room_by_id(data.room_id);
-        // console.log(room, "====room")
         if (room) {
             let members = room?.user_ids;
-            // console.log(members, "====members")
-
             let room_id = `${room?._id}`
             if (members && members.length > 0) {
                 for await (let member of members) {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
                     if (socket_ids && socket_ids.length > 0) {
                         for (let socket_id of socket_ids) {
-                            // console.log(`[socket_id] ${socket_id}`)
-                            // console.log(`[room_id] ${room_id}`);
                             io.in(socket_id).socketsJoin(room_id);
                         }
                     }
                 }
             }
-            // console.log(room_id, '====room_id,', typeof (room_id))
-            // console.log(socket.rooms, '======socket.rooms1111')
             io.in(room_id).emit("join-room", {        // sending to current user only
                 status: true,
                 statusCode: 200,
@@ -113,7 +88,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on("join-private-room", async (data) => {
-        // console.log(`[Listener Event]-[join-private-room]`);
         let room = await chatService.join_private_room(socket, data);
         if (room) {
             let members = room?.room?.user_ids;
@@ -123,8 +97,6 @@ io.on('connection', (socket) => {
                     let socket_ids = await chatService.get_user_socket_ids(connected_users, `${member}`);
                     if (socket_ids && socket_ids.length > 0) {
                         for (let socket_id of socket_ids) {
-                            // console.log(`[socket_id] ${socket_id}`)
-                            // console.log(`[room_id] ${room_id}`);
                             io.in(socket_id).socketsJoin(room_id);
                         }
                     }
@@ -139,13 +111,8 @@ io.on('connection', (socket) => {
     })
 
     socket.on("new-message", async (data) => {
-        // console.log(`[Listener Event]-[new-message]`);
-        // console.log(data, '====data new Message')
         let message = await chatService.send_message(socket, data)
         let get_room = await chatService.get_room_by_id(data.room_id);
-        // console.log(message, '====message')
-        // console.log(get_room, '====get_room')
-        // console.log(socket.rooms, '======socket.rooms')
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
@@ -160,7 +127,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on("read-message", async (data) => {
-        // console.log(`[Listener Event]-[read-message]`);
         let message = await chatService.read_message(socket, data);
         if (message) {
             socket.to(`${message.room_id}`).emit("read-message", {
@@ -172,9 +138,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("typing", async (data) => {
-        // console.log(`[Listener Event]-[typing]`);
         data.user_id = socket.user_id;
-        // data.typing = true;      // it will come from frontend
         socket.to(data.room_id).emit("typing", {
             status: true,
             statusCode: 200,
@@ -183,7 +147,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on("delete-message", async (data) => {
-        // console.log(`[Listener Event]-[delete-message]`);
         let delete_message = await chatService.delete_message(data.message_id);
         if (delete_message) {
             io.in(`${delete_message.room_id}`).emit("delete-message", {
@@ -208,8 +171,6 @@ io.on('connection', (socket) => {
     })
 
     socket.on('user-offline', () => {
-        // console.log(`[Listener Event]-[user-offline]`);
-        // console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
         io.emit("user-offline", {        // sending to all client about user logout/offline
             status: true,
@@ -217,13 +178,11 @@ io.on('connection', (socket) => {
             data: {
                 user_id: socket.user_id,
                 is_admin: socket.is_admin,
-                // admin_id: socket.admin_id
             }
         })
     });
 
     socket.on('notification-count', async (data) => {
-        console.log(`[Listener Event]-[nofitication-count']`);
         const unread_count = await chatService.unread_notification_count(data.user_id)
         let socket_ids = await chatService.get_user_socket_ids(connected_users, data.user_id);
         if (socket_ids && socket_ids.length > 0) {
@@ -240,8 +199,6 @@ io.on('connection', (socket) => {
     });
 
     socket.on('disconnect', () => {
-        // console.log(`[Listener Event]-[disconnected]`);
-        // console.log(`[socket disconnected] : ${socket.id}`);
         chatService.user_offline(socket, connected_users);
         io.emit("user-offline", {        // sending to all client about user logout/offline
             status: true,
@@ -249,7 +206,6 @@ io.on('connection', (socket) => {
             data: {
                 user_id: socket.user_id,
                 is_admin: socket.is_admin,
-                // admin_id: socket.admin_id
             }
         })
     });
@@ -263,9 +219,7 @@ io.on("connection_error", (err) => {
 });
 
 io.on("close", (socket) => {
-    // console.log(`[socket closed] : ${socket.id}`);
     chatService.user_online(socket, connected_users);
-    // console.log(connected_users)
 });
 
 

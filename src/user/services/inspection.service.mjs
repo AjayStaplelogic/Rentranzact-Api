@@ -3,15 +3,11 @@ import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
-import moment from "moment";
-import sendNotification from "../helpers/sendNotification.mjs";
-import { Notification } from "../models/notification.model.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import * as NotificationService from "./notification.service.mjs";
 
 async function createInspection(body, renterID) {
   const { propertyID, inspectionDate, inspectionTime, id, _id } = body;
-
   const property = await Property.findById(propertyID);
   if (!property) {
     return {
@@ -23,12 +19,8 @@ async function createInspection(body, renterID) {
   }
 
   const renterDetails = await User.findById(renterID);
-
   const landlordDetails = await User.findById(property.landlord_id)
-
   const { fullName, picture, phone, countryCode, email } = renterDetails;
-
-
   const payload = {
     ...body
   }
@@ -42,8 +34,6 @@ async function createInspection(body, renterID) {
     phone: phone,
     email: email
   };
-
-  // console.log(property, "==========property")
 
   payload.propertyName = property.propertyName;
   payload.addressText = property.address.addressText;
@@ -79,17 +69,6 @@ async function createInspection(body, renterID) {
         "inspection_id": data._id,
       }
       NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-      // let create_notification = await Notification.create(notification_payload);
-      // if (create_notification) {
-      //   if (landlordDetails && landlordDetails.fcmToken) {
-      //     const metadata = {
-      //       "propertyID": data.propertyID.toString(),
-      //       "redirectTo": "inspection",
-      //       "inspection_id": create_notification.inspection_id,
-      //     }
-      //     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-      //   }
-      // }
     }
 
     if (property_manger_details) {
@@ -104,25 +83,13 @@ async function createInspection(body, renterID) {
       notification_payload.send_to = property_manger_details?._id;
       notification_payload.property_manager_id = property_manger_details?._id;
 
-                const metadata = {
-            "propertyID": data.propertyID.toString(),
-            "redirectTo": "inspection",
-            "inspection_id": data._id,
-          }
+      const metadata = {
+        "propertyID": data.propertyID.toString(),
+        "redirectTo": "inspection",
+        "inspection_id": data._id,
+      }
 
-          NotificationService.createNotification(notification_payload, metadata, property_manger_details)
-
-      // let create_notification = await Notification.create(notification_payload);
-      // if (create_notification) {
-      //   if (property_manger_details && property_manger_details.fcmToken) {
-      //     const metadata = {
-      //       "propertyID": data.propertyID.toString(),
-      //       "redirectTo": "inspection",
-      //       "inspection_id": create_notification.inspection_id,
-      //     }
-      //     sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-      //   }
-      // }
+      NotificationService.createNotification(notification_payload, metadata, property_manger_details)
     }
 
     return {
@@ -267,12 +234,7 @@ async function fetchInspections(userData, req) {
 
 async function updateInspectionStatus(body, id) {
   const { status, inspectionID, reason } = body;
-
   const inspectionDetails = await Inspection.findById(inspectionID);
-
-  // const renterDetails = await User.findById(inspectionDetails?.RenterDetails?.id);
-  // const landlordDetails = await User.findById(inspectionDetails.landlordID);
-
   let notification_payload = {};
   notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.inspection_view;
   notification_payload.notificationHeading = "Inspection Update";
@@ -292,27 +254,22 @@ async function updateInspectionStatus(body, id) {
     if (reason) {
       update_payload.cancelReason = reason;
     }
-    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`
     notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
     notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`;
-    // console.log(notificationBody, "---notification body in condition")
   }
 
   if (InspectionStatus.ACCEPTED === status) {
     update_payload.acceptedBy = id;
-    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
     notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
     notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`;
   }
 
   if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
-    // notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`
     notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is completed by ${inspectionDetails.landlordName}`;
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
-
   const metadata = {
     "propertyID": data.propertyID.toString(),
     "redirectTo": "inspection",
@@ -320,20 +277,6 @@ async function updateInspectionStatus(body, id) {
   }
 
   NotificationService.createNotification(notification_payload, metadata, false)
-
-  // let create_notification = await Notification.create(notification_payload);
-  // if (create_notification) {
-  //   User.findById(create_notification.send_to).then((send_to_details) => {
-  //     if (send_to_details && send_to_details.fcmToken) {
-
-  //       sendNotification(send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, send_to_details.role)
-  //     }
-  //   })
-  // }
-  // console.log(notificationBody, "----notificationBody")
-
-  // const data_ = await sendNotification(renterDetails, "single", title, notificationBody, metadata, UserRoles.RENTER)
-
   return {
     data: data,
     message: "inspection status changed successfully",
@@ -382,20 +325,8 @@ async function inspectionEditService(body) {
                 "redirectTo": "inspection",
                 "inspection_id": data._id,
               }
-            
-              NotificationService.createNotification(notification_payload, metadata, landlordDetails)
 
-              // let create_notification = await Notification.create(notification_payload);
-              // if (create_notification) {
-              //   if (landlordDetails && landlordDetails.fcmToken) {
-              //     const metadata = {
-              //       "propertyID": data.propertyID.toString(),
-              //       "redirectTo": "inspection",
-              //       "inspection_id": create_notification.inspection_id,
-              //     }
-              //     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-              //   }
-              // }
+              NotificationService.createNotification(notification_payload, metadata, landlordDetails)
             }
           })
         }
@@ -419,27 +350,13 @@ async function inspectionEditService(body) {
                 "redirectTo": "inspection",
                 "inspection_id": data._id,
               }
-            
+
               NotificationService.createNotification(notification_payload, metadata, property_manger_details)
-
-
-              // let create_notification = await Notification.create(notification_payload);
-              // if (create_notification) {
-              //   if (property_manger_details && property_manger_details.fcmToken) {
-              //     const metadata = {
-              //       "propertyID": data.propertyID.toString(),
-              //       "redirectTo": "inspection",
-              //       "inspection_id": create_notification.inspection_id,
-              //     }
-              //     sendNotification(property_manger_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-              //   }
-              // }
             }
           })
         }
       }
     });
-
 
     return {
       data: data,
@@ -490,9 +407,7 @@ async function getInspectionsByUserID(id, role, PropertyID) {
 
 async function searchInspectionService(id, role, text, status) {
   if (status === InspectionStatus.COMPLETED) {
-
     const regex = new RegExp(text, "ig");
-
     const data = await Inspection.aggregate([
       {
         $match: {
@@ -507,20 +422,14 @@ async function searchInspectionService(id, role, text, status) {
       }
     ]);
 
-    // console.log(data, "==d=dyaaaadtaa ")
-
     return {
       data: data,
       message: "rent application completed successfully",
       status: true,
       statusCode: 200,
     };
-
-
   } else if (status === "pending") {
-
     const regex = new RegExp(text, "ig");
-
     const data = await Inspection.aggregate([
       {
         $match: {
@@ -543,9 +452,7 @@ async function searchInspectionService(id, role, text, status) {
     };
 
   } else if (status === "upcoming") {
-
     const regex = new RegExp(text, "ig");
-
     const data = await Inspection.aggregate([
       {
         $match: {
@@ -559,16 +466,12 @@ async function searchInspectionService(id, role, text, status) {
         }
       }
     ]);
-
-    // console.log(data, "==d=dyaaaadtaa ")
-
     return {
       data: data,
       message: "rent application completed successfully",
       status: true,
       statusCode: 200,
     };
-
   }
 }
 

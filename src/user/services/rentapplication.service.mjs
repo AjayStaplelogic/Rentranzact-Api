@@ -1,13 +1,9 @@
-import mongoose from "mongoose";
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
-import moment from "moment";
-import { Notification } from "../models/notification.model.mjs";
 import { User } from "../models/user.model.mjs";
-import sendNotification from "../helpers/sendNotification.mjs";
 import assert from "assert";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
@@ -151,16 +147,7 @@ async function addRentApplicationService(body, user) {
       }
     }
 
-    let isKinSame = kinDetailsSame(kinDetails, renterDetails.kinDetails)
-
-    // let verifyStatus = true;
-
-    // if (isKinSame) {             // Commented because client says no need to verify kin details
-    //   verifyStatus = true
-    // } else {
-    //   console.log("hitting smile api")
-    //   verifyStatus = await identityVerifier(identificationType, kinDetails);
-    // }
+    // let isKinSame = kinDetailsSame(kinDetails, renterDetails.kinDetails)
 
     // verifying personal details
     let smile_identification_payload = {
@@ -175,7 +162,6 @@ async function addRentApplicationService(body, user) {
       kinEmail: emailID,
     }
     const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);     // uncomment this code after client recharge for smile identity verification
-    // const verifyStatus = true;  // Remove this code after client recharge for smile identity verification
     if (verifyStatus) {
       //add kin details to the user
       kinDetails["identificationType"] = identificationType;
@@ -214,7 +200,6 @@ async function addRentApplicationService(body, user) {
           user_update_payload.fullName.concat(' ', data.lastName)
         }
 
-        // if (!isKinSame) {
         user_update_payload.kinDetails = {
           first_name: data.kinFirstName,
           last_name: data.kinLastName,
@@ -228,11 +213,8 @@ async function addRentApplicationService(body, user) {
           relationshipKin: data.relationshipKin,
           identificationType: data.verifcationType,
         }
-        // }
-        console.log(user_update_payload, '==========user_update_payload', renterID);
 
        const updatedRenter = await User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
-       console.log(updatedRenter, '==========updatedRenter',)
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
           if (landlordDetails) {
             let notification_payload = {};
@@ -252,18 +234,6 @@ async function addRentApplicationService(body, user) {
               "rentApplication": data._id.toString()
             }
             NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-
-            // let create_notification = await Notification.create(notification_payload);
-            // if (create_notification) {
-            //   if (landlordDetails && landlordDetails.fcmToken) {
-            //     const metadata = {
-            //       "propertyID": landlord._id.toString(),
-            //       "redirectTo": "rentApplication",
-            //       "rentApplication": create_notification.renterApplicationID
-            //     }
-            //     sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.LANDLORD)
-            //   }
-            // }
           }
         })
 
@@ -287,21 +257,8 @@ async function addRentApplicationService(body, user) {
               "rentApplication": data._id.toString()
             }
             NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
-
-            // let create_notification = await Notification.create(notification_payload);
-            // if (create_notification) {
-            //   if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
-            //     const metadata = {
-            //       "propertyID": landlord._id.toString(),
-            //       "redirectTo": "rentApplication",
-            //       "rentApplication": create_notification.renterApplicationID
-            //     }
-            //     await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, JSON.stringify(metadata), UserRoles.PROPERTY_MANAGER)
-            //   }
-            // }
           }
         })
-        console.log('=======Rent Application End ========');
 
         return {
           data: data,
@@ -326,7 +283,6 @@ async function addRentApplicationService(body, user) {
     }
 
   } catch (error) {
-    console.log(error);
     return {
       data: [],
       message: `${error}`,
@@ -348,7 +304,6 @@ async function rentApplicationsList(user, req) {
   } else if (req?.user?.data?.role == UserRoles.LANDLORD) {
     query.landlordID = req?.user?.data?._id;
   } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER) {
-
     query.pmID = req?.user?.data?._id;
   }
 
@@ -359,14 +314,6 @@ async function rentApplicationsList(user, req) {
   if (propertyID) {
     query.propertyID = propertyID;
   }
-
-  // if (kinIdentityCheck) {
-  //   if (kinIdentityCheck === "true") {
-  //     query.kinIdentityCheck = true;
-  //   } else if (kinIdentityCheck === "false") {
-  //     query.kinIdentityCheck = false;
-  //   }
-  // }
 
   let field = "createdAt";
   let order = "desc";
@@ -386,7 +333,6 @@ async function rentApplicationsList(user, req) {
     ]
   }
 
-  // console.log(query, "====query")
   let pipeline = [
     {
       $match: query
@@ -472,7 +418,6 @@ async function rentApplicationsList(user, req) {
     }
   ]
   let data = await rentApplication.aggregate(pipeline);
-  // console.log(data, '===data')
   return {
     data: data[0]?.data,
     message: "rent application fetched successfully",
@@ -485,7 +430,6 @@ async function rentApplicationsList(user, req) {
 
 async function updateRentApplications(body, id) {
   const { status, rentApplicationID, reason } = body;
-
   const rent_application_detail = await rentApplication.findById(rentApplicationID);
   if (rent_application_detail) {
     if (rent_application_detail.applicationStatus === status) {
@@ -523,15 +467,11 @@ async function updateRentApplications(body, id) {
             landlord_earning: breakdown?.landlord_earning ?? 0,
           },
             { new: true });
-
-          // const propertyDetails = await Property.findById(data.propertyID);
           if (data) {
             if (breakdown?.total_amount > 0) {
               User.findById(data.renterID).then(async (renterDetails) => {
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
-                // notification_payload.notificationHeading = `Your rent is due to ${landlordDetails?.fullName || propertyManagerDetails?.fullName}`;
-                // notification_payload.notificationBody = `Your monthly rent of ₦ ${propertyDetails.rent} on ${currentDate}`
                 notification_payload.notificationHeading = "Congratulations, your rent application have been approved";
                 notification_payload.notificationBody = "You can now proceed to make payment";
                 notification_payload.renterID = data.renterID;
@@ -540,7 +480,6 @@ async function updateRentApplications(body, id) {
                 notification_payload.propertyID = data.propertyID;
                 notification_payload.send_to = renterDetails._id;
                 notification_payload.property_manager_id = data.pmID;
-                // notification_payload.amount = propertyDetails.rent;
                 notification_payload.amount = breakdown.total_amount;
                 notification_payload.show_pay_now = true;
                 const metadata = {
@@ -550,19 +489,6 @@ async function updateRentApplications(body, id) {
                   "rentApplication": data._id.toString()
                 }
                 NotificationService.createNotification(notification_payload, metadata, renterDetails)
-
-                // let create_notification = await Notification.create(notification_payload);
-                // if (create_notification) {
-                //   if (renterDetails && renterDetails.fcmToken) {
-                //     const metadata = {
-                //       "amount": propertyDetails.rent.toString(),
-                //       "propertyID": data.propertyID.toString(),
-                //       "redirectTo": "payRent",
-                //       "rentApplication": create_notification.renterApplicationID.toString(),
-                //     }
-                //     sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
-                //   }
-                // }
               });
             }
           }
@@ -599,17 +525,7 @@ async function updateRentApplications(body, id) {
               "rentApplication": data._id.toString()
             }
             NotificationService.createNotification(notification_payload, metadata, renterDetails)
-
-            // let create_notification = await Notification.create(notification_payload);
-            // if (create_notification) {
-            //   if (renterDetails && renterDetails.fcmToken) {
-            //     const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString(), }
-            //     await sendNotification(renterDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.RENTER)
-            //   }
-            // }
           }
-          // console.log(data)
-
           return {
             data: data,
             message: "rent application canceled successfully",
@@ -625,7 +541,6 @@ async function updateRentApplications(body, id) {
             const landlordDetails = await User.findById(data.landlordID);
             if (landlordDetails) {
               let notification_payload = {};
-              // notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
               notification_payload.notificationHeading = "Rent Application Withdrawn";
               notification_payload.notificationBody = `Renter withdraw his rent application`;
               notification_payload.renterID = data.renterID;
@@ -640,21 +555,11 @@ async function updateRentApplications(body, id) {
                 "rentApplication": data._id.toString()
               }
               NotificationService.createNotification(notification_payload, metadata, landlordDetails)
-
-
-              // let create_notification = await Notification.create(notification_payload);
-              // if (create_notification) {
-              //   if (landlordDetails && landlordDetails.fcmToken) {
-              //     const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString() }
-              //     await sendNotification(landlordDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.LANDLORD)
-              //   }
-              // }
             }
 
             const propertyManagerDetails = await User.findById(data.pmID);
             if (propertyManagerDetails) {
               let notification_payload = {};
-              // notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
               notification_payload.notificationHeading = "Rent Application Withdrawn";
               notification_payload.notificationBody = `Renter withdraw his rent application`;
               notification_payload.renterID = data.renterID;
@@ -670,14 +575,6 @@ async function updateRentApplications(body, id) {
                 "rentApplication": data._id.toString()
               }
               NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
-
-              // let create_notification = await Notification.create(notification_payload);
-              // if (create_notification) {
-              //   if (propertyManagerDetails && propertyManagerDetails.fcmToken) {
-              //     const metadata = { "propertyID": data.propertyID.toString(), "redirectTo": "rentApplication", "rentApplication": create_notification.renterApplicationID.toString() }
-              //     await sendNotification(propertyManagerDetails, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, UserRoles.PROPERTY_MANAGER)
-              //   }
-              // }
             }
           }
           return {
@@ -712,7 +609,6 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
       $match: {
         landlordID: `${id}`,
         propertyID: PropertyID
-        // applicationStatus: RentApplicationStatus.PENDING
       }
     },
     {
@@ -776,7 +672,6 @@ async function getRentApplicationsByUserID(id, role, PropertyID) {
 
 async function getRentApplicationByID(id) {
   try {
-    console.log(`[Rent Application By Id]`)
     const data = await rentApplication.findById(id).lean().exec();
     if (data) {
       if (data.renterID) {
@@ -808,7 +703,6 @@ async function getRentApplicationByID(id) {
       }
     }
 
-    console.log(data)
     return {
       data: data,
       message: "rent application completed successfully",

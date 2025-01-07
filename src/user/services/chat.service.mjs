@@ -123,7 +123,6 @@ export const get_room_by_id = async (id) => {
         {
             $group: {
                 _id: "$_id",
-                // user_ids: { $push: "$user_details._id" },
                 user_details: {
                     $push: {
                         _id: "$user_details._id",
@@ -178,8 +177,6 @@ export const get_room_by_id = async (id) => {
         },
     ]);
 
-    // console.log(room, '=====room')
-
     if (room?.length > 0) {
         return room[0];
     }
@@ -205,7 +202,6 @@ export const send_message = async (socket, data) => {
         data.is_sender_admin = false;
         data.sender_id = socket.user_id;
     }
-    // data.reciever_id = await get_reciever_id_from_room(data.sender_id);
     let create_message = await Messages.create(data);
     if (create_message) {
         await update_room_last_message(create_message)
@@ -214,7 +210,6 @@ export const send_message = async (socket, data) => {
 }
 
 export const get_user_socket_ids = (connected_users, user_id) => {
-    // console.log(connected_users.filter(user => user.user_id === user_id), '=======connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)')
     return connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)
 }
 
@@ -235,7 +230,6 @@ export const update_room_last_message = async (message) => {
             new: true
         })
 
-    // console.log(update_room, '=======update_room')
     return update_room;
 }
 
@@ -252,7 +246,6 @@ export const read_message = async (socket, data) => {
     }
 
     let update_message = await Messages.findOneAndUpdate(query, { is_read: true }, { new: true });
-    // console.log(update_message, '=======updated message====')
     return update_message;
 }
 
