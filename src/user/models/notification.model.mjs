@@ -66,6 +66,10 @@ const notificationSchema = new mongoose.Schema(
             type: mongoose.Types.ObjectId,
             ref: 'transfers',
         },
+        review_id: {
+            type: mongoose.Types.ObjectId,
+            ref: 'reviews',
+        },
 
     },
     { timestamps: true }

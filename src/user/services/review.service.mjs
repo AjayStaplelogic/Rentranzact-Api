@@ -1,8 +1,12 @@
 import { Reviews } from "../models/reviews.model.mjs";
-import { ReviewTypeEnum, RatingFormula, EReviewStatus } from "../enums/review.enum.mjs";
+import { ReviewTypeEnum, RatingFormula, EReviewStatus, EReviewReportStatus } from "../enums/review.enum.mjs";
 import { User } from "../models/user.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Types } from "mongoose";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
+import { Admin } from "../../admin/models/admin.model.mjs";
+import { EADMINROLES } from "../../admin/enums/permissions.enums.mjs";
+import * as NotificationService from "../services/notification.service.mjs";
 const ObjectId = Types.ObjectId;
 
 /**
@@ -120,4 +124,67 @@ export const get_avg_by_rating_numbers = (score = 0) => {
         }
     }
     return 0;
+}
+/**
+ * When review updated sending notification to the users
+ * 
+ * @param {object} reviewData containing review object
+ * @param {string} updatedBy id of the user or admin who updated the review data
+ * @param {boolean} isUpdatedByUser true if updated by user otherwise false
+ * @returns {void} Nothing
+ */
+export const sendRatingNotification = (reviewData, updatedBy, isUpdatedByUser = false) => {
+    [isUpdatedByUser ? User : Admin].findById(updatedBy).then(async get_updated_by_details => {
+        const notification_payload = {};
+
+        // Send notification to landlord
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.review_view;
+        notification_payload.notificationHeading = "";
+        notification_payload.notificationBody = ``;
+        notification_payload.review_id = reviewData?._id ?? null;
+        notification_payload.is_send_to_admin = true;
+        const query = {
+            isDeleted: false
+        };
+
+        switch (reviewData.report_status) {
+            case EReviewReportStatus.reported:
+                notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} reported review. Please review and recommend for approval`;
+                notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} reported review. Please review and recommend for approval`;
+                query.role = EADMINROLES.REVIEWER_EMPLOYEE;
+                break;
+
+            case EReviewReportStatus.recommended:
+                notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
+                notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
+                query.role = EADMINROLES.REVIEWER_ADMIN;
+                break;
+
+            case EReviewReportStatus.recommendRejected:
+                break;
+
+            case EReviewReportStatus.accepted:
+                notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
+                notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
+                query.role = EADMINROLES.SUPER_ADMIN;
+                break;
+
+            case EReviewReportStatus.rejected:
+                break;
+        }
+
+        if (query.role) {
+            Admin.find(query).then((adminUsers) => {
+                for (let admin of adminUsers) {
+                    notification_payload.send_to = admin._id;
+                    const metadata = {
+                        "review_id": notification_payload.review_id.toString(),
+                        "redirectTo": notification_payload.redirect_to
+                    };
+
+                    NotificationService.createNotification(notification_payload, metadata, admin);
+                }
+            });
+        }
+    });
 }

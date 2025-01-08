@@ -9,4 +9,5 @@ export const ENOTIFICATION_REDIRECT_PATHS = {
     tawk_to_dashboard : "tawk_to_dashboard",
     electricity_bill_view : "electricity_bill_view",
     transfer_view : "transfer_view",
+    review_view : "review_view"
 }
