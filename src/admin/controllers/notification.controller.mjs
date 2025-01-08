@@ -36,7 +36,7 @@ async function getAllNotifications(req, res) {
     }
 
     if (send_to) {
-      query["send_to"] = ObjectId(send_to);
+      query["send_to"] = new ObjectId(send_to);
     }
 
     let field = "createdAt";
