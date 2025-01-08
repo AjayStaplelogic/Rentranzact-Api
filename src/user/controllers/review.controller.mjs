@@ -311,9 +311,13 @@ export const deleteReview = async (req, res) => {
 
 export const updateReportStatus = async (req, res) => {
     try {
-        let { id, report_status, report_reason } = req.body;
+        let { id, report_status, report_reason, current_user_id } = req.body;
         if (!id) {
             return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        if (!current_user_id) {
+            return sendResponse(res, {}, "Current user Id required", false, 400);
         }
 
         if (!report_status) {
@@ -327,7 +331,6 @@ export const updateReportStatus = async (req, res) => {
         const get_review = await Reviews.findOne({
             _id: id,
             isDeleted: false,
-            // landloard_id: req.user.data._id
         });
 
         if (get_review) {
@@ -363,9 +366,15 @@ export const updateReportStatus = async (req, res) => {
             let update_review = await Reviews.findOneAndUpdate({
                 _id: id,
                 isDeleted: false
-            }, update_payload);
+            },
+                update_payload,
+                {
+                    new: true
+                }
+            );
 
             if (update_review) {
+                ReviewServices.sendRatingNotification(update_review, current_user_id, true);
                 return sendResponse(res, {}, "success", true, 200);
             }
         }
@@ -377,9 +386,14 @@ export const updateReportStatus = async (req, res) => {
 
 export const updateRecommendStatus = async (req, res) => {
     try {
-        let { id, report_status } = req.body;
+        let { id, report_status, current_user_id } = req.body;
+
         if (!id) {
             return sendResponse(res, {}, "Id required", false, 400);
+        }
+
+        if (!current_user_id) {
+            return sendResponse(res, {}, "Current user Id required", false, 400);
         }
 
         if (!report_status) {
@@ -396,8 +410,6 @@ export const updateRecommendStatus = async (req, res) => {
         });
 
         if (get_review) {
-   
-
             if (get_review.report_status === report_status) {
                 return sendResponse(res, {}, "Review already has this status", false, 400);
             }
@@ -426,9 +438,15 @@ export const updateRecommendStatus = async (req, res) => {
             let update_review = await Reviews.findOneAndUpdate({
                 _id: id,
                 isDeleted: false
-            }, update_payload);
+            },
+                update_payload,
+                {
+                    new: true
+                }
+            );
 
             if (update_review) {
+                ReviewServices.sendRatingNotification(update_review, current_user_id, true);
                 return sendResponse(res, {}, "success", true, 200);
             }
         }

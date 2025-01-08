@@ -116,7 +116,7 @@ async function loginAdmin(body) {
   } else {
     return {
       data: [],
-      message: "admin not found",
+      message: "Invalid credentials",
       status: false,
       statusCode: 404,
     };

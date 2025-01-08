@@ -3,6 +3,7 @@ import { addAdmin, loginAdmin } from "../services/admin.service.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import * as authValidations from "../validations/auth.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
+import bcrypt from "bcrypt";
 
 async function login(req, res) {
   const { body } = req;
@@ -94,4 +95,42 @@ const editProfile = async (req, res) => {
   }
 }
 
-export { login, signup, getProfile, editProfile };
+const changePassword = async (req, res) => {
+  try {
+
+    const { isError, errors } = validator(req.body, authValidations.changePassword);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 403);
+    }
+
+    const get_admin = await Admin.findOne({
+      _id: req.body.id,
+      isDeleted: false
+    });
+
+    if (get_admin) {
+      const isMatch = bcrypt.compareSync(req.body.old_password, get_admin.password);
+      if (isMatch) {
+        const salt = parseInt(process.env.SALT);
+        const encrypted_pass = bcrypt.hashSync(req.body.new_password, salt);
+        if (encrypted_pass) {
+          let update_pass = await Admin.findByIdAndUpdate(get_admin._id, {
+            password: encrypted_pass
+          });
+          if (update_pass) {
+            return sendResponse(res, null, "Password changes successfully", true, 200);
+          }
+          return sendResponse(res, null, "User Not Found", false, 404);
+        }
+      }
+      return sendResponse(res, null, "Old password not matched", false, 400)
+    }
+    return sendResponse(res, null, "User Not Found", false, 404);
+  } catch (error) {
+    return sendResponse(res, null, error?.message, false, 400);
+  }
+}
+
+
+export { login, signup, getProfile, editProfile, changePassword };
