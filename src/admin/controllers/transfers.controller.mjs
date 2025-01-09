@@ -8,7 +8,6 @@ import * as AccountServices from "../../user/services/account.service.mjs";
 import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import * as TransferService from "../services/transfer.service.mjs";
-
 export const getAllTransfers = async (req, res) => {
     try {
         let { search, status, transfer_type } = req.query;
