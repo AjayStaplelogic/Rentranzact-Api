@@ -447,7 +447,7 @@ export const updateRecommendStatus = async (req, res) => {
             );
 
             if (update_review) {
-                ReviewServices.sendRatingNotification(update_review, current_user_id, true);
+                ReviewServices.sendRatingNotification(update_review, current_user_id,  update_review.report_status === EReviewReportStatus.reported ? true : false);
                 return sendResponse(res, {}, "success", true, 200);
             }
         }
