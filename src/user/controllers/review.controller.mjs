@@ -284,7 +284,7 @@ export const changeReviewStatus = async (req, res) => {
 
 export const deleteReview = async (req, res) => {
     try {
-        let { id } = req.query;
+        let { id, current_user_id } = req.query;
         if (!id) {
             return sendResponse(res, {}, "Id required", false, 400);
         }
@@ -300,6 +300,7 @@ export const deleteReview = async (req, res) => {
 
                 let update_property = await Property.findByIdAndUpdate(update_review.property_id, update_payload);
             }
+            activityLog(current_user_id, `deleted review`);
             return sendResponse(res, {}, "success", true, 200);
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);
@@ -374,7 +375,7 @@ export const updateReportStatus = async (req, res) => {
             );
 
             if (update_review) {
-                ReviewServices.sendRatingNotification(update_review, current_user_id, true);
+                ReviewServices.sendRatingNotification(update_review, current_user_id, update_review.report_status === EReviewReportStatus.reported ? true : false);
                 return sendResponse(res, {}, "success", true, 200);
             }
         }

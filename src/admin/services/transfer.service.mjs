@@ -3,6 +3,7 @@ import { ETRANSFER_STATUS } from "../../user/enums/transfer.enums.mjs"
 import { Admin } from "../models/admin.model.mjs";
 import { EADMINROLES } from "../enums/permissions.enums.mjs";
 import * as NotificationService from "../../user/services/notification.service.mjs";
+import activityLog from "../helpers/activityLog.mjs";
 
 /**
  * To send notifications to the admin users when transfer data updated
@@ -31,24 +32,30 @@ export const sendTransferNotifications = async (transferData, updatedBy) => {
                 notification_payload.notificationHeading = `Transfer initiated by ${get_updated_by_details?.fullName ?? ""}. Please review and approve the transfer`;
                 notification_payload.notificationBody = `Transfer initiated by ${get_updated_by_details?.fullName ?? ""}. Please review and approve the transfer`;
                 query.role = EADMINROLES.FINANCIAL_ADMIN;
+                activityLog(updatedBy, `initiates the transfer`);
                 break;
 
             case ETRANSFER_STATUS.initiateRejected:
+                activityLog(updatedBy, `rejected the transfer initiation`);
                 break;
 
             case ETRANSFER_STATUS.approvedByEmp:
                 notification_payload.notificationHeading = `Transfer approved by ${get_updated_by_details?.fullName ?? ""}. Please review and transfer`;
                 notification_payload.notificationBody = `Transfer approved by ${get_updated_by_details?.fullName ?? ""}. Please review and transfer`;
                 query.role = EADMINROLES.SUPER_ADMIN;
+                activityLog(updatedBy, `approved the transfers`);
                 break;
 
             case ETRANSFER_STATUS.rejectedByEmp:
+                activityLog(updatedBy, `rejected the transfers`);
                 break;
 
             case ETRANSFER_STATUS.transferred:
+                activityLog(updatedBy, `completed the transfer successfully`);
                 break;
 
             case ETRANSFER_STATUS.rejected:
+                activityLog(updatedBy, `rejected the final transfers`);
                 break;
         }
 

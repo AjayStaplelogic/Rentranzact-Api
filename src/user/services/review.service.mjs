@@ -7,6 +7,8 @@ import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import { Admin } from "../../admin/models/admin.model.mjs";
 import { EADMINROLES } from "../../admin/enums/permissions.enums.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
+import activityLog from "../../admin/helpers/activityLog.mjs";
+
 const ObjectId = Types.ObjectId;
 
 /**
@@ -158,18 +160,22 @@ export const sendRatingNotification = (reviewData, updatedBy, isUpdatedByUser = 
                 notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
                 notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
                 query.role = EADMINROLES.REVIEWER_ADMIN;
+                activityLog(updatedBy, `recommended review for deletion`);
                 break;
 
             case EReviewReportStatus.recommendRejected:
+                activityLog(updatedBy, `rejected review deletion request`);
                 break;
 
             case EReviewReportStatus.accepted:
                 notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
                 notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
                 query.role = EADMINROLES.SUPER_ADMIN;
+                activityLog(updatedBy, `approved recommendation for review deletion`);
                 break;
 
             case EReviewReportStatus.rejected:
+                activityLog(updatedBy, `rejected recommendation for review deletion`);
                 break;
         }
 
