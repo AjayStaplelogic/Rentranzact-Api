@@ -91,7 +91,6 @@ export const getAllActivityLogs = async (req, res) => {
                     updatedAt: "$updatedAt",
                     empID: "$empID",
                     // body: "$body",
-                    "employee.fullName": "$employee.fullName",
                     body: {
                         $cond: {
                             if: {
