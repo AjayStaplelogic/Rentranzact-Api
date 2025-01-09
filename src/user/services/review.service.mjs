@@ -136,8 +136,12 @@ export const get_avg_by_rating_numbers = (score = 0) => {
  * @returns {void} Nothing
  */
 export const sendRatingNotification = (reviewData, updatedBy, isUpdatedByUser = false) => {
+    console.log(updatedBy, '=========updatedBy')
     let Model = isUpdatedByUser === true ? User : Admin;
+    console.log(Model, '=========Model')
+
     Model.findById(updatedBy).then(async get_updated_by_details => {
+        console.log(get_updated_by_details, '=========get_updated_by_details')
         const notification_payload = {};
 
         // Send notification to landlord
