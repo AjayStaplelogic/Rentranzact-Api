@@ -32,30 +32,30 @@ export const sendTransferNotifications = async (transferData, updatedBy) => {
                 notification_payload.notificationHeading = `Transfer initiated by ${get_updated_by_details?.fullName ?? ""}. Please review and approve the transfer`;
                 notification_payload.notificationBody = `Transfer initiated by ${get_updated_by_details?.fullName ?? ""}. Please review and approve the transfer`;
                 query.role = EADMINROLES.FINANCIAL_ADMIN;
-                activityLog(updatedBy, `initiates the transfer`);
+                activityLog(updatedBy, `initiates the transfer for property '${transferData?.property_name ?? ""}'`);
                 break;
 
             case ETRANSFER_STATUS.initiateRejected:
-                activityLog(updatedBy, `rejected the transfer initiation`);
+                activityLog(updatedBy, `rejected the transfer initiation for property '${transferData?.property_name ?? ""}'`);
                 break;
 
             case ETRANSFER_STATUS.approvedByEmp:
                 notification_payload.notificationHeading = `Transfer approved by ${get_updated_by_details?.fullName ?? ""}. Please review and transfer`;
                 notification_payload.notificationBody = `Transfer approved by ${get_updated_by_details?.fullName ?? ""}. Please review and transfer`;
                 query.role = EADMINROLES.SUPER_ADMIN;
-                activityLog(updatedBy, `approved the transfers`);
+                activityLog(updatedBy, `approved the transfers for property '${transferData?.property_name ?? ""}'`);
                 break;
 
             case ETRANSFER_STATUS.rejectedByEmp:
-                activityLog(updatedBy, `rejected the transfers`);
+                activityLog(updatedBy, `rejected the transfers for property '${transferData?.property_name ?? ""}'`);
                 break;
 
             case ETRANSFER_STATUS.transferred:
-                activityLog(updatedBy, `completed the transfer successfully`);
+                activityLog(updatedBy, `completed the transfer successfully for property '${transferData?.property_name ?? ""}'`);
                 break;
 
             case ETRANSFER_STATUS.rejected:
-                activityLog(updatedBy, `rejected the final transfers`);
+                activityLog(updatedBy, `rejected the final transfers for property '${transferData?.property_name ?? ""}'`);
                 break;
         }
 

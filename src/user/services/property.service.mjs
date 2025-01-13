@@ -105,8 +105,10 @@ async function addPropertyService(
 
   const property = await Property.create(Property_);
   if (property) {
-    if (property.property_manager_id) {   // property have property manager then informing him via email
+    if (property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email
       User.findById(property.property_manager_id).then(property_manager => {
+
+        // Sending email notification to property manager
         PropertyEmails.assignPMToProperty({
           email: property_manager.email,
           property_id: property._id,
@@ -114,6 +116,50 @@ async function addPropertyService(
           landlord_name: req?.user?.data?.fullName,
           property_name: property.propertyName,
         })
+
+        // Sending system notification to property manager
+        const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.notificationHeading = "Property Assigned";
+        notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+        notification_payload.landlordID = property.landlord_id;
+        notification_payload.propertyID = property._id;
+        notification_payload.send_to = property.property_manager_id;
+        notification_payload.property_manager_id = property.property_manager_id;
+        const metadata = {
+          "propertyID": property._id.toString(),
+          "redirectTo": "property",
+        }
+        NotificationService.createNotification(notification_payload, metadata, property_manager)
+      })
+
+    }
+    if (property.landlord_id && role === UserRoles.PROPERTY_MANAGER) {   // property have landlord and property manager added the property then informing him via email
+      User.findById(property.landlord_id).then(landlord_details => {
+
+        // Sending email notification to landlord
+        PropertyEmails.assignLandlordToProperty({
+          email: landlord_details.email,
+          property_id: property._id,
+          landlord_name: landlord_details.fullName,
+          property_manager_name: req?.user?.data?.fullName,
+          property_name: property.propertyName,
+        })
+
+        // Sending system notification to landlord
+        const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.notificationHeading = "Property Assigned";
+        notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+        notification_payload.landlordID = property.landlord_id;
+        notification_payload.propertyID = property._id;
+        notification_payload.send_to = landlord_details._id;
+        notification_payload.property_manager_id = property.property_manager_id;
+        const metadata = {
+          "propertyID": property._id.toString(),
+          "redirectTo": "property",
+        }
+        NotificationService.createNotification(notification_payload, metadata, landlord_details)
       })
     }
 
@@ -783,7 +829,6 @@ async function deletePropertyService(userID, propertyID) {
     };
   }
 }
-
 
 function getRentalBreakUp(propertyDetails) {
   const breakdown = {

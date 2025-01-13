@@ -136,12 +136,10 @@ export const get_avg_by_rating_numbers = (score = 0) => {
  * @returns {void} Nothing
  */
 export const sendRatingNotification = (reviewData, updatedBy, isUpdatedByUser = false) => {
-    console.log(updatedBy, '=========updatedBy')
     let Model = isUpdatedByUser === true ? User : Admin;
-    console.log(Model, '=========Model')
-
     Model.findById(updatedBy).then(async get_updated_by_details => {
-        console.log(get_updated_by_details, '=========get_updated_by_details')
+        let get_property = await Property.findById(reviewData.property_id);
+
         const notification_payload = {};
 
         // Send notification to landlord
@@ -165,22 +163,22 @@ export const sendRatingNotification = (reviewData, updatedBy, isUpdatedByUser = 
                 notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
                 notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} recommended review for deletion. Please review and approve`;
                 query.role = EADMINROLES.REVIEWER_ADMIN;
-                activityLog(updatedBy, `recommended review for deletion`);
+                activityLog(updatedBy, `recommended review deletion for property '${get_property?.propertyName ?? ""}'`);
                 break;
 
             case EReviewReportStatus.recommendRejected:
-                activityLog(updatedBy, `rejected review deletion request`);
+                activityLog(updatedBy, `rejected review deletion request for property '${get_property?.propertyName ?? ""}'`);
                 break;
 
             case EReviewReportStatus.accepted:
                 notification_payload.notificationHeading = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
                 notification_payload.notificationBody = `${get_updated_by_details?.fullName ?? ""} approved review for deletion. Please review and delete`;
                 query.role = EADMINROLES.SUPER_ADMIN;
-                activityLog(updatedBy, `approved recommendation for review deletion`);
+                activityLog(updatedBy, `approved review deletion recommendation for property '${get_property?.propertyName ?? ""}'`);
                 break;
 
             case EReviewReportStatus.rejected:
-                activityLog(updatedBy, `rejected recommendation for review deletion`);
+                activityLog(updatedBy, `rejected review deletion recommendation for property '${get_property?.propertyName ?? ""}'`);
                 break;
         }
 

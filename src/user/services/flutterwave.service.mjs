@@ -1,4 +1,4 @@
-import {  RentType } from "../enums/property.enums.mjs";
+import { RentType } from "../enums/property.enums.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
