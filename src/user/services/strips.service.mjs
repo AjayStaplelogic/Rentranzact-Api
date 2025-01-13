@@ -1,7 +1,7 @@
 import Stripe from "stripe";
 import { Transaction } from "../models/transactions.model.mjs";
 import { Property } from "../models/property.model.mjs";
-import { RentBreakDownPer, RentType } from "../enums/property.enums.mjs";
+import { RentType } from "../enums/property.enums.mjs";
 import moment from "moment";
 import { User } from "../models/user.model.mjs";
 import { RentingHistory } from "../models/rentingHistory.model.mjs";
@@ -16,6 +16,7 @@ import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
+import * as TransactionServices from "../../user/services/transaction.service.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -178,8 +179,18 @@ async function addStripeTransaction(body, renterApplicationID) {
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
 
         // Adding commission for property manager
-        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-            await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+        if (propertyDetails.property_manager_id) {       // If property owner is landlord
+            if (propertyDetails.landlord_id) {
+                await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+            }
+
+            // Sending email to property manager about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.property_manager_id,
+                amount: amount
+            });
         }
         data.save()
 
@@ -203,6 +214,14 @@ async function addStripeTransaction(body, renterApplicationID) {
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
             TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+
+            // Sending email to landlord about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.landlord_id,
+                amount: amount
+            });
         }
         return {
             data: [],
@@ -465,8 +484,17 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     })
 
     // Adding commission for property manager
-    if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-        await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+    if (propertyDetails.property_manager_id) {       // If property owner is landlord
+        if (propertyDetails.landlord_id) {
+            await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
+        }
+        // Sending email to property manager about successful rent payment
+        TransactionServices.sendRentPaymentNotificationAndEmail({
+            property: propertyDetails,
+            renter_details: renterDetails,
+            send_to: propertyDetails?.property_manager_id,
+            amount: amount
+        });
     }
     data.save()
     if (notificationID) {
@@ -476,6 +504,14 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     // Requesting Admin for transfer admin account to landlord account
     if (propertyDetails?.landlord_id) {
         TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+
+        // Sending email to landlord about successful rent payment
+        TransactionServices.sendRentPaymentNotificationAndEmail({
+            property: propertyDetails,
+            renter_details: renterDetails,
+            send_to: propertyDetails?.landlord_id,
+            amount: amount
+        });
     }
 
     return {
