@@ -24,39 +24,13 @@ import * as NotificationService from "../services/notification.service.mjs";
 import * as PropertyEmails from "../emails/property.email.mjs";
 
 async function addProperty(req, res) {
-  // console.log(`[Inside add property controller]`)
   const { body } = req;
-
-  // console.log(body , "body in add propertyyyyyy")
-
   const id = req.user.data._id;
-
-
   const files = req.files;
 
   if (!files || files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
-
-  // const images = files.filter((file) => file.mimetype.startsWith("image/"));
-  // const documents = files.filter((file) => file.mimetype === "application/pdf");
-
-
-
-  // if (images.length > 0) {
-  //   // console.log("Images uploaded:");
-
-  //   images.forEach((image) => {
-
-  //   });
-  // }
-
-  // if (documents.length > 0) {
-  //   // console.log("Documents uploaded:");
-  //   documents.forEach((document) => {
-
-  //   });
-  // }
 
   const data = await addPropertyService(
     req.PropertyID,
@@ -73,95 +47,60 @@ async function addProperty(req, res) {
 
 async function searchProperty(req, res) {
   const { body } = req;
-
   const data = await searchInProperty(body);
-  console.log(data, '=======data')
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
 async function propertiesList(req, res) {
   const { body } = req;
-
-
-  // const id = req.user.data._id;
-
   const { nearByProperty, userID, } = body;
-
   if (nearByProperty) {
-
     const data = await nearbyProperies(body, userID);
-
-
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   } else {
     const data = await filterProperies(body, userID);
-
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
   }
 }
 
 async function propertyByID(req, res) {
   const { id } = req.params;
-  // const { _id } = req.user.data;
   const { userID } = req.query;
-
   const data = await getPropertyByID(id, userID);
-
   sendResponse(res, data?.data, data.message, data.status, data.statusCode);
 }
 
 async function deleteProperty(req, res) {
-
   const { id } = req.params;
   const { _id } = req.user.data;
-
   const data = await deletePropertyService(_id, id);
-
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
 async function addFavorite(req, res) {
   const { id } = req.params;
-
-  // console.log(id, "this is property which liked or dislikeddddd")
   const { _id } = req.user.data;
-
   const data = await addFavoriteProperties(id, _id);
-
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
 async function searchPropertyByKeywords(req, res) {
   const { search } = req.query;
   const { _id } = req.user.data;
-
-
   const data = await searchPropertyByString(search, _id);
-
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
 }
 
 async function myProperties(req, res) {
-  // console.log(`[My Properties API]`)
   const { role, _id } = req.user.data;
-
-
   const data = await getMyProperties(role, _id, req);
-
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
 }
 
 async function leaveProperty(req, res) {
-
   const userID = req.user.data._id;
-
   const propertyID = req.params.id;
-
-
   const data = await leavePropertyService(userID, propertyID)
-
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
@@ -307,7 +246,6 @@ async function getAllProperties(req, res) {
           landmark: "$landmark",
           rented: "$rented",
           liked: "$liked"
-          // dist  : "$dist",
         }
       },
       {
@@ -352,7 +290,6 @@ async function getAllProperties(req, res) {
         }
       })
     }
-    // console.log(pipeline, '====pipeline')
     let get_properties = await Property.aggregate(pipeline);
     return sendResponse(res, get_properties, "success", true, 200);
   } catch (error) {
@@ -362,7 +299,6 @@ async function getAllProperties(req, res) {
 
 async function getPropertyManagerList(req, res) {
   try {
-
     const sort_key = req.query.sort_key || "createdAt";
     const sort_order = req.query.sort_order || "desc";
 
@@ -429,46 +365,32 @@ async function getPropertyManagerList(req, res) {
 
 async function getPropertyManagerDetails(req, res) {
   try {
-
     const id = req.params.id;
-
     const data = await User.findById(id).select('fullName role email verified countryCode phone picture')
     return sendResponse(res, data, `user detail`, true, 200);
-
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
   }
-
 }
 
 async function getPropertyListByPmID(req, res) {
-
   try {
     const id = req.params.id;
     const data = await Property.find({ property_manager_id: id }).select('propertyName images address.addressText rent rentType avg_rating total_reviews rent_period_end rent_period_start lease_end_timestamp')
-
     return sendResponse(res, data, `property list for property manager`, true, 200);
-
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
   }
 }
 
 async function teminatePM(req, res) {
-
   try {
-
     const id = req.params.id;
-
     const data = await Property.findByIdAndUpdate(id, { property_manager_id: null })
-
     return sendResponse(res, data, `teminated property manager successfully`, true, 200);
-
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
   }
-
-
 }
 
 async function editProperty(req, res) {
@@ -542,9 +464,7 @@ async function editProperty(req, res) {
     req.body.approval_status = ApprovalStatus.PENDING;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
-
-
-      if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id) {   // property have property manager then informing him via email
+      if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email
         User.findById(property.property_manager_id).then(property_manager => {
           PropertyEmails.assignPMToProperty({
             email: property_manager.email,
@@ -553,9 +473,52 @@ async function editProperty(req, res) {
             landlord_name: req?.user?.data?.fullName,
             property_name: property.propertyName,
           })
+
+          // Sending system notification to property manager
+          const notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+          notification_payload.notificationHeading = "Property Assigned";
+          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+          notification_payload.landlordID = property.landlord_id;
+          notification_payload.propertyID = property._id;
+          notification_payload.send_to = property.property_manager_id;
+          notification_payload.property_manager_id = property.property_manager_id;
+          const metadata = {
+            "propertyID": property._id.toString(),
+            "redirectTo": "property",
+          }
+          NotificationService.createNotification(notification_payload, metadata, property_manager)
         })
       }
 
+      if (property.landlord_id && property.landlord_id != get_property.landlord_id && role === UserRoles.PROPERTY_MANAGER) {   // property have landlord and property manager added the property then informing him via email
+        User.findById(property.landlord_id).then(landlord_details => {
+
+          // Sending email notification to landlord
+          PropertyEmails.assignLandlordToProperty({
+            email: landlord_details.email,
+            property_id: property._id,
+            landlord_name: landlord_details.fullName,
+            property_manager_name: req?.user?.data?.fullName,
+            property_name: property.propertyName,
+          })
+
+          // Sending system notification to landlord
+          const notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+          notification_payload.notificationHeading = "Property Assigned";
+          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+          notification_payload.landlordID = property.landlord_id;
+          notification_payload.propertyID = property._id;
+          notification_payload.send_to = landlord_details._id;
+          notification_payload.property_manager_id = property.property_manager_id;
+          const metadata = {
+            "propertyID": property._id.toString(),
+            "redirectTo": "property",
+          }
+          NotificationService.createNotification(notification_payload, metadata, landlord_details)
+        })
+      }
 
       Admin.find({ role: "superAdmin" }).then((admins) => {
         if (admins && admins.length > 0) {
@@ -589,10 +552,7 @@ async function editProperty(req, res) {
       return sendResponse(res, property, 'property updated successfully', true, 200);
     }
     return sendResponse(res, null, "Invalid Id", false, 400);
-
-
   } catch (error) {
-    console.log(error, '=====error')
     return sendResponse(res, [], error.message, false, 400)
   }
 }
