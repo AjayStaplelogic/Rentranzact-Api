@@ -15,13 +15,13 @@ import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
-
+import * as TransactionServices from "../../user/services/transaction.service.mjs";
 async function addFlutterwaveTransaction(body, renterApplicationID) {
     const { status, amount, createdAt, id, meta_data } = body;
     const momentObject = moment(createdAt);
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
-    const { wallet, propertyID, userID, notificationID } = meta_data;
+    const { wallet, TransactionServices, userID, notificationID } = meta_data;
     const renterDetails = await User.findById(userID)
     const propertyDetails = await Property.findById(propertyID);
     const landlordDetails = await User.findById(propertyDetails.landlord_id);
@@ -154,8 +154,18 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED });
 
         // Adding commission for property manager
-        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        if (propertyDetails.property_manager_id) {       // If property owner is landlord
+            if (propertyDetails.landlord_id) {
+                await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+            }
+
+            // Sending email to property manager about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.property_manager_id,
+                amount: amount
+            });
         }
 
         data.save()
@@ -179,7 +189,15 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
             TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            // Sending email to landlord about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.landlord_id,
+                amount: amount
+            });
         }
+
     }
 
     return {
@@ -366,8 +384,18 @@ async function addFlutterwaveTransactionForOld(body) {
         }
 
         const data = new Transaction(changePayload)
-        if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
-            await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+        if (propertyDetails.property_manager_id) {       // If property owner is landlord
+            if (propertyDetails.landlord_id) {
+                await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+            }
+
+            // Sending email to property manager about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.property_manager_id,
+                amount: amount
+            });
         }
         data.save()
         if (notificationID) {
@@ -378,6 +406,14 @@ async function addFlutterwaveTransactionForOld(body) {
         if (propertyDetails?.landlord_id) {
             TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
         }
+
+        // Sending email to landlord about successful rent payment
+        TransactionServices.sendRentPaymentNotificationAndEmail({
+            property: propertyDetails,
+            renter_details: renterDetails,
+            send_to: propertyDetails?.landlord_id,
+            amount: amount
+        });
     }
 
     return {

@@ -1,6 +1,10 @@
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import mongoose from 'mongoose';
+import { User } from "../models/user.model.mjs";
+import { rentPaidEmail } from "../emails/rent.emails.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
+import * as NotificationService from "./notification.service.mjs";
 
 async function getMyTransaction(userID, role, req) {
   let { search, type, status } = req.query;
@@ -71,8 +75,8 @@ async function getMyTransaction(userID, role, req) {
         },
       },
       {
-        
-        $unset : ["property_mananger_details"]
+
+        $unset: ["property_mananger_details"]
       },
       {
         $sort: {
@@ -171,8 +175,8 @@ async function getMyTransaction(userID, role, req) {
         },
       },
       {
-        
-        $unset : ["property_mananger_details"]
+
+        $unset: ["property_mananger_details"]
       },
       {
         $sort: {
@@ -292,7 +296,49 @@ async function transactionByIdService(id) {
   };
 }
 
+/**
+ * 
+ * When rent payment succeeds then sending system and email notification
+ * 
+ * @param {object} options
+ * @param {object} options.property property details object for related payment
+ * @param {object} options.renter_details renter details object who is responsible for the payment
+ * @param {object} options.send_to id of the landlord or property manager to send the payment
+ * @param {object} options.amount amount of the payment
+ * @returns {void} nothing
+ */
+const sendRentPaymentNotificationAndEmail = (options) => {
+  let { property, renter_details, send_to, amount } = options;    // landlord id can be of property manager
+  User.findById(send_to).then(receiver_details => {
+
+    // Sending email notification to landlord
+    rentPaidEmail({
+      email: receiver_details.email,
+      fullName: receiver_details.fullName,
+      amount: amount,
+      property_name: property.propertyName,
+      renter_name: renter_details.fullName,
+    })
+
+    // Sending system notification to landlord
+    const notification_payload = {};
+    notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+    notification_payload.notificationHeading = "Rent Paid";
+    notification_payload.notificationBody = `${renter_details.fullName ?? ""} paid rent successfully`;
+    notification_payload.landlordID = property.landlord_id;
+    notification_payload.propertyID = property._id;
+    notification_payload.send_to = receiver_details._id;
+    notification_payload.property_manager_id = property.property_manager_id;
+    const metadata = {
+      "propertyID": property._id.toString(),
+      "redirectTo": "property",
+    }
+    NotificationService.createNotification(notification_payload, metadata, receiver_details)
+  })
+}
+
 export {
   getMyTransaction,
-  transactionByIdService
+  transactionByIdService,
+  sendRentPaymentNotificationAndEmail
 }

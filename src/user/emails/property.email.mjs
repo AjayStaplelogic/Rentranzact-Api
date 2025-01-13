@@ -61,7 +61,7 @@ export const assignLandlordToProperty = (options) => {
     <h2 style="color: #333333">Property Added</h2>
     <p style="font-size: 16px; color: #333333;">Dear <strong>${landlord_name}</strong>,</p>
     <p style="font-size: 16px; color: #555555">We hope this message finds you well.</p>
-    <p style="font-size: 16px; color: #555555">We would like to inform you that <strong>${property_manager_name}</strong> added a new property <strong>${property_name}</strong>. 
+    <p style="font-size: 16px; color: #555555">We would like to inform you that <strong>${property_manager_name}</strong> added a new property <strong>${property_name}</strong>
     on your behalf. Please click on the button to view property details.</p>
     <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" class="button" style=" display: inline-block;
             background-color: #007bff;
