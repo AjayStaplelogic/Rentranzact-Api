@@ -1,10 +1,14 @@
 import { subscribeNewsletter } from "../services/newsletter.service.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { getMyTransaction, transactionByIdService } from "../services/transaction.service.mjs";
+import { getMyTransaction, transactionByIdService, getRentTransactionHtml } from "../services/transaction.service.mjs";
 import { UserRoles } from '../enums/role.enums.mjs';
 import { Transaction } from "../models/transactions.model.mjs";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
+import { ConvertHtmlToPdf } from "../services/pdf.service.mjs";
+import { Property } from "../models/property.model.mjs";
+import { User } from "../models/user.model.mjs";
+
 
 async function myTransaction(req, res) {
   const { body } = req;
@@ -62,16 +66,13 @@ async function getAllRentTransactions(req, res) {
 
     query.propertyID = { $exists: true };
 
-    // console.log(query, '=======query')
-    // console.log(JSON.stringify(query2), '=======JSON.stringify(query2)')
-
     let pipeline = [
       {
         $match: query
       },
       {
-        $addFields : {
-          property_manager_id : {$toObjectId : "$pmID"}
+        $addFields: {
+          property_manager_id: { $toObjectId: "$pmID" }
         }
       },
       {
@@ -146,5 +147,37 @@ async function getAllRentTransactions(req, res) {
   }
 }
 
+async function downloadTransactionPdf(req, res) {
+  try {
+    const get_transaction = await Transaction.findById(req.query.id)
+    if (get_transaction) {
+      // let get_property = await Property.findById(get_transaction.propertyID);
+      let get_renter = await User.findById(get_transaction.renterID);
 
-export { myTransaction, transactionById, getAllRentTransactions };
+      let payload = {
+        transaction_date: get_transaction?.createdAt,
+        amount: get_transaction?.amount,
+        property_name: get_transaction?.property ?? "",
+        description: `Rent for ${get_transaction?.property ?? ""}`,
+        renter_name: get_renter?.fullName ?? "",
+        payment_method: get_transaction?.payment_mode ?? ""
+      }
+      // Convert HTML content to PDF (returns PDF as buffer)
+      const htmlContent = getRentTransactionHtml(payload)
+      const pdfBuffer = await ConvertHtmlToPdf(htmlContent);
+      const newBuffer = Buffer.from(pdfBuffer)
+      console.log('THis is buffer', Buffer.isBuffer(newBuffer));
+      res.set('Content-Type', 'application/octet-stream');
+      res.set('Content-Disposition', 'attachment; filename=transaction.pdf');
+      res.set('Content-Length', newBuffer.length);
+      return res.send(newBuffer);
+    }
+
+    return sendResponse(res, null, "Invalid Id", false, 400)
+
+  } catch (error) {
+    return sendResponse(res, null, `${error}`, false, 500)
+  }
+}
+
+export { myTransaction, transactionById, getAllRentTransactions, downloadTransactionPdf };

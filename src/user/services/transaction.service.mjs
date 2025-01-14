@@ -5,6 +5,8 @@ import { User } from "../models/user.model.mjs";
 import { rentPaidEmail } from "../emails/rent.emails.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import * as NotificationService from "./notification.service.mjs";
+import moment from "moment";
+import { numberToWords } from "../helpers/common.helper.mjs";
 
 async function getMyTransaction(userID, role, req) {
   let { search, type, status } = req.query;
@@ -337,8 +339,56 @@ const sendRentPaymentNotificationAndEmail = (options) => {
   })
 }
 
+
+const getRentTransactionHtml = (options) => {
+  const { transaction_date, amount, property_name, description, renter_name, payment_method } = options;
+  let html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Transaction Receipt</title>
+</head>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #F8F9FA; color: #333;">
+  <div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #FFFFFF; ">
+    <!-- Header Section -->
+    <div style="text-align: center; margin-bottom: 20px;">
+      <img src="${process.env.BACKEND_URL}/images/logo.png" alt="Rentranzact Logo" style="max-width: 150px;" />
+      <h2 style="margin: 10px 0; color: #007BFF;">Transaction Receipt</h2>
+      <hr/>
+      <p style="color: #555;">Generated from Rentranzact on ${moment().format("DD/MM/YYYY HH:MM")}</p>
+    </div>
+    <!-- Content Section -->
+    <div style="line-height: 1.6;">
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Transaction Date:</strong> ${moment(transaction_date).format("DD/MM/YYYY HH:MM")}</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Transaction Amount:</strong> ₦,${amount ?? ""}</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Amount in Words:</strong> ${numberToWords(amount) ?? ""} Naira</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Property Name:</strong> ${property_name ?? ""}</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Payment Description:</strong> ${description ?? ""}</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Paid by:</strong> ${renter_name ?? ""}</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Received by:</strong> Rentranzact Ltd</p>
+      <p><strong style="display: inline-block; width: 200px; color: #333;">Payment Method:</strong>${payment_method ?? ""}</p>
+    </div>
+    <hr/>
+    
+    <!-- Disclaimer Section -->
+    <div style="margin-top: 20px; font-size: 0.9em; color: #666;">
+      <p style="color: #555;  text-align: center;  margin-bottom: 20px;">DISCLAIMER</p>
+      <p style="font-size: 6px margin: 10px 0;">Your payment has been successful and the beneficiary's account will be credited. However, this does not serve as confirmation of payment into the beneficiary's account. Please allow a minimum of 24 hours for confirmation of payment except for public holidays and weekends which could take longer.</p>
+      <p style="font-size: 6px margin: 10px 0;">Due to the nature of the internet, transactions may be subject to interruption, transmission blackout, delayed transmission, and incorrect data transmission from your bank. Rentranzact will not be liable in these circumstances.</p>
+      <p style="font-size: 6px margin: 10px 0;">For further questions or inquiries, please call <strong style="color: #333;">0123456789</strong> or send an email to <a href="mailto:support@rentranzact.com" style="color: #007BFF;">support@rentranzact.com</a>.</p>
+      <p style="margin: 10px 0; text-align: center;  margin-top: 20px; font-weight: bold">Thank you for choosing Rentranzact.</p>
+    </div>
+  </div>
+</body>
+</html>   
+  `
+
+  return html;
+}
+
 export {
   getMyTransaction,
   transactionByIdService,
-  sendRentPaymentNotificationAndEmail
+  sendRentPaymentNotificationAndEmail,
+  getRentTransactionHtml
 }
