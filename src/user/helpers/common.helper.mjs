@@ -35,3 +35,45 @@ export const makePaystackMetaDataObjForNative = (str) => {
 }
 
 // console.log(makePaystackMetaDataObjForNative("amount_50000-propertyID_prop123-userID_user456-notificationID_notif789-wallet_false"), '====file')
+
+export const numberToWords = (num) => {
+    if (num === 0) return "zero";
+
+    const ones = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten",
+        "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "seventeen", "eighteen", "nineteen"];
+    const tens = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy", "eighty", "ninety"];
+    const thousands = ["", "thousand", "million", "billion"];
+
+    let result = '';
+    let i = 0;
+
+    function convertChunk(num) {
+        let chunk = '';
+        if (num >= 100) {
+            chunk += ones[Math.floor(num / 100)] + ' hundred ';
+            num %= 100;
+        }
+        if (num >= 20) {
+            chunk += tens[Math.floor(num / 10)] + ' ';
+            num %= 10;
+        }
+        if (num > 0) {
+            chunk += ones[num] + ' ';
+        }
+        return chunk.trim();
+    }
+
+    while (num > 0) {
+        let chunk = num % 1000;
+        if (chunk !== 0) {
+            result = convertChunk(chunk) + ' ' + thousands[i] + ' ' + result;
+        }
+        num = Math.floor(num / 1000);
+        i++;
+    }
+
+    return result.trim();
+}
+
+// Example usage:
+// console.log(numberToWords(123456789));  // "one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine"
