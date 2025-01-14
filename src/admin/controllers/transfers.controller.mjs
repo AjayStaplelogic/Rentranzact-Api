@@ -8,6 +8,7 @@ import * as AccountServices from "../../user/services/account.service.mjs";
 import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import * as TransferService from "../services/transfer.service.mjs";
+
 export const getAllTransfers = async (req, res) => {
     try {
         let { search, status, transfer_type } = req.query;
@@ -192,7 +193,6 @@ export const updateTransferStatus = async (req, res) => {
                         Number(get_transfer.amount)
                     )
 
-                    console.log(converted_currency, '=====converted_currency');
                     if (converted_currency && converted_currency.amount > 0) {
                         const initiate_transfer = await StripeCommonServices.transferFunds(
                             get_connected_account.connect_acc_id,
@@ -208,6 +208,9 @@ export const updateTransferStatus = async (req, res) => {
                             payload.status = ETRANSFER_STATUS.transferred;
                             let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                             if (update_transfer) {
+                                TransferService.sendTransferNotificationAndEmail({
+                                    transferDetials : update_transfer
+                                })
                                 return sendResponse(res, null, "Transfered successfully", true, 200);
                             }
                         }

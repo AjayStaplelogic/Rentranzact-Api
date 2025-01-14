@@ -97,6 +97,8 @@ app.use(express.static(path.join(__dirname, "../apidoc")))
 
 app.use("/ids", express.static(path.join(__dirname, "../uploads/RentApplicationDocs")))
 app.use(express.static(path.join(__dirname, "../uploads")))
+app.use(express.static("public"))
+
 
 connectToMongoDB();
 

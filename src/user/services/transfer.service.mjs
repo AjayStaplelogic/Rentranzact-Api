@@ -5,6 +5,10 @@ import * as AccountServices from "../services/account.service.mjs";
 import * as CommonHelpers from "../helpers/common.helper.mjs";
 import * as StripeCommonServices from "../services/stripecommon.service.mjs";
 import { User } from "../models/user.model.mjs";
+import * as NotificationService from "./notification.service.mjs";
+import { transferSucceedEmail } from "../emails/transfer.emails.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 
 /**
  * To make transfer request to admin from landlord when renter pays rent 
@@ -138,4 +142,33 @@ export const transferForWalletRecharge = async (user_id, from_currency = "USD", 
         return false;
     }
     return false;
+}
+
+export const sendTransferNotificationAndEmail = (options) => {
+    let { transferDetials } = options;    
+    User.findById(transferDetials.to).then(receiver_details => {
+
+        // Sending email notification to landlord
+        transferSucceedEmail({
+            email: receiver_details.email,
+            fullName: receiver_details.fullName,
+            amount: transferDetials.amount,
+            property_name: transferDetials.property_name,
+        });
+
+        // Sending system notification to landlord
+        const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.wallet_view;
+        notification_payload.notificationHeading = `Rentranzact has approved the rent payment for property '${transferDetials.property_name}' and transferred to your wallet`;
+        notification_payload.notificationBody = `Rentranzact has approved the rent payment for property '${transferDetials.property_name}' and transferred to your wallet`;
+        notification_payload.landlordID = receiver_details.role === UserRoles.LANDLORD ? receiver_details._id : null;
+        notification_payload.propertyID = transferDetials.property_id;;
+        notification_payload.send_to = transferDetials.to;
+        notification_payload.property_manager_id = receiver_details.role === UserRoles.PROPERTY_MANAGER ? receiver_details._id : null;
+        const metadata = {
+            "propertyID": transferDetials.property_id.toString(),
+            "redirectTo": "wallet_view",
+        }
+        NotificationService.createNotification(notification_payload, metadata, receiver_details)
+    });
 }
