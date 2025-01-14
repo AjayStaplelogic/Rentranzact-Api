@@ -70,7 +70,11 @@ export const payElectricityBill = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
+        console.log(req.body, '=======req.body')
+
         const validate_bill = await ElectricityService.validateBill(req.body.item_code, req.body.biller_code, req.body.meter_number);
+        console.log(validate_bill, '=======validate_bill');
+        
         if (validate_bill) {
             return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
         }
