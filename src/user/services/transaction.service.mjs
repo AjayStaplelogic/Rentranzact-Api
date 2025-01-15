@@ -355,7 +355,7 @@ const getRentTransactionHtml = (options) => {
       <img src="${process.env.BACKEND_URL}/images/logo.png" alt="Rentranzact Logo" style="max-width: 150px;" />
     </div>
     <div style="text-align: center; margin-bottom: 20px;">
-      <h2 style="margin: 10px 0; color: #007BFF;">Transaction Receipt</h2>
+      <h2 style="margin: 10px 0; color: #13556d;">Transaction Receipt</h2>
       <hr/>
       <p style="color: #555;">Generated from Rentranzact on ${moment().format("DD/MM/YYYY HH:MM")}</p>
     </div>
@@ -363,19 +363,19 @@ const getRentTransactionHtml = (options) => {
     <div style="line-height: 1.6;">
       <p>
         <strong style="display: inline-block; width: 200px;">
-          <span style="color:#f8cd82">Transaction Date:</span>
+          <span style="color:#cee83a">Transaction Date:</span>
         </strong>
-        <span style="color:#038a91"> 
+        <span style="color:#54bdc3"> 
           ${moment(transaction_date).format("DD/MM/YYYY HH:MM")}
         </span>
       </p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Transaction Amount:</span></strong><span style="color:#038a91"> ₦${amount ?? ""}</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Amount in Words:</span></strong><span style="color:#038a91"> ${numberToWords(amount) ?? ""} Naira</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Property Name:</span></strong><span style="color:#038a91"> ${property_name ?? ""}</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Payment Description:</span></strong><span style="color:#038a91"> ${description ?? ""}</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Paid by:</span></strong><span style="color:#038a91"> ${renter_name ?? ""}</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Received by:</span></strong><span style="color:#038a91"> Rentranzact Ltd</span></p>
-      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Payment Method:</span></strong><span style="color:#038a91">${payment_method ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Transaction Amount:</span></strong><span style="color:#54bdc3"> ₦${amount ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Amount in Words:</span></strong><span style="color:#54bdc3"> ${numberToWords(amount) ?? ""} Naira</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Property Name:</span></strong><span style="color:#54bdc3"> ${property_name ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Payment Description:</span></strong><span style="color:#54bdc3"> ${description ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Paid by:</span></strong><span style="color:#54bdc3"> ${renter_name ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Received by:</span></strong><span style="color:#54bdc3"> Rentranzact Ltd</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Payment Method:</span></strong><span style="color:#54bdc3">${payment_method ?? ""}</span></p>
     </div>
     <hr/>
     
