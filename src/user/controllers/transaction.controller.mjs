@@ -150,6 +150,7 @@ async function getAllRentTransactions(req, res) {
 async function downloadTransactionPdf(req, res) {
   try { 
     const get_transaction = await Transaction.findById(req.query.id)
+    console.log('This is transaction', get_transaction);
     if (get_transaction) {
       // let get_property = await Property.findById(get_transaction.propertyID);
       let get_renter = await User.findById(get_transaction.renterID);
