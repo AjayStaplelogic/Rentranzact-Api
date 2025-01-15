@@ -351,8 +351,10 @@ const getRentTransactionHtml = (options) => {
 <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #F8F9FA; color: #333;">
   <div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #FFFFFF; ">
     <!-- Header Section -->
-    <div style="text-align: center; margin-bottom: 20px;">
+    <div style="text-align: right; margin-bottom: 30px;">
       <img src="${process.env.BACKEND_URL}/images/logo.png" alt="Rentranzact Logo" style="max-width: 150px;" />
+    </div>
+    <div style="text-align: center; margin-bottom: 20px;">
       <h2 style="margin: 10px 0; color: #007BFF;">Transaction Receipt</h2>
       <hr/>
       <p style="color: #555;">Generated from Rentranzact on ${moment().format("DD/MM/YYYY HH:MM")}</p>

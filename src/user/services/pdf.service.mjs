@@ -16,7 +16,8 @@ export const ConvertHtmlToPdf = async (htmlContent) => {
       //     : puppeteer.executablePath(),
     });
     const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
+    // await page.setContent(htmlContent, { waitUntil: "domcontentloaded" });
+    await page.setContent(htmlContent, { waitUntil: "networkidle0" });    // To load images
     const pdfbuffer = await page.pdf({ format: 'A4' });
     // await browser.close();
     return pdfbuffer;
