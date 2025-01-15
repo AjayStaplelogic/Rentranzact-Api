@@ -10,7 +10,7 @@ router.get('/transaction/:id' , authorizer([UserRoles.RENTER, UserRoles.LANDLORD
 
 router.get('/transactions/rent' , authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER ]) ,  getAllRentTransactions);
 
-router.get('/transactions/download' , authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER ]),  downloadTransactionPdf);
+router.get('/transactions/download' , authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER , UserRoles.RENTER]),  downloadTransactionPdf);
 
 
 
