@@ -351,22 +351,31 @@ const getRentTransactionHtml = (options) => {
 <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #F8F9FA; color: #333;">
   <div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #FFFFFF; ">
     <!-- Header Section -->
-    <div style="text-align: center; margin-bottom: 20px;">
+    <div style="text-align: right; margin-bottom: 30px;">
       <img src="${process.env.BACKEND_URL}/images/logo.png" alt="Rentranzact Logo" style="max-width: 150px;" />
+    </div>
+    <div style="text-align: center; margin-bottom: 20px;">
       <h2 style="margin: 10px 0; color: #007BFF;">Transaction Receipt</h2>
       <hr/>
       <p style="color: #555;">Generated from Rentranzact on ${moment().format("DD/MM/YYYY HH:MM")}</p>
     </div>
     <!-- Content Section -->
     <div style="line-height: 1.6;">
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Transaction Date:</strong> ${moment(transaction_date).format("DD/MM/YYYY HH:MM")}</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Transaction Amount:</strong> ₦,${amount ?? ""}</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Amount in Words:</strong> ${numberToWords(amount) ?? ""} Naira</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Property Name:</strong> ${property_name ?? ""}</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Payment Description:</strong> ${description ?? ""}</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Paid by:</strong> ${renter_name ?? ""}</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Received by:</strong> Rentranzact Ltd</p>
-      <p><strong style="display: inline-block; width: 200px; color: #333;">Payment Method:</strong>${payment_method ?? ""}</p>
+      <p>
+        <strong style="display: inline-block; width: 200px;">
+          <span style="color:#f8cd82">Transaction Date:</span>
+        </strong>
+        <span style="color:#038a91"> 
+          ${moment(transaction_date).format("DD/MM/YYYY HH:MM")}
+        </span>
+      </p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Transaction Amount:</span></strong><span style="color:#038a91"> ₦${amount ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Amount in Words:</span></strong><span style="color:#038a91"> ${numberToWords(amount) ?? ""} Naira</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Property Name:</span></strong><span style="color:#038a91"> ${property_name ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Payment Description:</span></strong><span style="color:#038a91"> ${description ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Paid by:</span></strong><span style="color:#038a91"> ${renter_name ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Received by:</span></strong><span style="color:#038a91"> Rentranzact Ltd</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#f8cd82">Payment Method:</span></strong><span style="color:#038a91">${payment_method ?? ""}</span></p>
     </div>
     <hr/>
     
