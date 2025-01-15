@@ -29,4 +29,8 @@ RUN apt-get update && apt-get install -y \
 COPY . .
 EXPOSE 3001
 
+# Use the browserless/chrome image as the base
+# This will allow you to run Puppeteer and Chromium without manually setting up dependencies
+# FROM browserless/chrome:latest AS chrome
+
 CMD ["npm", "run", "prod"]
