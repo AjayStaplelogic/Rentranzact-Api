@@ -2,20 +2,21 @@
 import CurrencyConverter from "currency-converter-lt"
 
 export const convert_currency = async (from, to, amount) => {
+    console.log(from, '====from', to , "===to", amount, '========amount')
     const CC = new CurrencyConverter({
         from: from,
         to: to,
         amount: amount
     });
+
+    console.log(await CC.convert(amount), '=====await CC.convert(amount)')
     console.log(await CC.rates(), '=====await CC.rates()')
-    // return await CC.convert(6300000);
+
     return {
         amount: await CC.convert(amount),
         rate: await CC.rates()
     }
 }
-
-// console.log(await convert_currency("NGN", "USD", 100300))
 
 /**
  * @description This function is used to convert str to object, we need this because from react native we are unable to send meta data
@@ -34,7 +35,6 @@ export const makePaystackMetaDataObjForNative = (str) => {
     return obj;
 }
 
-// console.log(makePaystackMetaDataObjForNative("amount_50000-propertyID_prop123-userID_user456-notificationID_notif789-wallet_false"), '====file')
 
 export const numberToWords = (num) => {
     if (num === 0) return "zero";
@@ -75,5 +75,3 @@ export const numberToWords = (num) => {
     return result.trim();
 }
 
-// Example usage:
-// console.log(numberToWords(123456789));  // "one hundred twenty three million four hundred fifty six thousand seven hundred eighty nine"

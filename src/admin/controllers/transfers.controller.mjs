@@ -192,6 +192,7 @@ export const updateTransferStatus = async (req, res) => {
                         get_transfer.from_currency,
                         Number(get_transfer.amount)
                     )
+                    console.log(converted_currency, '=========converted_currency')
 
                     if (converted_currency && converted_currency.amount > 0) {
                         const initiate_transfer = await StripeCommonServices.transferFunds(
