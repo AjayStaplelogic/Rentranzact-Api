@@ -168,7 +168,7 @@ async function addPropertyService(
       if (admins && admins.length > 0) {
         for (const admin of admins) {
           const notification_payload = {};
-          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.admin_property_list_requests;
           notification_payload.notificationHeading = "New Property Added";
           notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} added a new property`;
           notification_payload.landlordID = property.landlord_id;

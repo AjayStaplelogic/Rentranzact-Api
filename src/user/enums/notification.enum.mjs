@@ -11,4 +11,5 @@ export const ENOTIFICATION_REDIRECT_PATHS = {
     transfer_view : "transfer_view",
     review_view : "review_view",
     wallet_view : "wallet_view",
+    admin_property_list_requests : "admin_property_list_requests"
 }
