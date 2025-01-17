@@ -52,8 +52,6 @@ async function property(req, res) {
 
   const { id } = req.params;
 
-  // console.log(id, "-----did")
-
   const data = await getPropertyByID(id);
 
   sendResponse(
@@ -84,7 +82,6 @@ async function deleteProperty(req, res) {
 
 async function updateProperty(req, res) {
   try {
-    console.log(req.body, '======Update Property')
     let { id } = req.body;
     if (!id) {
       return sendResponse(res, {}, "Id required", false, 400);
@@ -102,7 +99,6 @@ async function updateProperty(req, res) {
 
 async function getAllPropertyList(req, res) {
   try {
-    console.log(`[Admin Property List]`)
     let {
       category,
       type,
@@ -137,7 +133,7 @@ async function getAllPropertyList(req, res) {
       query["inDemand"] = inDemand === "true" ? true : false;
     }
 
-    if (city) { query.city = city; };
+    if (city) { query.city = city.toLowerCase(); };
 
     let skip = Number(page - 1) * count;
     if (search) {
@@ -216,7 +212,7 @@ async function getAllPropertyList(req, res) {
           rent: "$rent",
           propertyName: "$propertyName",
           status: "$status",
-          city: "$city",
+          city: { $toLower: "$city" },
           type: "$type",
           rented: "$rented",
           images: "$images",
@@ -284,7 +280,6 @@ async function getAllPropertyList(req, res) {
       pageNo: page,
       pageSize: count,
     };
-    console.log(get_properties[0].pagination)
     if (get_properties && get_properties.length > 0) {
       if (get_properties[0].pagination && get_properties[0].pagination.length) {
         additional_data.count = get_properties[0]?.pagination[0]?.total;
@@ -292,7 +287,6 @@ async function getAllPropertyList(req, res) {
     }
     return sendResponse(res, get_properties[0].data, "success", true, 200, {}, additional_data);
   } catch (error) {
-    console.log(error)
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
@@ -373,7 +367,6 @@ async function editProperty(req, res) {
 
 
   } catch (error) {
-    console.log(error, '=====error')
     return sendResponse(res, [], error.message, false, 400)
   }
 }
@@ -445,9 +438,7 @@ async function updatePropertyApprovalStatus(req, res) {
     }
     return sendResponse(res, null, "Invalid Id", false, 400);
   } catch (error) {
-    console.log(error, '===error')
     return sendResponse(res, [], error.message, false, 400)
-
   }
 }
 
@@ -464,7 +455,6 @@ async function deleteAggrementByID(req, res) {
       try {
         fs.unlinkSync(filePath)
       } catch (error) {
-        console.log(error, '====error');
       }
     }
   }
@@ -534,7 +524,6 @@ async function addProperty(req, res) {
     }
 
     const property = await Property.create(Property_);
-    // console.log(`[Property Created]`);
     if (property) {
       return sendResponse(res, property, "property created successfully", true, 201);
     }
