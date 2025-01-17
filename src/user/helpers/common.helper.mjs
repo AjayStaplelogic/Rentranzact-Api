@@ -1,22 +1,26 @@
-// const CC = require('currency-converter-lt')
+// import CurrencyConverter from "currency-converter-lt"
 import CurrencyConverter from "currency-converter-lt"
+import { Convert, Converter } from "easy-currencies";
 
 export const convert_currency = async (from, to, amount) => {
-    console.log(from, '====from', to , "===to", amount, '========amount')
-    const CC = new CurrencyConverter({
+    const CC = new CurrencyConverter({  // working with currency-converter-lt npm
         from: from,
         to: to,
         amount: amount
     });
 
-    console.log(await CC.convert(amount), '=====await CC.convert(amount)')
-    console.log(await CC.rates(), '=====await CC.rates()')
-
+    // return {             // Working with currency-converter-lt npm
+    //     amount: await CC.convert(amount),
+    //     rate: await CC.rates()
+    // }
+    const cc = new Converter();
+    const rates = await cc.getRates(from, to, false);
     return {
-        amount: await CC.convert(amount),
-        rate: await CC.rates()
+        amount: await Convert(amount).from(from).to(to),
+        rate: rates[to]
     }
 }
+
 
 /**
  * @description This function is used to convert str to object, we need this because from react native we are unable to send meta data
