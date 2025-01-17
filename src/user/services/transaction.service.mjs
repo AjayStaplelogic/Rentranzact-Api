@@ -339,7 +339,19 @@ const sendRentPaymentNotificationAndEmail = (options) => {
   })
 }
 
-
+/**
+ * 
+ * To get rent transaction invoice html
+ * 
+ * @param {object} options 
+ * @param {date} options.transaction_date transaction date
+ * @param {number} options.amount amount
+ * @param {string} options.property_name name of property
+ * @param {string} options.description description of transaction
+ * @param {string} options.renter_name name of renter (Paid by)
+ * @param {string} options.payment_method payment method
+ * @returns {string} contains html in string format
+ */
 const getRentTransactionHtml = (options) => {
   const { transaction_date, amount, property_name, description, renter_name, payment_method } = options;
   let html = `

@@ -88,7 +88,6 @@ async function getPropertiesList() {
 }
 
 async function getPropertyByID(id) {
-  // console.log(`[Admin Get Property By ID] ${id}`);
   const id1 = new ObjectId(id)
   const data = await Property.aggregate([
     {

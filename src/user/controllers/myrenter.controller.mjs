@@ -256,7 +256,6 @@ async function myRenterHistory(req, res) {
 }
 
 async function rentedProperties(req, res) {
-  console.log(`[My Renter/Current-Rented/Properties]`)
   try {
     let { id } = req.query;
     let page = Number(req.query.page) || 1;
@@ -276,7 +275,6 @@ async function rentedProperties(req, res) {
       query.property_manager_id = `${req?.user?.data?._id}`;
     }
 
-    // console.log(query);
     let data = await Property.aggregate([
       {
         $match: query

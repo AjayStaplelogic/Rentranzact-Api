@@ -57,23 +57,14 @@ async function getTimeSlot(req, res) {
 
     const { role, _id } = req.user.data;
     const { date } = req.body;
-
-
     if (role === UserRoles.RENTER) {
-
-        // console.log("======user id", _id, "------------- date", date)
-
         const data = await getTimeSlotByDate(date, _id);
-
         sendResponse(res, data.data, data.message, data.status, data.statusCode);
-
     }
-
 }
 
 async function getCalenderTimeSlots(req, res) {
     try {
-        // console.log("[Calender Time Slot]")
         let { renterID, propertyID, landlordID, property_manager_id, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -87,7 +78,6 @@ async function getCalenderTimeSlots(req, res) {
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
-        // console.log(query, '===query')
         let pipeline = [
             {
                 $match: query
@@ -266,7 +256,6 @@ async function getCalenderTimeSlots(req, res) {
 
 async function getCalenderBlockedSlots(req, res) {
     try {
-        // console.log("[Calender Blocked Time Slot]")
         let { userID, day, month, year } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -277,8 +266,6 @@ async function getCalenderBlockedSlots(req, res) {
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
-        console.log(query, '===query')
-        console.log(query2, '===query2')
 
         let pipeline = [
             {

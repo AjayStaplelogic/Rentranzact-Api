@@ -7,14 +7,11 @@ import * as NotificationService from "../services/notification.service.mjs"
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 
 const verifySignature = (body, signature) => {
-    console.log("Verify Signature Function")
-
     const digest = crypto
         .createHmac('sha1', WEBHOOK_SECRET)
         .update(body)
         .digest('hex');
 
-    console.log(digest, '=====digest-signature', signature)
     return signature === digest;
 };
 
@@ -50,19 +47,6 @@ export const twawToWebhook = async (req, res) => {
                                 "redirectTo": ENOTIFICATION_REDIRECT_PATHS.tawk_to_dashboard
                             }
                             NotificationService.createNotification(notification_payload, metadata, admin);
-
-                            // Notification.create(notification_payload).then((create_notification) => {
-                            //     if (create_notification) {
-                            //         if (create_notification) {
-                            //             if (admin && admin.fcmToken) {
-                            //                 const metadata = {
-                            //                     "redirectTo": "nowhere",
-                            //                 }
-                            //                 sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-                            //             }
-                            //         }
-                            //     }
-                            // });
                         }
                     }
                 })
@@ -71,31 +55,10 @@ export const twawToWebhook = async (req, res) => {
                 break;
         }
 
-
-        // global.io.broadcast.emit('news', { hello: 'world Testing socket' });
-        // const io = req.app.get('io');
-        // // console.log(io, '==io')
-        // let socket_ids = await chatService.get_user_socket_ids(data.connected_users, "66a21b414ee1be84903a0076");
-        // console.log(socket_ids, '==socket_ids')
-        // if (socket_ids && socket_ids.length > 0) {
-        //     for (let socket_id of socket_ids) {
-        //         // console.log(`[socket_id] ${socket_id}`)
-        //         io.to(socket_id).emit("notification-count", {
-        //             status: true,
-        //             statusCode: 200,
-        //             data: "data"
-        //         })
-        //         io.emit('notification-count', { hello: 'world Testing socket' });
-        //     }
-        // }
-
-
-        // controllerEvents.notification_count("66a21b414ee1be84903a0076")
         // Send a success response
         res.status(200).send('Webhook received successfully');
 
     } catch (error) {
-        console.error("Error while converting Twitch API data to Slack webhook payload:", error);
         return null;
     }
 }

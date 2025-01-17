@@ -4,7 +4,6 @@ import fs from "fs";
 export const ConvertHtmlToPdf = async (htmlContent) => {
   let browser = null;
   try {
-    console.log(htmlContent, '==========htmlContent')
     browser = await puppeteer.launch({
       headless: true,
       args: [

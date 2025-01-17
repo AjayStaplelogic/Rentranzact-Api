@@ -8,7 +8,6 @@ const ObjectId = mongoose.Types.ObjectId;
 
 export const addSocialMediaIcon = async (req, res) => {
     try {
-        console.log(`[Add social_media_icon]`)
         const { isError, errors } = validator(req.body, SocialMediaIconsValidations.addSocialMediaIcon);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -33,15 +32,12 @@ export const addSocialMediaIcon = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
 export const editSocialMediaIcon = async (req, res) => {
     try {
-        console.log(`[Edit social_media_icon]`)
         const { isError, errors } = validator(req.body, SocialMediaIconsValidations.editSocialMediaIcon);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -77,9 +73,7 @@ export const editSocialMediaIcon = async (req, res) => {
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 

@@ -3,7 +3,6 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 
 export const getBlogById = async (req, res) => {
     try {
-        console.log(`[User Blog By Id API]`)
         let { id, sortyBy } = req.query;
         if (!id) {
             return sendResponse(res, {}, "Id required", false, 400);

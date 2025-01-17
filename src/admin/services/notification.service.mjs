@@ -14,8 +14,6 @@ const sendNotifications = async (roleModel, roles, notification_content, is_admi
         };
 
         const usersOrAdmins = await roleModel.find(query);
-        console.log(usersOrAdmins?.length, '====lenghy')
-
         if (usersOrAdmins?.length > 0) {
             // Process each user/admin
             const notificationsPromises = usersOrAdmins.map(async (userOrAdmin) => {
@@ -40,7 +38,6 @@ const sendNotifications = async (roleModel, roles, notification_content, is_admi
             await Promise.all(notificationsPromises);
         }
     } catch (error) {
-        console.log("Error in sending notifications:", error);
     }
 };
 
@@ -52,6 +49,5 @@ export const sendNotificationsToRoles = async (roles = [], is_admin = false, not
             await sendNotifications(User, roles, notification_content, false);
         }
     } catch (error) {
-        console.log("Error in sendNotificationsToRoles:", error);
     }
 };

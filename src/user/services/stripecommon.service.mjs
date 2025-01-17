@@ -122,27 +122,12 @@ export const createAccount = async (user) => {
         tos_acceptance: {
             service_agreement: 'recipient',
         },
-        // settings: {
-        //     payouts: {
-        //         schedule: {
-        //             interval: "manual"
-        //         }
-        //     }
-        // },
         metadata: {
             user_id: user._id,
         },
     });
-    console.log(account, '===accoutn')
     return account;
 }
-
-// console.log(createAccount(
-//     {
-//         email: "Testing7@yopmail.com",
-//         fullName: "TEST ACCOUNT 7",
-//     }
-// ))
 
 /**
  * @description Create a new link for connect onboarding
@@ -160,13 +145,10 @@ export const createAccountLink = async (acc_id, type = "account_onboarding") => 
         },
     });
 
-    console.log(accountLink, '===accountLink')
-
     return accountLink;
 
 }
 
-// console.log(createAccountLink("acct_1QHgPvIWkutNVKz6"))
 
 /**
  * @description To transfer amount from one account to another
@@ -182,11 +164,8 @@ export const transferFunds = async (acc_id, amount, currency) => {
         destination: acc_id,
     });
 
-    console.log(transfer, '===transfer')
     return transfer;
 }
-
-// console.log(transferFunds("acct_1QINeeIod42BvpdP", 59.84, "USD"))
 
 /**
  * @description Get current balance in stripe account
@@ -199,14 +178,8 @@ export const getBalance = async (acc_id = null) => {
         query.stripeAccount = acc_id;
     }
     const balance = await stripe.balance.retrieve(query);
-    console.log(balance, '===balance')
-    console.log(JSON.stringify(balance), '===JSON.stringify(balance)')
-
     return balance;
 }
-
-
-// console.log(getBalance("acct_1QINeeIod42BvpdP"))
 
 /**
  * 
@@ -220,14 +193,6 @@ export const getBalance = async (acc_id = null) => {
  * @returns { payout | object} payout object from stripe containing payout data
  */
 export const payout = async (acc_id, external_acc_id, currency, amount, description = "", metadata = null) => {
-
-    // const balance = await stripe.balance.retrieve({
-    //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
-    //   });
-
-    //   console.log(balance, '===balance')
-    //   console.log(JSON.stringify(balance), '===JSON.stringify(balance)')
-
     const payout = await stripe.payouts.create({
         amount: Number(amount) * 100,
         currency: currency,
@@ -241,38 +206,19 @@ export const payout = async (acc_id, external_acc_id, currency, amount, descript
         }
     );
 
-    console.log(payout, '===payout')
     return payout;
 }
 
-// console.log(payout("acct_1QHgPvIWkutNVKz6","ba_1QHgSKIWkutNVKz6QSR4vEee", "NGN", 1))
-
-
+/**
+ * To delete stripe connected account with connected account Id
+ * 
+ * @param {string} acc_id stripe connect account Id
+ * @return {object} containing delete account details from stripe
+ */
 export const deleteAccount = async (acc_id) => {
     const deleted = await stripe.accounts.del(acc_id);
-    console.log(deleted, '===deleted')
     return deleted;
 }
-
-
-// console.log(deleteAccount("acct_1Q8aGLRRHzUEJINV"))
-
-// export const topUp = async () => {
-//     const topup = await stripe.topups.create({
-//         amount: 2000,
-//         currency: 'USD',
-//         description: 'Top-up for Jenny Rosen',
-//         statement_descriptor: 'Top-up',
-//     },
-//     // {
-//     //     stripeAccount: 'acct_1Q9gmYINmaZ2kbt0',
-//     // }
-// );
-
-//     console.log(topup, '=====topup')
-//     return topup;
-// }
-// console.log(topUp())
 
 
 export const createPaymentMethod = async () => {
@@ -288,12 +234,10 @@ export const createPaymentMethod = async () => {
         },
     });
 
-    console.log(paymentMethod, '=====paymentMethod')
     return paymentMethod;
 }
 
 export const createBankToken = async () => {
-
     const token = await stripe.tokens.create({
         bank_account: {
             country: 'NG',
@@ -305,12 +249,16 @@ export const createBankToken = async () => {
         },
     });
 
-    console.log(token, '=====token');
     return token;
 }
 
-// console.log(createBankToken(), '=====createBankToken()')
-
+/**
+ * To create external account for connected account on stripe
+ * 
+ * @param {string} acc_id stripe connected account id
+ * @param {string} external_acc_id stripe external account id
+ * @returns {object} containing external account details
+ */
 export const createExternalAccount = async (acc_id, external_acc_id) => {
     const externalAccount = await stripe.accounts.createExternalAccount(
         acc_id,
@@ -319,58 +267,15 @@ export const createExternalAccount = async (acc_id, external_acc_id) => {
         }
     );
 
-    console.log(externalAccount, '=====externalAccount');
     return externalAccount;
 }
 
-// console.log(createExternalAccount("acct_1QHgPvIWkutNVKz6", "btok_1QHhdMIqUp9zeP6EWsXvA4gr"), '=====createExternalAccount()')
 
-
-export const createPaymentIntent = async () => {
-    // const paymentIntent = await stripe.paymentIntents.create({
-    //     amount: 1000,
-    //     currency: "usd",
-    //     // payment_method: "pm_1GqjFvD0D9kK8xi3",
-    //     confirmation_method: "manual",
-    //     confirm: true,
-    //     transfer_group: "ORDER_12345",
-    //     on_behalf_of: "acct_1QINeeIod42BvpdP",
-    //     transfer_data: {
-    //         "destination": "acct_1MjOBYIqUp9zeP6E",  // Directing the payment to the connected account
-    //     },
-    //     // automatic_payment_methods: {
-    //     //     enabled: true,
-    //     // },
-    // });
-
-    // console.log(paymentIntent, '=====paymentIntent')
-    // return paymentIntent;
-
-
-    // const transfer = await stripe.transfers.create({
-    //     amount: 10,
-    //     currency: 'usd',  // Set the currency to match the balance of the connected account
-    //     destination: "acct_1MjOBYIqUp9zeP6E",  // This is the connected account ID from where funds will be transferred
-    //     // source_type: 'bank_account',  // This specifies that we are transferring from the account balance
-    //     transfer_group: 'ORDER_12345', // Optional: Helps to track the transfer (can be any string)
-    //   }, {
-    //     stripeAccount: "acct_1QINeeIod42BvpdP", // Specify the connected account for Custom/Express accounts
-    //   });
-
-    //   console.log(transfer, '====transfer')
-
-    //   return transfer;
-
-
-
-    // const charge = await stripe.charges.create({
-    //     amount: 1500*100,
-    //     currency: 'NGN',
-    //     source: 'acct_1QINeeIod42BvpdP',
-    //   });
-    //   console.log(charge, '====charge')
-    //   return charge;
-
+export const retrievePaymentMethod = async ()=>{
+    // card_1QKBAxIqUp9zeP6E079EAK5l
+    const paymentMethod = await stripe.paymentMethods.retrieve(
+        'card_1QKBAxIqUp9zeP6E079EAK5l'
+      );
+      console.log(paymentMethod, '========paymentMethod')
+      return paymentMethod;
 }
-
-// console.log(await createPaymentIntent(), '=====createPaymentIntent()')

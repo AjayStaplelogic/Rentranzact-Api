@@ -37,6 +37,13 @@ export const updateWalletPointsFromWebhook = (event) => {
   }
 }
 
+/**
+ * To fetch and update stripe connected account balance in Db
+ * 
+ * @param {string} user_id Id of the user to balance need to fetch and update
+ * @param {string} connect_acc_id Id (from Db) of the stripe connected account
+ * @returns {void} nothing
+ */
 export const fetchBalanceAndUpdateWalletPoints = async (user_id, connect_acc_id) => {
   if (connect_acc_id) {
     const balance = await StripeCommonServices.getBalance(connect_acc_id);

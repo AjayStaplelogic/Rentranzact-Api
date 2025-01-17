@@ -70,33 +70,14 @@ export const payElectricityBill = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        console.log(req.body, '=======req.body')
-
         const validate_bill = await ElectricityService.validateBill(req.body.item_code, req.body.biller_code, req.body.meter_number);
-        console.log(validate_bill, '=======validate_bill');
-        
         if (validate_bill) {
             return sendResponse(res, validate_bill?.data, validate_bill?.message, true, 200);
         }
         throw "Invalid bill information";
 
     } catch (error) {
-        console.log(error, '======error')
         return sendResponse(res, null, error.message, false, 400);
-        // return sendResponse(res, {
-        //   "response_code": "00",
-        // "address": null,
-        // "response_message": "Successful",
-        // "name": "Test DSTV Account",
-        // "biller_code": "BIL119",
-        // "customer": "0025401100",
-        // "product_code": "CB141",
-        // "email": null,
-        // "fee": 0,
-        // "maximum": 0,
-        // "minimum": 0
-        // }, "sucess", true, 200);
-
     }
 }
 
@@ -122,7 +103,6 @@ export const getBillHistory = async (req, res) => {
         let sort_query = {};
         sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
-        // console.log(query, '====query')
         let pipeline = [
             {
                 $match: query

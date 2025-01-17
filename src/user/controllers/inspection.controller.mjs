@@ -75,10 +75,6 @@ async function searchInspection(req, res) {
   const role = req.user.data.role;
   const { search } = req.query;
   const { status } = req.query;
-
-
-  // console.log(id , role , search , status , "==parammmmsss")
-
   const data = await searchInspectionService(id, role, search, status);
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

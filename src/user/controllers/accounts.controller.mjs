@@ -27,7 +27,6 @@ export const createConnectedAccount = async (req, res) => {
         }
 
         const create_stripe_account = await StripeCommonServices.createAccount(req.user.data);
-        console.log(create_stripe_account, '====create_stripe_account')
         if (create_stripe_account) {
             const create_account = await AccountServices.addUpdateAccount(req.user.data._id, create_stripe_account);
             if (create_account) {
@@ -39,7 +38,6 @@ export const createConnectedAccount = async (req, res) => {
         }
         throw "Server Error"
     } catch (error) {
-        console.log(error, '=======error');
         return sendResponse(res, null, `${error}`, false, 400);
     }
 }

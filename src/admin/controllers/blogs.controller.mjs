@@ -8,7 +8,6 @@ const ObjectId = mongoose.Types.ObjectId;
 
 export const addBlog = async (req, res) => {
     try {
-        console.log(`[Add Blog]`)
         const { isError, errors } = validator(req.body, blogValidations.addBlog);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -33,15 +32,12 @@ export const addBlog = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
 export const editBlog = async (req, res) => {
     try {
-        console.log(`[Add Blog]`)
         const { isError, errors } = validator(req.body, blogValidations.editBlog);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -77,9 +73,7 @@ export const editBlog = async (req, res) => {
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
@@ -183,7 +177,6 @@ export const deleteBlog = async (req, res) => {
         }
 
         let data = await Blogs.findByIdAndDelete(id);
-        console.log(data);
         if (data) {
             if (data.media) {
                 await blogServices.deleteMedia(data.media)

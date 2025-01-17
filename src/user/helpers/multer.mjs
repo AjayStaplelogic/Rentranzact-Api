@@ -52,11 +52,6 @@ const storage2 = multer.diskStorage({
     let { folder, mediaType } = req.body;
     folder = folder ?? "images"
     const folderPath = path.join(baseUploadPath, folder);
-
-    // console.log(folder, '=====folder storage2');
-    // console.log(mediaType, '=====mediaType storage2');
-
-
     // Create the directories if they don't exist
     if (!fs.existsSync(folderPath)) {
       fs.mkdirSync(folderPath, { recursive: true });

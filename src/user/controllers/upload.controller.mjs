@@ -25,13 +25,11 @@ export const uploadMultipleFiles = async (req, res) => {
         };
 
         if (req.body.mediaType) {
-            console.log("if countition")
             Multer.upload2.fileFilter = Multer.fileFilterFun(req.body.mediaType);
         }
 
         const upload = Multer.upload2.array("media", 10);
         upload(req, res, async function (err) {
-            console.log(err, '======err From Upload')
             if (err instanceof multer.MulterError) {
                 // A Multer error occurred when uploading.
                 return sendResponse(res, {}, err?.message, false, 400);
@@ -55,7 +53,6 @@ export const uploadMultipleFiles = async (req, res) => {
             return sendResponse(res, {}, "File not found", false, 400);
         })
     } catch (error) {
-        console.log(error, '=======error')
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 }
@@ -69,7 +66,6 @@ export const deleteFile = async (req, res) => {
                 fs.unlinkSync(`uploads/${filename}`);
             }
         } catch (error) {
-            console.log(error);
         }
         return sendResponse(res, [], "success", true, 200);
 
@@ -86,13 +82,11 @@ export const uploadMultipleFilesByAdmin = async (req, res) => {
         };
 
         if (req.body.mediaType) {
-            console.log("if countition")
             Multer.upload2.fileFilter = Multer.fileFilterFun(req.body.mediaType);
         }
 
         const upload = Multer.upload2.array("media", 10);
         upload(req, res, async function (err) {
-            console.log(err, '======err From Upload')
             if (err instanceof multer.MulterError) {
                 // A Multer error occurred when uploading.
                 return sendResponse(res, {}, err?.message, false, 400);
@@ -116,7 +110,6 @@ export const uploadMultipleFilesByAdmin = async (req, res) => {
             return sendResponse(res, {}, "File not found", false, 400);
         })
     } catch (error) {
-        console.log(error, '=======error')
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 }

@@ -9,6 +9,8 @@ export const convert_currency = async (from, to, amount) => {
         amount: amount
     });
 
+    console.log(await CC.convert(amount), '===========await CC.convert(amount)f')
+
     // return {             // Working with currency-converter-lt npm
     //     amount: await CC.convert(amount),
     //     rate: await CC.rates()

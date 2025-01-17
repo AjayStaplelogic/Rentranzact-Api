@@ -8,7 +8,6 @@ const ObjectId = mongoose.Types.ObjectId;
 
 export const addBanner = async (req, res) => {
     try {
-        console.log(`[Add Banner]`)
         const { isError, errors } = validator(req.body, bannerValidations.addBanner);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -33,7 +32,6 @@ export const addBanner = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
 
     }
@@ -41,7 +39,6 @@ export const addBanner = async (req, res) => {
 
 export const editBanner = async (req, res) => {
     try {
-        console.log(`[Add Banner]`)
         const { isError, errors } = validator(req.body, bannerValidations.editBanner);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -77,9 +74,7 @@ export const editBanner = async (req, res) => {
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
@@ -188,7 +183,6 @@ export const deleteBanner = async (req, res) => {
         }
 
         let data = await Banners.findByIdAndDelete(id);
-        console.log(data);
         if (data) {
             if (data.media) {
                 await bannerServices.deleteMedia(data.media)

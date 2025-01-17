@@ -43,6 +43,5 @@ export const addEmployeeEmail = (options) => {
     `
         sendMail(email, `Welcome to Rentranzact - ${fullName}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }

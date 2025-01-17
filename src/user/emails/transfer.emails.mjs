@@ -39,20 +39,5 @@ export const transferSucceedEmail = (options) => {
     `
         sendMail(email, `Rent Paid Confirmation - ${property_name}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
-
-// try {
-
-//     transferSucceedEmail({
-//         fullName: "344dfaHHJHDJF3",
-//         email: ["geivummaumeci-5197@yopmail.com"],
-//         last_four: "7676",
-//         landlord_name: "sunny",
-//         property_name: "sunny villa at kharar",
-//         amount: "1500",
-//     })
-// } catch (error) {
-//     console.log(error)
-// }

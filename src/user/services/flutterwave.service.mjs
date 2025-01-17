@@ -16,6 +16,8 @@ import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as TransactionServices from "../../user/services/transaction.service.mjs";
+import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
+
 async function addFlutterwaveTransaction(body, renterApplicationID) {
     const { status, amount, createdAt, id, meta_data } = body;
     const momentObject = moment(createdAt);
@@ -197,6 +199,14 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
                 amount: amount
             });
         }
+
+        // Sending email to renter about successful rent payment
+        rentPaidEmailToRenter({
+            email: renterDetails?.email,
+            amount: amount,
+            property_name: propertyDetails.propertyName,
+            renter_name: renterDetails?.fullName
+        })
 
     }
 
@@ -405,15 +415,22 @@ async function addFlutterwaveTransactionForOld(body) {
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
             TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            // Sending email to landlord about successful rent payment
+            TransactionServices.sendRentPaymentNotificationAndEmail({
+                property: propertyDetails,
+                renter_details: renterDetails,
+                send_to: propertyDetails?.landlord_id,
+                amount: amount
+            });
         }
 
-        // Sending email to landlord about successful rent payment
-        TransactionServices.sendRentPaymentNotificationAndEmail({
-            property: propertyDetails,
-            renter_details: renterDetails,
-            send_to: propertyDetails?.landlord_id,
-            amount: amount
-        });
+        // Sending email to renter about successful rent payment
+        rentPaidEmailToRenter({
+            email: renterDetails?.email,
+            amount: amount,
+            property_name: propertyDetails.propertyName,
+            renter_name: renterDetails?.fullName
+        })
     }
 
     return {

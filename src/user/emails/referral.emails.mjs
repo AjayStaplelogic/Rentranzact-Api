@@ -2,7 +2,6 @@ import { sendMail } from '../helpers/sendMail.mjs'
 
 export const sendReferralLink = (options) => {
     let { email, referralCode } = options;
-    console.log(`${process.env.FRONTEND_URL}/signup?referral=${referralCode}`);
     let html = `
          <html>
 <head>
@@ -34,12 +33,3 @@ export const sendReferralLink = (options) => {
 
     sendMail(email, "Referral program invitation!", html)
 }
-// try {
-    
-//     sendReferralLink({
-//         code : "344dfaHHJHDJF3",
-//         email : ["geivummaumeci-5197@yopmail.com", "shravan@yopmail.com"]
-//     })
-// } catch (error) {
-//     console.log(error)
-// }
