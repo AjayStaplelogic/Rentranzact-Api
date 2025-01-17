@@ -40,8 +40,6 @@ async function getMaintenanceRenter(req, res) {
     sendResponse(res, data.data, data.message, data.status, data.statusCode);
 
   }
-
-  // console.log(`[Maintenance]:[Not Matched Any Request]`)
 }
 
 async function resolveMaintenance(req, res) {
@@ -82,21 +80,6 @@ async function getMaintenanceDetails(req, res) {
       _id: id
     };
 
-    // switch (req?.user?.data?.role) {
-    //   case UserRoles.LANDLORD:
-    //     query.landlordID = req?.user?.data?._id;
-    //     break;
-
-    //   case UserRoles.PROPERTY_MANAGER:
-    //     query.property_manager_id = req?.user?.data?._id;
-    //     break;
-
-    //   case UserRoles.RENTER:
-    //     query.renterID = req?.user?.data?._id;
-    //     break;
-    // }
-
-    // console.log(query);
     const data = await Maintenance.findById(query).lean().exec();
     if (data) {
       if (data.renterID) {

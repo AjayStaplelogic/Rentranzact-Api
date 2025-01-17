@@ -27,7 +27,6 @@ async function rentApplications(req, res) {
 
 
 async function rentApplicationsByID(req, res) {
-  console.log(`[Rent Application By Id API]`)
   const id = req.params.id;
   const data = await getRentApplicationByID(id);
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
@@ -46,7 +45,6 @@ async function rentApplicationUpdate(req, res) {
 }
 
 async function getRentApplications(req, res) {
-  // console.log("[Rent Application API]")
   const id = req.user.data._id;
   const role = req.user.data.role;
   const PropertyID = req.params.id;
@@ -93,7 +91,6 @@ async function editRentApplication(req, res) {
         }
 
         const verifyStatus = await identityVerifier(req.body.identificationType, smile_identification_payload);
-        // console.log(verifyStatus, '=====verifyStatus')
         if (!verifyStatus) {
           return sendResponse(res, {}, "Personal information is incorrect", false, 400);
         }

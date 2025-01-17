@@ -13,6 +13,5 @@ export const axiosHandleErrorResponse = (error) => {
   } else {
     errorResponse = error.message;
   }
-  console.log(errorResponse, '====errorResponse')
   throw new Error(errorResponse);
 }

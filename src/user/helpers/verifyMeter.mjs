@@ -31,8 +31,6 @@ async function verifyMeter(meterID, meterType, serviceID) {
         }
 
     } catch (error) {
-
-        console.log(error , "[error in verify meter]");
         return false;
     }
     

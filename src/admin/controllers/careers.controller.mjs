@@ -5,7 +5,6 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 
 export const addCareer = async (req, res) => {
     try {
-        console.log(`[Add Carrier]`)
         const { isError, errors } = validator(req.body, CareerValidations.addCareer);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -26,7 +25,6 @@ export const addCareer = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
 
     }
@@ -34,7 +32,6 @@ export const addCareer = async (req, res) => {
 
 export const editCareer = async (req, res) => {
     try {
-        console.log(`[Add Blog]`)
         const { isError, errors } = validator(req.body, CareerValidations.editCareer);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -59,9 +56,7 @@ export const editCareer = async (req, res) => {
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 

@@ -30,6 +30,5 @@ export const deleteMedia = async (media)=>{
         let filePath = `uploads/testimonials/${media}`
         fs.unlinkSync(filePath)
     } catch (error) {
-        console.log(error)
     }
 }

@@ -6,7 +6,6 @@ import * as Constants from "../enums/common.mjs"
 
 async function flutterwave(req, res) {
   const { body } = req;
-  console.log(req.body, "=========boddyyyy Flutterwave webhook")
   switch (req.body["event.type"]) {
     case 'CARD_TRANSACTION':
       const meta_data = req.body.meta_data;
@@ -48,14 +47,7 @@ async function flutterwave(req, res) {
 
 async function flutterwaveRefundsWehook(req, res) {
   // Implement your refund webhook logic here
-  console.log("Flutterwave refund webhook triggered");
-  console.log("*********************************************")
-  console.log(req.body, '==============req.body')
-  console.log("*********************************************")
-
-  // const { id } = req.body;
   RefundService.updateRefundStatusFromWebhook(Constants.PAYMENT_GATEWAYS.FLUTTERWAVE,  req.body)
-
   return res.status(200).end();
 
 }

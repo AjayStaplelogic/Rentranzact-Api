@@ -7,7 +7,6 @@ export default function () {
      * @description Cron will run every midnight
      */
     cron.schedule("0 0 * * *", () => {
-        console.log("Every minute");
         // Perform your task here
 
         // Fetching and updating user credit score after 30 Days

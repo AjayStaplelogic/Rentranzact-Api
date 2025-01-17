@@ -5,7 +5,6 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 
 export const addContactRequest = async (req, res) => {
     try {
-        console.log(`[Add Carrier]`)
         const { isError, errors } = validator(req.body, ContactUsValidations.addContactRequest);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -18,8 +17,6 @@ export const addContactRequest = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }

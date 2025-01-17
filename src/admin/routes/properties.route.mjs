@@ -144,18 +144,10 @@ router.put("/property/edit",
                 randomFileName // Use random filename instead of file.originalname
             );
 
-
-            // console.log(file, '=======file111')
-            // console.log(file.mimetype.startsWith("image/"), '=======file.mimetype.startsWith("image/")111')
-
             if (file.mimetype.startsWith("image/")) {
-                // console.log("Changes file memetppe")
-
                 const relativePath2 = path.join(hostUrl, "property", req.PropertyID.toString(), "images", "thumbnails", randomFileName)
                 const relativePath3 = path.resolve(__dirname, '..', '..', '..', 'uploads', req.PropertyID.toString(), 'images', 'thumbnails', randomFileName);
                 req.images.push({ id: uuidv4(), url: relativePath, thumbnail: relativePath2 });
-                // console.log(req.images, '=======req.images111')
-
                 // Create and save the thumbnail
                 await createThumbnail(file.path, relativePath3, thumbnailWidth, thumbnailHeight);
             } else if (file.mimetype.startsWith("video/")) {
@@ -176,7 +168,6 @@ router.post(
     "/property",
     upload.any(),
     (req, res) => {
-        console.log(`[Inside upload]`);
         let count = 0;
         req.files.forEach(async (file) => {
             count++;
@@ -219,10 +210,7 @@ router.post(
             } else if (file.mimetype.startsWith("application/")) {
                 req.documents.push({ id: uuidv4(), url: relativePath, original_name: file.originalname });
             }
-
-            console.log(`[File Uploaded Count] : [${count}]`)
         });
-
         addProperty(req, res);
     }
 );

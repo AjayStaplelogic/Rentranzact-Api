@@ -2,8 +2,6 @@ import { sendMail } from '../helpers/sendMail.mjs'
 
 export const inviteForProperty = (options) => {
     let { email, property_id, landlord_name, property_name, address, about_property } = options;
-    // console.log(`${process.env.FRONTEND_URL}/property-detail/${property_id}`);
-
     let html = `
          <html>
 <head>
@@ -52,18 +50,3 @@ export const inviteForProperty = (options) => {
 
     sendMail(email, " Invitation to Rent Our Property", html)
 }
-// try {
-    
-//     inviteForProperty({
-//         property_id : "344dfaHHJHDJF3",
-//         email : ["geivummaumeci-5197@yopmail.com"],
-// landlord_name   : "Vladirmir putin",
-// property_name : "Sunny Villa - Sunny Island",
-// address : "Lekki Conservation Centre, Lekki - Epe Expressway, Lekki, Nigeria",
-// about_property : "The project offers 3 BHK apartments in Dera Bassi, Chandigarh. These apartments have a carpet area, ranging from 1292.0 sq. ft. to 1390.0 sq. ft. and are available at a price range starting from Rs. 87.76 Lac to Rs. 1.3 Crore. It is a ready to move project, with 15 towers and features an array of facilities including a Spa, Table Tennis, Multipurpose Hall, Car Parking, Billiards. Lifts are available too."
-
-
-//     })
-// } catch (error) {
-//     console.log(error)
-// }

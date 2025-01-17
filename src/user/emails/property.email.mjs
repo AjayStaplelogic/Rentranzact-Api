@@ -39,7 +39,6 @@ export const assignPMToProperty = (options) => {
     `
         sendMail(email, `Property Assigned - ${property_name}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
 
@@ -83,6 +82,5 @@ export const assignLandlordToProperty = (options) => {
     `
         sendMail(email, `Property Added - ${property_name}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }

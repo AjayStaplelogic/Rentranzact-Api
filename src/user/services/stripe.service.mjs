@@ -186,7 +186,6 @@ async function payViaWalletService(propertyID, userID, propertyDetails, amount, 
             // Get the Unix timestamp of one year later
             const timestampOneYearLater = oneYearLater.unix();
 
-            // console.log(timestampOneYearLater, "-----timestampOneYearLater")
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,

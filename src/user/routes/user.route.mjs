@@ -61,13 +61,8 @@ router.post("/forgot-password", forgotPassword)
 router.get("/favorites", authorizer([UserRoles.RENTER]), favourites)
 
 router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), upload.single('document'), (req, res) => {
-
     const fileName = req.user.data._id;
-
     const relativePath = path.join(hostUrl, "property", "LeaseAggrements", fileName + req.user.data.role + ".pdf")
-
-    // console.log(relativePath, "===relative path")
-
     req.documents = relativePath;
     uploadLeaseAggrement(req, res);
 })

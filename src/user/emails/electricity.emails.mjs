@@ -39,7 +39,6 @@ export const electricityBillInitiated = (options) => {
     `
         sendMail(email, `Electricity Bill Payment Initiated - ${meter_number}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
 
@@ -82,7 +81,6 @@ export const electricityBillPaid = (options) => {
     `
         sendMail(email, `Electricity Bill Payment Paid - ${meter_number}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
 
@@ -125,7 +123,6 @@ export const electricityBillFailed = (options) => {
     `
         sendMail(email, `Electricity Bill Payment Failed - ${meter_number}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
 
@@ -168,7 +165,6 @@ export const electricityBillRefundInitiated = (options) => {
     `
         sendMail(email, `Electricity Bill Refund Initiated - ${meter_number}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
 
@@ -211,20 +207,5 @@ export const electricityBillRefundCompleted = (options) => {
     `
         sendMail(email, `Electricity Bill Refund Completed - ${meter_number}`, html)
     } catch (error) {
-        console.log(error, "====error")
     }
 }
-
-
-// try {
-
-//     electricityBillRefundCompleted({
-//         meter_number: "344dfaHHJHDJF3",
-//         email: ["geivummaumeci-5197@yopmail.com"],
-//         fullName: "parveen",
-//         amount: "5709",
-//             status : "paid"
-//     })
-// } catch (error) {
-//     console.log(error)
-// }

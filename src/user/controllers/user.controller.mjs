@@ -30,8 +30,7 @@ async function deleteUser(req, res) {
 
   try {
     const id = req.user.data._id;
-    console.log(id, "===id")
-    const data = User.findByIdAndUpdate(id, { deleted: true }).then((Res) => console.log(Res))
+    const data = User.findByIdAndUpdate(id, { deleted: true }).then((Res) => console.log("jj"))
     return sendResponse(res, {}, 'successfully deleted data', true, 200)
 
   } catch (error) {
@@ -152,7 +151,6 @@ async function socialLogin(req, res) {
 }
 
 async function myprofile(req, res) {
-  // console.log(req.user.data, "====user")
   const { _id, role } = req.user.data;
   const data = await myProfileDetails(_id, role);
   sendResponse(
@@ -269,12 +267,9 @@ async function resetPassword(req, res) {
       return sendResponse(res, {}, "Password reset successfully", true, 200);
     }
     return sendResponse(res, {}, "User not found", false, 404);
-
   } catch (error) {
-    // console.log(error, '======errir')
     return sendResponse(res, {}, `${error}`, false, 500);
   }
-
 }
 
 async function editMyProfile(req, res) {
@@ -299,7 +294,6 @@ async function editMyProfile(req, res) {
 
     return sendResponse(res, {}, "User not found", false, 404);
   } catch (error) {
-    // console.log(error, '======errir')
     return sendResponse(res, {}, `${error}`, false, 500);
   }
 }
@@ -438,7 +432,6 @@ async function switchRole(req, res) {
 
     return sendResponse(res, {}, "User not found", false, 404);
   } catch (error) {
-    // console.log(error, '======errir')
     return sendResponse(res, {}, `${error}`, false, 400);
   }
 }
@@ -480,7 +473,6 @@ async function verifyReferralCode(req, res) {
 
     return sendResponse(res, {}, "Invalid Referral Code", false, 400);
   } catch (error) {
-    console.log(error, '===error')
     return sendResponse(res, {}, error?.message, false, 400);
   }
 }

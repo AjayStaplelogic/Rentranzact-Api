@@ -53,7 +53,6 @@ export const joinChatRoom = async (req, res) => {
 
 export const getChatRooms = async (req, res) => {
     try {
-        // console.log("[Review Listing]")
         let { user_id, search, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -219,7 +218,6 @@ export const getChatRooms = async (req, res) => {
 
 export const getMessages = async (req, res) => {
     try {
-        // console.log("[Message Listing]")
         let { room_id, search, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -339,7 +337,6 @@ export const getMessages = async (req, res) => {
 
 export const getContacts = async (req, res) => {
     try {
-        // console.log("[Message Listing]")
         let { room_id, search, sortBy, user_id } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
@@ -380,13 +377,11 @@ export const getContacts = async (req, res) => {
                     distinct_key = "landlord_id";
                 }
                 const user_ids = await Property.distinct(distinct_key, user_query);
-                console.log(user_ids, '====user_ids')
                 query._id = { $in: user_ids.map(item => new ObjectId(item)) }
             } else {
                 query._id = { $exists: false }       // Just to handle if user id is wrong then not sending any user data
             }
         }
-        // console.log(query, '========query')
         let pipeline = [
             {
                 $match: query

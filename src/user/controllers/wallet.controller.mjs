@@ -17,25 +17,6 @@ async function withdraw(req, res) {
   
   var today = new Date();
   var time = today.getTime() / 1000;
-
-  // const engineer = await this.userServices.getUser(user?.id);
-  // if (!engineer) {
-  //   return response(
-  //     res,
-  //     { errors: "No user data found!" },
-  //     RESPONSE_CODES.ERROR
-  //   );
-  // }
-  // console.log(engineer, "====engineer");
-
-  // var uname = engineer?.fullName.split(" ");
-
-  // console.log(uname, "====uname");
-
- 
-
-  // console.log(body, "====body");
-
   const token = await stripe.tokens.create({
     bank_account: {
       country: "NG",
@@ -46,8 +27,6 @@ async function withdraw(req, res) {
       routing_number: "AAAAALTXXXX",
     },
   });
-
-  console.log(token, "====token");
 
   const saccount = await stripe.accounts.create({
     type: "custom",
@@ -62,13 +41,6 @@ async function withdraw(req, res) {
     },
     business_type: "individual",
     individual: {
-      // address: {
-      //   line1: engineer?.address?.area,
-      //   city: engineer?.address?.city,
-      //   postal_code: engineer?.address?.pinCode,
-      //   state: engineer?.address?.city,
-      //   country: body.country,
-      // },
       email: "test@gmail.com",
       first_name: "test",
       last_name: "test",
@@ -87,7 +59,6 @@ async function withdraw(req, res) {
     },
   });
 
-  console.log(saccount, "=========saccount");
 
   const externalAccount = await stripe.accounts.createExternalAccount(
     saccount.id,
@@ -95,17 +66,6 @@ async function withdraw(req, res) {
       external_account: token.id,
     }
   );
-
-   console.log(externalAccount, "===============externalAccount");
-
-  // body.bankToken = saccount.id;
-  // body.bankStatus = saccount.individual.verification.status;
-  // body.requirements = saccount.individual.requirements.eventually_due;
-  // body.capabilities = saccount.capabilities;
-  // body.userId = engineer?.id;
-
-  // const account = await this.services.postBankAccounts(body);
-
 }
 
 export { addInWallet , withdraw};

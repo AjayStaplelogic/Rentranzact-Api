@@ -97,7 +97,6 @@ export const getPayouts = async (req, res) => {
         let sort_query = {};
         sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
-        // console.log(query, '====query')
         let pipeline = [
             {
                 $match: query

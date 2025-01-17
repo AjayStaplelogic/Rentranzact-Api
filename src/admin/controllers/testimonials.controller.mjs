@@ -6,8 +6,6 @@ import * as TestimonialServices from "../services/testimonials.service.mjs";
 
 export const addTestimonial = async (req, res) => {
     try {
-        console.log(`[Add testimonial]`)
-        console.log(req.body)
         const { isError, errors } = validator(req.body, TestimonialValidations.addTestimonial);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -32,15 +30,12 @@ export const addTestimonial = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
 export const editTestimonial = async (req, res) => {
     try {
-        console.log(`[Add testimonial]`)
         const { isError, errors } = validator(req.body, TestimonialValidations.editTestimonial);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -76,9 +71,7 @@ export const editTestimonial = async (req, res) => {
 
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 

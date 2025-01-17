@@ -17,6 +17,7 @@ import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as TransactionServices from "../../user/services/transaction.service.mjs";
+import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
@@ -223,6 +224,14 @@ async function addStripeTransaction(body, renterApplicationID) {
                 amount: amount
             });
         }
+
+        // Sending email to renter about successful rent payment
+        rentPaidEmailToRenter({
+            email: renterDetails?.email,
+            amount: amount,
+            property_name: propertyDetails.propertyName,
+            renter_name: renterDetails?.fullName
+        })
         return {
             data: [],
             message: "success",
@@ -289,7 +298,6 @@ async function rechargeWallet(body) {
                     const data_ = new Transaction(transaction_payload)
                     data_.save()
                 } else if (body.paymentMethod === "paystack") {
-                    console.log("Paystack Wallet")
                     const amount = Number(body.data.amount / 100);
                     const status = body.data.status;
                     const createdAt = body.data.paid_at;
@@ -513,6 +521,14 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             amount: amount
         });
     }
+
+    // Sending email to renter about successful rent payment
+    rentPaidEmailToRenter({
+        email: renterDetails?.email,
+        amount: amount,
+        property_name: propertyDetails.propertyName,
+        renter_name: renterDetails?.fullName
+    })
 
     return {
         data: [],

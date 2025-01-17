@@ -52,7 +52,6 @@ async function loginUser(body) {
     const isPasswordValid = await new Promise((resolve, reject) => {
       pkg.compare(password, user.password, function (err, hash) {
         if (err) {
-          console.log(err);
           reject(err);
         } else {
           resolve(hash);

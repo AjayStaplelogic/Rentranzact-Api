@@ -5,7 +5,6 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 
 export const addFaq = async (req, res) => {
     try {
-        console.log(`[Add Faq]`)
         const { isError, errors } = validator(req.body, FaqValidations.addFaq);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -26,15 +25,12 @@ export const addFaq = async (req, res) => {
         }
         return sendResponse(res, {}, "Server Error", false, 500);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 
 export const editFaq = async (req, res) => {
     try {
-        console.log(`[Edit Faq]`)
         const { isError, errors } = validator(req.body, FaqValidations.editFaq);
         if (isError) {
             let errorMessage = errors[0].replace(/['"]/g, "")
@@ -58,9 +54,7 @@ export const editFaq = async (req, res) => {
         }
         return sendResponse(res, {}, "Invalid Id", false, 400);
     } catch (error) {
-        console.log(error)
         return sendResponse(res, {}, `${error}`, false, 400);
-
     }
 }
 

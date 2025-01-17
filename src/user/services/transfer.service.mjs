@@ -9,6 +9,7 @@ import * as NotificationService from "./notification.service.mjs";
 import { transferSucceedEmail } from "../emails/transfer.emails.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
+import mongoose from "mongoose";
 
 /**
  * To make transfer request to admin from landlord when renter pays rent 
@@ -132,7 +133,6 @@ export const transferForWalletRecharge = async (user_id, from_currency = "USD", 
                         walletPoints: ((balance.available[0]?.amount + balance.pending[0]?.amount) / 100)
                     })
                         .then((updatedUser) => {
-                            console.log(updatedUser, '====updatedUser Wallet')
                         })
                 }
                 return transfer;
@@ -144,8 +144,19 @@ export const transferForWalletRecharge = async (user_id, from_currency = "USD", 
     return false;
 }
 
+/**
+ * 
+ * To send system and email notification for successful transfer
+ * 
+ * @param {object | Transfers} options Should contain updated transfer object
+ * @param {mongoose.Types.ObjectId} options.to Benificiary Id
+ * @param {number} options.amount transfered amount
+ * @param {string} options.property_name Name of the referenced property
+ * @param {mongoose.Types.ObjectId} options.property_id Id of the property
+ * @returns {void} Nothing
+ */
 export const sendTransferNotificationAndEmail = (options) => {
-    let { transferDetials } = options;    
+    let { transferDetials } = options;
     User.findById(transferDetials.to).then(receiver_details => {
 
         // Sending email notification to landlord
