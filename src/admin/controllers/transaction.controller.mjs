@@ -10,7 +10,7 @@ async function getTransaction(req, res) {
     let query = {};
     let query2 = {};
 
-    let field = "updatedAt";
+    let field = "createdAt";
     let order = "desc";
     let sort_query = {};
     if (sortBy) {
@@ -109,10 +109,15 @@ async function getTransaction(req, res) {
           landloard_image: "$landlord_details.picture",
           property_name: "$property_details.propertyName",
           property_images: "$property_details.images",
+          createdAt: "$createdAt",
+
         }
       },
       {
         $match: query2
+      },
+      {
+        $sort : sort_query
       },
       {
         $facet: {
