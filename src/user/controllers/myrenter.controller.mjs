@@ -323,7 +323,9 @@ async function rentedProperties(req, res) {
                 fullName: "$renterDetails.fullName",
                 phone: "$renterDetails.phone",
                 email: "$renterDetails.email",
-                permanentAddress: "$renterDetails.permanentAddress"
+                permanentAddress: "$renterDetails.permanentAddress",
+                credit_score: "$renterDetails.credit_score",
+                credit_rating: "$renterDetails.credit_rating",
               }
             }
           ],
