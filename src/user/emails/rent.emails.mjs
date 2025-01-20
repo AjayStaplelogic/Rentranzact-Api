@@ -1,5 +1,5 @@
 import { sendMail } from '../helpers/sendMail.mjs'
- console.log("Email File")
+console.log("Email File")
 export const rentPaidEmail = (options) => {
     try {
         let { email, fullName, amount, property_name, renter_name } = options;
@@ -45,7 +45,7 @@ export const rentPaidEmail = (options) => {
 
 export const rentPaidEmailToRenter = (options) => {
     try {
-        let { email, amount, property_name, renter_name } = options;
+        let { email, amount, property_name, renter_name, transaction_id } = options;
         let html = `
          <!DOCTYPE html>
 <html lang="en">
@@ -62,7 +62,14 @@ export const rentPaidEmailToRenter = (options) => {
    <p style="font-size: 16px; color: #555555">We hope this message finds you well.</p>
     <p style="font-size: 16px; color: #555555">We would like to inform you that we have received <strong>₦${amount}</strong> for the rent of <strong>${property_name}</strong> property. </p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
-    <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
+   <a href="${process.env.BACKEND_URL}/api/admin/transactions/download?id=${transaction_id}" style=" display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 20px" class="download-button" target="_blank">Download Invoice</a>
+   <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
             background-color: #007bff;
             color: white;
             padding: 10px 20px;
