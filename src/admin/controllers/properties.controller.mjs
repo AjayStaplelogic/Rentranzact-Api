@@ -133,7 +133,7 @@ async function getAllPropertyList(req, res) {
       query["inDemand"] = inDemand === "true" ? true : false;
     }
 
-    if (city) { query.city = city.toLowerCase(); };
+    if (city) { query2.city = city.toLowerCase(); };
 
     let skip = Number(page - 1) * count;
     if (search) {
