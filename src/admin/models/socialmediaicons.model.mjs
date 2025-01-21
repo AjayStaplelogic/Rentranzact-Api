@@ -4,13 +4,18 @@ import * as FaqEnums from "../enums/faq.enums.mjs";
 const Schema = mongoose.Schema;
 
 const SocialMediaSchema = new Schema({
+    slug: {
+        type: String,
+        enum: ["instagram", "facebook", "twitter", "linkedin"],
+        index: true
+    },
     title: {
         type: String,
     },
     link: {
         type: String,
     },
-    media : {
+    media: {
         type: String,
     },
 }, {

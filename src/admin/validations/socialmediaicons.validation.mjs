@@ -11,3 +11,9 @@ export const editSocialMediaIcon = Joi.object().keys({
     link : Joi.string().required().uri(),
 });
 
+
+export const addUpdateSocialMediaIcons = Joi.object().keys({
+    slug : Joi.string().required().valid("instagram", "facebook", "twitter", "linkedin"),
+    title : Joi.string().optional().allow(""),
+    link : Joi.string().required().uri(),
+});

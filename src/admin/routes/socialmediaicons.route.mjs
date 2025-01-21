@@ -4,12 +4,13 @@ import * as SocialMediaIconsController from "../controllers/socialmediaicons.con
 import * as SocialMediaIconsServices from "../services/socialmediaicons.service.mjs"
 
 // Define routes for SocialMediaIconss
-router.post('/social-media/icon', SocialMediaIconsServices.upload.single("file"), SocialMediaIconsController.addSocialMediaIcon);
-router.put('/social-media/icon', SocialMediaIconsServices.upload.single("file"), SocialMediaIconsController.editSocialMediaIcon);
+// router.post('/social-media/icon', SocialMediaIconsServices.upload.single("file"), SocialMediaIconsController.addSocialMediaIcon);
+// router.put('/social-media/icon', SocialMediaIconsServices.upload.single("file"), SocialMediaIconsController.editSocialMediaIcon);
 router.get('/social-media/icons', SocialMediaIconsController.getAllSocialMediaIcons);
 router.get('/social-media/icon', SocialMediaIconsController.getSocialMediaIconById);
-router.delete('/social-media/icon', SocialMediaIconsController.deleteSocialMediaIcon);
+// router.delete('/social-media/icon', SocialMediaIconsController.deleteSocialMediaIcon);
 
-
+router.post('/social-media/icon', SocialMediaIconsController.addUpdateSocialMediaIcons);
+router.get('/social-media/icon/slug', SocialMediaIconsController.getSocialMidiaIconsBySlug);
 export default router;
 
