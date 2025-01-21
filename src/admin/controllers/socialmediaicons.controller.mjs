@@ -186,3 +186,46 @@ export const deleteSocialMediaIcon = async (req, res) => {
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 }
+
+export const addUpdateSocialMediaIcons = async (req, res) => {
+    try {
+        const { isError, errors } = validator(req.body, SocialMediaIconsValidations.addUpdateSocialMediaIcons);
+        if (isError) {
+            let errorMessage = errors[0].replace(/['"]/g, "")
+            return sendResponse(res, [], errorMessage, false, 403);
+        }
+
+        let update_icon = await SocialMediaIcons.findOneAndUpdate({
+            slug: req.body.slug,
+        },
+            req.body,
+            { new: true, upsert: true, runValidators: true }
+        );
+
+        if (update_icon) {
+            return sendResponse(res, update_icon, "Data updated successfully", true, 200);
+        }
+
+        return sendResponse(res, {}, "Server Error", false, 500);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 400);
+    }
+}
+
+export const getSocialMidiaIconsBySlug = async (req, res) => {
+    try {
+        let { slug } = req.query;
+        if (!slug) {
+            return sendResponse(res, {}, "Slug required", false, 400);
+        }
+
+        let data = await SocialMediaIcons.findOne({ slug: slug });
+        if (data) {
+            return sendResponse(res, data, "Success", true, 200);
+        }
+
+        return sendResponse(res, {}, "Invalid Slug", false, 500);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 400);
+    }
+}
