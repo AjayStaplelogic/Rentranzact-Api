@@ -111,6 +111,7 @@ export const getAllSocialMediaIcons = async (req, res) => {
                     title: "$title",
                     media: "$media",
                     link: "$link",
+                    slug: "$slug",
                 }
             },
             {
