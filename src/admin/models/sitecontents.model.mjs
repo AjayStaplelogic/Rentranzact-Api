@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const siteContentSchema = new Schema({
     slug : {
         type: String,
-        enum : ["about-us", "privacy-policy", "data-protection"],
+        enum : ["about-us", "privacy-policy", "data-protection", "terms-and-conditions"],
         index : true
     },
     title : {
