@@ -5,6 +5,7 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 import { Property } from "../models/property.model.mjs";
 import Invites from "../models/invites.model.mjs";
 import generateReferralCode from "../helpers/referalCodeGenerator.mjs";
+import { ERenterType } from "../enums/invite.enum.mjs";
 
 export const inviteRenter = async (req, res) => {
     try {
@@ -23,12 +24,14 @@ export const inviteRenter = async (req, res) => {
         if (!get_invitaton) {
             const property = await Property.findById(req.body.property_id);
             if (property) {
-                const invitation_token = generateReferralCode();
-                req.body.invitation_token = invitation_token;
-                req.body.invited_by = req.user.data._id;
-                if (req.body.rent_expiration_date) {
-                    req.body.rent_expiration_date_str = req.body.rent_expiration_date
-                    req.body.rent_expiration_date = new Date(req.body.rent_expiration_date);
+                if(req.body.renter_type === ERenterType.old){
+                    const invitation_token = generateReferralCode();
+                    req.body.invitation_token = invitation_token;
+                    req.body.invited_by = req.user.data._id;
+                    if (req.body.rent_expiration_date) {
+                        req.body.rent_expiration_date_str = req.body.rent_expiration_date
+                        req.body.rent_expiration_date = new Date(req.body.rent_expiration_date);
+                    }
                 }
                 const create_invitation = await Invites.create(req.body);
                 if (create_invitation) {
