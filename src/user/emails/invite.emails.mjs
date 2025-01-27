@@ -1,7 +1,7 @@
 import { sendMail } from '../helpers/sendMail.mjs'
 
 export const inviteForProperty = (options) => {
-    let { email, property_id, landlord_name, property_name, address, about_property } = options;
+    let { email, property_id, landlord_name, invitation_token, address, about_property } = options;
     let html = `
          <html>
 <head>
@@ -28,7 +28,7 @@ export const inviteForProperty = (options) => {
     If you're interested, I'd be happy to schedule a viewing at your convenience. Please let me know if you’d like more details or to arrange a time to visit.
   </p>
   <span>
-  <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" 
+  <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}?invitation_token=${invitation_token}" 
   style="
   color: #ffffff;
   text-decoration:none; 
