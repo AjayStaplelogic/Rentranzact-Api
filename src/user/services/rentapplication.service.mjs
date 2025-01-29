@@ -8,6 +8,8 @@ import assert from "assert";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as NotificationService from "./notification.service.mjs";
+import Invites from "../models/invites.model.mjs";
+import { EInviteStatus } from "../enums/invite.enum.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -170,6 +172,44 @@ async function addRentApplicationService(body, user) {
 
       const renterDetails = await User.findById(renterID);
 
+      // ********* If renter submit application with invite *************//
+      if (body.invitation_token) {
+        const get_invitaton = await Invites.findOne({
+          invitation_token: body.invitation_token,
+        });
+
+        if (get_invitaton) {
+          if ([EInviteStatus.accepted, EInviteStatus.rejected].includes(get_invitaton.invite_status)) {
+            return {
+              data: null,
+              message: "Invitation already used",
+              status: false,
+              statusCode: 400,
+            };
+          }
+
+          if(get_invitaton.invited_by.toString() != payload.pmID &&  get_invitaton.invited_by.toString() != payload.landlordID){
+            return {
+              data: null,
+              message: "You can't use inviation of other who is not your property manager or landlord",
+              status: false,
+              statusCode: 400,
+            };
+          }
+
+          payload.invite_id = get_invitaton._id;
+          payload.invitation_token = get_invitaton.invitation_token;
+        } else {
+          return {
+            data: null,
+            message: "Invalid Invitation code",
+            status: false,
+            statusCode: 400,
+          };
+        }
+      }
+      // ********* If renter submit application with invite *************//
+
       let data = await rentApplication.create(payload);
       if (data) {
         let user_update_payload = {
@@ -214,7 +254,7 @@ async function addRentApplicationService(body, user) {
           identificationType: data.verifcationType,
         }
 
-       const updatedRenter = await User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
+        const updatedRenter = await User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
         User.findById(landlord.landlord_id).then(async (landlordDetails) => {
           if (landlordDetails) {
             let notification_payload = {};

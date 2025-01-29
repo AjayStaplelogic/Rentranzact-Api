@@ -1,6 +1,6 @@
 // models/User.js
 
-import mongoose from "mongoose";
+import mongoose, { Schema } from "mongoose";
 import { RentApplicationStatus, ExpectedStaysDurationType } from "../enums/rentApplication.enums.mjs";
 
 // Define the schema for the User model
@@ -300,9 +300,15 @@ const rentApplicationSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-  
-    /** End of Updating keys when rent application accepted for future payment or static records */
 
+    /** End of Updating keys when rent application accepted for future payment or static records */
+    invite_id: {
+      type: Schema.Types.ObjectId,
+      ref: "invites"
+    },
+    invitation_token: {
+      type: String
+    },
   },
 
   { timestamps: true }
