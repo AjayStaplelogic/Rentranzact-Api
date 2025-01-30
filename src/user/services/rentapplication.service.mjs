@@ -10,6 +10,8 @@ import * as PropertyServices from "../services/property.service.mjs";
 import * as NotificationService from "./notification.service.mjs";
 import Invites from "../models/invites.model.mjs";
 import { EInviteStatus } from "../enums/invite.enum.mjs";
+import moment from "moment";
+import * as RentApplicationEmails from "../emails/rentapplication.emails.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -188,7 +190,7 @@ async function addRentApplicationService(body, user) {
             };
           }
 
-          if(get_invitaton.invited_by.toString() != payload.pmID &&  get_invitaton.invited_by.toString() != payload.landlordID){
+          if (get_invitaton.invited_by.toString() != payload.pmID && get_invitaton.invited_by.toString() != payload.landlordID) {
             return {
               data: null,
               message: "You can't use inviation of other who is not your property manager or landlord",
@@ -508,7 +510,7 @@ async function updateRentApplications(body, id) {
           },
             { new: true });
           if (data) {
-            if (breakdown?.total_amount > 0) {
+            if (breakdown?.total_amount > 0 && !data.invite_id) {
               User.findById(data.renterID).then(async (renterDetails) => {
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
@@ -531,6 +533,63 @@ async function updateRentApplications(body, id) {
                 NotificationService.createNotification(notification_payload, metadata, renterDetails)
               });
             }
+
+            // ********************** If Rent application is submitted view invitation ****************//
+            if (data.invite_id) {
+              const get_invitaton = await Invites.findById(data.invite_id);
+              let lease_end_timestamp = "";
+              if (["commercial", "residential"].includes(propertyDetails.category)) {
+                lease_end_timestamp = moment.unix(created).add(1, "years").unix();
+              } else if (propertyDetails.category === "short stay") {
+                lease_end_timestamp = moment.unix(created).add(1, "months").unix();
+              }
+
+              const updateProperty = await Property.findByIdAndUpdate(data.propertyID, {
+                rented: true,
+                renterID: data.renterID,
+                rent_period_start: moment().unix().toString(),
+                rent_period_end: moment.unix(get_invitaton.rent_expiration_date),
+                rent_period_due: moment.unix(get_invitaton.rent_expiration_date),
+                payment_count: 1,
+                lease_end_timestamp: lease_end_timestamp,
+                inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+                next_payment_at : new Date(get_invitaton.rent_expiration_date)
+              });
+
+              if (updateProperty) {
+                await Invites.findByIdAndUpdate(data.invite_id, {
+                  invite_status: EInviteStatus.accepted
+                })
+                User.findById(data.renterID).then(async (renterDetails) => {
+                  RentApplicationEmails.applicationAcceptedViaInviteRenter({
+                    email: renterDetails.email,
+                    property_name: propertyDetails.propertyName,
+                    renter_name: renterDetails.fullName,
+                    property_id: propertyDetails._id
+                  })
+
+                  let notification_payload = {};
+                  notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+                  notification_payload.notificationHeading = `Congratulations, your rent application have been approved and you are not linked with property ${propertyDetails?.propertyName ?? ""}`;
+                  notification_payload.notificationBody = `Congratulations, your rent application have been approved and you are not linked with property ${propertyDetails?.propertyName ?? ""}`;
+                  notification_payload.renterID = data.renterID;
+                  notification_payload.landlordID = data.landlordID;
+                  notification_payload.renterApplicationID = data._id;
+                  notification_payload.propertyID = data.propertyID;
+                  notification_payload.send_to = renterDetails._id;
+                  notification_payload.property_manager_id = data.pmID;
+                  const metadata = {
+                    "amount": propertyDetails.rent.toString(),
+                    "propertyID": data.propertyID.toString(),
+                    "redirectTo": "property_view",
+                    "rentApplication": data._id.toString()
+                  }
+                  NotificationService.createNotification(notification_payload, metadata, renterDetails)
+                });
+              }
+            }
+
+            // ********************** If Rent application is submitted view invitation ****************//
           }
 
           return {
@@ -758,5 +817,7 @@ async function getRentApplicationByID(id) {
     };
   }
 }
+
+
 
 export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID };

@@ -31,6 +31,7 @@ export const sendMail = (to, subject, html) => {
         throw new Error('Error sending email: ', error);
       }
 
+      console.log(info, '=info')
       return info;
     });
 
