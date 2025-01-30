@@ -1,5 +1,4 @@
 import { sendMail } from '../helpers/sendMail.mjs'
-console.log("Email File")
 export const rentPaidEmail = (options) => {
     try {
         let { email, fullName, amount, property_name, renter_name } = options;
@@ -91,15 +90,3 @@ export const rentPaidEmailToRenter = (options) => {
     } catch (error) {
     }
 }
-
-// try {
-//     rentPaidEmailToRenter({
-//         email: "frewoikiprevoi-7190@yopmail.com",
-//         fullName: "Sunny Dhiman The Gangster",
-//         amount: 100,
-//         property_name: "Sunny ka beda",
-//         renter_name: "Sunny Dhiman The Gangster",
-//     })
-// } catch (error) {
-//     console.log(error, '=======error')
-// }

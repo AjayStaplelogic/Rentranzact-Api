@@ -187,6 +187,9 @@ const propertySchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
+    next_payment_at : {
+      type : Date,
+    },
     rented: {
       type: Boolean,
       required: false,
