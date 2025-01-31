@@ -13,6 +13,8 @@ import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum
 import { Admin } from "../../admin/models/admin.model.mjs";
 import * as NotificationService from "./notification.service.mjs";
 import * as PropertyEmails from "../emails/property.email.mjs";
+import * as RentEmails from "../emails/rent.emails.mjs";
+import moment from "moment";
 
 async function addPropertyService(
   PropertyID,
@@ -764,7 +766,8 @@ async function leavePropertyService(userID, propertyID) {
     rented: false,
     rent_period_start: "",
     rent_period_end: "",
-    payment_count: 0
+    payment_count: 0,
+    next_payment_at: null
   });
 
   if (data) {
@@ -871,6 +874,39 @@ function getRentalBreakUp(propertyDetails) {
   return breakdown;
 }
 
+async function sendRentReminderEmail() {
+  console.log(`[Rent Reminder Email Function Is Invoked]`)
+  const sevenDaysFromNow = moment().add(7, 'days').startOf('day').toDate();
+  const eightDaysFromNow = moment(sevenDaysFromNow).add(1, 'day').toDate();
+  const properties = await Property.find({
+    rented: true,
+    next_payment_at: {
+      $gte: sevenDaysFromNow,
+      $lt: eightDaysFromNow,
+    },
+  });
+  console.log(`[Rent Reminder Email Function] Found ${properties?.length} properties for rent reminder.`);
+
+  if (properties?.length > 0) {
+    for await (let property of properties) {
+      const renterDetails = await User.findById(property.renterID);
+      console.log(`[Rent Reminder Email Sent To ] : [${renterDetails?.email}]`);
+      if (renterDetails) {
+        const emailData = {
+          email: renterDetails.email,
+          // amount : 0,
+          property_name: property.propertyName,
+          renter_name: renterDetails.fullName,
+          property_id: property._id,
+          next_payment_at: property.next_payment_at,
+        };
+
+        RentEmails.rentReminderEmailToRenter(emailData)
+      }
+    }
+  }
+}
+
 export {
   deletePropertyService,
   getMyProperties,
@@ -882,5 +918,6 @@ export {
   addFavoriteProperties,
   searchPropertyByString,
   leavePropertyService,
-  getRentalBreakUp
+  getRentalBreakUp,
+  sendRentReminderEmail
 };

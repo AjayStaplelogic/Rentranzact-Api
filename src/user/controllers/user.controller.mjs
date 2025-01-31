@@ -308,7 +308,8 @@ async function teriminateRenter(req, res) {
       rent_period_end: "",
       rent_period_start: "",
       renterID: null,
-      payment_count: 0
+      payment_count: 0,
+      next_payment_at : null
     })
 
     await Maintenance.deleteMany({ propertyID: propertyID });
