@@ -84,3 +84,5 @@ export const assignLandlordToProperty = (options) => {
     } catch (error) {
     }
 }
+
+

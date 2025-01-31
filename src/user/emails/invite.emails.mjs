@@ -1,7 +1,7 @@
 import { sendMail } from '../helpers/sendMail.mjs'
 
 export const inviteForProperty = (options) => {
-  let { email, property_id, landlord_name, invitation_token, address, about_property } = options;
+  let { email, property_id, property_name, invitation_token, address, about_property } = options;
   let html = `
          <html>
 <head>
@@ -18,7 +18,7 @@ export const inviteForProperty = (options) => {
 ">
   <h1> Invitation to Rent Our Property!</h1>
   <p style="line-height: 18px">
-    I hope you’re doing well. I’d like to invite you to consider renting our property at ${address}.
+    I hope you’re doing well. I’d like to invite you to consider renting our property ${property_name ?? ""} at ${address}.
   </p>
   <h4>About Property</h4>
     <p style="line-height: 18px">

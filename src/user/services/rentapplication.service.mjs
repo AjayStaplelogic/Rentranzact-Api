@@ -199,6 +199,15 @@ async function addRentApplicationService(body, user) {
             };
           }
 
+          if (get_invitaton.property_id.toString() != body.propertyID) {
+            return {
+              data: null,
+              message: "Sorry you are not allowed to access this inivitation to rent this property",
+              status: false,
+              statusCode: 400,
+            };
+          }
+
           payload.invite_id = get_invitaton._id;
           payload.invitation_token = get_invitaton.invitation_token;
         } else {
@@ -548,8 +557,8 @@ async function updateRentApplications(body, id) {
                 rented: true,
                 renterID: data.renterID,
                 rent_period_start: moment().unix().toString(),
-                rent_period_end: moment.unix(get_invitaton.rent_expiration_date),
-                rent_period_due: moment.unix(get_invitaton.rent_expiration_date),
+                rent_period_end: moment(get_invitaton.rent_expiration_date).unix(),
+                rent_period_due: moment(get_invitaton.rent_expiration_date).unix(),
                 payment_count: 1,
                 lease_end_timestamp: lease_end_timestamp,
                 inDemand: false,        // setting this to false because when property is rented then should remove from in demand
@@ -565,13 +574,14 @@ async function updateRentApplications(body, id) {
                     email: renterDetails.email,
                     property_name: propertyDetails.propertyName,
                     renter_name: renterDetails.fullName,
-                    property_id: propertyDetails._id
+                    property_id: propertyDetails._id,
+                    rent_expiration_date : get_invitaton.rent_expiration_date
                   })
 
                   let notification_payload = {};
                   notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
-                  notification_payload.notificationHeading = `Congratulations, your rent application have been approved and you are not linked with property ${propertyDetails?.propertyName ?? ""}`;
-                  notification_payload.notificationBody = `Congratulations, your rent application have been approved and you are not linked with property ${propertyDetails?.propertyName ?? ""}`;
+                  notification_payload.notificationHeading = `Congratulations, your rent application have been approved`;
+                  notification_payload.notificationBody = `Congratulations, your rent application have been approved and you are now linked with property ${propertyDetails?.propertyName ?? ""}`;
                   notification_payload.renterID = data.renterID;
                   notification_payload.landlordID = data.landlordID;
                   notification_payload.renterApplicationID = data._id;
