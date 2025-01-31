@@ -74,7 +74,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneMonthLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand: false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+                next_payment_at: new Date(Number(timestampOneMonthLater) * 1000),
             })
 
             const addRenterHistory = new RentingHistory({
@@ -105,7 +106,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneQuaterLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand: false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+                next_payment_at: new Date(Number(timestampOneQuaterLater) * 1000),
             })
 
             const addRenterHistory = new RentingHistory({
@@ -139,7 +141,8 @@ async function addStripeTransaction(body, renterApplicationID) {
                 rent_period_due: timestampOneYearLater,
                 payment_count: newCount,
                 lease_end_timestamp: lease_end_timestamp,
-                inDemand: false        // setting this to false because when property is rented then should remove from in demand
+                inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+                next_payment_at: new Date(Number(timestampOneYearLater) * 1000),
             })
 
             const addRenterHistory = new RentingHistory({
@@ -390,7 +393,8 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             renterID: userID,
             rent_period_due: timestampOneMonthLater,
             payment_count: newCount,
-            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+            inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+            next_payment_at: new Date(Number(timestampOneMonthLater) * 1000),
         })
 
         const addRenterHistory = new RentingHistory({
@@ -421,7 +425,8 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             renterID: userID,
             payment_count: newCount,
             rent_period_due: timestampOneQuaterLater,
-            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+            inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+            next_payment_at: new Date(Number(timestampOneQuaterLater) * 1000),
         })
 
         const addRenterHistory = new RentingHistory({
@@ -451,7 +456,8 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
             renterID: userID,
             payment_count: newCount,
             rent_period_due: timestampOneYearLater,
-            inDemand: false        // setting this to false because when property is rented then should remove from in demand
+            inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+            next_payment_at: new Date(Number(timestampOneQuaterLater) * 1000),
         })
 
         const addRenterHistory = new RentingHistory({
