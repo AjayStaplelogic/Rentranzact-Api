@@ -1,8 +1,9 @@
+import moment from "moment";
 import { sendMail } from "../helpers/sendMail.mjs";
 
 export const applicationAcceptedViaInviteRenter = (options) => {
     try {
-        let { email, property_name, renter_name, property_id } = options;
+        let { email, property_name, renter_name, property_id, rent_expiration_date } = options;
         let html = `
          <!DOCTYPE html>
   <html lang="en">
@@ -17,7 +18,7 @@ export const applicationAcceptedViaInviteRenter = (options) => {
     <h2 style="color: #333333">Rent Application Update </h2>
     <p style="font-size: 16px; color: #333333;">Dear <strong>${renter_name}</strong>,</p>
    <p style="font-size: 16px; color: #555555">We hope this message finds you well.</p>
-    <p style="font-size: 16px; color: #555555">We would like to inform you that landlord have acceppted your rent application for property <strong>${property_name}</strong> and marked as rented for you. </p>
+    <p style="font-size: 16px; color: #555555">We would like to inform you that landlord have acceppted your rent application for property <strong>${property_name}</strong> and marked as rented for you. Current rent period will expire on ${moment(rent_expiration_date).format("DD MMM YYYY")} </p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
    <a href="${process.env.FRONTEND_URL}/rented-property-detail/${property_id}" style=" display: inline-block;
             background-color: #007bff;

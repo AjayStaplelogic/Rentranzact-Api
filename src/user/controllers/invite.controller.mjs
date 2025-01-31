@@ -24,7 +24,7 @@ export const inviteRenter = async (req, res) => {
         if (!get_invitaton) {
             const property = await Property.findById(req.body.property_id);
             if (property) {
-                if(req.body.renter_type === ERenterType.old){
+                if (req.body.renter_type === ERenterType.old) {
                     const invitation_token = generateReferralCode();
                     req.body.invitation_token = invitation_token;
                     req.body.invited_by = req.user.data._id;
@@ -40,7 +40,8 @@ export const inviteRenter = async (req, res) => {
                         property_id: property?._id,
                         address: property?.address?.addressText ?? "",
                         about_property: property?.aboutProperty ?? "",
-                        invitation_token: create_invitation.invitation_token
+                        invitation_token: create_invitation.invitation_token,
+                        property_name: property.propertyName
                     });
 
                     return sendResponse(res, null, "Success", true, 200);
