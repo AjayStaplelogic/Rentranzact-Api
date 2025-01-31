@@ -539,9 +539,9 @@ async function updateRentApplications(body, id) {
               const get_invitaton = await Invites.findById(data.invite_id);
               let lease_end_timestamp = "";
               if (["commercial", "residential"].includes(propertyDetails.category)) {
-                lease_end_timestamp = moment.unix(created).add(1, "years").unix();
+                lease_end_timestamp = moment().add(1, "years").unix();
               } else if (propertyDetails.category === "short stay") {
-                lease_end_timestamp = moment.unix(created).add(1, "months").unix();
+                lease_end_timestamp = moment().add(1, "months").unix();
               }
 
               const updateProperty = await Property.findByIdAndUpdate(data.propertyID, {
