@@ -12,6 +12,7 @@ import Invites from "../models/invites.model.mjs";
 import { EInviteStatus } from "../enums/invite.enum.mjs";
 import moment from "moment";
 import * as RentApplicationEmails from "../emails/rentapplication.emails.mjs";
+import { RentingHistory } from "../models/rentingHistory.model.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
@@ -562,10 +563,25 @@ async function updateRentApplications(body, id) {
                 payment_count: 1,
                 lease_end_timestamp: lease_end_timestamp,
                 inDemand: false,        // setting this to false because when property is rented then should remove from in demand
-                next_payment_at : new Date(get_invitaton.rent_expiration_date)
+                next_payment_at: new Date(get_invitaton.rent_expiration_date)
+              }, {
+                new: true
               });
 
               if (updateProperty) {
+                const addRenterHistory = new RentingHistory({
+                  renterID: updateProperty.renterID,
+                  landlordID: propertyDetails?.landlord_id,
+                  rentingType: propertyDetails?.rentType,
+                  rentingEnd: propertyDetails?.rent_period_end,
+                  rentingStart: propertyDetails?.rent_period_start,
+                  propertyID: propertyDetails?._id,
+                  renterActive: true,
+                  pmID: propertyDetails?.property_manager_id,
+                })
+
+                addRenterHistory.save()
+
                 await Invites.findByIdAndUpdate(data.invite_id, {
                   invite_status: EInviteStatus.accepted
                 })
@@ -575,7 +591,7 @@ async function updateRentApplications(body, id) {
                     property_name: propertyDetails.propertyName,
                     renter_name: renterDetails.fullName,
                     property_id: propertyDetails._id,
-                    rent_expiration_date : get_invitaton.rent_expiration_date
+                    rent_expiration_date: get_invitaton.rent_expiration_date
                   })
 
                   let notification_payload = {};
