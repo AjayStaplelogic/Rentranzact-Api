@@ -1,5 +1,3 @@
-// models/User.js
-
 import mongoose from "mongoose";
 // Define the schema for the User model
 const newsletterSchema = new mongoose.Schema(

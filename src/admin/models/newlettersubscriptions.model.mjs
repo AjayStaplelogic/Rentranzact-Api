@@ -3,9 +3,17 @@ import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const newsLetterSubscriptionSchema = new Schema({
-    email : {
-        type : String,
+    email: {
+        type: String,
     },
+    status: {
+        type: String,
+        enum: [
+            "active",
+            "inactive",
+        ],
+        default: 'active'
+    }
 }, {
     timestamps: true,
     toJSON: true,
