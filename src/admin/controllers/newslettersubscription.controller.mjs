@@ -31,6 +31,7 @@ export const getAllSubscriptions = async (req, res) => {
                     createdAt: "$createdAt",
                     updatedAt: "$updatedAt",
                     email: "$email",
+                    status: "$status",
                 }
             },
             {

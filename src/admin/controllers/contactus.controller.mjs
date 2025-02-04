@@ -1,9 +1,10 @@
 import { sendResponse } from "../../user/helpers/sendResponse.mjs"
 import ContactUs from "../../user/models/contactus.model.mjs";
+import moment from "moment-timezone";
 
 export const getAllRequests = async (req, res) => {
     try {
-        let { search, sortBy } = req.query;
+        let { search, sortBy, from, to, timezone } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -22,6 +23,23 @@ export const getAllRequests = async (req, res) => {
             order = sortBy.split(' ')[1];
         }
         sort_query[field] = order == "desc" ? -1 : 1;
+
+
+        if (from && to) {
+            query.createdAt = {
+                $gte: moment(from).tz(timezone, true).startOf("day").toDate(),
+                $lte: moment(to).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (from && !to) {
+            query.createdAt = {
+                $gte: moment(to).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (!from && to) {
+            query.createdAt = {
+                $lte: moment(to).tz(timezone, true).endOf("day").toDate()
+            }
+        }
+
         let pipeline = [
             {
                 $match: query
