@@ -571,13 +571,13 @@ async function updateRentApplications(body, id) {
               if (updateProperty) {
                 const addRenterHistory = new RentingHistory({
                   renterID: updateProperty.renterID,
-                  landlordID: propertyDetails?.landlord_id,
-                  rentingType: propertyDetails?.rentType,
-                  rentingEnd: propertyDetails?.rent_period_end,
-                  rentingStart: propertyDetails?.rent_period_start,
-                  propertyID: propertyDetails?._id,
+                  landlordID: updateProperty?.landlord_id,
+                  rentingType: updateProperty?.rentType,
+                  rentingEnd: updateProperty?.rent_period_end,
+                  rentingStart: updateProperty?.rent_period_start,
+                  propertyID: updateProperty?._id,
                   renterActive: true,
-                  pmID: propertyDetails?.property_manager_id,
+                  pmID: updateProperty?.property_manager_id,
                 })
 
                 addRenterHistory.save()
