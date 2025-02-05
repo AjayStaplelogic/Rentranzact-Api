@@ -1,5 +1,6 @@
 import { sendResponse } from "../../user/helpers/sendResponse.mjs"
 import NewsLetterSubscriptions from "../models/newlettersubscriptions.model.mjs";
+import { generateXlxs } from "../services/xlxs.service.mjs";
 
 export const getAllSubscriptions = async (req, res) => {
     try {
@@ -103,5 +104,55 @@ export const updateNewsletterSubscriptionStatus = async (req, res) => {
 
     } catch (error) {
         return sendResponse(res, null, error?.message, false, 500);
+    }
+}
+
+export const downloadXlxs = async (req, res) => {
+    try {
+        let { search, sortBy } = req.query;
+        let query = {};
+        if (search) {
+            query.$or = [
+                { email: { $regex: search, $options: 'i' } },
+            ]
+        }
+        let field = "createdAt";
+        let order = "desc";
+        let sort_query = {};
+        if (sortBy) {
+            field = sortBy.split(' ')[0];
+            order = sortBy.split(' ')[1];
+        }
+        sort_query[field] = order == "desc" ? -1 : 1;
+        let pipeline = [
+            {
+                $match: query
+            },
+            {
+                $project: {
+                    _id: 0,
+                    Date: "$createdAt",
+                    Email: "$email",
+                    Status: "$status",
+                }
+            },
+            {
+                $sort: sort_query
+            }
+        ];
+
+        let data = await NewsLetterSubscriptions.aggregate(pipeline);
+        const columnWidths = [
+            { wpx: 100 },
+            { wpx: 200 },
+            { wpx: 100 },
+        ];
+
+        const buffer = await generateXlxs(data, "Sheet 1", columnWidths)
+        res.setHeader("Content-type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.setHeader("Content-Disposition", `attachment; filename="newsletter_subscriptions.xlsx"`)
+        return res.send(buffer);
+    } catch (error) {
+        return sendResponse(res, {}, `${error}`, false, 500);
     }
 }
