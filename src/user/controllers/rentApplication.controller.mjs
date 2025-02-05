@@ -34,14 +34,14 @@ async function rentApplicationsByID(req, res) {
 
 
 async function rentApplicationUpdate(req, res) {
-
   const id = req.user.data._id;
   const { body } = req;
-
-  const data = await updateRentApplications(body, id);
-
-
-  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  try {
+    const data = await updateRentApplications(body, id);
+    sendResponse(res, data.data, data.message, data.status, data.statusCode);
+  } catch (error) {
+    sendResponse(res, null, error.message, false, 500);
+  }
 }
 
 async function getRentApplications(req, res) {
