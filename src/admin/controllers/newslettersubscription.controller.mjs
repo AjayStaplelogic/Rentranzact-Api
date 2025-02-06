@@ -116,7 +116,7 @@ export const downloadXlxs = async (req, res) => {
                 { email: { $regex: search, $options: 'i' } },
             ]
         }
-        let field = "createdAt";
+        let field = "Date";
         let order = "desc";
         let sort_query = {};
         if (sortBy) {
