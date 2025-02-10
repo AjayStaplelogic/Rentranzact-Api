@@ -154,11 +154,11 @@ async function getAllProperties(req, res) {
     }
 
     if (min_rooms && max_rooms) {
-      query.number_of_rooms = { $gte: Number(min_rooms), $lte: Number(max_rooms) }
+      query.bedrooms = { $gte: Number(min_rooms), $lte: Number(max_rooms) }
     } else if (min_rooms && !max_rooms) {
-      query.number_of_rooms = { $gte: Number(min_rooms) }
+      query.bedrooms = { $gte: Number(min_rooms) }
     } else if (!min_rooms && max_rooms) {
-      query.number_of_rooms = { $lt: Number(max_rooms) }
+      query.bedrooms = { $lt: Number(max_rooms) }
     }
 
     if (furnishingType) { query.furnishingType = { $in: furnishingType.split(",") }; };
