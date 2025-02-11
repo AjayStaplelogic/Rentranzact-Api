@@ -78,6 +78,7 @@ async function getCalenderTimeSlots(req, res) {
         if (month) { query2.month = Number(month) };
         if (day) { query2.day = Number(day) };
         let skip = Number(page - 1) * count;
+
         let pipeline = [
             {
                 $match: query
