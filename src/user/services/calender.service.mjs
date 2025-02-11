@@ -70,7 +70,7 @@ async function getToCalender(userID) {
 async function getRenterCalender(userID, propertyID) {
     const property = await Property.findById(propertyID);
     const result2 = await Inspection.find({
-        inspectionStatus: InspectionStatus.INITIATED,
+        inspectionStatus: {$in : [InspectionStatus.INITIATED, InspectionStatus.ACCEPTED ]},
         "RenterDetails.id": userID
     }).select('id inspectionTime inspectionDate landlordID fullDay');
 
