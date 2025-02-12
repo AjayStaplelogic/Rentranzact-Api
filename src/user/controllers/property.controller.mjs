@@ -198,7 +198,7 @@ async function getAllProperties(req, res) {
     if (rented) {
       query.rented = rented == 'true' ? true : false;
     }
-    
+
     let pipeline = [
       {
         $match: query
@@ -555,6 +555,35 @@ async function editProperty(req, res) {
           }
         }
       })
+
+      // If rent price of rented property is changed then sending system and email notification to renter
+      if (property.rented && property.rent != get_property.rent) {
+        User.findById(property.renterID).then(renter_details => {
+          PropertyEmails.editRent({
+            email: renter_details.email,
+            renter_name: renter_details.fullName,
+            property_id: property._id,
+            property_name: property.propertyName,
+            old_rent: get_property.rent,
+            new_rent: property.rent
+          });
+
+          // Sending system notification to renter
+          const notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+          notification_payload.notificationHeading = "Rent price changed";
+          notification_payload.notificationBody = `Rent price changed to from ${get_property.rent} to ${property.rent} for property ${property.propertyName}`;
+          notification_payload.landlordID = property?.landlord_id;
+          notification_payload.propertyID = property._id;
+          notification_payload.send_to = renter_details._id;
+          notification_payload.property_manager_id = property?.property_manager_id;
+          const metadata = {
+            "propertyID": property._id.toString(),
+            "redirectTo": "property",
+          }
+          NotificationService.createNotification(notification_payload, metadata, renter_details)
+        })
+      }
       return sendResponse(res, property, 'property updated successfully', true, 200);
     }
     return sendResponse(res, null, "Invalid Id", false, 400);
