@@ -129,7 +129,7 @@ async function loginUser(body) {
 }
 
 async function addUser(body) {
-  const userExist = await User.findOne({ email: body.email, deleted : false });
+  const userExist = await User.findOne({ email: body.email, deleted: false });
 
   if (userExist) {
     return {
@@ -223,10 +223,10 @@ async function socialSignup(body) {
   const { socialPlatform, email, email_verified, name, picture, exp, fcmToken, referralCode } = body;
   const user = await User.findOne({
     email: email,
-    deleted : false,
+    deleted: false,
   });
 
-  if(user){
+  if (user) {
     if (user.account_status === EACCOUNT_STATUS.blacklisted) {
       return {
         data: null,
@@ -236,7 +236,7 @@ async function socialSignup(body) {
         accessToken: "",
       };
     }
-  
+
     if (user.account_status === EACCOUNT_STATUS.suspended) {
       return {
         data: null,
@@ -247,7 +247,7 @@ async function socialSignup(body) {
       };
     }
   }
-  
+
   if (referralCode) {
     const validCode = await referralService.isMyCodeExistsInUsers(referralCode);
     if (!validCode) {
@@ -620,6 +620,10 @@ async function getWalletDetails(id) {
   };
   if (role == UserRoles.LANDLORD) {
     rent_transaction_query.landlordID = id;
+  } else if (role == UserRoles.PROPERTY_MANAGER) {
+    rent_transaction_query.pmID = id;
+  } else if (role == UserRoles.RENTER) {
+    rent_transaction_query.renterID = id;
   }
 
   let rent_transaction_pipeline = [
@@ -638,10 +642,10 @@ async function getWalletDetails(id) {
   }
 
   let total = Number(Deposited) + Number(Withdrawn) + RentCollected + EarnedRewards;
-  let deposite_percentage = Number(Deposited) * 100 / total;
-  let withdrawn_percentage = Number(Withdrawn) * 100 / total;
-  let rent_collected_percentage = Number(RentCollected) * 100 / total;
-  let earned_rewards_percentage = Number(EarnedRewards) * 100 / total;
+  let deposite_percentage = Deposited > 0 ? Number(Deposited) * 100 / total : 0;
+  let withdrawn_percentage = Withdrawn > 0 ? Number(Withdrawn) * 100 / total : 0;
+  let rent_collected_percentage = RentCollected > 0 ? Number(RentCollected) * 100 / total : 0;
+  let earned_rewards_percentage = EarnedRewards > 0 ? Number(EarnedRewards) * 100 / total : 0;
 
   return {
     data: {
@@ -655,7 +659,7 @@ async function getWalletDetails(id) {
       rent_collected_percentage,
       earned_rewards_percentage
     },
-    message: "successfully fetched lease aggrements",
+    message: "successfully fetched wallet stats",
     status: true,
     statusCode: 200
   };
