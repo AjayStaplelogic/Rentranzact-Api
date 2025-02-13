@@ -22,6 +22,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { Admin } from "../../admin/models/admin.model.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import { EACCOUNT_STATUS } from "../enums/user.enum.mjs";
+import Commissions from "../models/commissions.model.mjs";
+import { ECommissionType } from "../enums/commission.enum.mjs";
 
 async function loginUser(body) {
   const { email, password, fcmToken } = body;
@@ -612,6 +614,20 @@ async function getWalletDetails(id) {
 
   const Deposited = results.find(result => result._id === 'CREDIT')?.totalAmount || 0;
   const Withdrawn = results.find(result => result._id === 'DEBIT')?.totalAmount || 0;
+  const commission = await Commissions.aggregate([
+    {
+      $match: {
+        type: ECommissionType.rent,
+        to: id
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalCommission: { $sum: '$commission' }
+      }
+    }
+  ])
   let RentCollected = 0;
   let EarnedRewards = Number(earned_rewards) || 0;
 
@@ -657,7 +673,8 @@ async function getWalletDetails(id) {
       deposite_percentage,
       withdrawn_percentage,
       rent_collected_percentage,
-      earned_rewards_percentage
+      earned_rewards_percentage,
+      commission : commission?.[0]?.totalCommission ?? 0
     },
     message: "successfully fetched wallet stats",
     status: true,
