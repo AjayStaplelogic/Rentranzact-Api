@@ -404,9 +404,9 @@ async function editProperty(req, res) {
     const { id, email } = req.body;
     const role = req?.user?.data?.role;
     const user_id = req?.user?.data?._id;
-
+  
     if (!id) {
-      return sendResponse(res, {}, 'id is required', false, 400);
+      return sendResponse(res, {}, 'Id is required', false, 400);
     }
 
     if (role === UserRoles.PROPERTY_MANAGER && !email) {
