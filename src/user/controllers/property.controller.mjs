@@ -409,6 +409,10 @@ async function editProperty(req, res) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
 
+    if (role === UserRoles.PROPERTY_MANAGER && !email) {
+      return sendResponse(res, null, "Landlord is required", false, 403);
+    }
+
     const get_property = await Property.findById(id);
     if (!get_property) {
       return sendResponse(res, {}, 'Property not found', false, 404);

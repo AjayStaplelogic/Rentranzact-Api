@@ -33,6 +33,15 @@ async function addPropertyService(
   let landlord_id = role === UserRoles.LANDLORD ? id : null;
   let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? id : null;
 
+  if (req.user.data.role === UserRoles.PROPERTY_MANAGER && !email) {
+    return {
+      data: [],
+      message: "Landlord is required",
+      status: false,
+      statusCode: 403,
+    };
+  }
+
   let name = "";
   if (email) {
     let user = await User.findOne({
