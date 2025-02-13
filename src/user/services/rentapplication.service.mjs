@@ -524,7 +524,7 @@ async function updateRentApplications(body, id) {
               User.findById(data.renterID).then(async (renterDetails) => {
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
-                notification_payload.notificationHeading = "Congratulations, your rent application have been approved";
+                notification_payload.notificationHeading = `Congratulations, your rent application have been approved ${propertyDetails?.propertyName ?? ""}`;
                 notification_payload.notificationBody = "You can now proceed to make payment";
                 notification_payload.renterID = data.renterID;
                 notification_payload.landlordID = data.landlordID;
