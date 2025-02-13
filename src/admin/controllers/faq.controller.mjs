@@ -11,7 +11,7 @@ export const addFaq = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        req.body.question = req.body.question.toLowerCase().trim();
+        // req.body.question = req.body.question.toLowerCase().trim();
         let query = { question: req.body.question };
 
         let is_exist = await Faqs.findOne(query);
@@ -37,7 +37,7 @@ export const editFaq = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        req.body.question = req.body.question.toLowerCase().trim();
+        // req.body.question = req.body.question.toLowerCase().trim();
         let query = {
             question: req.body.question,
             _id: { $ne: req.body.id }

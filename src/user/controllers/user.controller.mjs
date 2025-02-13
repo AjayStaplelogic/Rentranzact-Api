@@ -25,6 +25,9 @@ import { accessTokenGenerator } from "../helpers/accessTokenGenerator.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import { EShareVia } from "../enums/referral.enum.mjs";
 import * as referralEmailService from "../emails/referral.emails.mjs"
+import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
+import * as NotificationService from "../services/notification.service.mjs";
 
 async function deleteUser(req, res) {
 
@@ -300,21 +303,38 @@ async function editMyProfile(req, res) {
 
 async function teriminateRenter(req, res) {
   try {
-
     const propertyID = req.params.id;
-
-    await Property.findByIdAndUpdate(propertyID, {
+    const property = await Property.findByIdAndUpdate(propertyID, {
       rented: false,
       rent_period_end: "",
       rent_period_start: "",
       renterID: null,
       payment_count: 0,
-      next_payment_at : null
+      next_payment_at: null
     })
 
     await Maintenance.deleteMany({ propertyID: propertyID });
-    return sendResponse(res, [], `terminated successfully`, true, 200);
 
+    // Sending system notification to renter
+    User.findById(property.renterID).then(renter_details => {
+
+      // Sending system notification to renter
+      const notification_payload = {};
+      notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+      notification_payload.notificationHeading = "Tenancy Terminated";
+      notification_payload.notificationBody = `${req?.user?.data?.role == UserRoles.LANDLORD ? "Landlord" : "Property Manager"} ${req?.user?.data?.fullName} terminated you tenancy for property ${property?.propertyName}`;
+      notification_payload.landlordID = property?.landlord_id;
+      notification_payload.propertyID = property._id;
+      notification_payload.send_to = renter_details._id;
+      notification_payload.property_manager_id = property?.property_manager_id;
+      const metadata = {
+        "propertyID": property._id.toString(),
+        "redirectTo": "property",
+      }
+      NotificationService.createNotification(notification_payload, metadata, renter_details)
+    })
+
+    return sendResponse(res, [], `terminated successfully`, true, 200);
   } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
