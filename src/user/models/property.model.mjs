@@ -6,7 +6,6 @@
 
 import mongoose from "mongoose";
 import { ApprovalStatus } from "../enums/property.enums.mjs"
-// Define the schema for the User model
 const propertySchema = new mongoose.Schema(
   {
     propertyID: {
@@ -45,12 +44,10 @@ const propertySchema = new mongoose.Schema(
 
     name: {
       type: String,
-      // required: true,
     },
 
     email: {
       type: String,
-      // required: true,
     },
 
     renterID: {
@@ -68,7 +65,6 @@ const propertySchema = new mongoose.Schema(
     },
     city: {
       type: String,
-      // required: true,
     },
 
     number_of_floors: {
@@ -106,17 +102,13 @@ const propertySchema = new mongoose.Schema(
     },
     landmark: {
       type: String,
-      // required: true,
     },
-
     bedrooms: {
       type: Number,
       required: false,
     },
-
     superArea: {
       type: String,
-      // required: true,
     },
     availability: {
       type: Number,
@@ -124,17 +116,13 @@ const propertySchema = new mongoose.Schema(
     },
     communityType: {
       type: String,
-      // required: true,
     },
-
     cautionDeposite: {
       type: Number,
       required: false,
     },
-
     servicesCharges: {
       type: Number,
-      // required: true,
     },
     amenities: {
       type: Array,
@@ -148,32 +136,26 @@ const propertySchema = new mongoose.Schema(
       type: Array,
       required: true,
     },
-
     videos: {
       type: Array,
       required: true,
     },
-
     verified: {
       type: Boolean,
       default: false,
     },
-
     rent_period_start: {
       type: String,
       required: false,
     },
-
     rent_period_end: {
       type: String,
       required: false,
     },
-
     rent_period_due: {
       type: String,
       required: false,
     },
-
     rent_paid_due: {
       type: Boolean,
       required: false,
@@ -208,7 +190,6 @@ const propertySchema = new mongoose.Schema(
 
     landlord_id: {
       type: String,
-      // required: true,
     },
 
     inDemand: {
@@ -275,7 +256,6 @@ const propertySchema = new mongoose.Schema(
       type: String,
       enum: Object.values(ApprovalStatus),
       default: ApprovalStatus.PENDING
-      // default: ApprovalStatus.APPROVED    // just for demo, set pending after demo
     }
   },
   { timestamps: true }
