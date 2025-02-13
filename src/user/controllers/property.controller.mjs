@@ -450,12 +450,7 @@ async function editProperty(req, res) {
         }
       } else {
         console.log(`[Invalid Email Address]`)
-        return {
-          data: [],
-          message: "email of property manager or landlord is not valid",
-          status: false,
-          statusCode: 403,
-        };
+        return sendResponse(res, null, "email of property manager or landlord is not valid", false, 403)
       }
     }
 
@@ -502,6 +497,34 @@ async function editProperty(req, res) {
             "redirectTo": "property",
           }
           NotificationService.createNotification(notification_payload, metadata, property_manager)
+
+
+          // Sending system notification to renter
+          User.findById(property.renterID).then(renter_details => {
+            PropertyEmails.assignPMToPropertyEmailToRenter({
+              email: renter_details.email,
+              property_id: property._id,
+              renter_name: renter_details.fullName,
+              property_manager_name: property_manager.fullName,
+              landlord_name: req?.user?.data?.fullName,
+              property_name: property.propertyName,
+            });
+
+            // Sending system notification to renter
+            const notification_payload = {};
+            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+            notification_payload.notificationHeading = "New Property Manager Assinged";
+            notification_payload.notificationBody = `New property manager ${property_manager.fullName}  assinged to property ${property.propertyName}`;
+            notification_payload.landlordID = property?.landlord_id;
+            notification_payload.propertyID = property._id;
+            notification_payload.send_to = renter_details._id;
+            notification_payload.property_manager_id = property?.property_manager_id;
+            const metadata = {
+              "propertyID": property._id.toString(),
+              "redirectTo": "property",
+            }
+            NotificationService.createNotification(notification_payload, metadata, renter_details)
+          })
         })
       }
 
