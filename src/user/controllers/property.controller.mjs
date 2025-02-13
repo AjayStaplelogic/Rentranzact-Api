@@ -439,8 +439,6 @@ async function editProperty(req, res) {
           $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
         },
       }).lean().exec();
-      console.log(`[Property Before Update] [USER-DATA] : [${user}] `)
-
       if (user) {
         name = user.fullName;
         if (user.role === UserRoles.LANDLORD) {
@@ -449,12 +447,9 @@ async function editProperty(req, res) {
           property_manager_id = user._id;
         }
       } else {
-        console.log(`[Invalid Email Address]`)
         return sendResponse(res, null, "email of property manager or landlord is not valid", false, 403)
       }
     }
-
-    console.log(`[PM-ID-BEFORE] : [[${property_manager_id}]]`)
 
     if (req.body.address) {
       req.body.address = JSON.parse(req.body.address);
@@ -466,13 +461,10 @@ async function editProperty(req, res) {
 
     req.body.landlord_id = landlord_id;
     req.body.property_manager_id = property_manager_id ?? null;
-    console.log(`[PM-ID-BEFORE-2-FROM-BODY] : [${req.body.property_manager_id}]`)
-
     req.body.name = name;
     req.body.approval_status = ApprovalStatus.PENDING;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
-      console.log(`[Property Updated] [PM-ID] : [${property.property_manager_id}] `)
       if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email
         User.findById(property.property_manager_id).then(property_manager => {
           PropertyEmails.assignPMToProperty({
@@ -499,32 +491,34 @@ async function editProperty(req, res) {
           NotificationService.createNotification(notification_payload, metadata, property_manager)
 
 
-          // Sending system notification to renter
-          User.findById(property.renterID).then(renter_details => {
-            PropertyEmails.assignPMToPropertyEmailToRenter({
-              email: renter_details.email,
-              property_id: property._id,
-              renter_name: renter_details.fullName,
-              property_manager_name: property_manager.fullName,
-              landlord_name: req?.user?.data?.fullName,
-              property_name: property.propertyName,
-            });
-
+          if (property.rented) {
             // Sending system notification to renter
-            const notification_payload = {};
-            notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
-            notification_payload.notificationHeading = "New Property Manager Assinged";
-            notification_payload.notificationBody = `New property manager ${property_manager.fullName}  assinged to property ${property.propertyName}`;
-            notification_payload.landlordID = property?.landlord_id;
-            notification_payload.propertyID = property._id;
-            notification_payload.send_to = renter_details._id;
-            notification_payload.property_manager_id = property?.property_manager_id;
-            const metadata = {
-              "propertyID": property._id.toString(),
-              "redirectTo": "property",
-            }
-            NotificationService.createNotification(notification_payload, metadata, renter_details)
-          })
+            User.findById(property.renterID).then(renter_details => {
+              PropertyEmails.assignPMToPropertyEmailToRenter({
+                email: renter_details.email,
+                property_id: property._id,
+                renter_name: renter_details.fullName,
+                property_manager_name: property_manager.fullName,
+                landlord_name: req?.user?.data?.fullName,
+                property_name: property.propertyName,
+              });
+
+              // Sending system notification to renter
+              const notification_payload = {};
+              notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+              notification_payload.notificationHeading = "New Property Manager Assinged";
+              notification_payload.notificationBody = `New property manager ${property_manager.fullName}  assinged to property ${property.propertyName}`;
+              notification_payload.landlordID = property?.landlord_id;
+              notification_payload.propertyID = property._id;
+              notification_payload.send_to = renter_details._id;
+              notification_payload.property_manager_id = property?.property_manager_id;
+              const metadata = {
+                "propertyID": property._id.toString(),
+                "redirectTo": "property",
+              }
+              NotificationService.createNotification(notification_payload, metadata, renter_details)
+            })
+          }
         })
       }
 
@@ -610,7 +604,7 @@ async function editProperty(req, res) {
     }
     return sendResponse(res, null, "Invalid Id", false, 400);
   } catch (error) {
-    return sendResponse(res, [], error.message, false, 400)
+    return sendResponse(res, null, error?.message, false, 400)
   }
 }
 
