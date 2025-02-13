@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import { EPaymentType } from "../enums/wallet.enum.mjs"
-// Define the schema for the User model
 const walletSchema = new mongoose.Schema(
     {
         intentID: {
@@ -38,7 +37,6 @@ const walletSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const Wallet = mongoose.model("Wallet", walletSchema);
 
 export { Wallet };
