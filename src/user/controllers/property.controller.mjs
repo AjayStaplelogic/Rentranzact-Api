@@ -439,6 +439,8 @@ async function editProperty(req, res) {
           $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
         },
       }).lean().exec();
+      console.log(`[Property Before Update] [USER-DATA] : [${user}] `)
+
       if (user) {
         name = user.fullName;
         if (user.role === UserRoles.LANDLORD) {
@@ -447,6 +449,7 @@ async function editProperty(req, res) {
           property_manager_id = user._id;
         }
       } else {
+        console.log(`[Invalid Email Address]`)
         return {
           data: [],
           message: "email of property manager or landlord is not valid",
@@ -455,6 +458,8 @@ async function editProperty(req, res) {
         };
       }
     }
+
+    console.log(`[PM-ID-BEFORE] : [[${property_manager_id}]]`)
 
     if (req.body.address) {
       req.body.address = JSON.parse(req.body.address);
@@ -466,10 +471,13 @@ async function editProperty(req, res) {
 
     req.body.landlord_id = landlord_id;
     req.body.property_manager_id = property_manager_id ?? null;
+    console.log(`[PM-ID-BEFORE-2-FROM-BODY] : [${req.body.property_manager_id}]`)
+
     req.body.name = name;
     req.body.approval_status = ApprovalStatus.PENDING;
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
+      console.log(`[Property Updated] [PM-ID] : [${property.property_manager_id}] `)
       if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email
         User.findById(property.property_manager_id).then(property_manager => {
           PropertyEmails.assignPMToProperty({
@@ -543,15 +551,6 @@ async function editProperty(req, res) {
               "redirectTo": "property",
             }
             NotificationService.createNotification(notification_payload, metadata, admin)
-
-            // Notification.create(notification_payload).then((create_notification) => {
-            //   if (create_notification) {
-            //     if (admin && admin.fcmToken) {
-
-            //       sendNotification(admin, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, admin.role)
-            //     }
-            //   }
-            // });
           }
         }
       })
