@@ -22,6 +22,7 @@ import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
 
 async function addStripeTransaction(body, renterApplicationID) {
+    console.log("FIRST STRIPE TRANSACTION")
     let userID;
     let propertyID;
     let notificationID;
@@ -29,6 +30,8 @@ async function addStripeTransaction(body, renterApplicationID) {
     let status;
     let created;
     let id;
+
+    console.log(body, '===================body 222222222')
 
     if (body.paymentMethod === "stripe") {
         userID = body.data.object.metadata.userID;
@@ -52,6 +55,7 @@ async function addStripeTransaction(body, renterApplicationID) {
         id = body?.data?.id;
     }
 
+    console.log(created, '===================created')
     const propertyDetails = await Property.findById(propertyID);
     if (propertyDetails) {
         let lease_end_timestamp = "";
@@ -63,9 +67,12 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         if (propertyDetails.rentType === RentType.MONTHLY) {
             let newCount = propertyDetails.payment_count + 1;
+            console.log(created, '==================created 2222222222')
             const originalDate = moment.unix(created.toString());
             const oneMonthLater = originalDate.add(1, 'months');
             const timestampOneMonthLater = oneMonthLater.unix();
+            console.log(created, '==================created 3333333333333')
+
             const updateProperty = await Property.findByIdAndUpdate(propertyID, {
                 rented: true,
                 renterID: userID,
@@ -90,6 +97,8 @@ async function addStripeTransaction(body, renterApplicationID) {
             })
 
             addRenterHistory.save()
+            console.log(addRenterHistory, '==================addRenterHistory')
+
         } else if (propertyDetails.rentType === RentType.QUATERLY) {
             // Convert timestamp to a Moment.js object
             let newCount = propertyDetails.payment_count + 1;
