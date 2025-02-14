@@ -6,6 +6,7 @@ import * as Constants from "../enums/common.mjs"
 
 async function flutterwave(req, res) {
   const { body } = req;
+  console.log(body, '====================body 1111111111')
   switch (req.body["event.type"]) {
     case 'CARD_TRANSACTION':
       const meta_data = req.body.meta_data;
