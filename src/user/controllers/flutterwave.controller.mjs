@@ -27,22 +27,23 @@ async function flutterwave(req, res) {
     default:
       break;
   }
-  const { meta_data } = body;
-  let { wallet } = meta_data
-  if (wallet === "true") {
-    addToWallet(body)
-  } else {
-    let property = await Property.findById(meta_data.propertyID);
-    let data = {}
-    if (property) {
-      if (!property.payment_count || property.payment_count == 0) {
-        data = await addFlutterwaveTransaction(body, meta_data.renterApplicationID)
-      } else if (property.payment_count > 0) {
-        data = await addFlutterwaveTransactionForOld(body)
+  if(body?.data?.status === "successful" ){
+    const { meta_data } = body;
+    let { wallet } = meta_data
+    if (wallet === "true") {
+      addToWallet(body)
+    } else {
+      let property = await Property.findById(meta_data.propertyID);
+      let data = {}
+      if (property) {
+        if (!property.payment_count || property.payment_count == 0) {
+          data = await addFlutterwaveTransaction(body, meta_data.renterApplicationID)
+        } else if (property.payment_count > 0) {
+          data = await addFlutterwaveTransactionForOld(body)
+        }
       }
     }
   }
-
   return res.status(200).end();
 }
 

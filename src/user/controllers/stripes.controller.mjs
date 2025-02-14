@@ -10,7 +10,8 @@ import * as WalletServices from "../services/wallet.service.mjs";
 async function stripe(req, res) {
 
     const { body } = req;
-
+    console.log("********************************STRIPE WEBHOOK*************************")
+    console.log(body, '===============body');
     if (body.type === "payment_intent.succeeded") {
         const { wallet, renterApplicationID } = body.data.object.metadata;
         body.paymentMethod = "stripe"
