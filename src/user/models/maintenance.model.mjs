@@ -17,7 +17,6 @@ const maintenanceSchema = new mongoose.Schema(
 
         landlordID: {
             type: String,
-            // required: true,
         },
         landlordRemark: {
             type: String,
@@ -48,7 +47,6 @@ const maintenanceSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const Maintenance = mongoose.model("maintenance", maintenanceSchema);
 
 export { Maintenance };

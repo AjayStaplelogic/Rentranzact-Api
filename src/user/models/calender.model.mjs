@@ -1,7 +1,4 @@
-// models/User.js
-
 import mongoose from "mongoose";
-
 const calenderSchema = new mongoose.Schema(
     {
         userID: {
@@ -30,7 +27,6 @@ const calenderSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const Calender = mongoose.model("Calender", calenderSchema);
 
 export { Calender };

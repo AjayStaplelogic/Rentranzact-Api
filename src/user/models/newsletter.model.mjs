@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-// Define the schema for the User model
 const newsletterSchema = new mongoose.Schema(
   {
     email: {
@@ -16,7 +15,6 @@ const newsletterSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create the User model from the schema
 const newsletter = mongoose.model("newsletter", newsletterSchema);
 
 export { newsletter };

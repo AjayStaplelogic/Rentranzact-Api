@@ -372,7 +372,7 @@ async function getPropertyManagerList(req, res) {
 async function getPropertyManagerDetails(req, res) {
   try {
     const id = req.params.id;
-    const data = await User.findById(id).select('fullName role email verified countryCode phone picture permanentAddress age')
+    const data = await User.findById(id).select('fullName role email verified countryCode phone picture permanentAddress age kinDetails')
     return sendResponse(res, data, `user detail`, true, 200);
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
@@ -467,11 +467,6 @@ async function editProperty(req, res) {
     req.body.property_manager_id = property_manager_id ?? null;
     req.body.name = name;
     req.body.approval_status = ApprovalStatus.PENDING;
-    console.log(req.body, '==========req.body');
-    if(req.body.total_administrative_offices >= 0){
-      req.body.total_administrative_offices = Number(req.body.total_administrative_offices)
-    }
-
     const property = await Property.findByIdAndUpdate(id, req.body, { new: true });
     if (property) {
       if (property.property_manager_id && property.property_manager_id != get_property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email

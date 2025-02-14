@@ -16,7 +16,6 @@ const LeaseAggrementsSchema = new mongoose.Schema(
         },
         landlordID: {
             type: String,
-            // required: true
         },
         uploadedAt: {
             type: String,
@@ -39,7 +38,6 @@ const LeaseAggrementsSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const LeaseAggrements = mongoose.model("LeaseAggrements", LeaseAggrementsSchema);
 
 export { LeaseAggrements };
