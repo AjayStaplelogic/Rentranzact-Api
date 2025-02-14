@@ -1,6 +1,4 @@
-// models/User.js
 import mongoose from "mongoose";
-// Define the schema for the User model
 const TokenSchema = new mongoose.Schema({
     type: {
         type: String,
@@ -18,8 +16,6 @@ const TokenSchema = new mongoose.Schema({
     { timestamps: true }
 );
 
-
-// Create the User model from the schema
 const Tokens = mongoose.model("tokens", TokenSchema);
 
 export { Tokens };

@@ -1,9 +1,5 @@
-// models/User.js
-
 import mongoose, { Schema } from "mongoose";
 import { RentApplicationStatus, ExpectedStaysDurationType } from "../enums/rentApplication.enums.mjs";
-
-// Define the schema for the User model
 const rentApplicationSchema = new mongoose.Schema(
   {
     nin: {
@@ -75,12 +71,10 @@ const rentApplicationSchema = new mongoose.Schema(
 
     name: {
       type: String,
-      // required: true,
     },
 
     no_of_occupant: {
       type: Number,
-      // required: true,
     },
 
     checkinDate: {
@@ -107,7 +101,6 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     age: {
       type: Number,
-      // required: true,
     },
 
     rentNowPayLater: {
@@ -125,11 +118,9 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     permanentCity: {
       type: String,
-      // required: true,
     },
     permanentState: {
       type: String,
-      // required: true,
     },
     permanentZipcode: {
       type: Number,
@@ -137,7 +128,6 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     permanentContactNumber: {
       type: String,
-      // required: true,
     },
     applicationStatus: {
       type: String,
@@ -153,7 +143,6 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     landlordID: {
       type: String,
-      // required: true
     },
     kinIdentityCheck: {
       type: Boolean,
@@ -178,7 +167,6 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     pmID: {
       type: String,
-      // required: false
     },
 
     /** Personal details */

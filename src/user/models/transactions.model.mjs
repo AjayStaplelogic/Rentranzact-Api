@@ -84,7 +84,6 @@ const transactionSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Create the User model from the schema
 const Transaction = mongoose.model("transaction", transactionSchema);
 
 export { Transaction };

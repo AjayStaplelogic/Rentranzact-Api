@@ -16,7 +16,6 @@ const rentingHistorySchema = new mongoose.Schema(
         },
         landlordID: {
             type: String,
-            // required: true,
         },
         rentingStart: {
             type: String,
@@ -38,7 +37,6 @@ const rentingHistorySchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-// Create the User model from the schema
 const RentingHistory = mongoose.model("rentingHistory", rentingHistorySchema);
 
 export { RentingHistory };
