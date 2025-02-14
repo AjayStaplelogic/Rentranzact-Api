@@ -372,7 +372,7 @@ async function getPropertyManagerList(req, res) {
 async function getPropertyManagerDetails(req, res) {
   try {
     const id = req.params.id;
-    const data = await User.findById(id).select('fullName role email verified countryCode phone picture permanentAddress age')
+    const data = await User.findById(id).select('fullName role email verified countryCode phone picture permanentAddress age kinDetails')
     return sendResponse(res, data, `user detail`, true, 200);
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
