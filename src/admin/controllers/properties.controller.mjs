@@ -403,7 +403,7 @@ async function updatePropertyApprovalStatus(req, res) {
         const notification_payload = {};
         notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
         notification_payload.notificationHeading = "Approval Status Updated";
-        notification_payload.notificationBody = `Rentranzact has reviewed your property and your current status is ${update_property?.approval_status}`;
+        notification_payload.notificationBody = `Rentranzact has reviewed your property ${update_property?.propertyName ?? ""} and your current status is ${update_property?.approval_status}`;
         notification_payload.landlordID = property?.landlord_id ?? null;
         notification_payload.propertyID = property._id;
         notification_payload.property_manager_id = property?.property_manager_id ?? null;

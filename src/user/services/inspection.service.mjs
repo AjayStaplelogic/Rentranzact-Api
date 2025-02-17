@@ -254,8 +254,13 @@ async function updateInspectionStatus(body, id) {
     if (reason) {
       update_payload.cancelReason = reason;
     }
-    notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
-    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`;
+    if (inspectionDetails.landlordID == id || inspectionDetails?.property_manager_id == id) {
+      notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
+      notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`;
+    }else{
+      notification_payload.send_to = inspectionDetails?.landlordID ?? inspectionDetails?.property_manager_id;
+      notification_payload.notificationBody = `Inspection for ${inspectionDetails.propertyName} is cancelled by renter`;
+    }
   }
 
   if (InspectionStatus.ACCEPTED === status) {
