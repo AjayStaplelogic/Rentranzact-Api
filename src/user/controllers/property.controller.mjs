@@ -404,7 +404,7 @@ async function editProperty(req, res) {
     const { id, email } = req.body;
     const role = req?.user?.data?.role;
     const user_id = req?.user?.data?._id;
-  
+
     if (!id) {
       return sendResponse(res, {}, 'Id is required', false, 400);
     }
@@ -483,7 +483,7 @@ async function editProperty(req, res) {
           const notification_payload = {};
           notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
           notification_payload.notificationHeading = "Property Assigned";
-          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property ${property?.propertyName}`;
           notification_payload.landlordID = property.landlord_id;
           notification_payload.propertyID = property._id;
           notification_payload.send_to = property.property_manager_id;
@@ -511,7 +511,7 @@ async function editProperty(req, res) {
               const notification_payload = {};
               notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
               notification_payload.notificationHeading = "New Property Manager Assinged";
-              notification_payload.notificationBody = `New property manager ${property_manager.fullName}  assinged to property ${property.propertyName}`;
+              notification_payload.notificationBody = `New property manager ${property_manager.fullName} assinged to property ${property.propertyName}`;
               notification_payload.landlordID = property?.landlord_id;
               notification_payload.propertyID = property._id;
               notification_payload.send_to = renter_details._id;
@@ -542,7 +542,7 @@ async function editProperty(req, res) {
           const notification_payload = {};
           notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
           notification_payload.notificationHeading = "Property Assigned";
-          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property`;
+          notification_payload.notificationBody = `${req?.user?.data?.fullName ?? ""} assigned you a new property ${property.propertyName}`;
           notification_payload.landlordID = property.landlord_id;
           notification_payload.propertyID = property._id;
           notification_payload.send_to = landlord_details._id;

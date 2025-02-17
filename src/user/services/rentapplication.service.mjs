@@ -524,7 +524,7 @@ async function updateRentApplications(body, id) {
               User.findById(data.renterID).then(async (renterDetails) => {
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen;
-                notification_payload.notificationHeading = `Congratulations, your rent application have been approved ${propertyDetails?.propertyName ?? ""}`;
+                notification_payload.notificationHeading = `Congratulations, your rent application have been approved for ${propertyDetails?.propertyName ?? ""}`;
                 notification_payload.notificationBody = "You can now proceed to make payment";
                 notification_payload.renterID = data.renterID;
                 notification_payload.landlordID = data.landlordID;
@@ -596,7 +596,7 @@ async function updateRentApplications(body, id) {
 
                   let notification_payload = {};
                   notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
-                  notification_payload.notificationHeading = `Congratulations, your rent application have been approved`;
+                  notification_payload.notificationHeading = `Congratulations, your rent application have been approved for ${propertyDetails?.propertyName ?? ""}`;
                   notification_payload.notificationBody = `Congratulations, your rent application have been approved and you are now linked with property ${propertyDetails?.propertyName ?? ""}`;
                   notification_payload.renterID = data.renterID;
                   notification_payload.landlordID = data.landlordID;
@@ -636,8 +636,8 @@ async function updateRentApplications(body, id) {
             const renterDetails = await User.findById(data.renterID);
             let notification_payload = {};
             notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
-            notification_payload.notificationHeading = "Rent Application Cancelled";
-            notification_payload.notificationBody = `Your rent application has been cancelled by landlord, Reason : ${data?.cancelReason ?? "N/A"}`;
+            notification_payload.notificationHeading = `Rent Application Cancelled  for ${propertyDetails?.propertyName ?? ""}`;
+            notification_payload.notificationBody = `Your rent application has been cancelled by landlord for ${propertyDetails?.propertyName ?? ""}, Reason : ${data?.cancelReason ?? "N/A"}`;
             notification_payload.renterID = data.renterID;
             notification_payload.landlordID = data.landlordID;
             notification_payload.renterApplicationID = data._id;
@@ -666,8 +666,8 @@ async function updateRentApplications(body, id) {
             const landlordDetails = await User.findById(data.landlordID);
             if (landlordDetails) {
               let notification_payload = {};
-              notification_payload.notificationHeading = "Rent Application Withdrawn";
-              notification_payload.notificationBody = `Renter withdraw his rent application`;
+              notification_payload.notificationHeading = `Rent Application Withdrawn  for ${propertyDetails?.propertyName ?? ""}`;
+              notification_payload.notificationBody = `Renter withdraw his rent application for ${propertyDetails?.propertyName ?? ""}`;
               notification_payload.renterID = data.renterID;
               notification_payload.landlordID = data.landlordID;
               notification_payload.renterApplicationID = data._id;
@@ -685,8 +685,8 @@ async function updateRentApplications(body, id) {
             const propertyManagerDetails = await User.findById(data.pmID);
             if (propertyManagerDetails) {
               let notification_payload = {};
-              notification_payload.notificationHeading = "Rent Application Withdrawn";
-              notification_payload.notificationBody = `Renter withdraw his rent application`;
+              notification_payload.notificationHeading = `Rent Application Withdrawn for ${propertyDetails?.propertyName ?? ""}`;
+              notification_payload.notificationBody = `Renter withdraw his rent application for ${propertyDetails?.propertyName ?? ""}`;
               notification_payload.renterID = data.renterID;
               notification_payload.landlordID = data.landlordID;
               notification_payload.renterApplicationID = data._id;

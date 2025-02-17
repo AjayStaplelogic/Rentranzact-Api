@@ -79,7 +79,7 @@ const transactionSchema = new mongoose.Schema(
     receiver_id : {
       type: mongoose.Types.ObjectId,
       ref: "users"
-    }
+    },
   },
   { timestamps: true }
 );

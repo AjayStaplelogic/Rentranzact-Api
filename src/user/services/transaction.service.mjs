@@ -326,7 +326,7 @@ const sendRentPaymentNotificationAndEmail = (options) => {
     const notification_payload = {};
     notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
     notification_payload.notificationHeading = "Rent Paid";
-    notification_payload.notificationBody = `${renter_details.fullName ?? ""} paid rent successfully`;
+    notification_payload.notificationBody = `${renter_details.fullName ?? ""} paid rent successfully for ${property.propertyName}`;
     notification_payload.landlordID = property.landlord_id;
     notification_payload.propertyID = property._id;
     notification_payload.send_to = receiver_details._id;
