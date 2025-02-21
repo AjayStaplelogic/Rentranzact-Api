@@ -232,7 +232,7 @@ async function fetchInspections(userData, req) {
   }
 }
 
-async function updateInspectionStatus(body, id) {
+async function updateInspectionStatus(body, id, req) {
   const { status, inspectionID, reason } = body;
   const inspectionDetails = await Inspection.findById(inspectionID);
   let notification_payload = {};
@@ -256,22 +256,22 @@ async function updateInspectionStatus(body, id) {
     }
     if (inspectionDetails.landlordID == id || inspectionDetails?.property_manager_id == id) {
       notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
-      notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is cancelled by ${inspectionDetails.landlordName}`;
-    }else{
+      notification_payload.notificationBody = `Your Inspection for ${inspectionDetails?.propertyName ?? ""} is cancelled by ${inspectionDetails?.landlordName ?? ""}`;
+    } else {
       notification_payload.send_to = inspectionDetails?.landlordID ?? inspectionDetails?.property_manager_id;
-      notification_payload.notificationBody = `Inspection for ${inspectionDetails.propertyName} is cancelled by renter`;
+      notification_payload.notificationBody = `Inspection for ${inspectionDetails.propertyName} is cancelled by ${req?.user?.data?.fullName ?? "renter"}${reason ? ` reason : ${reason}` : ""}`;
     }
   }
 
   if (InspectionStatus.ACCEPTED === status) {
     update_payload.acceptedBy = id;
     notification_payload.send_to = inspectionDetails?.RenterDetails?.id;
-    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is accepted by ${inspectionDetails.landlordName}`;
+    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails?.propertyName ?? ""} is accepted by ${inspectionDetails?.landlordName ?? ""}`;
   }
 
   if (InspectionStatus.COMPLETED === status) {
     update_payload.approverID = id;
-    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails.propertyName} is completed by ${inspectionDetails.landlordName}`;
+    notification_payload.notificationBody = `Your Inspection for ${inspectionDetails?.propertyName ?? ""} is completed by ${inspectionDetails?.landlordName ?? ""}`;
   }
 
   const data = await Inspection.findByIdAndUpdate(inspectionID, update_payload, { new: true });
