@@ -44,7 +44,7 @@ async function inspectionUpdate(req, res) {
   const id = req.user.data._id;
   const { body } = req;
 
-  const data = await updateInspectionStatus(body, id);
+  const data = await updateInspectionStatus(body, id, req);
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
