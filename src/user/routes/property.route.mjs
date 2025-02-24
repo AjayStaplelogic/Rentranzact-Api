@@ -107,7 +107,31 @@ const storage = multer.diskStorage({
   },
 });
 
+const s3Storage = multerS3({
+  s3: S3,
+  bucket: "bucketName",     // add your bucket name
+  shouldTransform: true,
+  transforms: [
+    {
+      id: 'original',
+      key: (req, file, cb) => cb(null, new Date().getTime() + '_' + req.file.originalname),
+      transform: (req, file, cb) => cb(null, sharp().jpg())
+    },
+    {
+      id: 'large',
+      key: (req, file, cb) => cb(null, new Date().getTime() + '_large_' + req.file.originalname),
+      transform: (req, file, cb) => cb(null, sharp().resize(1200, 900).jpg())
+    },
+    {
+      id: 'small',
+      key: (req, file, cb) => cb(null, new Date().getTime() + '_small_' + req.file.originalname),
+      transform: (req, file, cb) => cb(null, sharp().resize(400, 300).jpg())
+    }
+  ]
+})
+
 const upload = multer({ storage: storage });
+// const upload = multer({ dest: 'uploads/' });
 const hostUrl = process.env.HOST_URL;
 
 router.post("/property/search", searchProperty);
@@ -154,6 +178,7 @@ router.post(
   ]),
   upload.any(),
   (req, res) => {
+    console.log(req.files, '==============req.files 111111')
     req.files.forEach(async (file) => {
       const thumbnailWidth = 89; // Set your desired thumbnail width
       const thumbnailHeight = 68; // Set your desired thumbnail height
@@ -211,7 +236,7 @@ router.post("/leave-property/:id", authorizer([UserRoles.RENTER]), leaveProperty
 
 router.get("/properties", getAllProperties)
 
-router.delete("/property/:id", authorizer([UserRoles.LANDLORD]), deleteProperty)
+router.delete("/property/:id", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), deleteProperty)
 
 router.get("/property-managers", authorizer([UserRoles.LANDLORD]), getPropertyManagerList)
 

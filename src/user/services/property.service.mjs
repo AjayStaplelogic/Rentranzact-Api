@@ -813,11 +813,15 @@ async function leavePropertyService(userID, propertyID) {
 
 }
 
-async function deletePropertyService(userID, propertyID) {
+async function deletePropertyService(userID, propertyID, role) {
   const data = await Inspection.find({
-    landlordID: userID,
+    // landlordID: userID,
     inspectionStatus: InspectionStatus.ACCEPTED,
-    propertyID: propertyID
+    propertyID: propertyID,
+    $or: [
+      { $eq: ["$landlordID", userID] },
+      { $eq: ["$property_manager_id", userID] },
+    ]
   });
 
   if (data.length !== 0) {
@@ -830,14 +834,39 @@ async function deletePropertyService(userID, propertyID) {
 
   } else {
 
-    const data = await Property.findByIdAndDelete(propertyID);
-    await Inspection.deleteMany({ landlordID: userID })
+    const delete_query = {
+      _id: propertyID,
+      rented: false
+    }
+
+    if (role === UserRoles.LANDLORD) {
+      delete_query.landlord_id = userID;
+    } else if (role === UserRoles.PROPERTY_MANAGER) {
+      delete_query.property_manager_id = userID;
+    }
+
+    const data = await Property.findOneAndDelete(delete_query);
+    if (data) {
+      await Inspection.deleteMany({
+        $or: [
+          { $eq: ["$landlordID", userID] },
+          { $eq: ["$property_manager_id", userID] },
+        ]
+      })
+
+      return {
+        data: data,
+        message: "Property Deleted Successfully",
+        status: true,
+        statusCode: 200,
+      };
+    }
 
     return {
-      data: data,
-      message: "Property Deleted Successfully",
-      status: true,
-      statusCode: 200,
+      data: null,
+      message: "Unable To Delete Property",
+      status: false,
+      statusCode: 400,
     };
   }
 }
