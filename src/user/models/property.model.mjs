@@ -256,6 +256,10 @@ const propertySchema = new mongoose.Schema(
       type: String,
       enum: Object.values(ApprovalStatus),
       default: ApprovalStatus.PENDING
+    },
+    approval_count : {    // Number of times property approved
+      type: Number,
+      default: 0
     }
   },
   { timestamps: true }

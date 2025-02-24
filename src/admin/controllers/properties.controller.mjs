@@ -5,8 +5,6 @@ import { User } from "../../user/models/user.model.mjs"
 import * as propertyValidation from "../validations/property.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import { ApprovalStatus } from "../../user/enums/property.enums.mjs"
-import { Notification } from "../../user/models/notification.model.mjs";
-import sendNotification from "../../user/helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 import { LeaseAggrements } from "../../user/models/leaseAggrements.model.mjs";
 import fs from "fs";
@@ -14,7 +12,6 @@ import path from "path";
 import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import * as NotificationService from "../../user/services/notification.service.mjs";
-import { Admin } from "../models/admin.model.mjs";
 import activityLog from "../helpers/activityLog.mjs";
 
 
@@ -114,6 +111,7 @@ async function getAllPropertyList(req, res) {
       renterID,
       landlord_id,
       property_manager_id,
+      property_status,   // Used for approval_count
     } = req.query;
     let page = Number(req.query.page || 1);
     let count = Number(req.query.count || 20);
@@ -164,6 +162,19 @@ async function getAllPropertyList(req, res) {
 
     if (property_manager_id) {
       query.property_manager_id = property_manager_id;
+    }
+
+    if (property_status) {
+      switch (property_status) {
+        case "new":
+          query.approval_count = { $lte: 0 };
+          break;
+        case "old":
+          query.approval_count = { $gte: 1 };
+          break;
+        // case "all":
+        //   break;
+      }
     }
 
     let pipeline = [
@@ -230,6 +241,7 @@ async function getAllPropertyList(req, res) {
           rent_period_start: "$rent_period_start",
           rent_period_end: "$rent_period_end",
           rentType: "$rentType",
+          approval_count : "$approval_count"
         }
       },
       {
@@ -293,10 +305,7 @@ async function getAllPropertyList(req, res) {
 
 async function editProperty(req, res) {
   try {
-    const { id, email } = req.body;
-    // const role = req?.user?.data?.role;
-    // const user_id = req?.user?.data?._id;
-
+    const { id } = req.body;
     if (!id) {
       return sendResponse(res, {}, 'id is required', false, 400);
     }
@@ -314,35 +323,6 @@ async function editProperty(req, res) {
       }
     }
 
-    // let landlord_id = role === UserRoles.LANDLORD ? user_id : null;
-    // let property_manager_id = role === UserRoles.PROPERTY_MANAGER ? user_id : null;
-
-    // let name = "";
-    // if (email) {
-    //   let user = await User.findOne({
-    //     email: email.toLowerCase().trim(),
-    //     deleted: false,
-    //     role: {
-    //       $in: [UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER],
-    //     },
-    //   }).lean().exec();
-    //   if (user) {
-    //     name = user.fullName;
-    //     if (user.role === UserRoles.LANDLORD) {
-    //       landlord_id = user._id;
-    //     } else if (user.role === UserRoles.PROPERTY_MANAGER) {
-    //       property_manager_id = user._id;
-    //     }
-    //   } else {
-    //     return {
-    //       data: [],
-    //       message: "email of property manager or landlord is not valid",
-    //       status: false,
-    //       statusCode: 403,
-    //     };
-    //   }
-    // }
-
     if (req.body.address) {
       req.body.address = JSON.parse(req.body.address);
     }
@@ -350,10 +330,6 @@ async function editProperty(req, res) {
     if (req.body.amenities) {
       req.body.amenities = JSON.parse(req.body.amenities);
     }
-
-    // req.body.landlord_id = landlord_id;
-    // req.body.property_manager_id = property_manager_id ?? null;
-    // req.body.name = name;
 
     // Remove unnecessary fields before saving to database, admin cannot edit these details
     delete req.body.landlord_id;
@@ -382,9 +358,9 @@ async function updatePropertyApprovalStatus(req, res) {
 
     const { id, status, current_user_id } = req.body;
 
-    if (!id || !status) {
-      return sendResponse(res, {}, 'id and status are required', false, 400);
-    }
+    // if (!id || !status) {
+    //   return sendResponse(res, {}, 'Id and status are required', false, 400);
+    // }
 
     const property = await Property.findById(id);
     if (property) {
@@ -396,7 +372,15 @@ async function updatePropertyApprovalStatus(req, res) {
         return sendResponse(res, {}, 'Cannot approve rejected property', false, 403);
       }
 
-      const update_property = await Property.findByIdAndUpdate(id, { approval_status: status }, { new: true });
+      const update_payload = {
+        approval_status: status
+      }
+
+      if (status === ApprovalStatus.APPROVED) {
+        update_payload.approval_count = { $inc: 1 };
+      }
+
+      const update_property = await Property.findByIdAndUpdate(id, update_payload, { new: true });
       if (update_property) {
 
         // Send notification to landlord
@@ -419,20 +403,7 @@ async function updatePropertyApprovalStatus(req, res) {
         }
 
         NotificationService.createNotification(notification_payload, metadata, get_send_to_details);
-
-
         activityLog(current_user_id, `reviewed the property "${update_property?.propertyName ?? ""}" and changed status to ${update_property?.approval_status} `);
-
-        // const create_notification = await Notification.create(notification_payload);
-        // if (create_notification) {
-        //   if (get_send_to_details && get_send_to_details.fcmToken) {
-        //     const metadata = {
-        //       "propertyID": update_property._id.toString(),
-        //       "redirectTo": "property",
-        //     }
-        //     sendNotification(get_send_to_details, "single", create_notification.notificationHeading, create_notification.notificationBody, metadata, get_send_to_details.role)
-        //   }
-        // }
         return sendResponse(res, {}, 'property status updated successfully', true, 200);
       }
     }
