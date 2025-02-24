@@ -72,8 +72,8 @@ async function propertyByID(req, res) {
 
 async function deleteProperty(req, res) {
   const { id } = req.params;
-  const { _id } = req.user.data;
-  const data = await deletePropertyService(_id, id);
+  const { _id, role } = req.user.data;
+  const data = await deletePropertyService(_id, id, role);
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 }
 
