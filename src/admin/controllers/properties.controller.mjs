@@ -241,7 +241,7 @@ async function getAllPropertyList(req, res) {
           rent_period_start: "$rent_period_start",
           rent_period_end: "$rent_period_end",
           rentType: "$rentType",
-          approval_count : "$approval_count"
+          approval_count: "$approval_count"
         }
       },
       {
@@ -377,7 +377,7 @@ async function updatePropertyApprovalStatus(req, res) {
       }
 
       if (status === ApprovalStatus.APPROVED) {
-        update_payload.approval_count = { $inc: 1 };
+        update_payload.$inc = { approval_count: 1 };
       }
 
       const update_property = await Property.findByIdAndUpdate(id, update_payload, { new: true });
