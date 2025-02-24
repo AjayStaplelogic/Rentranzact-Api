@@ -819,8 +819,8 @@ async function deletePropertyService(userID, propertyID, role) {
     inspectionStatus: InspectionStatus.ACCEPTED,
     propertyID: propertyID,
     $or: [
-      { $eq: ["$landlordID", userID] },
-      { $eq: ["$property_manager_id", userID] },
+      { landlordID: userID },
+      { property_manager_id: userID }
     ]
   });
 
@@ -847,12 +847,12 @@ async function deletePropertyService(userID, propertyID, role) {
 
     const data = await Property.findOneAndDelete(delete_query);
     if (data) {
-      await Inspection.deleteMany({
-        $or: [
-          { $eq: ["$landlordID", userID] },
-          { $eq: ["$property_manager_id", userID] },
-        ]
-      })
+    await Inspection.deleteMany({
+      $or: [
+        { landlordID: userID },
+        { property_manager_id: userID }
+      ]
+    })
 
       return {
         data: data,
