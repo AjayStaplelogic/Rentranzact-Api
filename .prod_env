@@ -32,3 +32,7 @@ FLUTTERWAVE_SECRET = FLWSECK-8b64d61d5fc7d885d50e2d217fdd20b7-1944ae67668vt-X
   SENDGRID_PORT = 587
   FROM = rentranzactltd@gmail.com
   REPLY = rentranzactltd@gmail.com
+
+AWS_REGION=sa-east-1
+S3_BUCKET_NAME=rentranzact
+BUCKET_BASE_URL=https://rentranzact.s3.sa-east-1.amazonaws.com

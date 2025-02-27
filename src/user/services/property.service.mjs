@@ -44,6 +44,15 @@ async function addPropertyService(
 
   let name = "";
   if (email) {
+    if (req?.user?.data?.email.toLowerCase().trim() === email.toLowerCase().trim()) {
+      return {
+        data: [],
+        message: "Cannot add email of your own account",
+        status: false,
+        statusCode: 403,
+      };
+    }
+
     let user = await User.findOne({
       email: email.toLowerCase().trim(),
       deleted: false,
@@ -847,12 +856,12 @@ async function deletePropertyService(userID, propertyID, role) {
 
     const data = await Property.findOneAndDelete(delete_query);
     if (data) {
-    await Inspection.deleteMany({
-      $or: [
-        { landlordID: userID },
-        { property_manager_id: userID }
-      ]
-    })
+      await Inspection.deleteMany({
+        $or: [
+          { landlordID: userID },
+          { property_manager_id: userID }
+        ]
+      })
 
       return {
         data: data,

@@ -13,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.750.0",
     "@ironsoftware/ironpdf": "^2024.12.9",
     "apple-signin-auth": "^1.7.6",
     "axios": "^1.7.2",

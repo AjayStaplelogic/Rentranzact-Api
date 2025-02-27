@@ -28,6 +28,7 @@ async function addProperty(req, res) {
   const id = req.user.data._id;
   const files = req.files;
 
+  console.log(req.images, '==============req.images')
   if (!files || files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
@@ -436,6 +437,10 @@ async function editProperty(req, res) {
 
     let name = "";
     if (email) {
+      if (req?.user?.data?.email.toLowerCase().trim() === email.toLowerCase().trim()) {
+        return sendResponse(res, null, "Cannot add email of your own account", false, 403);
+      }
+
       let user = await User.findOne({
         email: email.toLowerCase().trim(),
         deleted: false,
