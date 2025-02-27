@@ -465,6 +465,18 @@ async function getPropertyByID(id, userID) {
     } else {
       dataMerge["liked"] = false
     }
+
+    const get_rent_application = await rentApplication.findOne({
+      renterID: userID,
+      applicationStatus: {
+        $in: [RentApplicationStatus.PENDING, RentApplicationStatus.ACCEPTED]
+      }
+    }, {
+      applicationStatus: 1
+    }).sort({ createdAt: -1 });
+    if (get_rent_application) {
+      dataMerge["rent_application_status"] = get_rent_application?.applicationStatus;
+    }
   }
 
   dataMerge.inspection_count = await Inspection.countDocuments({ propertyID: id, inspectionStatus: "initiated" });

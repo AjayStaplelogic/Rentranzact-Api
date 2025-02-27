@@ -616,6 +616,15 @@ async function updateRentApplications(body, id) {
             }
 
             // ********************** If Rent application is submitted view invitation ****************//
+
+            // ******************** Cancel All Pending Rent Applications ********************//
+            rentApplication.updateMany({
+              applicationStatus: RentApplicationStatus.PENDING,
+              propertyID: data.propertyID
+            }, {
+              applicationStatus: RentApplicationStatus.CANCELED
+            }).then((data) => { })
+            // ******************** End Cancel All Pending Rent Applications ********************//
           }
 
           return {
