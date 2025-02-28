@@ -288,7 +288,7 @@ export const read_message = async (socket, data) => {
     return update_message;
 }
 
-export const read_multiple_messages = async (io, socket, data) => {
+export const read_multiple_messages = async (io, socket, data, connected_users) => {
     let query = {
         _id: data.message_id,
         is_read: false
@@ -305,7 +305,10 @@ export const read_multiple_messages = async (io, socket, data) => {
         if (get_message) {
             Messages.find(query).lean().exec().then((messages) => {
                 query.createdAt = { $lte: get_message.createdAt };
+                console.log(messages?.length, '========messages?.length');
+                console.log(JSON.stringify(query), '========query');
                 Messages.updateMany(query, { is_read: true, read_at: new Date() }, { new: true }).then(async (updated_messages) => {
+                    console.log(updated_messages, '========updated_messages')
                     for await (let message of messages) {
                         message.is_read = true;
                         socket.to(`${message.room_id}`).emit("read-multiple-messages", {

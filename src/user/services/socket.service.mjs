@@ -140,7 +140,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("read-multiple-messages", async (data) => {
-        chatService.read_multiple_messages(io, socket, data);
+        chatService.read_multiple_messages(io, socket, data, connected_users);
     })
 
     socket.on("typing", async (data) => {
