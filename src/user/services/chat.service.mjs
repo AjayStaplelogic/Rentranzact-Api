@@ -74,7 +74,7 @@ export const join_private_room = async (socket, data) => {
     }
 }
 
-export const get_room_by_id = async (id) => {
+export const get_room_by_id = async (id, user_id) => {
     let room = await ChatRooms.aggregate([
         {
             $match: {
@@ -173,7 +173,44 @@ export const get_room_by_id = async (id) => {
             },
         },
         {
-            $unset: ["admin_details"]
+            $lookup: {
+                from: "messages",
+                let: {
+                    reciever_id: new ObjectId(user_id),
+                    room_id: "$_id"
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $and: [
+                                    { $eq: ["$reciever_id", "$$reciever_id"] },
+                                    { $eq: ["$is_read", false] },
+                                    { $eq: ["$room_id", "$$room_id"] }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        $count: "unread_count"
+                    }
+                ],
+                as: "unread_messages"
+            }
+        },
+        {
+            $addFields: {
+                unread_messages_count: {
+                    $cond: [
+                        { $eq: ["$unread_messages", []] },
+                        0,
+                        { $arrayElemAt: ["$unread_messages.unread_count", 0] }
+                    ]
+                }
+            }
+        },
+        {
+            $unset: ["admin_details", "unread_messages"]
         },
     ]);
 
@@ -245,8 +282,41 @@ export const read_message = async (socket, data) => {
         query.reciever_id = socket.user_id;
     }
 
-    let update_message = await Messages.findOneAndUpdate(query, { is_read: true }, { new: true });
+    let update_message = await Messages.findOneAndUpdate(query, { is_read: true, read_at: new Date() }, { new: true });
     return update_message;
+}
+
+export const read_multiple_messages = async (io, socket, data) => {
+    let query = {
+        _id: data.message_id,
+        is_read: false
+    };
+    if (socket.is_admin) {
+        query.is_reciever_admin = true;
+        query.admin_id = socket.user_id;
+    } else {
+        query.is_reciever_admin = false;
+        query.reciever_id = socket.user_id;
+    }
+
+    Messages.findOne(query).then((get_message) => {
+        if (get_message) {
+            Messages.find(query).lean().exec().then((messages) => {
+                query.createdAt = { $lte: get_message.createdAt };
+                Messages.updateMany(query, { is_read: true, read_at: new Date() }, { new: true }).then(async (updated_messages) => {
+                    for await (let message of messages) {
+                        message.is_read = true;
+                        socket.to(`${message.room_id}`).emit("read-multiple-messages", {
+                            status: true,
+                            statusCode: 200,
+                            data: message
+                        })
+                    }
+                    get_unread_chats_count(io, connected_users, socket.user_id)
+                });
+            });
+        }
+    });
 }
 
 export const join_multiple_rooms = async (socket) => {
@@ -281,3 +351,48 @@ export const unread_notification_count = async (user_id) => {
         read: false
     })
 }
+
+export const get_unread_chats_count = async (io, connected_users, user_id) => {
+    Messages.aggregate([
+        {
+            $match: {
+                reciever_id: new ObjectId(user_id),
+                is_read: false,
+                is_deleted: false
+            }
+        },
+        {
+            $group: {
+                _id: "$room_id",
+                room_count: { $sum: 1 }
+            }
+        },
+        {
+            $group: {
+                _id: null,
+                unread_rooms: { $sum: "$room_count" }
+            }
+        }
+    ]).then((rooms) => {
+        console.log(rooms, '============rooms')
+        let socket_ids = get_user_socket_ids(connected_users, `${user_id}`);
+        console.log(socket_ids, '============socket_ids')
+        if (socket_ids && socket_ids.length > 0) {
+            for (let socket_id of socket_ids) {
+                console.log(socket_id, '============socket_id')
+
+                io.in(socket_id).emit("unread-chats-count", {
+                    status: true,
+                    statusCode: 200,
+                    data: {
+                        unread_chat_count: rooms?.[0]?.unread_rooms
+                    }
+                });
+            }
+        }
+    })
+
+}
+
+
+// get_unread_chats_count("", [], "66b9e04c2d49260684171507")
