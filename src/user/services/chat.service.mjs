@@ -213,12 +213,14 @@ export const get_room_by_id = async (id, user_id) => {
             $unset: ["admin_details", "unread_messages"]
         },
     ]);
-
+    console.log(room)
     if (room?.length > 0) {
         return room[0];
     }
     return null;
 }
+
+// console.log(get_room_by_id("67c159b49ad8e7db36a0c423", "66b9e04c2d49260684171507"), '========get_room_by_id')
 
 export const get_reciever_id_from_room = async (room_id, sender_id) => {
     const room = await ChatRooms.findById(room_id);

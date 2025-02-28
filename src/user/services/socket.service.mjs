@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
 
     socket.on("new-message", async (data) => {
         let message = await chatService.send_message(socket, data)
-        let get_room = await chatService.get_room_by_id(data.room_id, socket.user_id);
+        let get_room = await chatService.get_room_by_id(data.room_id, message?.reciever_id);
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
