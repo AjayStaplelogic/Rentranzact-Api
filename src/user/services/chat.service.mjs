@@ -366,13 +366,14 @@ export const get_unread_chats_count = async (io, connected_users, user_id) => {
         {
             $group: {
                 _id: "$room_id",
-                room_count: { $sum: 1 }
+                message_count: { $sum: 1 }
             }
         },
         {
             $group: {
                 _id: null,
-                unread_rooms: { $sum: "$room_count" }
+                unread_messages: { $sum: "$room_count" },
+                unread_rooms: { $sum: 1 }
             }
         }
     ]).then((rooms) => {
