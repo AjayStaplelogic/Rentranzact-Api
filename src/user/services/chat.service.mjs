@@ -291,13 +291,13 @@ export const read_multiple_messages = async (io, socket, data, connected_users) 
         _id: data.message_id,
         is_read: false
     };
-    if (socket.is_admin) {
-        query.is_reciever_admin = true;
-        query.admin_id = socket.user_id;
-    } else {
-        query.is_reciever_admin = false;
+    // if (socket.is_admin) {
+    //     query.is_reciever_admin = true;
+    //     query.admin_id = socket.user_id;
+    // } else {
+        // query.is_reciever_admin = false;
         query.reciever_id = socket.user_id;
-    }
+    // }
     console.log(JSON.stringify(query), '========query 111111111');
 
     Messages.findOne(query).then((get_message) => {
