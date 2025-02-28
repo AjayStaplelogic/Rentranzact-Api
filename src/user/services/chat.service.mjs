@@ -312,9 +312,15 @@ export const read_multiple_messages = async (io, socket, data) => {
                             status: true,
                             statusCode: 200,
                             data: message
-                        })
+                        });
                     }
                     get_unread_chats_count(io, connected_users, socket.user_id)
+                    let get_room = await get_room_by_id(get_message.room_id, socket.user_id);
+                    io.in(`${get_message.room_id}`).emit("private-room-updated", { // sending to sender and reciever
+                        status: true,
+                        statusCode: 200,
+                        data: get_room
+                    });
                 });
             });
         }
