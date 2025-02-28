@@ -112,7 +112,7 @@ io.on('connection', (socket) => {
 
     socket.on("new-message", async (data) => {
         let message = await chatService.send_message(socket, data)
-        let get_room = await chatService.get_room_by_id(data.room_id);
+        let get_room = await chatService.get_room_by_id(data.room_id, socket.user_id);
         io.in(`${message.room_id}`).emit("new-message", {
             status: true,
             statusCode: 200,
@@ -124,6 +124,8 @@ io.on('connection', (socket) => {
             statusCode: 200,
             data: get_room
         });
+
+        chatService.get_unread_chats_count(io, connected_users, message.reciever_id)
     })
 
     socket.on("read-message", async (data) => {
@@ -135,6 +137,10 @@ io.on('connection', (socket) => {
                 data: message
             })
         }
+    })
+
+    socket.on("read-multiple-messages", async (data) => {
+        chatService.read_multiple_messages(io, socket, data);
     })
 
     socket.on("typing", async (data) => {
@@ -197,6 +203,11 @@ io.on('connection', (socket) => {
             }
         }
     });
+
+    socket.on("unread-chats-count", async () => {
+        console.log(socket.user_id, '========= socket user_id')
+        chatService.get_unread_chats_count(io, connected_users, socket.user_id)
+    })
 
     socket.on('disconnect', () => {
         chatService.user_offline(socket, connected_users);

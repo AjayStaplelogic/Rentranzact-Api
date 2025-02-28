@@ -121,18 +121,12 @@ export const getChatRooms = async (req, res) => {
             {
                 $group: {
                     _id: "$_id",
-                    // user_ids: { $push: "$user_details._id" },
                     user_details: {
                         $addToSet: {
                             _id: "$user_details._id",
                             fullName: "$user_details.fullName",
                             picture: "$user_details.picture"
                         },
-                        // $addToSet: {
-                        //     _id: "$admin_details._id",
-                        //     fullName: "$admin_details.fullName",
-                        //     picture: "$admin_details.picture"
-                        // }
                     },
                     last_message: { $last: "$last_message" },
                     last_message_at: { $last: "$last_message_at" },
@@ -143,7 +137,7 @@ export const getChatRooms = async (req, res) => {
                             _id: "$admin_details._id",
                             fullName: "$admin_details.fullName",
                             picture: "$admin_details.picture",
-                            is_admin : true
+                            is_admin: true
                         }
                     }
                 }
@@ -156,8 +150,8 @@ export const getChatRooms = async (req, res) => {
                 }
             },
             {
-                $addFields : {
-                    user_ids : "$user_details._id"
+                $addFields: {
+                    user_ids: "$user_details._id"
                 }
             },
             {
@@ -177,10 +171,47 @@ export const getChatRooms = async (req, res) => {
                 },
             },
             {
+                $lookup: {
+                    from: "messages",
+                    let: {
+                        reciever_id: new ObjectId(user_id),
+                        room_id: "$_id"
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ["$reciever_id", "$$reciever_id"] },
+                                        { $eq: ["$is_read", false] },
+                                        { $eq: ["$room_id", "$$room_id"] }
+                                    ]
+                                }
+                            }
+                        },
+                        {
+                            $count: "unread_count"
+                        }
+                    ],
+                    as: "unread_messages"
+                }
+            },
+            {
+                $addFields : {
+                    unread_messages_count: {
+                        $cond: [
+                            { $eq: ["$unread_messages", []] },
+                            0,
+                            { $arrayElemAt: ["$unread_messages.unread_count", 0] }
+                        ]
+                    }
+                }
+            },
+            {
                 $match: query2
             },
             {
-                $unset: ["admin_details"]
+                $unset: ["admin_details", "unread_messages"]
             },
             {
                 $facet: {
@@ -283,6 +314,7 @@ export const getMessages = async (req, res) => {
                     is_sender_admin: "$is_sender_admin",
                     is_reciever_admin: "$is_reciever_admin",
                     read: "$read",
+                    is_read: "$is_read",
                     is_deleted: "$is_deleted",
                     read_at: "$read_at",
                     admin_id: "$admin_id",
