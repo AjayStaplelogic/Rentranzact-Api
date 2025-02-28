@@ -304,6 +304,7 @@ export const read_multiple_messages = async (io, socket, data, connected_users) 
     Messages.findOne(query).then((get_message) => {
         if (get_message) {
             delete query._id;
+            query.room_id = get_message.room_id;
             Messages.find(query).lean().exec().then((messages) => {
                 query.createdAt = { $lte: get_message.createdAt };
                 console.log(messages?.length, '========messages?.length');
