@@ -467,6 +467,7 @@ async function getPropertyByID(id, userID) {
     }
 
     const get_rent_application = await rentApplication.findOne({
+      propertyID : data._id,
       renterID: userID,
       applicationStatus: {
         $in: [RentApplicationStatus.PENDING, RentApplicationStatus.ACCEPTED]
