@@ -288,7 +288,7 @@ export const read_message = async (socket, data) => {
     return update_message;
 }
 
-export const read_multiple_messages = async (io, socket, data) => {
+export const read_multiple_messages = async (io, socket, data, connected_users) => {
     let query = {
         _id: data.message_id,
         is_read: false
