@@ -220,8 +220,6 @@ export const get_room_by_id = async (id, user_id) => {
     return null;
 }
 
-// console.log(get_room_by_id("67c159b49ad8e7db36a0c423", "66b9e04c2d49260684171507"), '========get_room_by_id')
-
 export const get_reciever_id_from_room = async (room_id, sender_id) => {
     const room = await ChatRooms.findById(room_id);
     if (room) {
@@ -300,8 +298,11 @@ export const read_multiple_messages = async (io, socket, data, connected_users) 
         query.is_reciever_admin = false;
         query.reciever_id = socket.user_id;
     }
+    console.log(JSON.stringify(query), '========query 111111111');
 
     Messages.findOne(query).then((get_message) => {
+        console.log(get_message, '========get_message')
+
         if (get_message) {
             delete query._id;
             query.room_id = get_message.room_id;
