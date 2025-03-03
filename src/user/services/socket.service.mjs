@@ -205,7 +205,8 @@ io.on('connection', (socket) => {
     });
 
     socket.on("unread-chats-count", async () => {
-        console.log(socket.user_id, '========= socket user_id')
+        console.log(socket.user_id, '========= socket user_id');
+        console.log(socket.admin_id, '========= socket admin_id');
         chatService.get_unread_chats_count(io, connected_users, socket.user_id)
     })
 

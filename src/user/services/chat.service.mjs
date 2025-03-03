@@ -5,6 +5,13 @@ import { Notification } from "../models/notification.model.mjs";
 
 const ObjectId = mongoose.Types.ObjectId;
 
+/**
+ * When user connected to socket then adding them in connected users array
+ * 
+ * @param {Object} socket Socket.IO object
+ * @param {Array} connected_arr Array of connected users
+ * @returns {Array} Array of connected users
+ */
 export const user_online = (socket, connected_arr) => {
     return connected_arr.push({
         socket_id: socket.id,
@@ -13,6 +20,13 @@ export const user_online = (socket, connected_arr) => {
     })
 }
 
+/**
+ * When user disconnects from socket, Then removing the user Where socket id matches
+ * 
+ * @param {Object} socket Socket.IO Object
+ * @param {Array} connected_arr Array of connected users 
+ * @returns {Array} Array of connected users
+ */
 export const user_offline = (socket, connected_arr) => {
     let index = connected_arr.findIndex(user => user.socket_id === socket.id);
     if (index >= 0) {
@@ -20,6 +34,13 @@ export const user_offline = (socket, connected_arr) => {
     }
 }
 
+/**
+ * To create new room between users, and if already created returing the old one
+ * 
+ * @param {Object} socket Socket.IO object
+ * @param {Object} data contains chat_with id
+ * @returns {Object} object containing room information
+ */
 export const join_private_room = async (socket, data) => {
     if (!socket.is_admin) {
         let room = await ChatRooms.findOne({
@@ -74,6 +95,13 @@ export const join_private_room = async (socket, data) => {
     }
 }
 
+/**
+ * To fetch room by Id and unread messages count for reciever
+ * 
+ * @param {ObjectId} id Id of the room
+ * @param {ObjectId} user_id Id of the room user whose unread message count wanted
+ * @returns {Object} Object containing room information and unread message count
+ */
 export const get_room_by_id = async (id, user_id) => {
     let room = await ChatRooms.aggregate([
         {
@@ -172,6 +200,8 @@ export const get_room_by_id = async (id, user_id) => {
                 }
             },
         },
+
+        // Checking for messages count where receiver id matches
         {
             $lookup: {
                 from: "messages",
@@ -209,6 +239,7 @@ export const get_room_by_id = async (id, user_id) => {
                 }
             }
         },
+        // End Checking for messages count where receiver id matches
         {
             $unset: ["admin_details", "unread_messages"]
         },
@@ -220,6 +251,13 @@ export const get_room_by_id = async (id, user_id) => {
     return null;
 }
 
+/**
+ * To fetch the user other than the given sender Id from the private room
+ * 
+ * @param {ObjectId} room_id Id of the room
+ * @param {ObjectId} sender_id Id of the sender
+ * @returns {ObjectId} Id of the reciever
+ */
 export const get_reciever_id_from_room = async (room_id, sender_id) => {
     const room = await ChatRooms.findById(room_id);
     if (room) {
@@ -231,6 +269,13 @@ export const get_reciever_id_from_room = async (room_id, sender_id) => {
     return null;
 }
 
+/**
+ * To create message in DB
+ * 
+ * @param {Object} socket Socket.IO object
+ * @param {Object} data containing message content
+ * @returns {Object} Newly created message object
+ */
 export const send_message = async (socket, data) => {
     if (socket.is_admin) {
         data.is_sender_admin = true;
@@ -246,16 +291,34 @@ export const send_message = async (socket, data) => {
     return create_message;
 }
 
+/**
+ * To find the objects from connected users where user_id matches
+ * 
+ * @param {Array} connected_users Array of connected users
+ * @param {ObjectId} user_id Id of the user
+ * @returns {Array} Array of connected users
+ */
 export const get_user_socket_ids = (connected_users, user_id) => {
     return connected_users.filter(user => user.user_id === user_id).map(item => item.socket_id)
 }
 
+/**
+ * To find the objects of admin from connected users
+ * 
+ * @param {Array} connected_users Array of connected users
+ * @returns {Array} Array of connected users
+ */
 export const get_admin_socket_ids = async (connected_users) => {
     return connected_users.filter(user => user.is_admin === true).map(item => item.socket_id)
 }
 
+/**
+ * To update room when new message sent 
+ * 
+ * @param {Object} message Message object
+ * @returns {Object} room containg updated data with latest message
+ */
 export const update_room_last_message = async (message) => {
-
     let payload = {
         last_message: message.content,
         last_message_at: message.createdAt,
@@ -270,7 +333,7 @@ export const update_room_last_message = async (message) => {
     return update_room;
 }
 
-export const read_message = async (socket, data) => {
+export const read_message = async (socket, data) => {       // Not In USE
     let query = {
         _id: data.message_id
     };
@@ -286,6 +349,15 @@ export const read_message = async (socket, data) => {
     return update_message;
 }
 
+/**
+ * To update read status of messages and emitting the necessary events
+ * 
+ * @param {Object} io Socket.IO object
+ * @param {Object} socket Socket Object
+ * @param {Object} data containg message_id
+ * @param {Array} connected_users Array of connected users
+ * @returns {Void} Nothing
+ */
 export const read_multiple_messages = async (io, socket, data, connected_users) => {
     let query = {
         _id: data.message_id,
@@ -295,8 +367,8 @@ export const read_multiple_messages = async (io, socket, data, connected_users) 
     //     query.is_reciever_admin = true;
     //     query.admin_id = socket.user_id;
     // } else {
-        // query.is_reciever_admin = false;
-        query.reciever_id = socket.user_id;
+    // query.is_reciever_admin = false;
+    query.reciever_id = socket.user_id;
     // }
     console.log(JSON.stringify(query), '========query 111111111');
 
@@ -333,6 +405,12 @@ export const read_multiple_messages = async (io, socket, data, connected_users) 
     });
 }
 
+/**
+ * To join all rooms of current user to socket
+ * 
+ * @param {Object} socket Socket object
+ * @returns {Void} Nothing
+ */
 export const join_multiple_rooms = async (socket) => {
     let get_rooms = await ChatRooms.find({
         user_ids: { $in: [socket.user_id] },
@@ -348,6 +426,12 @@ export const join_multiple_rooms = async (socket) => {
     }
 }
 
+/**
+ * To delete message from DB and update the room
+ * 
+ * @param {ObjectId} message_id Id of the message 
+ * @returns {Object} Message object which is deleted
+ */
 export const delete_message = async (message_id) => {
     let message = await Messages.findByIdAndDelete(message_id);
     if (message) {
@@ -359,6 +443,12 @@ export const delete_message = async (message_id) => {
     }
 }
 
+/**
+ * To get the number of notifications that is unread by particular user
+ * 
+ * @param {ObjectId} user_id Id of the user
+ * @returns {Number} Number of notifications count
+ */
 export const unread_notification_count = async (user_id) => {
     return Notification.countDocuments({
         send_to: user_id,
@@ -366,6 +456,14 @@ export const unread_notification_count = async (user_id) => {
     })
 }
 
+/**
+ * To emit a unread-chats-count event for the specified user
+ * 
+ * @param {Object} io Socket.IO instance 
+ * @param {Array} connected_users  Array of connected users
+ * @param {ObjectId} user_id Id of the user
+ * @returns {Void} Nothing 
+ */
 export const get_unread_chats_count = async (io, connected_users, user_id) => {
     Messages.aggregate([
         {
