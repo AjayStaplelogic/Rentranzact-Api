@@ -3,6 +3,7 @@ import multer from "multer";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as Multer from '../helpers/multer.mjs';
 import fs from "fs";
+import * as s3Service from "../services/s3.service.mjs";
 
 export const uploadSingleImage = (req, res) => {
     try {
@@ -111,5 +112,18 @@ export const uploadMultipleFilesByAdmin = async (req, res) => {
         })
     } catch (error) {
         return sendResponse(res, {}, `${error}`, false, 500);
+    }
+}
+
+export const deleteFilesFromS3 = async (req, res) => {
+    try {
+        let { filenames } = req.body;
+        if (filenames?.length) {
+            await s3Service.deleteMultipleFileFromAws(filenames);
+        }
+
+        return sendResponse(res, null, "success", true, 200);
+    } catch (error) {
+        return sendResponse(res, {}, error?.message ?? error, false, 400);
     }
 }

@@ -437,7 +437,7 @@ async function editProperty(req, res) {
 
     let name = "";
     if (email) {
-      if (req?.user?.data?.email.toLowerCase().trim() === email.toLowerCase().trim()) {
+      if (req?.user?.data?.email.toLowerCase().trim() === email.toLowerCase().trim() && req?.user?.data?.role != UserRoles.PROPERTY_MANAGER) {
         return sendResponse(res, null, "Cannot add email of your own account", false, 403);
       }
 
