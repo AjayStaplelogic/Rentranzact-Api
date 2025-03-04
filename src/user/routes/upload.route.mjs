@@ -11,5 +11,6 @@ router.post('/upload/file/multiple', authorizer([UserRoles.RENTER, UserRoles.LAN
 router.delete('/delete/file', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), uploadController.deleteFile);
 router.post('/admin/upload/file/multiple', uploadController.uploadMultipleFilesByAdmin); // Created separate because admin doesn't have access token
 router.post('/bucket/delete/file/multiple', authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), uploadController.deleteFilesFromS3);
+router.post('/admin/bucket/delete/file/multiple', uploadController.deleteFilesFromS3);
 export default router;
 
