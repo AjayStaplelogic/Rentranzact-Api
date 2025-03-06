@@ -10,6 +10,15 @@ const s3Client = new S3Client({
     region: process.env.AWS_REGION
 });
 
+// const s3Client = new S3Client({
+//     region: process.env.AWS_REGION,
+//     credentials: {
+//         accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+//         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+//     }
+// });
+
+
 const BUCKET_NAME = process.env.S3_BUCKET_NAME;
 
 /**
@@ -22,7 +31,10 @@ const BUCKET_NAME = process.env.S3_BUCKET_NAME;
  */
 export const uploadFile = async (filePath, keyName, contentType) => {
     console.log(contentType, '==========contentType')
+    console.log(filePath, '==========filePath')
     const file = fs.createReadStream(filePath);
+    console.log(file, '==========file')
+
     const uploadParams = {
         Bucket: BUCKET_NAME,
         Key: keyName,
@@ -109,3 +121,10 @@ export const deleteMultipleFileFromAws = async (fileNames = []) => {
         return 'error';
     }
 };
+
+export const getKeyNameForFileUploaded = (url)=>{
+    return url?.split(`${process.env.BUCKET_BASE_URL}/`)?.[1]
+}
+
+
+console.log(getKeyNameForFileUploaded("https://rentranzact.s3.sa-east-1.amazonaws.com/lease-aggrements/66e3efdf9d6c11bc07d26da1d/9b9e22a929c0f0f59ec978c4bf20eb8c4cfd8c9a.pdf"))
