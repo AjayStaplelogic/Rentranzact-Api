@@ -4,6 +4,7 @@ import { Admin } from "../models/admin.model.mjs";
 import * as authValidations from "../validations/auth.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import bcrypt from "bcrypt";
+import * as s3Service from "../../user/services/s3.service.mjs";
 
 async function login(req, res) {
   const { body } = req;
@@ -77,16 +78,31 @@ const editProfile = async (req, res) => {
       return sendResponse(res, [], errorMessage, false, 403);
     }
 
-    let data = await Admin.findOneAndUpdate({
+    const get_user = await Admin.findOne({
       _id: req.body.id,
       isDeleted: false,
-    },
-      req.body
-    );
-
-    if (data) {
-      return sendResponse(res, null, "success", true, 200);
+    });
+    if(get_user){
+      let data = await Admin.findByIdAndUpdate(req.body.id,
+        req.body,
+        {
+          new : true
+        }
+      );
+  
+      if (data) {
+        if (get_user.picture != data.picture) {
+          // Delete old picture
+          if (get_user?.picture) {
+            const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_user?.picture);
+            await s3Service.deleteFileFromAws(keyToDelete)
+          }
+        }
+  
+        return sendResponse(res, null, "success", true, 200);
+      }
     }
+
 
     return sendResponse(res, {}, "Invalid Id", false, 400);
 
