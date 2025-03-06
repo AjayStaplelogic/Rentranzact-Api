@@ -5,11 +5,12 @@ import * as Multer from '../helpers/multer.mjs';
 import fs from "fs";
 import * as s3Service from "../services/s3.service.mjs";
 
-export const uploadSingleImage = (req, res) => {
+export const uploadSingleImage = async (req, res) => {
     try {
         if (req.file) {
-            let resObj = { ...req.file }
-            resObj.fullPath = `${process.env.HOST_URL}images/${req.file.filename}`;
+            await s3Service.uploadFile(req.file.path, `common/random/${req?.file?.filename}`, req?.file?.mimetype);
+            let resObj = { ...req.file };
+            resObj.fullPath = `${process.env.BUCKET_BASE_URL}/common/random/${req.file.filename}`;
             return sendResponse(res, resObj, "success", true, 200);
         }
         return sendResponse(res, {}, "File not found", false, 400);
@@ -43,9 +44,11 @@ export const uploadMultipleFiles = async (req, res) => {
             if (req.files && req.files.length) {
                 let res_arr = []
                 for await (let file of req.files) {
+                    await s3Service.uploadFile(file?.path, `${req?.body?.folder ?? "common/images"}/${file?.filename}`, file?.mimetype);
                     let resObj = {
                         ...file,
-                        fullPath: `${process.env.HOST_URL}${req?.body?.folder ?? "images"}/${file.filename}`
+                        // fullPath: `${process.env.HOST_URL}${req?.body?.folder ?? "images"}/${file.filename}`
+                        fullPath: `${process.env.BUCKET_BASE_URL}/${req?.body?.folder ?? "common/images"}/${file.filename}`
                     }
                     res_arr.push(resObj)
                 }
@@ -100,9 +103,11 @@ export const uploadMultipleFilesByAdmin = async (req, res) => {
             if (req.files && req.files.length) {
                 let res_arr = []
                 for await (let file of req.files) {
+                    await s3Service.uploadFile(file?.path, `${req?.body?.folder ?? "common/images"}/${file?.filename}`, file?.mimetype);
                     let resObj = {
                         ...file,
-                        fullPath: `${process.env.HOST_URL}${req?.body?.folder ?? "images"}/${file.filename}`
+                        // fullPath: `${process.env.HOST_URL}${req?.body?.folder ?? "images"}/${file.filename}`
+                        fullPath: `${process.env.BUCKET_BASE_URL}/${req?.body?.folder ?? "common/images"}/${file.filename}`
                     }
                     res_arr.push(resObj)
                 }
