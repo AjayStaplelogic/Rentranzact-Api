@@ -236,7 +236,7 @@ async function deleteAggrement(req, res) {
   const data = await deleteAggrementByID(_id, id, role);
   sendResponse(
     res,
-    data.data,
+    null,
     data.message,
     data.status,
     data.statusCode
