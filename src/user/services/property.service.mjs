@@ -299,7 +299,7 @@ async function filterProperies(body, id) {
     }
   }
 
-  const data = await Property.find(filters).sort(sort_query)
+  const data = await Property.find(filters).sort(sort_query);
   let modifiedProperties = data;
   if (id) {
     if (favorite_arr && favorite_arr.length > 0) {
@@ -459,8 +459,8 @@ async function getPropertyByID(id, userID) {
   }
 
   if (userID) {
-    const favorite = await User.findById(userID).select("favorite")
-    if (favorite && favorite?.favorite?.includes(userID)) {
+    const favorite = await User.findById(userID).select("favorite");
+    if (favorite && favorite?.favorite?.includes(id)) {
       dataMerge["liked"] = true
     } else {
       dataMerge["liked"] = false
@@ -935,7 +935,6 @@ function getRentalBreakUp(propertyDetails) {
 }
 
 async function sendRentReminderEmail() {
-  console.log(`[Rent Reminder Email Function Is Invoked]`)
   const sevenDaysFromNow = moment().add(7, 'days').startOf('day').toDate();
   const eightDaysFromNow = moment(sevenDaysFromNow).add(1, 'day').toDate();
   const properties = await Property.find({
@@ -945,16 +944,13 @@ async function sendRentReminderEmail() {
       $lt: eightDaysFromNow,
     },
   });
-  console.log(`[Rent Reminder Email Function] Found ${properties?.length} properties for rent reminder.`);
 
   if (properties?.length > 0) {
     for await (let property of properties) {
       const renterDetails = await User.findById(property.renterID);
-      console.log(`[Rent Reminder Email Sent To ] : [${renterDetails?.email}]`);
       if (renterDetails) {
         const emailData = {
           email: renterDetails.email,
-          // amount : 0,
           property_name: property.propertyName,
           renter_name: renterDetails.fullName,
           property_id: property._id,

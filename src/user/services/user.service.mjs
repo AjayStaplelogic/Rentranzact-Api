@@ -24,6 +24,7 @@ import * as referralService from "../services/referral.service.mjs";
 import { EACCOUNT_STATUS } from "../enums/user.enum.mjs";
 import Commissions from "../models/commissions.model.mjs";
 import { ECommissionType } from "../enums/commission.enum.mjs";
+import * as s3Service from "../services/s3.service.mjs";
 
 async function loginUser(body) {
   const { email, password, fcmToken } = body;
@@ -674,7 +675,7 @@ async function getWalletDetails(id) {
       withdrawn_percentage,
       rent_collected_percentage,
       earned_rewards_percentage,
-      commission : commission?.[0]?.totalCommission ?? 0
+      commission: commission?.[0]?.totalCommission ?? 0
     },
     message: "successfully fetched wallet stats",
     status: true,
@@ -686,20 +687,10 @@ async function getWalletDetails(id) {
 async function deleteAggrementByID(userID, aggrementID, role) {
   if (role === UserRoles.RENTER) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
-    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
     if (data) {
-      const match = data?.url?.match(regex);
-      if (match) {
-        const filenameWithExtension = match[1];
-        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-        try {
-          fs.unlinkSync(filePath)
-        } catch (error) {
-        }
-      } else {
-      }
+      const keyToDelete = await s3Service.getKeyNameForFileUploaded(data?.url);
+      await s3Service.deleteFileFromAws(keyToDelete)
     }
-
     return {
       data,
       message: "successfully fetched lease aggrements",
@@ -709,19 +700,9 @@ async function deleteAggrementByID(userID, aggrementID, role) {
 
   } else if (role === UserRoles.LANDLORD) {
     const data = await LeaseAggrements.findByIdAndDelete(aggrementID)
-    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
-
     if (data) {
-      const match = data?.url?.match(regex);
-      if (match) {
-        const filenameWithExtension = match[1];
-        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-        try {
-          fs.unlinkSync(filePath)
-        } catch (error) {
-        }
-      } else {
-      }
+      const keyToDelete = await s3Service.getKeyNameForFileUploaded(data?.url);
+      await s3Service.deleteFileFromAws(keyToDelete)
     }
     return {
       data,
@@ -734,19 +715,11 @@ async function deleteAggrementByID(userID, aggrementID, role) {
       _id: aggrementID,
       property_manager_id: userID
     })
-    const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
 
     if (data) {
-      const match = data?.url?.match(regex);
-      if (match) {
-        const filenameWithExtension = match[1];
-        const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-        try {
-          fs.unlinkSync(filePath)
-        } catch (error) {
-        }
-      } else {
-      }
+      const keyToDelete = await s3Service.getKeyNameForFileUploaded(data?.url);
+      await s3Service.deleteFileFromAws(keyToDelete);
+
       return {
         data,
         message: "successfully deleted lease aggrements",

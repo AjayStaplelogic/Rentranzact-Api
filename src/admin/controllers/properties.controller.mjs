@@ -13,7 +13,7 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import * as NotificationService from "../../user/services/notification.service.mjs";
 import activityLog from "../helpers/activityLog.mjs";
-
+import * as s3Service from "../../user/services/s3.service.mjs";
 
 async function properties(req, res) {
 
@@ -415,19 +415,10 @@ async function updatePropertyApprovalStatus(req, res) {
 
 async function deleteAggrementByID(req, res) {
   const { id } = req.params;
-
   const data = await LeaseAggrements.findByIdAndDelete(id)
-  const regex = /\/([^\/?#]+)\.[^\/?#]+$/;
-
   if (data) {
-    const match = data?.url?.match(regex);
-    if (match) {
-      const filePath = path.join(__dirname, "../", "uploads", "LeaseAggrements", `${data.renterID}.pdf`)
-      try {
-        fs.unlinkSync(filePath)
-      } catch (error) {
-      }
-    }
+    const keyToDelete = await s3Service.getKeyNameForFileUploaded(data?.url);
+    await s3Service.deleteFileFromAws(keyToDelete)
   }
 
   return sendResponse(res, null, 'Deleted successfully', true, 200);
