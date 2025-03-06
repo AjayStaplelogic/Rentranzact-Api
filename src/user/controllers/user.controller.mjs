@@ -28,6 +28,7 @@ import * as referralEmailService from "../emails/referral.emails.mjs"
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
+import * as s3Service from "../services/s3.service.mjs";
 
 async function deleteUser(req, res) {
 
@@ -278,21 +279,33 @@ async function resetPassword(req, res) {
 async function editMyProfile(req, res) {
   try {
     let id = req.user.data._id;
-    delete req.body.email;
-    delete req.body.password;
-    delete req.body.otp;
-    delete req.body.role;
-    let update_user = await User.findByIdAndUpdate(id,
-      req.body,
-      { new: true }
-    );
+    let get_user = await User.findOne({
+      _id: id,
+      deleted: false
+    });
+    if (get_user) {
+      delete req.body.email;
+      delete req.body.password;
+      delete req.body.otp;
+      delete req.body.role;
+      let update_user = await User.findByIdAndUpdate(id,
+        req.body,
+        { new: true }
+      );
 
-    if (update_user) {
-      delete update_user.email;
-      delete update_user.password;
-      delete update_user.otp;
-      return sendResponse(res, update_user, "Profile updated successfully", true, 200);
-
+      if (update_user) {
+        delete update_user.email;
+        delete update_user.password;
+        delete update_user.otp;
+        if (get_user.picture != update_user.picture) {
+          // Delete old picture
+          if (get_user?.picture) {
+            const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_user?.picture);
+            await s3Service.deleteFileFromAws(keyToDelete)
+          }
+        }
+        return sendResponse(res, update_user, "Profile updated successfully", true, 200);
+      }
     }
 
     return sendResponse(res, {}, "User not found", false, 404);
