@@ -16,12 +16,15 @@ import authorizer from '../middleware/authorizer.middleware.mjs';
 import multer from 'multer';
 import path from "path"
 import fs from "fs";
-
-
+import * as s3Service from "../services/s3.service.mjs";
+import { generateRandomFileName } from "../helpers/randomNameGenerator.mjs";
+import { fileURLToPath } from 'url';
 const baseUploadPath = "uploads/";
 
 const hostUrl = process.env.HOST_URL;
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         const documentDir = path.join(baseUploadPath, "LeaseAggrements");
@@ -35,12 +38,13 @@ const storage = multer.diskStorage({
 
     filename: function (req, file, cb) {
 
-        const ext = path.extname(file.originalname); // Get the file extension
-        const randomFileName = req.user.data._id + req.user.data.role + ext;
+        // const ext = path.extname(file.originalname); // Get the file extension
+        // const randomFileName = req.user.data._id + req.user.data.role + ext;
+        const randomFileName = generateRandomFileName(file);
+
         cb(null, randomFileName);
     },
 });
-
 
 const upload = multer({ storage: storage });
 
@@ -60,10 +64,11 @@ router.post("/forgot-password", forgotPassword)
 
 router.get("/favorites", authorizer([UserRoles.RENTER]), favourites)
 
-router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), upload.single('document'), (req, res) => {
-    const fileName = req.user.data._id;
-    const relativePath = path.join(hostUrl, "property", "LeaseAggrements", fileName + req.user.data.role + ".pdf")
-    req.documents = relativePath;
+router.post("/lease-aggrement", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), upload.single('document'), async (req, res) => {
+    const randomFileName = req.file.filename;
+    const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "LeaseAggrements", randomFileName)
+    await s3Service.uploadFile(relativePath, `lease-aggrements/${req.body.propertyID.toString()}/${randomFileName}`, req?.file?.mimetype)
+    req.documents = `${process.env.BUCKET_BASE_URL}/lease-aggrements/${req.body.propertyID.toString()}/${randomFileName}`;
     uploadLeaseAggrement(req, res);
 })
 
