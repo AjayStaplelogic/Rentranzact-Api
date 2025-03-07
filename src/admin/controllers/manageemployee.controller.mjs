@@ -2,6 +2,7 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 // import { addUserByAdmin , getUsersList , getUserByID , deleteUserService} from "../services/manageuser.service.mjs";
 import { getEmployeeService, addEmployeeService } from "../services/manageeemployee.service.mjs";
 import { Admin } from "../models/admin.model.mjs";
+import * as s3Service from "../../user/services/s3.service.mjs";
 
 async function getEmployee(req, res) {
   const pageNo = parseInt(req.query.pageNo) || 1;
@@ -60,13 +61,26 @@ async function editEmployee(req, res) {
       return sendResponse(res, {}, "ID is required", false, 400);
     }
 
-    if (req.body.joining_date) {
-      req.body.joining_date = new Date(req.body.joining_date);
-    }
+    let get_user = await Admin.findOne({
+      _id: id,
+      isDeleted: false
+    });
+    if (get_user) {
+      if (req.body.joining_date) {
+        req.body.joining_date = new Date(req.body.joining_date);
+      }
 
-    let data = await Admin.findByIdAndUpdate(id, req.body, { new: true });
-    if (data) {
-      return sendResponse(res, null, "Employee details updated successfully", true, 200);
+      let data = await Admin.findByIdAndUpdate(id, req.body, { new: true });
+      if (data) {
+        if (get_user.picture != data.picture) {
+          // Delete old picture
+          if (get_user?.picture) {
+            const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_user?.picture);
+            await s3Service.deleteFileFromAws(keyToDelete)
+          }
+        }
+        return sendResponse(res, null, "Employee details updated successfully", true, 200);
+      }
     }
     return sendResponse(res, {}, "Employee not found", false, 404);
   } catch (error) {

@@ -7,7 +7,7 @@ import * as Multer from '../helpers/multer.mjs';
 import rateLimitter from "../middleware/ratelimitter.middleware.mjs";
 const newRateLimitter = rateLimitter({
     windowMs: 60 * 60 * 1000, // 1 hour
-    max: 50, // 50 requests per minute
+    max: 100, // 100 requests per minute
 })
 
 router.post('/upload/image', newRateLimitter, authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), Multer.upload.single("media"), uploadController.uploadSingleImage);
