@@ -25,6 +25,7 @@
     "currency-converter-lt": "^2.0.1",
     "easy-currencies": "^1.8.1",
     "express": "^4.19.2",
+    "express-rate-limit": "^7.5.0",
     "firebase": "^10.12.5",
     "firebase-admin": "^12.3.0",
     "google-auth-library": "^9.10.0",
