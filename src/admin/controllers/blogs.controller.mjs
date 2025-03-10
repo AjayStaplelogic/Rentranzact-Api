@@ -5,6 +5,11 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 import * as blogServices from "../services/blog.service.mjs";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
+import * as s3Service from "../../user/services/s3.service.mjs";
+import path from "path"
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const addBlog = async (req, res) => {
     try {
@@ -23,9 +28,10 @@ export const addBlog = async (req, res) => {
         }
 
         if (req.file) {
-            req.body.media = req?.file?.filename;
+            const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "blogs", req?.file?.filename)
+            await s3Service.uploadFile(relativePath, `blogs/${req?.file?.filename}`, req?.file?.mimetype)
+            req.body.media = `${process.env.BUCKET_BASE_URL}/blogs/${req?.file?.filename}`;
         }
-
         let create_blog = await Blogs.create(req.body);
         if (create_blog) {
             return sendResponse(res, create_blog, "Blog added successfully", true, 200);
@@ -58,9 +64,14 @@ export const editBlog = async (req, res) => {
         let get_blog = await Blogs.findById(req.body.id);
         if (get_blog) {
             if (req.file) {
-                req.body.media = req?.file?.filename;
+                const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "blogs", req?.file?.filename)
+                await s3Service.uploadFile(relativePath, `blogs/${req?.file?.filename}`, req?.file?.mimetype)
+                req.body.media = `${process.env.BUCKET_BASE_URL}/blogs/${req?.file?.filename}`;
+                // req.body.media = req?.file?.filename;
                 if (get_blog.media) {
-                    await blogServices.deleteMedia(get_blog.media)
+                    // await blogServices.deleteMedia(get_blog.media)
+                    const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_blog.media);
+                    await s3Service.deleteFileFromAws(keyToDelete)
                 }
             }
 
@@ -179,7 +190,9 @@ export const deleteBlog = async (req, res) => {
         let data = await Blogs.findByIdAndDelete(id);
         if (data) {
             if (data.media) {
-                await blogServices.deleteMedia(data.media)
+                // await blogServices.deleteMedia(data.media)
+                const keyToDelete = await s3Service.getKeyNameForFileUploaded(data.media);
+                await s3Service.deleteFileFromAws(keyToDelete)
             }
             return sendResponse(res, {}, "success", true, 200);
         }
