@@ -5,6 +5,11 @@ import { validator } from "../../user/helpers/schema-validator.mjs";
 import * as bannerServices from "../services/banner.service.mjs";
 import mongoose from "mongoose";
 const ObjectId = mongoose.Types.ObjectId;
+import * as s3Service from "../../user/services/s3.service.mjs";
+import path from "path"
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const addBanner = async (req, res) => {
     try {
@@ -23,7 +28,10 @@ export const addBanner = async (req, res) => {
         }
 
         if (req.file) {
-            req.body.media = req?.file?.filename;
+            // req.body.media = req?.file?.filename;
+            const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "banners", req?.file?.filename)
+            await s3Service.uploadFile(relativePath, `banners/${req?.file?.filename}`, req?.file?.mimetype)
+            req.body.media = `${process.env.BUCKET_BASE_URL}/banners/${req?.file?.filename}`;
         }
 
         let create_banner = await Banners.create(req.body);
@@ -59,9 +67,14 @@ export const editBanner = async (req, res) => {
         let get_banner = await Banners.findById(req.body.id);
         if (get_banner) {
             if (req.file) {
-                req.body.media = req?.file?.filename;
+                // req.body.media = req?.file?.filename;
+                const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "banners", req?.file?.filename)
+                await s3Service.uploadFile(relativePath, `banners/${req?.file?.filename}`, req?.file?.mimetype)
+                req.body.media = `${process.env.BUCKET_BASE_URL}/banners/${req?.file?.filename}`;
                 if (get_banner.media) {
-                    await bannerServices.deleteMedia(get_banner.media)
+                    // await bannerServices.deleteMedia(get_banner.media)
+                    const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_banner.media);
+                    await s3Service.deleteFileFromAws(keyToDelete)
                 }
             }
 
@@ -80,7 +93,7 @@ export const editBanner = async (req, res) => {
 
 export const getAllBanners = async (req, res) => {
     try {
-        let { search, status, sortBy, exclude_id,page_name } = req.query;
+        let { search, status, sortBy, exclude_id, page_name } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
         let query = {};
@@ -118,7 +131,7 @@ export const getAllBanners = async (req, res) => {
                     title: "$title",
                     media: "$media",
                     content: "$content",
-                    page:"$page"
+                    page: "$page"
                 }
             },
             {
@@ -185,7 +198,9 @@ export const deleteBanner = async (req, res) => {
         let data = await Banners.findByIdAndDelete(id);
         if (data) {
             if (data.media) {
-                await bannerServices.deleteMedia(data.media)
+                // await bannerServices.deleteMedia(data.media)
+                const keyToDelete = await s3Service.getKeyNameForFileUploaded(data.media);
+                await s3Service.deleteFileFromAws(keyToDelete)
             }
             return sendResponse(res, {}, "success", true, 200);
         }
