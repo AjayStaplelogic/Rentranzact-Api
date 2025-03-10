@@ -3,6 +3,11 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as TestimonialValidations from "../validations/testimonials.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import * as TestimonialServices from "../services/testimonials.service.mjs";
+import * as s3Service from "../../user/services/s3.service.mjs";
+import path from "path"
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const addTestimonial = async (req, res) => {
     try {
@@ -21,7 +26,10 @@ export const addTestimonial = async (req, res) => {
         }
 
         if (req.file) {
-            req.body.media = req?.file?.filename;
+            // req.body.media = req?.file?.filename;
+            const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "testimonials", req?.file?.filename)
+            await s3Service.uploadFile(relativePath, `testimonials/${req?.file?.filename}`, req?.file?.mimetype)
+            req.body.media = `${process.env.BUCKET_BASE_URL}/testimonials/${req?.file?.filename}`;
         }
 
         let create_testimonial = await Testimonials.create(req.body);
@@ -55,10 +63,15 @@ export const editTestimonial = async (req, res) => {
 
         let get_testimonial = await Testimonials.findById(req.body.id);
         if (get_testimonial) {
-            if (req.file) {                
-                req.body.media = req?.file?.filename;
+            if (req.file) {
+                // req.body.media = req?.file?.filename;
+                const relativePath = path.resolve(__dirname, '..', '..', '..', "uploads", "testimonials", req?.file?.filename)
+                await s3Service.uploadFile(relativePath, `testimonials/${req?.file?.filename}`, req?.file?.mimetype)
+                req.body.media = `${process.env.BUCKET_BASE_URL}/testimonials/${req?.file?.filename}`;
                 if (get_testimonial.media) {
-                    await TestimonialServices.deleteMedia(get_testimonial.media)
+                    // await TestimonialServices.deleteMedia(get_testimonial.media)
+                    const keyToDelete = await s3Service.getKeyNameForFileUploaded(get_testimonial.media);
+                    await s3Service.deleteFileFromAws(keyToDelete)
                 }
             }
 
@@ -175,7 +188,9 @@ export const deleteTestimonial = async (req, res) => {
         let data = await Testimonials.findByIdAndDelete(id);
         if (data) {
             if (data.media) {
-                await TestimonialServices.deleteMedia(data.media)
+                // await TestimonialServices.deleteMedia(data.media)
+                const keyToDelete = await s3Service.getKeyNameForFileUploaded(data.media);
+                await s3Service.deleteFileFromAws(keyToDelete)
             }
             return sendResponse(res, {}, "success", true, 200);
         }
