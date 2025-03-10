@@ -297,6 +297,10 @@ const rentApplicationSchema = new mongoose.Schema(
     invitation_token: {
       type: String
     },
+
+    propertyCategory: {
+      type: String,
+    },
   },
 
   { timestamps: true }
