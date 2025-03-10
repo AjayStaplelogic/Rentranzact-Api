@@ -56,6 +56,7 @@ async function addRentApplicationService(body, user) {
     const landlord = await Property.findById(propertyID);
     const payload = {
       propertyID: propertyID,
+      propertyCategory : landlord?.category,
       employmentStatus,
       occupation,
       kinFirstName,
