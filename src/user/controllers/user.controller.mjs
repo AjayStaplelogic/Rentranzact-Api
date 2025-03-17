@@ -56,7 +56,7 @@ async function deleteUser(req, res) {
     if (get_rented_properties) {
       return sendResponse(res, null, 'Terminate tenancy or lease property first', false, 400)
     }
-    const data = User.findOneAndUpdate({
+    const data = await User.findOneAndUpdate({
       _id: id,
       deleted: false
     }, { deleted: true });
