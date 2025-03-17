@@ -29,14 +29,52 @@ import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
 import * as s3Service from "../services/s3.service.mjs";
+import { Calender } from "../models/calender.model.mjs";
+import Cards from "../models/cards.model.mjs";
+import CreditScores from "../models/creditscore.model.mjs";
 
 async function deleteUser(req, res) {
-
   try {
     const id = req.user.data._id;
-    const data = User.findByIdAndUpdate(id, { deleted: true }).then((Res) => console.log("jj"))
-    return sendResponse(res, {}, 'successfully deleted data', true, 200)
+    const query = {};
+    switch (req.user.data.role) {
+      case UserRoles.LANDLORD:
+        query.landlord_id = id;
+        query.rented = true;
+        break;
 
+      case UserRoles.PROPERTY_MANAGER:
+        query.property_manager_id = id;
+        break;
+
+      case UserRoles.RENTER:
+        query.renterID = id;
+        query.rented = true;
+        break
+    }
+    const get_rented_properties = await Property.findOne(query);
+    if (get_rented_properties) {
+      return sendResponse(res, null, 'Terminate tenancy or lease property first', false, 400)
+    }
+    const data = User.findOneAndUpdate({
+      _id: id,
+      deleted: false
+    }, { deleted: true });
+    if (data) {
+        await Calender.deleteMany({       // Deleting calender blocked dates
+          userID : id
+        });
+
+        await Cards.deleteMany({        // Deleting cards
+          user_id : id
+        })
+
+        await CreditScores.deleteMany({
+          user_id : id
+        })
+      return sendResponse(res, {}, 'successfully deleted data', true, 200)
+    }
+    return sendResponse(res, null, "Server Error", false, 500);
   } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }

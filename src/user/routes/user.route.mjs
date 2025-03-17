@@ -90,7 +90,7 @@ router.get("/commisions", authorizer([UserRoles.PROPERTY_MANAGER]), commisions)
 
 router.get("/user", authorizer([UserRoles.PROPERTY_MANAGER, UserRoles.LANDLORD, UserRoles.RENTER]), getUserDetails)
 
-router.get("/delete/user", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), deleteUser)
+router.delete("/delete/user", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), deleteUser)
 
 router.post('/switch-role', authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER, UserRoles.RENTER]), switchRole);
 
