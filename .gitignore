@@ -3,3 +3,6 @@ package-lock.json
 /public
 /logs
 /uploads
+.env
+.prod_env
+.dev_env
