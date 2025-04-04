@@ -61,45 +61,39 @@ async function deleteUser(req, res) {
       deleted: false
     }, { deleted: true });
     if (data) {
-        await Calender.deleteMany({       // Deleting calender blocked dates
-          userID : id
-        });
+      await Calender.deleteMany({       // Deleting calender blocked dates
+        userID: id
+      });
 
-        await Cards.deleteMany({        // Deleting cards
-          user_id : id
-        })
+      await Cards.deleteMany({        // Deleting cards
+        user_id: id
+      })
 
-        await CreditScores.deleteMany({
-          user_id : id
-        })
+      await CreditScores.deleteMany({
+        user_id: id
+      })
       return sendResponse(res, {}, 'successfully deleted data', true, 200)
     }
     return sendResponse(res, null, "Server Error", false, 500);
   } catch (error) {
     return sendResponse(res, {}, `${error}`, false, 500);
   }
-
 }
 
 async function login(req, res) {
   const { body } = req;
+  body.email = body.email.toLowerCase().trim();
+  const data = await loginUser(body);
 
-  const { isError, errors } = validator(body, userLogin);
+  sendResponse(
+    res,
+    data.data,
+    data.message,
+    data.status,
+    data.statusCode,
+    data.accessToken
+  );
 
-  if (false) {
-    sendResponse(res, [], errors, false, 403);
-  } else {
-    const data = await loginUser(body);
-
-    sendResponse(
-      res,
-      data.data,
-      data.message,
-      data.status,
-      data.statusCode,
-      data.accessToken
-    );
-  }
 }
 
 async function signup(req, res) {
@@ -114,25 +108,20 @@ async function signup(req, res) {
     body.initial_role = body.role;
 
     if (referralCode) {
-      // const validCode = await validateCode(referralCode);
       const validCode = await referralService.isMyCodeExistsInUsers(referralCode);
       if (!validCode) {
-        // const data = await addUser(body);
-
-        // await applyReferralCode(referralCode, data._id);
-
-        // sendResponse(
-        //   res,
-        //   data.data,
-        //   data.message,
-        //   data.status,
-        //   data.statusCode,
-        //   data.accessToken
-        // );
-        res.status(400).json({ msg: "Invalid Referral code" });
+        // return res.status(400).json({ msg: "Invalid Referral code" });
+        sendResponse(
+          res,
+          null,
+          "Invalid Referral code",
+          false,
+          400
+        );
       }
     }
 
+    body.email = body.email.toLowerCase().trim();
     const data = await addUser(body);
 
     sendResponse(
