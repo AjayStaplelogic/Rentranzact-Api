@@ -205,13 +205,15 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         }
 
         // Sending email to renter about successful rent payment
-        rentPaidEmailToRenter({
-            email: renterDetails?.email,
-            amount: amount,
-            property_name: propertyDetails.propertyName,
-            renter_name: renterDetails?.fullName
-        })
-
+        if (data?._id) {
+            rentPaidEmailToRenter({
+                email: renterDetails?.email,
+                amount: amount,
+                property_name: propertyDetails.propertyName,
+                renter_name: renterDetails?.fullName,
+                transaction_id: data._id
+            })
+        }
     }
 
     return {
@@ -432,12 +434,15 @@ async function addFlutterwaveTransactionForOld(body) {
         }
 
         // Sending email to renter about successful rent payment
-        rentPaidEmailToRenter({
-            email: renterDetails?.email,
-            amount: amount,
-            property_name: propertyDetails.propertyName,
-            renter_name: renterDetails?.fullName
-        })
+        if (data?._id) {
+            rentPaidEmailToRenter({
+                email: renterDetails?.email,
+                amount: amount,
+                property_name: propertyDetails.propertyName,
+                renter_name: renterDetails?.fullName,
+                transaction_id: data._id
+            })
+        }
     }
 
     return {

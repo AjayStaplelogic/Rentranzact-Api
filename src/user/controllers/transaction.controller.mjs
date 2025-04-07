@@ -181,30 +181,33 @@ async function downloadTransactionPdf(req, res) {
 
 async function adminDownloadTransactionPdf(req, res) {
   try {
-    const get_transaction = await Transaction.findById(req.query.id)
-    if (get_transaction) {
-      // let get_property = await Property.findById(get_transaction.propertyID);
-      let get_renter = await User.findById(get_transaction.renterID);
+    if (req.query.id) {
+      const get_transaction = await Transaction.findById(req.query.id)
+      if (get_transaction) {
+        // let get_property = await Property.findById(get_transaction.propertyID);
+        let get_renter = await User.findById(get_transaction.renterID);
 
-      let payload = {
-        transaction_date: get_transaction?.createdAt,
-        amount: get_transaction?.amount,
-        property_name: get_transaction?.property ?? "",
-        description: `Rent for ${get_transaction?.property ?? ""}`,
-        renter_name: get_renter?.fullName ?? "",
-        payment_method: get_transaction?.payment_mode ?? ""
+        let payload = {
+          transaction_date: get_transaction?.createdAt,
+          amount: get_transaction?.amount,
+          property_name: get_transaction?.property ?? "",
+          description: `Rent for ${get_transaction?.property ?? ""}`,
+          renter_name: get_renter?.fullName ?? "",
+          payment_method: get_transaction?.payment_mode ?? ""
+        }
+        // Convert HTML content to PDF (returns PDF as buffer)
+        const htmlContent = getRentTransactionHtml(payload)
+        const pdfBuffer = await ConvertHtmlToPdf(htmlContent);
+        const newBuffer = Buffer.from(pdfBuffer)
+        res.set('Content-Type', 'application/octet-stream');
+        res.set('Content-Disposition', 'attachment; filename=transaction.pdf');
+        res.set('Content-Length', newBuffer.length);
+        return res.send(newBuffer);
       }
-      // Convert HTML content to PDF (returns PDF as buffer)
-      const htmlContent = getRentTransactionHtml(payload)
-      const pdfBuffer = await ConvertHtmlToPdf(htmlContent);
-      const newBuffer = Buffer.from(pdfBuffer)
-      res.set('Content-Type', 'application/octet-stream');
-      res.set('Content-Disposition', 'attachment; filename=transaction.pdf');
-      res.set('Content-Length', newBuffer.length);
-      return res.send(newBuffer);
+      return sendResponse(res, null, "Invalid Id", false, 400)
     }
 
-    return sendResponse(res, null, "Invalid Id", false, 400)
+    return sendResponse(res, null, "Id required", false, 400)
 
   } catch (error) {
     return sendResponse(res, null, `${error}`, false, 500)
