@@ -22,6 +22,7 @@ import sendNotification from "../helpers/sendNotification.mjs";
 import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
 import * as PropertyEmails from "../emails/property.email.mjs";
+import * as PropertyValidations from "../validations/property.validation.mjs"
 
 async function addProperty(req, res) {
   const { body } = req;
@@ -395,13 +396,40 @@ async function getPropertyListByPmID(req, res) {
 
 async function teminatePM(req, res) {
   try {
-    const id = req.params.id;
+    const { isError, errors } = validator(req.body, PropertyValidations.teriminatePM);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 422);
+    }
     const data = await Property.findOneAndUpdate({
-      _id: id,
+      _id: req.body.property_id,
       landlord_id: req?.user?.data?._id,
-      property_manager_id: req.query.property_manager_id
-    }, { property_manager_id: null });
+      property_manager_id: req.body.property_manager_id
+    }, {
+      property_manager_id: null,
+      name: "",
+      email: ""
+    });
     if (data) {
+      // Sending system notification to property manager
+      User.findById(data.property_manager_id).then(property_manager_details => {
+
+        // Sending system notification to property manager
+        const notification_payload = {};
+        // notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.notificationHeading = "Termination of Property Management Services";
+        notification_payload.notificationBody = `Landlord ${req?.user?.data?.fullName} terminated you from property management services for property ${data?.propertyName}${req.body.reason ? ` Reason : ${req.body.reason}` : ""}`;
+        notification_payload.landlordID = data?.landlord_id;
+        notification_payload.propertyID = data._id;
+        notification_payload.send_to = property_manager_details._id;
+        notification_payload.property_manager_id = data?.property_manager_id;
+        const metadata = {
+          "propertyID": data._id.toString(),
+          "redirectTo": "property",
+        }
+        NotificationService.createNotification(notification_payload, metadata, property_manager_details)
+      })
+
       return sendResponse(res, data, `teminated property manager successfully`, true, 200);
     }
   } catch (error) {

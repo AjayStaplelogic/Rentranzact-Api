@@ -213,7 +213,7 @@ router.get("/property-manager/:id", authorizer([UserRoles.LANDLORD]), getPropert
 
 router.get("/property-manager-property-lists/:id", authorizer([UserRoles.LANDLORD]), getPropertyListByPmID)
 
-router.get("/terminate-property-manager/:id", authorizer([UserRoles.LANDLORD]), teminatePM)
+router.post("/terminate-property-manager", authorizer([UserRoles.LANDLORD]), teminatePM)
 
 router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]),
   upload.any(),
