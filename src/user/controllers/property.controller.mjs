@@ -23,6 +23,7 @@ import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import * as NotificationService from "../services/notification.service.mjs";
 import * as PropertyEmails from "../emails/property.email.mjs";
 import * as PropertyValidations from "../validations/property.validation.mjs"
+import { validator } from "../helpers/schema-validator.mjs";
 
 async function addProperty(req, res) {
   const { body } = req;
@@ -430,7 +431,7 @@ async function teminatePM(req, res) {
         NotificationService.createNotification(notification_payload, metadata, property_manager_details)
       })
 
-      return sendResponse(res, data, `teminated property manager successfully`, true, 200);
+      return sendResponse(res, null, `teminated property manager successfully`, true, 200);
     }
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
