@@ -383,7 +383,10 @@ async function getPropertyManagerDetails(req, res) {
 async function getPropertyListByPmID(req, res) {
   try {
     const id = req.params.id;
-    const data = await Property.find({ property_manager_id: id }).select('propertyName images address.addressText rent rentType avg_rating total_reviews rent_period_end rent_period_start lease_end_timestamp')
+    const data = await Property.find({
+      property_manager_id: id,
+      landlord_id: req?.user?.data?._id,
+    }).select('propertyName images address.addressText rent rentType avg_rating total_reviews rent_period_end rent_period_start lease_end_timestamp rented');
     return sendResponse(res, data, `property list for property manager`, true, 200);
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
@@ -393,8 +396,14 @@ async function getPropertyListByPmID(req, res) {
 async function teminatePM(req, res) {
   try {
     const id = req.params.id;
-    const data = await Property.findByIdAndUpdate(id, { property_manager_id: null })
-    return sendResponse(res, data, `teminated property manager successfully`, true, 200);
+    const data = await Property.findOneAndUpdate({
+      _id: id,
+      landlord_id: req?.user?.data?._id,
+      property_manager_id: req.query.property_manager_id
+    }, { property_manager_id: null });
+    if (data) {
+      return sendResponse(res, data, `teminated property manager successfully`, true, 200);
+    }
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
   }
