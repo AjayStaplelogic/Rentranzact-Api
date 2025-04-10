@@ -7,42 +7,45 @@ const maintenanceSchema = new mongoose.Schema(
             required: true,
         },
         propertyID: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: "properties",
             required: true,
         },
         renterID: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: "users",
             required: true,
         },
 
         landlordID: {
-            type: String,
+            type: mongoose.Types.ObjectId,
+            ref: "users"
         },
-        landlordRemark: {
-            type: String,
-            required: false,
-        },
+        // landlordRemark: {
+        //     type: String,
+        //     required: false,
+        // },
         renterRemark: {
             type: String,
             required: false,
         },
-        status : {
-            type : String,
-            default : "pending",
-            enum : ["pending", "resolved", "remarked"]
+        status: {
+            type: String,
+            default: "pending",
+            enum: ["pending", "resolved", "remarked"]
         },
-        resolvedOn : {
+        resolvedOn: {
             type: String,
             required: false
         },
-        canceledOn : {
+        canceledOn: {
             type: String,
-            required : false
+            required: false
         },
         property_manager_id: {
             type: mongoose.Types.ObjectId,
-            ref : "users"
-          },
+            ref: "users"
+        }
     },
     { timestamps: true }
 );

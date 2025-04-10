@@ -431,8 +431,9 @@ async function teminatePM(req, res) {
         NotificationService.createNotification(notification_payload, metadata, property_manager_details)
       })
 
-      return sendResponse(res, null, `teminated property manager successfully`, true, 200);
+      return sendResponse(res, null, `Property manager services terminated successfully`, true, 200);
     }
+    return sendResponse(res, null, `You can terminate services of your property only`, false, 400);
   } catch (error) {
     return sendResponse(res, [], `${error}`, false, 500);
   }
