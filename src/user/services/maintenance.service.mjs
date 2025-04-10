@@ -33,11 +33,11 @@ async function addMaintenanceRequests(body, req) {
             const data = new Maintenance(body);
             data.save()
             if (data) {
-                await MaintenanceRemarks.create({
-                    maintenance_request_id: data._id,
-                    user_id: req.user.data._id,
-                    remark: req.body.renterRemark
-                });
+                // await MaintenanceRemarks.create({
+                //     maintenance_request_id: data._id,
+                //     user_id: req.user.data._id,
+                //     remark: req.body.renterRemark
+                // });
 
                 if (data.landlordID) {
                     User.findById(data.landlordID).then(landlordDetails => {
