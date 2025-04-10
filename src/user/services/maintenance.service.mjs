@@ -275,7 +275,7 @@ async function addRemarkToRequest(req) {
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
                 notification_payload.notificationHeading = "Maintenance Remarks";
-                notification_payload.notificationBody = `${req.user.data?.fullName ?? ""} added remarks on your maintenance request for ${propertyDetails?.propertyName ?? ""}`;
+                notification_payload.notificationBody = `${req.user.data?.fullName ?? ""} added remarks on maintenance request for ${propertyDetails?.propertyName ?? ""}`;
                 notification_payload.renterID = renterDetails._id;
                 notification_payload.landlordID = data.landlordID;
                 notification_payload.maintanence_id = data._id;
