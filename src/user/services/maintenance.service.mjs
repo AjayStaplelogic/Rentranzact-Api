@@ -270,26 +270,44 @@ async function addRemarkToRequest(req) {
             if (addRemark) {
                 const data = await Maintenance.findByIdAndUpdate(get_maintenance._id, { status: ManinenanceEnums.STATUS.REMARKED });
                 const renterDetails = await User.findById(data.renterID);
-                const landlordDetails = await User.findById(data.landlordID)
                 const propertyDetails = await Property.findById(data.propertyID);
 
                 let notification_payload = {};
                 notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.maintenance_view;
                 notification_payload.notificationHeading = "Maintenance Remarks";
-                notification_payload.notificationBody = `${landlordDetails?.fullName ?? ""} added remarks on your maintenance request for ${propertyDetails?.propertyName ?? ""}`;
+                notification_payload.notificationBody = `${req.user.data?.fullName ?? ""} added remarks on maintenance request for ${propertyDetails?.propertyName ?? ""}`;
                 notification_payload.renterID = renterDetails._id;
                 notification_payload.landlordID = data.landlordID;
                 notification_payload.maintanence_id = data._id;
                 notification_payload.propertyID = data.propertyID;
-                notification_payload.send_to = renterDetails._id;
                 notification_payload.property_manager_id = data.property_manager_id;
-
-                const metadata = {
-                    "propertyID": data.propertyID.toString(),
-                    "redirectTo": "maintanence",
-                    "maintanence_id": data._id.toString(),
+                // notification_payload.send_to = [data.landlordID, data.property_manager_id].includes(req.user.data._id) ? renterDetails._id : null;
+                let send_to_arr = [];
+                if ([data?.landlordID?.toString(), data?.property_manager_id?.toString()].includes(req?.user?.data?._id)) {
+                    send_to_arr.push(renterDetails)
                 }
-                NotificationService.createNotification(notification_payload, metadata, renterDetails)
+                if (data?.renterID?.toString() == req.user.data._id) {
+                    if (data.landlordID) {
+                        const landlordDetails = await User.findById(data.landlordID)
+                        send_to_arr.push(landlordDetails)
+                    }
+                    if (data.property_manager_id) {
+                        const propertyManagerDetails = await User.findById(data.property_manager_id)
+                        send_to_arr.push(propertyManagerDetails)
+                    }
+                }
+
+                if (send_to_arr.length > 0) {
+                    for (let item of send_to_arr) {
+                        notification_payload.send_to = item._id;
+                        const metadata = {
+                            "propertyID": data.propertyID.toString(),
+                            "redirectTo": "maintanence",
+                            "maintanence_id": data._id.toString(),
+                        }
+                        NotificationService.createNotification(notification_payload, metadata, item)
+                    }
+                }
                 return {
                     data: data,
                     message: "Remark has been added successfully",
