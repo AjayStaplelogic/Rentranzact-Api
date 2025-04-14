@@ -160,7 +160,7 @@ export const finalizeReferralBonus = async (update_transfer) => {
                 amount: Number(update_transfer.amount),
                 status: "successful",
                 type: "CREDIT",
-                userID: to,
+                userID: update_transfer.to,
                 intentID: uuidv4(),
                 payment_type: EPaymentType.referralBonus,
                 createdAt: created
