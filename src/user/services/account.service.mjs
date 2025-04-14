@@ -58,7 +58,7 @@ export const addUpdateAccount = async (user_id, account_data) => {
         i_phone: account_data?.individual?.phone,
         i_dob: account_data?.individual?.dob,
         i_address: account_data?.individual?.address,
-        i_verification_status: account_data?.individual?.status,
+        i_verification_status: account_data?.individual?.verification?.status,
     }
 
     payload.status = getConnectedAccountState(account_data);
