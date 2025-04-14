@@ -24,7 +24,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
-    const { wallet, TransactionServices, userID, notificationID, propertyID } = meta_data;
+    const { wallet, userID, notificationID, propertyID } = meta_data;
     const renterDetails = await User.findById(userID)
     const propertyDetails = await Property.findById(propertyID);
     const landlordDetails = await User.findById(propertyDetails.landlord_id);

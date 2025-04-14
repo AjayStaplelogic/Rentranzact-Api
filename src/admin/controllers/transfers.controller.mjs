@@ -2,12 +2,14 @@ import Transfers from "../../user/models/transfers.model.mjs"
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as TransferValidations from "../validations/transfer.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
-import { ETRANSFER_STATUS } from "../../user/enums/transfer.enums.mjs"
+import { ETRANSFER_STATUS, ETRANSFER_TYPE } from "../../user/enums/transfer.enums.mjs"
 import * as StripeCommonServices from "../../user/services/stripecommon.service.mjs";
 import * as AccountServices from "../../user/services/account.service.mjs";
 import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import * as TransferService from "../services/transfer.service.mjs";
+import * as ReferralServices from "../../user/services/referral.service.mjs";
+import * as UserTransferService from "../../user/services/transfer.service.mjs"
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -207,11 +209,19 @@ export const updateTransferStatus = async (req, res) => {
                             payload.transfer_id = initiate_transfer.id;
                             payload.conversion_rate = converted_currency.rate;
                             payload.status = ETRANSFER_STATUS.transferred;
+                            payload.converted_amount = Number(converted_currency.amount);
                             let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                             if (update_transfer) {
-                                TransferService.sendTransferNotificationAndEmail({
-                                    transferDetials : update_transfer
-                                })
+                                UserTransferService.sendTransferNotificationAndEmail({
+                                    transferDetials: update_transfer
+                                });
+
+                                switch (update_transfer.transfer_type) {
+                                    case ETRANSFER_TYPE.referralBonus:
+                                        await ReferralServices.finalizeReferralBonus(update_transfer.amount, update_transfer.to)
+                                        break
+
+                                }
                                 return sendResponse(res, null, "Transfered successfully", true, 200);
                             }
                         }
