@@ -5,7 +5,7 @@ import moment from "moment";
 import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
-import { EBonusPer } from "../enums/referral.enum.mjs"
+import { EBonusPer, EReferralEarningStatus } from "../enums/referral.enum.mjs"
 import { EPaymentType } from "../enums/wallet.enum.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
 import * as TransferServices from "./transfer.service.mjs";
@@ -150,14 +150,14 @@ export const calculateReferralAmountWithRTZFee = (rtz_fee = 0) => {
     return Number((rtz_fee * EBonusPer.referrer) / 100) || 0;
 }
 
-export const finalizeReferralBonus = async (amount, to,) => {
+export const finalizeReferralBonus = async (update_transfer) => {
     try {
         console.log("********** Finalize Referral Bonus *************")
-        const benificiaryDetails = await User.findById(to).lean().exec();
+        const benificiaryDetails = await User.findById(update_transfer.to).lean().exec();
         if (benificiaryDetails) {
             const created = moment().unix();
             const wallet_payload = {
-                amount: Number(amount),
+                amount: Number(update_transfer.amount),
                 status: "successful",
                 type: "CREDIT",
                 userID: to,
@@ -170,7 +170,7 @@ export const finalizeReferralBonus = async (amount, to,) => {
 
             const transaction_payload = {
                 wallet: true,
-                amount: amount,
+                amount: update_transfer.amount,
                 status: "successful",
                 date: created,
                 intentID: uuidv4(),
@@ -190,6 +190,13 @@ export const finalizeReferralBonus = async (amount, to,) => {
             create_transaction.save();
             console.log(add_wallet, '============add_wallet');
             console.log(create_transaction, '============create_transaction');
+            if (create_transaction) {
+                if (update_transfer.referral_earning_id) {
+                    await ReferralEarnings.findByIdAndUpdate(update_transfer.referral_earning_id, {
+                        status: EReferralEarningStatus.paid
+                    })
+                }
+            }
         }
     } catch (error) {
         console.log(error, '===========Error in finalize referal bonus')
