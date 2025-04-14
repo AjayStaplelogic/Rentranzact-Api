@@ -218,7 +218,7 @@ export const updateTransferStatus = async (req, res) => {
 
                                 switch (update_transfer.transfer_type) {
                                     case ETRANSFER_TYPE.referralBonus:
-                                        await ReferralServices.finalizeReferralBonus(update_transfer.amount, update_transfer.to)
+                                        await ReferralServices.finalizeReferralBonus(update_transfer)
                                         break
 
                                 }
