@@ -8,6 +8,7 @@ import { Transaction } from "../models/transactions.model.mjs";
 import { EBonusPer } from "../enums/referral.enum.mjs"
 import { EPaymentType } from "../enums/wallet.enum.mjs";
 import { Wallet } from "../models/wallet.model.mjs";
+import * as TransferServices from "./transfer.service.mjs";
 
 /**
  * @description Returns the random string of requested strLength, by default it will return code of length 8
@@ -64,6 +65,7 @@ export const getUserByMyCode = async (referralCode) => {
  */
 export const addReferralBonusInWallet = async (amount, from, to, property_id = null) => {
     try {
+        console.log("************* Add referral Bonus In Wallet ***************")
         if (amount > 0) {
             amount = Number(amount.toFixed(2));
         }
@@ -75,6 +77,7 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 to: to,
                 isDeleted: false
             });
+            console.log(already_added, '==================already_added');
 
             if (!already_added) {
                 let referral_earning_payload = {
@@ -86,52 +89,53 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
                 };
 
                 const new_referral_earnings = new ReferralEarnings(referral_earning_payload);
-                const created = moment().unix();
+                // const created = moment().unix();
 
-                const wallet_payload = {
-                    amount: Number(amount),
-                    status: "successful",
-                    type: "CREDIT",
-                    userID: to,
-                    intentID: uuidv4(),
-                    payment_type: EPaymentType.rechargeWallet,
-                    createdAt: created
-                }
+                // const wallet_payload = {
+                //     amount: Number(amount),
+                //     status: "successful",
+                //     type: "CREDIT",
+                //     userID: to,
+                //     intentID: uuidv4(),
+                //     payment_type: EPaymentType.rechargeWallet,
+                //     createdAt: created
+                // }
 
-                const add_wallet = new Wallet(wallet_payload);
+                // const add_wallet = new Wallet(wallet_payload);
 
-                const transaction_payload = {
-                    wallet: true,
-                    amount: amount,
-                    status: "successful",
-                    date: created,
-                    intentID: uuidv4(),
-                    type: "CREDIT",
-                    transaction_type: ETRANSACTION_TYPE.referralBonus
-                };
+                // const transaction_payload = {
+                //     wallet: true,
+                //     amount: amount,
+                //     status: "successful",
+                //     date: created,
+                //     intentID: uuidv4(),
+                //     type: "CREDIT",
+                //     transaction_type: ETRANSACTION_TYPE.referralBonus
+                // };
 
-                if (UserRoles.LANDLORD === benificiaryDetails?.role) {
-                    transaction_payload.landlordID = benificiaryDetails._id;
-                } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
-                    transaction_payload.pmID = benificiaryDetails._id;
-                } else if (UserRoles.RENTER === benificiaryDetails?.role) {
-                    transaction_payload.renterID = benificiaryDetails._id;
-                }
-                const create_transaction = new Transaction(transaction_payload);
+                // if (UserRoles.LANDLORD === benificiaryDetails?.role) {
+                //     transaction_payload.landlordID = benificiaryDetails._id;
+                // } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
+                //     transaction_payload.pmID = benificiaryDetails._id;
+                // } else if (UserRoles.RENTER === benificiaryDetails?.role) {
+                //     transaction_payload.renterID = benificiaryDetails._id;
+                // }
+                // const create_transaction = new Transaction(transaction_payload);
+
                 new_referral_earnings.save();
-                add_wallet.save();
-                create_transaction.save();
-                if (add_wallet._id) {
-                    await User.findByIdAndUpdate(add_wallet.userID, {
-                        $inc: {
-                            walletPoints: add_wallet.amount,
-                            earned_rewards: add_wallet.amount
-                        }
-                    });
-                }
+                console.log(new_referral_earnings, '==================new_referral_earnings');
+
+                const transfer = await TransferServices.makeTransferForReferralBonus(new_referral_earnings)
+                console.log(transfer, '==================transfer');
+
+                // if (transfer) {
+                // add_wallet.save();
+                // create_transaction.save();
+                // }
             }
         }
     } catch (error) {
+        console.log(error, '==========Error in add Referal Bonus')
     }
 
 }
@@ -144,4 +148,50 @@ export const addReferralBonusInWallet = async (amount, from, to, property_id = n
  */
 export const calculateReferralAmountWithRTZFee = (rtz_fee = 0) => {
     return Number((rtz_fee * EBonusPer.referrer) / 100) || 0;
+}
+
+export const finalizeReferralBonus = async (amount, to,) => {
+    try {
+        console.log("********** Finalize Referral Bonus *************")
+        const benificiaryDetails = await User.findById(to).lean().exec();
+        if (benificiaryDetails) {
+            const created = moment().unix();
+            const wallet_payload = {
+                amount: Number(amount),
+                status: "successful",
+                type: "CREDIT",
+                userID: to,
+                intentID: uuidv4(),
+                payment_type: EPaymentType.referralBonus,
+                createdAt: created
+            }
+
+            const add_wallet = new Wallet(wallet_payload);
+
+            const transaction_payload = {
+                wallet: true,
+                amount: amount,
+                status: "successful",
+                date: created,
+                intentID: uuidv4(),
+                type: "CREDIT",
+                transaction_type: ETRANSACTION_TYPE.referralBonus
+            };
+
+            if (UserRoles.LANDLORD === benificiaryDetails?.role) {
+                transaction_payload.landlordID = benificiaryDetails._id;
+            } else if (UserRoles.PROPERTY_MANAGER === benificiaryDetails?.role) {
+                transaction_payload.pmID = benificiaryDetails._id;
+            } else if (UserRoles.RENTER === benificiaryDetails?.role) {
+                transaction_payload.renterID = benificiaryDetails._id;
+            }
+            const create_transaction = new Transaction(transaction_payload);
+            add_wallet.save();
+            create_transaction.save();
+            console.log(add_wallet, '============add_wallet');
+            console.log(create_transaction, '============create_transaction');
+        }
+    } catch (error) {
+        console.log(error, '===========Error in finalize referal bonus')
+    }
 }

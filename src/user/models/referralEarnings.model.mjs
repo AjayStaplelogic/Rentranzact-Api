@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { EReferralEarningStatus } from "../enums/referral.enum.mjs";
 const Schema = mongoose.Schema;
 
 const referralEarningsSchema = new Schema({
@@ -23,6 +24,11 @@ const referralEarningsSchema = new Schema({
     isDeleted: {
         type: Boolean,
         default: false
+    },
+    status: {
+        type : String,
+        enum: Object.values(EReferralEarningStatus),
+        default: EReferralEarningStatus.pending
     }
 }, {
     timestamps: true,

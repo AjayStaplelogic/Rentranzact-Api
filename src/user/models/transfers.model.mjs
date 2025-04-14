@@ -42,6 +42,9 @@ const schema = new Schema({
     amount: {
         type: Number,
     },
+    converted_amount: {
+        type: Number,
+    },
     from_currency: {
         type: String,
     },
@@ -121,6 +124,10 @@ const schema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: 'admins'
     },
+    referral_earning_id : {
+        type : mongoose.Types.ObjectId,
+        ref : "referralearnings"
+    }
 
 }, {
     timestamps: true,

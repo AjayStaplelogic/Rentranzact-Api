@@ -20,35 +20,41 @@ import mongoose from "mongoose";
  * @returns {object} Newly created transfer object
  */
 export const makeTransferForPropertyRent = async (property_data = null, property_id = null, amount = 0) => {
-    if (!property_data) {       // If property data is not provided then fetching it will property_id
-        if (!property_id) {     // If property id is also not provided then returned false
-            return false;
+    try {
+
+
+        if (!property_data) {       // If property data is not provided then fetching it will property_id
+            if (!property_id) {     // If property id is also not provided then returned false
+                return false;
+            }
+
+            property_data = await Property.findById(property_id);
+            if (!property_data) {       // If property not found in db then returning false
+                return false;
+            }
         }
 
-        property_data = await Property.findById(property_id);
-        if (!property_data) {       // If property not found in db then returning false
-            return false;
+        if (amount > 0) {
+            const transfer_payload = {
+                transfer_type: ETRANSFER_TYPE.rentPayment,
+                is_from_admin: true,
+                to: property_data?.landlord_id,
+                property_id: property_data._id,
+                amount: amount,
+                from_currency: "USD",
+                to_currency: "NGN",
+                property_name: property_data?.propertyName ?? "",
+                property_address: property_data?.address?.addressText ?? "",
+                property_images: property_data?.images ?? []
+            }
+
+            return await createTransferInDB(transfer_payload);
         }
+
+        return false;
+    } catch (error) {
+
     }
-
-    if (amount > 0) {
-        const transfer_payload = {
-            transfer_type: ETRANSFER_TYPE.rentPayment,
-            is_from_admin: true,
-            to: property_data?.landlord_id,
-            property_id: property_data._id,
-            amount: amount,
-            from_currency: "USD",
-            to_currency: "NGN",
-            property_name: property_data?.propertyName ?? "",
-            property_address: property_data?.address?.addressText ?? "",
-            property_images: property_data?.images ?? []
-        }
-
-        return await createTransferInDB(transfer_payload);
-    }
-
-    return false;
 }
 
 /**
@@ -182,4 +188,41 @@ export const sendTransferNotificationAndEmail = (options) => {
         }
         NotificationService.createNotification(notification_payload, metadata, receiver_details)
     });
+}
+
+
+/**
+ * To make transfer request to admin, when user get referral bonus 
+ * 
+ * @param {object} referral_data Object containing referral earning collection data
+ * @returns {object} Newly created transfer object
+ */
+export const makeTransferForReferralBonus = async (referral_data = null) => {
+    console.log('***************** Make Transfer For Referral Bonus *************')
+    if (referral_data) {
+        let property_data = null;
+        if (referral_data.property_id) {
+            property_data = await Property.findById(referral_data.property_id);
+        }
+
+        if (referral_data.amount > 0) {
+            const transfer_payload = {
+                transfer_type: ETRANSFER_TYPE.referralBonus,
+                referral_earning_id: referral_data._id,
+                is_from_admin: true,
+                to: referral_data?.to,
+                property_id: referral_data.property_id,
+                amount: referral_data.amount,
+                from_currency: "USD",
+                to_currency: "NGN",
+                property_name: property_data?.propertyName ?? "",
+                property_address: property_data?.address?.addressText ?? "",
+                property_images: property_data?.images ?? []
+            }
+
+            return await createTransferInDB(transfer_payload);
+        }
+    }
+
+    return false;
 }
