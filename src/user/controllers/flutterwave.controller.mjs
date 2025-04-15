@@ -40,7 +40,7 @@ async function flutterwave(req, res) {
   }
 
   console.log("*********** Passed Switch Case ***********");
-  if (body?.data?.status === "successful") {
+  if (body?.data?.status === "successful" || body?.status === "successful") {
     const { meta_data } = body;
     let { wallet } = meta_data
     console.log(wallet, '============wallet')
