@@ -226,7 +226,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
 async function addToWallet(body) {
     try {
-
+        console.log('**********Add To Wallet Functio n***********')
         let { amount, status, createdAt, id } = body;
         let { userID } = body.meta_data;
         const created = moment(createdAt).unix();
@@ -239,6 +239,7 @@ async function addToWallet(body) {
                         "NGN",
                         amount
                     )
+                    console.log(transfer, '==========transfer')
                     if (transfer) {
                         let payload = {
                             amount,
