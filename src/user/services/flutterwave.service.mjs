@@ -162,7 +162,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
         // Adding commission for property manager
         if (propertyDetails.property_manager_id) {       // If property owner is landlord
             if (propertyDetails.landlord_id) {
-                await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+                await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
             }
 
             // Sending email to property manager about successful rent payment
@@ -406,7 +406,7 @@ async function addFlutterwaveTransactionForOld(body) {
         const data = new Transaction(changePayload)
         if (propertyDetails.property_manager_id) {       // If property owner is landlord
             if (propertyDetails.landlord_id) {
-                await commissionServices.rentCommissionToPM(propertyDetails, null, rent);
+                await commissionServices.rentCommissionToPM(propertyDetails, null, propertyDetails.rent);
             }
 
             // Sending email to property manager about successful rent payment
