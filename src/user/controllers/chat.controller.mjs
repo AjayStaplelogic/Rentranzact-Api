@@ -262,7 +262,7 @@ export const getMessages = async (req, res) => {
             ]
         }
         let field = "createdAt";
-        let order = "desc";
+        let order = "asc";
         let sort_query = {};
         if (sortBy) {
             field = sortBy.split(' ')[0];
@@ -273,34 +273,6 @@ export const getMessages = async (req, res) => {
             {
                 $match: query
             },
-            // {
-            //     $lookup: {
-            //         from: "users",
-            //         localField: "sender_id",
-            //         foreignField: "_id",
-            //         as: "sender_details"
-            //     }
-            // },
-            // {
-            //     $unwind: {
-            //         path: "$sender_details",
-            //         preserveNullAndEmptyArrays: true
-            //     }
-            // },
-            // {
-            //     $lookup: {
-            //         from: "users",
-            //         localField: "reciever_id",
-            //         foreignField: "_id",
-            //         as: "reciever_details"
-            //     }
-            // },
-            // {
-            //     $unwind: {
-            //         path: "$reciever_details",
-            //         preserveNullAndEmptyArrays: true
-            //     }
-            // },
             {
                 $project: {
                     createdAt: "$createdAt",
@@ -318,16 +290,6 @@ export const getMessages = async (req, res) => {
                     is_deleted: "$is_deleted",
                     read_at: "$read_at",
                     admin_id: "$admin_id",
-                    // sender_details: {
-                    //     _id: "$sender_details._id",
-                    //     fullName: "$sender_details.fullName",
-                    //     picture: "$sender_details.picture"
-                    // },
-                    // reciever_details: {
-                    //     _id: "$reciever_details._id",
-                    //     fullName: "$reciever_details.fullName",
-                    //     picture: "$reciever_details.picture"
-                    // }
                 }
             },
             {
