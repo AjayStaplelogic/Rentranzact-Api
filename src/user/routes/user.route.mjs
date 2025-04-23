@@ -80,7 +80,7 @@ router.get("/wallet", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRole
 
 router.post("/verify-otp", userOtpVerification)
 
-router.post("/reset-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD]), resetPassword)
+router.post("/reset-password", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), resetPassword)
 
 router.put("/my-profile", authorizer([UserRoles.RENTER, UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), editMyProfile)
 
