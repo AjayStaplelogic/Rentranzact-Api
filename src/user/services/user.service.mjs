@@ -429,7 +429,7 @@ async function socialSignup(body) {
 }
 
 async function forgotPasswordService(email) {
-  const user = await User.findOne({ email: email }).lean().exec();
+  const user = await User.findOne({ email: email, deleted : false }).lean().exec();
   if (user) {
     let otp = generateOTP();
     let update_user = await User.findByIdAndUpdate(user._id, { otp: otp }, { new: true });
