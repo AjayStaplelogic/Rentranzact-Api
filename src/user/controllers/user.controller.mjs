@@ -287,7 +287,10 @@ async function userOtpVerification(req, res) {
 async function resetPassword(req, res) {
   try {
     let { password } = req.body;
-    let get_user = await User.findOne({ _id: req.user.data._id }).lean().exec();
+    let get_user = await User.findOne({
+       _id: req.user.data._id,
+       deleted : false
+       }).lean().exec();
     if (get_user) {
       let hash_password = bcrypt.hashSync(password, Number(process.env.SALT));
       let update_user = await User.findByIdAndUpdate(get_user._id,
