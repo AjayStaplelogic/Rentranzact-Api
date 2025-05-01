@@ -184,7 +184,7 @@ async function addStripeTransaction(body, renterApplicationID) {
             landlordID: landlordDetails?._id,
             pmID: propertyDetails?.property_manager_id,
             type: "DEBIT",
-            payment_mode: "stripe",
+            payment_mode: body?.paymentMethod,
             allCharges: breakdown,
             transaction_type: ETRANSACTION_TYPE.rentPayment
         })
@@ -298,7 +298,7 @@ async function rechargeWallet(body) {
                         date: created,
                         intentID: id,
                         type: "CREDIT",
-                        payment_mode: body.paymentMethod,
+                        payment_mode: body?.paymentMethod,
                         transaction_type: ETRANSACTION_TYPE.rechargeWallet,
                         receiver_id: userDetail._id
                     };
@@ -335,7 +335,7 @@ async function rechargeWallet(body) {
                         date: created,
                         intentID: id,
                         type: "CREDIT",
-                        payment_mode: body.paymentMethod,
+                        payment_mode: body?.paymentMethod,
                         transaction_type: ETRANSACTION_TYPE.rechargeWallet,
                         receiver_id: userDetail._id
                     }
@@ -504,7 +504,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         landlordID: landlordDetails?._id,
         pmID: propertyDetails?.property_manager_id,
         type: "DEBIT",
-        payment_mode: "stripe",
+        payment_mode: body?.paymentMethod,
         allCharges: breakdown,
         transaction_type: ETRANSACTION_TYPE.rentPayment
     })

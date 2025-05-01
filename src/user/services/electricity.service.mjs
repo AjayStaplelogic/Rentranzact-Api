@@ -151,58 +151,61 @@ export const createCharge = ({
  * @returns {void} - Nothing 
  */
 export const initiateBillPaymentFromWebhook = async (webhook_obj) => {
-    try {
-        const { meta_data } = webhook_obj;
-        User.findById(meta_data.user_id).then((user) => {
-            Bills.create({
-                user_id: meta_data.user_id,
-                amount_charge_to_cust: webhook_obj.amount,
-                bill_amount: meta_data.amount,
-            }).then(async (bill) => {
-                const initiatedPayment = await initiatePayment({
-                    country_code: meta_data?.country_code ?? "NG",
-                    customer: meta_data.meter_number,
-                    amount: meta_data.amount,
-                    biller_code: meta_data.biller_code,
-                    item_code: meta_data.item_code,
-                });
+    if (webhook_obj?.data?.id) {
+        const eventData = webhook_obj.data
+        try {
+            const { meta_data } = webhook_obj;
+            User.findById(meta_data.user_id).then((user) => {
+                Bills.create({
+                    user_id: meta_data.user_id,
+                    amount_charge_to_cust: eventData.amount,
+                    bill_amount: meta_data.amount,
+                }).then(async (bill) => {
+                    const initiatedPayment = await initiatePayment({
+                        country_code: meta_data?.country_code ?? "NG",
+                        customer: meta_data.meter_number,
+                        amount: meta_data.amount,
+                        biller_code: meta_data.biller_code,
+                        item_code: meta_data.item_code,
+                    });
 
-                if (initiatedPayment) {
-                    Bills.findByIdAndUpdate(bill._id, {
-                        phone_number: initiatedPayment?.data?.phone_number ?? "",
-                        bill_amount: initiatedPayment?.data?.amount,
-                        network: initiatedPayment?.data?.network ?? "",
-                        code: initiatedPayment?.data?.code ?? "",
-                        tx_ref: initiatedPayment?.data?.tx_ref ?? "",
-                        reference: initiatedPayment?.data?.reference ?? "",
-                        batch_reference: initiatedPayment?.data?.batch ?? "",
-                        recharge_token: initiatedPayment?.data?.recharge_token ?? "",
-                        fee: initiatedPayment?.data?.fee,
-                        transaction_id: webhook_obj.id,
-                        meter_number: meta_data.meter_number
-                    },
-                        {
-                            new: true
-                        }).then((updatedBill) => {
-                            electricityEmails.electricityBillInitiated({
-                                email: user.email,
-                                fullName: user.fullName,
-                                amount: updatedBill.amount_charge_to_cust,
-                                meter_number: meta_data.meter_number
-                            });
-                        }).catch(error => {
-                            // logic to refund for charge created before
-                            createBillRefund(webhook_obj.id, bill._id, meta_data.meter_number);
-                        })
-                }
-            }).catch((error) => {
-                // logic to refund for charge created before
-                createBillRefund(webhook_obj.id, null, meta_data.meter_number);
+                    if (initiatedPayment) {
+                        Bills.findByIdAndUpdate(bill._id, {
+                            phone_number: initiatedPayment?.data?.phone_number ?? "",
+                            bill_amount: initiatedPayment?.data?.amount,
+                            network: initiatedPayment?.data?.network ?? "",
+                            code: initiatedPayment?.data?.code ?? "",
+                            tx_ref: initiatedPayment?.data?.tx_ref ?? "",
+                            reference: initiatedPayment?.data?.reference ?? "",
+                            batch_reference: initiatedPayment?.data?.batch ?? "",
+                            recharge_token: initiatedPayment?.data?.recharge_token ?? "",
+                            fee: initiatedPayment?.data?.fee,
+                            transaction_id: eventData.id,
+                            meter_number: meta_data.meter_number
+                        },
+                            {
+                                new: true
+                            }).then((updatedBill) => {
+                                electricityEmails.electricityBillInitiated({
+                                    email: user.email,
+                                    fullName: user.fullName,
+                                    amount: updatedBill.amount_charge_to_cust,
+                                    meter_number: meta_data.meter_number
+                                });
+                            }).catch(error => {
+                                // logic to refund for charge created before
+                                createBillRefund(eventData.id, bill._id, meta_data.meter_number);
+                            })
+                    }
+                }).catch((error) => {
+                    // logic to refund for charge created before
+                    createBillRefund(eventData.id, null, meta_data.meter_number);
+                })
             })
-        })
-    } catch (error) {
-        // Logic to refund for charge created before
-        createBillRefund(webhook_obj.id, null, meta_data.meter_number);
+        } catch (error) {
+            // Logic to refund for charge created before
+            createBillRefund(eventData.id, null, meta_data.meter_number);
+        }
     }
 }
 

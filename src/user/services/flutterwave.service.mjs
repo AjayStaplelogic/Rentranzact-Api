@@ -19,8 +19,8 @@ import * as TransactionServices from "../../user/services/transaction.service.mj
 import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
-    const { status, amount, createdAt, id, meta_data } = body;
-    const momentObject = moment(createdAt);
+    const { status, amount, created_at, id, meta_data } = body?.data;
+    const momentObject = moment(created_at);
 
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
@@ -227,9 +227,9 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 async function addToWallet(body) {
     try {
         console.log('**********Add To Wallet Functio n***********')
-        let { amount, status, createdAt, id } = body;
+        let { amount, status, created_at, id } = body.data;
         let { userID } = body.meta_data;
-        const created = moment(createdAt).unix();
+        const created = moment(created_at).unix();
         if (status === "successful") {
             User.findById(userID).then(async (userDetail) => {
                 if (userDetail) {
@@ -284,8 +284,8 @@ async function addToWallet(body) {
 }
 
 async function addFlutterwaveTransactionForOld(body) {
-    const { status, amount, createdAt, id, meta_data } = body;
-    const momentObject = moment(createdAt);
+    const { status, amount, created_at, id, meta_data } = body.data;
+    const momentObject = moment(created_at);
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
     const { propertyID, userID, notificationID } = meta_data;
