@@ -80,6 +80,10 @@ const transactionSchema = new mongoose.Schema(
       type: mongoose.Types.ObjectId,
       ref: "users"
     },
+
+    property_address : {
+      type : String
+    },
   },
   { timestamps: true }
 );

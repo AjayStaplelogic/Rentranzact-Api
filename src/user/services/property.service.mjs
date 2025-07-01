@@ -467,7 +467,7 @@ async function getPropertyByID(id, userID) {
     }
 
     const get_rent_application = await rentApplication.findOne({
-      propertyID : data._id,
+      propertyID: data._id,
       renterID: userID,
       applicationStatus: {
         $in: [RentApplicationStatus.PENDING, RentApplicationStatus.ACCEPTED]
@@ -869,12 +869,14 @@ async function deletePropertyService(userID, propertyID, role) {
 
     const data = await Property.findOneAndDelete(delete_query);
     if (data) {
-      await Inspection.deleteMany({
-        $or: [
-          { landlordID: userID },
-          { property_manager_id: userID }
-        ]
-      })
+      // await Inspection.deleteMany({
+      //   $or: [
+      //     { landlordID: userID },
+      //     { property_manager_id: userID }
+      //   ]
+      // });
+
+      deletePropertyRelatedDataWhenDelete(propertyID, userID);
 
       return {
         data: data,
@@ -893,7 +895,7 @@ async function deletePropertyService(userID, propertyID, role) {
   }
 }
 
-function getRentalBreakUp(propertyDetails) {
+function getRentalBreakUp(propertyDetails,  rent_paid=0) {
   const breakdown = {
     service_charge: 0,
     rent: 0,
@@ -904,16 +906,20 @@ function getRentalBreakUp(propertyDetails) {
     agency_fee: 0,
     agent_fee: 0,
     rtz_fee: 0,
-    landlord_earning: 0
+    rtz_percentage: 0,
+    landlord_earning: 0,
+    rent_paid : 0
   };
   const rent = Number(propertyDetails.rent);
   breakdown.rent = rent;
+  breakdown.rent_paid = rent_paid;
   breakdown.landlord_earning += rent;
   breakdown.service_charge = propertyDetails.servicesCharges;
   breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
   breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
   breakdown.insurance = 0;    // variable declaration for future use
   breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
+  breakdown.rtz_percentage = RentBreakDownPer.RTZ_FEE_PERCENT;
 
   if (propertyDetails.payment_count === 0) {
     breakdown.service_charge = propertyDetails.servicesCharges > 0 ? propertyDetails.servicesCharges : 0;
@@ -961,6 +967,22 @@ async function sendRentReminderEmail() {
       }
     }
   }
+}
+
+async function deletePropertyRelatedDataWhenDelete(property_id, deletedBy_id) {
+  await Inspection.deleteMany({
+    $or: [
+      { landlordID: deletedBy_id },
+      { property_manager_id: deletedBy_id }
+    ]
+  });
+  await Notification.deleteMany({
+    propertyID: property_id,
+    amount: {
+      $gt: 0
+    },
+    redirect_to: ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen
+  });
 }
 
 export {

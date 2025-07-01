@@ -32,6 +32,7 @@ import userAccountsRoutes from "./user/routes/accounts.route.mjs";
 import userPayouts from "./user/routes/payout.route.mjs";
 import userInviteRoutes from "./user/routes/invite.route.mjs";
 import userCreditScoreRoutes from "./user/routes/creditscore.route.mjs";
+import bankAccountRoutes from "./user/routes/bankAccount.route.mjs";
 
 //admin imports
 import adminRoutes from "./admin/routes/admin.route.mjs"
@@ -135,6 +136,7 @@ app.use("/api", userAccountsRoutes);
 app.use("/api", userPayouts);
 app.use("/api", userInviteRoutes);
 app.use("/api", userCreditScoreRoutes);
+app.use("/api", bankAccountRoutes)
 
 //admin
 app.use("/api/admin", adminRoutes)

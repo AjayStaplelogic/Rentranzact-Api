@@ -3,6 +3,7 @@ import { Property } from "../../user/models/property.model.mjs";
 import { ObjectId } from 'bson';
 import { Inspection } from "../../user/models/inspection.model.mjs";
 import { InspectionStatus } from "../../user/enums/inspection.enums.mjs";
+import { ENOTIFICATION_REDIRECT_PATHS } from "../../user/enums/notification.enum.mjs";
 
 async function leaseAggrementsList(req) {
   let { filters, search } = req.query;
@@ -190,6 +191,13 @@ async function deletePropertyByID(id) {
 
     const property = await Property.findByIdAndDelete(id);
     if (property) {
+      await Notification.deleteMany({
+        propertyID: id,
+        amount: {
+          $gt: 0
+        },
+        redirect_to: ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen
+      });
       return {
         data: data,
         message: "Property Deleted Successfully",

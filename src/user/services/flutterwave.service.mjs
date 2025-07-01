@@ -17,6 +17,7 @@ import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as TransactionServices from "../../user/services/transaction.service.mjs";
 import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
+import axios from "axios";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
     const { status, amount, created_at, id, meta_data } = body?.data;
@@ -132,7 +133,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             addRenterHistory.save()
         }
 
-        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails,  amount);
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -148,7 +149,8 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown,
-            transaction_type: ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment,
+            property_address : propertyDetails?.address?.addressText ?? ""
         }
 
         if (landlordDetails) {
@@ -194,7 +196,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
                 property: propertyDetails,
@@ -379,7 +381,7 @@ async function addFlutterwaveTransactionForOld(body) {
             })
             addRenterHistory.save()
         }
-        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails, amount);
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -395,7 +397,8 @@ async function addFlutterwaveTransactionForOld(body) {
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown,
-            transaction_type: ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment,
+            property_address : propertyDetails?.address?.addressText ?? ""
         }
 
         if (landlordDetails) {
@@ -424,7 +427,7 @@ async function addFlutterwaveTransactionForOld(body) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
                 property: propertyDetails,
@@ -455,4 +458,31 @@ async function addFlutterwaveTransactionForOld(body) {
 
 }
 
-export { addFlutterwaveTransaction, addToWallet, addFlutterwaveTransactionForOld };
+async function verifyBankAccountWithFlutterwave(account_bank, account_number) {
+    const url = `https://api.flutterwave.com/v3/accounts/resolve`;
+    const payload = {
+        account_bank: account_bank,
+        account_number: account_number,
+    }
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${process.env.FLUTTERWAVE_SECRET}`
+        }
+    }
+    try {
+        const { data } = await axios.post(url, payload, config);
+        console.log(data, '==========data');
+        return data?.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// verifyBankAccount("0448", "0690000034")
+
+export {
+    addFlutterwaveTransaction,
+    addToWallet,
+    addFlutterwaveTransactionForOld,
+    verifyBankAccountWithFlutterwave
+};

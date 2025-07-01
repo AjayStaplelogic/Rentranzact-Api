@@ -124,11 +124,37 @@ const schema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: 'admins'
     },
-    referral_earning_id : {
-        type : mongoose.Types.ObjectId,
-        ref : "referralearnings"
-    }
+    referral_earning_id: {
+        type: mongoose.Types.ObjectId,
+        ref: "referralearnings"
+    },
 
+// New 
+    rent_paid: {
+        type: Number
+    },
+
+    rtz_percentage: {
+        type: Number
+    },
+
+    rtz_fee: {
+        type: Number
+    },
+    agent_fee: {
+        type: Number
+    },
+    landlord_earning: {
+        type: Number
+    },
+    landlord_id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'users',
+        index: true
+    },
+    reference_number: {
+        type: String
+    }
 }, {
     timestamps: true,
     toJSON: true,
