@@ -471,9 +471,11 @@ async function verifyBankAccountWithFlutterwave(account_bank, account_number) {
     }
     try {
         const { data } = await axios.post(url, payload, config);
-        console.log(data, '==========data');
         return data?.data;
     } catch (error) {
+        if(error?.response?.data?.message){
+            throw error?.response?.data?.message
+        }
         throw error;
     }
 }
