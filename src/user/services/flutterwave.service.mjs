@@ -17,6 +17,7 @@ import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as TransactionServices from "../../user/services/transaction.service.mjs";
 import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
+import axios from "axios";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
     const { status, amount, created_at, id, meta_data } = body?.data;
@@ -455,4 +456,31 @@ async function addFlutterwaveTransactionForOld(body) {
 
 }
 
-export { addFlutterwaveTransaction, addToWallet, addFlutterwaveTransactionForOld };
+async function verifyBankAccountWithFlutterwave(account_bank, account_number) {
+    const url = `https://api.flutterwave.com/v3/accounts/resolve`;
+    const payload = {
+        account_bank: account_bank,
+        account_number: account_number,
+    }
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${process.env.FLUTTERWAVE_SECRET}`
+        }
+    }
+    try {
+        const { data } = await axios.post(url, payload, config);
+        console.log(data, '==========data');
+        return data?.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
+// verifyBankAccount("0448", "0690000034")
+
+export {
+    addFlutterwaveTransaction,
+    addToWallet,
+    addFlutterwaveTransactionForOld,
+    verifyBankAccountWithFlutterwave
+};

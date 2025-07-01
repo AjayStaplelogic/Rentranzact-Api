@@ -467,7 +467,7 @@ async function getPropertyByID(id, userID) {
     }
 
     const get_rent_application = await rentApplication.findOne({
-      propertyID : data._id,
+      propertyID: data._id,
       renterID: userID,
       applicationStatus: {
         $in: [RentApplicationStatus.PENDING, RentApplicationStatus.ACCEPTED]
@@ -869,12 +869,14 @@ async function deletePropertyService(userID, propertyID, role) {
 
     const data = await Property.findOneAndDelete(delete_query);
     if (data) {
-      await Inspection.deleteMany({
-        $or: [
-          { landlordID: userID },
-          { property_manager_id: userID }
-        ]
-      })
+      // await Inspection.deleteMany({
+      //   $or: [
+      //     { landlordID: userID },
+      //     { property_manager_id: userID }
+      //   ]
+      // });
+
+      deletePropertyRelatedDataWhenDelete(propertyID, userID);
 
       return {
         data: data,
@@ -961,6 +963,22 @@ async function sendRentReminderEmail() {
       }
     }
   }
+}
+
+async function deletePropertyRelatedDataWhenDelete(property_id, deletedBy_id) {
+  await Inspection.deleteMany({
+    $or: [
+      { landlordID: deletedBy_id },
+      { property_manager_id: deletedBy_id }
+    ]
+  });
+  await Notification.deleteMany({
+    propertyID: property_id,
+    amount: {
+      $gt: 0
+    },
+    redirect_to: ENOTIFICATION_REDIRECT_PATHS.rent_payment_screen
+  });
 }
 
 export {
