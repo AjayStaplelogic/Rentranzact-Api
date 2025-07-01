@@ -26,8 +26,8 @@ const FurnishingType = {
 const RentBreakDownPer = {
   AGENCY_FEE: 10,
   AGENT_FEE_PERCENT: 7,
-  RTZ_FEE_PERCENT: 3,
-  LEGAL_FEE_PERCENT: 5,
+  RTZ_FEE_PERCENT: 5,
+  LEGAL_FEE_PERCENT: 10,
   CAUTION_FEE_PERCENT: 10,
 }
 
