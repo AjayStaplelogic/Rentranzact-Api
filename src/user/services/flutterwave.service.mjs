@@ -133,7 +133,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             addRenterHistory.save()
         }
 
-        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails,  amount);
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -149,7 +149,8 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown,
-            transaction_type: ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment,
+            property_address : propertyDetails?.address?.addressText ?? ""
         }
 
         if (landlordDetails) {
@@ -195,7 +196,7 @@ async function addFlutterwaveTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
                 property: propertyDetails,
@@ -380,7 +381,7 @@ async function addFlutterwaveTransactionForOld(body) {
             })
             addRenterHistory.save()
         }
-        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails, amount);
         // Saving transaction record in DB
         const changePayload = {
             wallet: false,
@@ -396,7 +397,8 @@ async function addFlutterwaveTransactionForOld(body) {
             type: "Debit",
             payment_mode: "flutterwave",
             allCharges: breakdown,
-            transaction_type: ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment,
+            property_address : propertyDetails?.address?.addressText ?? ""
         }
 
         if (landlordDetails) {
@@ -425,7 +427,7 @@ async function addFlutterwaveTransactionForOld(body) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
                 property: propertyDetails,
