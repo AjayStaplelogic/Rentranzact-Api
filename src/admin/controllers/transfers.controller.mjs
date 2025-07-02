@@ -70,7 +70,7 @@ export const getAllTransfers = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-             {
+            {
                 $lookup: {
                     from: "users",
                     localField: "renter_id",
@@ -84,7 +84,7 @@ export const getAllTransfers = async (req, res) => {
                     preserveNullAndEmptyArrays: true
                 }
             },
-             {
+            {
                 $lookup: {
                     from: "bank_accounts",
                     localField: "to",
@@ -117,14 +117,14 @@ export const getAllTransfers = async (req, res) => {
                     initiatedAt: "$initiatedAt",
                     initiateRejectedAt: "$initiateRejectedAt",
                     renter_name: "$renter_detail.fullName",
-                    account_number : "$bank_account_details.account_number",
-                    account_bank : "$bank_account_details.account_bank",
-                    rent_paid : "$rent_paid",
-                    rtz_percentage : "$rtz_percentage",
-                    rtz_fee : "$rtz_fee",
-                    agent_fee : "$agent_fee",
-                    landlord_earning : "$landlord_earning",
-                    reference_number : "$reference_number",
+                    account_number: "$bank_account_details.account_number",
+                    account_bank: "$bank_account_details.account_bank",
+                    rent_paid: "$rent_paid",
+                    rtz_percentage: "$rtz_percentage",
+                    rtz_fee: "$rtz_fee",
+                    agent_fee: "$agent_fee",
+                    landlord_earning: "$landlord_earning",
+                    reference_number: "$reference_number",
                 }
             },
             {
@@ -194,7 +194,8 @@ export const updateTransferStatus = async (req, res) => {
 
         const get_transfer = await Transfers.findOne({
             _id: id,
-            isDeleted: false
+            isDeleted: false,
+            status: "approved-by-emp"
         });
 
         if (get_transfer) {
@@ -224,55 +225,55 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                if (get_connected_account) {
-                    const converted_currency = await CommonHelpers.convert_currency(
-                        get_transfer.to_currency,
-                        get_transfer.from_currency,
-                        Number(get_transfer.amount)
-                    )
+                // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                // if (get_connected_account) {
+                //     const converted_currency = await CommonHelpers.convert_currency(
+                //         get_transfer.to_currency,
+                //         get_transfer.from_currency,
+                //         Number(get_transfer.amount)
+                //     )
 
-                    if (converted_currency && converted_currency.amount > 0) {
-                        const initiate_transfer = await StripeCommonServices.transferFunds(
-                            get_connected_account.connect_acc_id,
-                            Number(converted_currency.amount),
-                            get_transfer?.from_currency
-                        );
+                // if (converted_currency && converted_currency.amount > 0) {
+                //     const initiate_transfer = await StripeCommonServices.transferFunds(
+                //         get_connected_account.connect_acc_id,
+                //         Number(converted_currency.amount),
+                //         get_transfer?.from_currency
+                //     );
 
-                        if (initiate_transfer?.id) {
-                            payload.destination = initiate_transfer.destination;
-                            payload.connect_acc_id = get_connected_account._id;
-                            payload.transfer_id = initiate_transfer.id;
-                            payload.conversion_rate = converted_currency.rate;
-                            payload.status = ETRANSFER_STATUS.transferred;
-                            payload.converted_amount = Number(converted_currency.amount);
-                            let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                            if (update_transfer) {
-                                UserTransferService.sendTransferNotificationAndEmail({
-                                    transferDetials: update_transfer
-                                });
+                //     if (initiate_transfer?.id) {
+                // payload.destination = initiate_transfer.destination;
+                // payload.connect_acc_id = get_connected_account._id;
+                // payload.transfer_id = initiate_transfer.id;
+                // payload.conversion_rate = converted_currency.rate;
+                payload.status = ETRANSFER_STATUS.transferred;
+                // payload.converted_amount = Number(converted_currency.amount);
+                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                if (update_transfer) {
+                    UserTransferService.sendTransferNotificationAndEmail({
+                        transferDetials: update_transfer
+                    });
 
-                                switch (update_transfer.transfer_type) {
-                                    case ETRANSFER_TYPE.referralBonus:
-                                        await ReferralServices.finalizeReferralBonus(update_transfer)
-                                        break
-
-                                }
-                                return sendResponse(res, null, "Transfered successfully", true, 200);
-                            }
-                        }
+                    switch (update_transfer.transfer_type) {
+                        case ETRANSFER_TYPE.referralBonus:
+                            await ReferralServices.finalizeReferralBonus(update_transfer)
+                            break
 
                     }
-                    return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+                    return sendResponse(res, null, "Transfered successfully", true, 200);
                 }
-
-                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             }
-            return sendResponse(res, null, "Invalid recipient", false, 400);
 
         }
+        // return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+        // }
 
-        return sendResponse(res, null, "Data not found", false, 404);
+        // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+        // }
+        // return sendResponse(res, null, "Invalid recipient", false, 400);
+
+        // }
+
+        // return sendResponse(res, null, "Data not found", false, 404);
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400)
     }
