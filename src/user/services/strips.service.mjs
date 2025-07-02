@@ -169,7 +169,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         const renterDetails = await User.findById(userID);
         const landlordDetails = await User.findById(propertyDetails.landlord_id)
-        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+        let breakdown = PropertyServices.getRentalBreakUp(propertyDetails, amount);
         const data = new Transaction({
             wallet: false,
             renterID: userID,
@@ -186,7 +186,8 @@ async function addStripeTransaction(body, renterApplicationID) {
             type: "DEBIT",
             payment_mode: body?.paymentMethod,
             allCharges: breakdown,
-            transaction_type: ETRANSACTION_TYPE.rentPayment
+            transaction_type: ETRANSACTION_TYPE.rentPayment,
+            property_address: propertyDetails?.address?.addressText ?? ""
         })
 
         await rentApplication.findByIdAndUpdate(renterApplicationID, { "applicationStatus": RentApplicationStatus.COMPLETED })
@@ -226,7 +227,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
 
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
@@ -489,7 +490,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
     const renterDetails = await User.findById(userID);
 
     const landlordDetails = await User.findById(propertyDetails.landlord_id)
-    let breakdown = PropertyServices.getRentalBreakUp(propertyDetails);
+    let breakdown = PropertyServices.getRentalBreakUp(propertyDetails, amount);
     const data = new Transaction({
         wallet: false,
         renterID: userID,
@@ -506,7 +507,9 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
         type: "DEBIT",
         payment_mode: body?.paymentMethod,
         allCharges: breakdown,
-        transaction_type: ETRANSACTION_TYPE.rentPayment
+        transaction_type: ETRANSACTION_TYPE.rentPayment,
+        property_address: propertyDetails?.address?.addressText ?? ""
+
     })
 
     // Adding commission for property manager
@@ -529,7 +532,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     // Requesting Admin for transfer admin account to landlord account
     if (propertyDetails?.landlord_id) {
-        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning);
+        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
 
         // Sending email to landlord about successful rent payment
         TransactionServices.sendRentPaymentNotificationAndEmail({
