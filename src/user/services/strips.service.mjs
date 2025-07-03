@@ -227,7 +227,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails);
 
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
@@ -532,7 +532,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     // Requesting Admin for transfer admin account to landlord account
     if (propertyDetails?.landlord_id) {
-        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown);
+        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails);
 
         // Sending email to landlord about successful rent payment
         TransactionServices.sendRentPaymentNotificationAndEmail({

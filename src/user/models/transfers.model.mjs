@@ -129,7 +129,7 @@ const schema = new Schema({
         ref: "referralearnings"
     },
 
-// New 
+    // New 
     rent_paid: {
         type: Number
     },
@@ -154,7 +154,12 @@ const schema = new Schema({
     },
     reference_number: {
         type: String
-    }
+    },
+    renter_id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'users',
+        index: true
+    },
 }, {
     timestamps: true,
     toJSON: true,

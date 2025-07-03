@@ -71,6 +71,34 @@ export const getAllTransfers = async (req, res) => {
                 }
             },
             {
+                $lookup: {
+                    from: "users",
+                    localField: "renter_id",
+                    foreignField: "_id",
+                    as: "renter_detail"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$renter_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "bank_accounts",
+                    localField: "to",
+                    foreignField: "user_id",
+                    as: "bank_account_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$bank_account_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
                 $project: {
                     id: "$_id",
                     createdAt: "$createdAt",
@@ -88,6 +116,15 @@ export const getAllTransfers = async (req, res) => {
                     approvedBy_name: "$approvedBy_detail.fullName",
                     initiatedAt: "$initiatedAt",
                     initiateRejectedAt: "$initiateRejectedAt",
+                    renter_name: "$renter_detail.fullName",
+                    account_number: "$bank_account_details.account_number",
+                    account_bank: "$bank_account_details.account_bank",
+                    rent_paid: "$rent_paid",
+                    rtz_percentage: "$rtz_percentage",
+                    rtz_fee: "$rtz_fee",
+                    agent_fee: "$agent_fee",
+                    landlord_earning: "$landlord_earning",
+                    reference_number: "$reference_number",
                 }
             },
             {
@@ -157,7 +194,8 @@ export const updateTransferStatus = async (req, res) => {
 
         const get_transfer = await Transfers.findOne({
             _id: id,
-            isDeleted: false
+            isDeleted: false,
+            status: "approved-by-emp"
         });
 
         if (get_transfer) {
@@ -187,56 +225,55 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                if (get_connected_account) {
-                    const converted_currency = await CommonHelpers.convert_currency(
-                        get_transfer.to_currency,
-                        get_transfer.from_currency,
-                        Number(get_transfer.amount)
-                    )
-                    console.log(converted_currency, '=========converted_currency')
+                // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                // if (get_connected_account) {
+                //     const converted_currency = await CommonHelpers.convert_currency(
+                //         get_transfer.to_currency,
+                //         get_transfer.from_currency,
+                //         Number(get_transfer.amount)
+                //     )
 
-                    if (converted_currency && converted_currency.amount > 0) {
-                        const initiate_transfer = await StripeCommonServices.transferFunds(
-                            get_connected_account.connect_acc_id,
-                            Number(converted_currency.amount),
-                            get_transfer?.from_currency
-                        );
+                // if (converted_currency && converted_currency.amount > 0) {
+                //     const initiate_transfer = await StripeCommonServices.transferFunds(
+                //         get_connected_account.connect_acc_id,
+                //         Number(converted_currency.amount),
+                //         get_transfer?.from_currency
+                //     );
 
-                        if (initiate_transfer?.id) {
-                            payload.destination = initiate_transfer.destination;
-                            payload.connect_acc_id = get_connected_account._id;
-                            payload.transfer_id = initiate_transfer.id;
-                            payload.conversion_rate = converted_currency.rate;
-                            payload.status = ETRANSFER_STATUS.transferred;
-                            payload.converted_amount = Number(converted_currency.amount);
-                            let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                            if (update_transfer) {
-                                UserTransferService.sendTransferNotificationAndEmail({
-                                    transferDetials: update_transfer
-                                });
+                //     if (initiate_transfer?.id) {
+                // payload.destination = initiate_transfer.destination;
+                // payload.connect_acc_id = get_connected_account._id;
+                // payload.transfer_id = initiate_transfer.id;
+                // payload.conversion_rate = converted_currency.rate;
+                payload.status = ETRANSFER_STATUS.transferred;
+                // payload.converted_amount = Number(converted_currency.amount);
+                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                if (update_transfer) {
+                    UserTransferService.sendTransferNotificationAndEmail({
+                        transferDetials: update_transfer
+                    });
 
-                                switch (update_transfer.transfer_type) {
-                                    case ETRANSFER_TYPE.referralBonus:
-                                        await ReferralServices.finalizeReferralBonus(update_transfer)
-                                        break
-
-                                }
-                                return sendResponse(res, null, "Transfered successfully", true, 200);
-                            }
-                        }
+                    switch (update_transfer.transfer_type) {
+                        case ETRANSFER_TYPE.referralBonus:
+                            await ReferralServices.finalizeReferralBonus(update_transfer)
+                            break
 
                     }
-                    return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+                    return sendResponse(res, null, "Transfered successfully", true, 200);
                 }
-
-                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             }
-            return sendResponse(res, null, "Invalid recipient", false, 400);
 
         }
+        // return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+        // }
 
-        return sendResponse(res, null, "Data not found", false, 404);
+        // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+        // }
+        // return sendResponse(res, null, "Invalid recipient", false, 400);
+
+        // }
+
+        // return sendResponse(res, null, "Data not found", false, 404);
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400)
     }
@@ -318,7 +355,7 @@ export const updateInitiateApprovalStatus = async (req, res) => {
             return sendResponse(res, [], errorMessage, false, 403);
         }
 
-        const { id, status, current_user_id } = req.body;
+        const { id, status, current_user_id, reference_number } = req.body;
 
         const get_transfer = await Transfers.findOne({
             _id: id,
@@ -351,6 +388,7 @@ export const updateInitiateApprovalStatus = async (req, res) => {
                     case ETRANSFER_STATUS.initiated:
                         payload.initiatedAt = new Date();
                         payload.initiatedBy = current_user_id;
+                        payload.reference_number = reference_number;
                         break;
                     case ETRANSFER_STATUS.initiateRejected:
                         payload.initiateRejectedAt = new Date();

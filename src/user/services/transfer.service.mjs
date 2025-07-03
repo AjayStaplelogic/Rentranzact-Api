@@ -19,7 +19,7 @@ import mongoose from "mongoose";
  * @param {number} amount rent amount to be transferred
  * @returns {object} Newly created transfer object
  */
-export const makeTransferForPropertyRent = async (property_data = null, property_id = null, amount = 0, rental_breakdown) => {
+export const makeTransferForPropertyRent = async (property_data = null, property_id = null, amount = 0, rental_breakdown, renterDetails) => {
     try {
 
 
@@ -53,6 +53,7 @@ export const makeTransferForPropertyRent = async (property_data = null, property
                 agent_fee : rental_breakdown.agent_fee,
                 landlord_earning : rental_breakdown.landlord_earning,
                 landlord_id : property_data?.landlord_id,
+                renter_id : renterDetails._id
             }
 
             return await createTransferInDB(transfer_payload);
