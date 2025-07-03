@@ -3,17 +3,18 @@ import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as TransferValidations from "../validations/transfer.validation.mjs"
 import { validator } from "../../user/helpers/schema-validator.mjs";
 import { ETRANSFER_STATUS, ETRANSFER_TYPE } from "../../user/enums/transfer.enums.mjs"
-import * as StripeCommonServices from "../../user/services/stripecommon.service.mjs";
+// import * as StripeCommonServices from "../../user/services/stripecommon.service.mjs";
 import * as AccountServices from "../../user/services/account.service.mjs";
-import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
+// import * as CommonHelpers from "../../user/helpers/common.helper.mjs";
 import { User } from "../../user/models/user.model.mjs";
 import * as TransferService from "../services/transfer.service.mjs";
 import * as ReferralServices from "../../user/services/referral.service.mjs";
 import * as UserTransferService from "../../user/services/transfer.service.mjs"
+import moment from "moment";
 
 export const getAllTransfers = async (req, res) => {
     try {
-        let { search, status, transfer_type } = req.query;
+        let { search, status, transfer_type, start_date, end_date, timezone } = req.query;
         const sort_key = req.query.sort_key || "createdAt";
         const sort_order = req.query.sort_order || "desc";
         let page = Number(req.query.page || 1);
@@ -30,6 +31,8 @@ export const getAllTransfers = async (req, res) => {
             query.$or = [
                 { property_name: { $regex: search, $options: 'i' } },
                 { to_name: { $regex: search, $options: 'i' } },
+                { property_address: { $regex: search, $options: 'i' } },
+                { reference_number: { $regex: search, $options: 'i' } },
             ]
         }
 
@@ -38,6 +41,20 @@ export const getAllTransfers = async (req, res) => {
 
         if (transfer_type) { query.transfer_type = transfer_type };
 
+        if (start_date && end_date) {
+            query.transferredAt = {
+                $gte: moment(start_date).tz(timezone, true).startOf("day").toDate(),
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (start_date && !end_date) {
+            query.transferredAt = {
+                $gte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (!start_date && end_date) {
+            query.transferredAt = {
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        }
         let pipeline = [
             {
                 $match: query
@@ -112,6 +129,7 @@ export const getAllTransfers = async (req, res) => {
                     amount: "$amount",
                     property_name: "$property_name",
                     property_images: "$property_images",
+                    property_address: "$property_address",
                     to_name: "$to_detail.fullName",
                     approvedBy_name: "$approvedBy_detail.fullName",
                     initiatedAt: "$initiatedAt",
@@ -195,7 +213,7 @@ export const updateTransferStatus = async (req, res) => {
         const get_transfer = await Transfers.findOne({
             _id: id,
             isDeleted: false,
-            status: "approved-by-emp"
+            status: ETRANSFER_STATUS.approvedByEmp
         });
 
         if (get_transfer) {
@@ -411,6 +429,45 @@ export const updateInitiateApprovalStatus = async (req, res) => {
             return sendResponse(res, null, "Invalid recipient", false, 400);
         }
         return sendResponse(res, null, "Data not found", false, 404);
+    } catch (error) {
+        return sendResponse(res, null, `${error}`, false, 400)
+    }
+};
+
+export const updateTransferDate = async (req, res) => {
+    try {
+        const { isError, errors } = validator(req.body, TransferValidations.updateTransferDate);
+        if (isError) {
+            let errorMessage = errors[0].replace(/['"]/g, "")
+            return sendResponse(res, [], errorMessage, false, 403);
+        }
+
+        const { id, transferredAt, reference_number } = req.body;
+
+        const get_transfer = await Transfers.findOne({
+            _id: id,
+            isDeleted: false,
+            status: ETRANSFER_STATUS.transferred
+        });
+
+        if (get_transfer) {
+            const payload = {};
+            if (reference_number) {
+                payload.reference_number = reference_number;
+            }
+            if (transferredAt) {
+                payload.transferredAt = transferredAt;
+            }
+            let update_transfer = await Transfers.findByIdAndUpdate(get_transfer._id, payload, { new: true });
+
+            if (update_transfer) {
+                return sendResponse(res, null, "Date updated successfully", true, 200);
+            }
+
+            return sendResponse(res, null, "Unable to update date", false, 400);
+        }
+        return sendResponse(res, null, "Data not found Or status not paid yet", false, 404);
+
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400)
     }

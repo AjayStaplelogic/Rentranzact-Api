@@ -24,3 +24,10 @@ export const updateInitiateApprovalStatus = Joi.object().keys({
     reference_number: Joi.string().optional().allow(""),
 });
 
+export const updateTransferDate = Joi.object().keys({
+    // current_user_id: Joi.string().required(),
+    id: Joi.string().required(),
+    transferredAt: Joi.date(),
+    reference_number: Joi.string()
+});
+
