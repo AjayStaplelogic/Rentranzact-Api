@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS, ETRANSACTION_TYPE } from "../enums/common.mjs";
 const transactionSchema = new mongoose.Schema(
   {
 
@@ -75,15 +75,27 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(ETRANSACTION_TYPE)
     },
-    
-    receiver_id : {
+
+    receiver_id: {
       type: mongoose.Types.ObjectId,
       ref: "users"
     },
 
-    property_address : {
-      type : String
+    property_address: {
+      type: String
     },
+
+    landlord_payment_status: {
+      type: String,
+      enum: Object.values(ETRANSACTION_LANDLORD_PAYMENT_STATUS),
+      default: ETRANSACTION_LANDLORD_PAYMENT_STATUS.pending
+    },
+
+    pm_payment_status: {
+      type: String,
+      enum: Object.values(ETRANSACTION_PM_PAYMENT_STATUS),
+      default: ETRANSACTION_PM_PAYMENT_STATUS.pending
+    }
   },
   { timestamps: true }
 );

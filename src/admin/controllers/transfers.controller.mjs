@@ -11,6 +11,8 @@ import * as TransferService from "../services/transfer.service.mjs";
 import * as ReferralServices from "../../user/services/referral.service.mjs";
 import * as UserTransferService from "../../user/services/transfer.service.mjs"
 import moment from "moment";
+import { Transaction } from "../../user/models/transactions.model.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -274,6 +276,13 @@ export const updateTransferStatus = async (req, res) => {
                     switch (update_transfer.transfer_type) {
                         case ETRANSFER_TYPE.referralBonus:
                             await ReferralServices.finalizeReferralBonus(update_transfer)
+                            break
+
+                        case ETRANSFER_TYPE.rentPayment:
+                            await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
+                                landlord_payment_status : ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                                pm_payment_status : ETRANSACTION_PM_PAYMENT_STATUS.paid
+                            })
                             break
 
                     }
