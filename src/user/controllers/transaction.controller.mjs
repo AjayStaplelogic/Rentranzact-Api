@@ -8,6 +8,7 @@ const ObjectId = mongoose.Types.ObjectId;
 import { ConvertHtmlToPdf } from "../services/pdf.service.mjs";
 import { Property } from "../models/property.model.mjs";
 import { User } from "../models/user.model.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../enums/common.mjs";
 
 
 async function myTransaction(req, res) {
@@ -60,8 +61,10 @@ async function getAllRentTransactions(req, res) {
 
     if (req?.user?.data?.role == UserRoles.LANDLORD) {
       query.landlordID = req.user.data._id;
+      query.landlord_payment_status = ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid;
     } else if (req?.user?.data?.role == UserRoles.PROPERTY_MANAGER) {
       query.pmID = req.user.data._id;
+      query.pm_payment_status = ETRANSACTION_PM_PAYMENT_STATUS.paid;
     }
 
     query.propertyID = { $exists: true };

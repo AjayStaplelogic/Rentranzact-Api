@@ -160,6 +160,10 @@ const schema = new Schema({
         ref: 'users',
         index: true
     },
+    transaction_id: {
+        type: mongoose.Types.ObjectId,
+        ref: 'transactions',
+    },
 }, {
     timestamps: true,
     toJSON: true,

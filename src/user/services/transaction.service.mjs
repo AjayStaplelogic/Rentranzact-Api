@@ -7,6 +7,7 @@ import { ENOTIFICATION_REDIRECT_PATHS } from "../enums/notification.enum.mjs";
 import * as NotificationService from "./notification.service.mjs";
 import moment from "moment";
 import { numberToWords } from "../helpers/common.helper.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../enums/common.mjs";
 
 async function getMyTransaction(userID, role, req) {
   let { search, type, status } = req.query;
@@ -21,8 +22,10 @@ async function getMyTransaction(userID, role, req) {
     query.renterID = userID;
   } else if (role === UserRoles.LANDLORD) {
     query.landlordID = userID;
+    query.landlord_payment_status = ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid;
   } else if (role === UserRoles.PROPERTY_MANAGER) {
     query.pmID = userID;
+    query.pm_payment_status = ETRANSACTION_PM_PAYMENT_STATUS.paid;
   }
 
   if (type) { query.type = type };

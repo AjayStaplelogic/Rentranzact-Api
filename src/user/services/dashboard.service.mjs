@@ -4,6 +4,7 @@ import { Maintenance } from "../models/maintenance.model.mjs";
 import { Property } from "../models/property.model.mjs";
 import { Transaction } from "../models/transactions.model.mjs";
 import { InspectionStatus } from "../enums/inspection.enums.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../enums/common.mjs";
 
 async function getDashboardStats(user) {
     const rented = await Property.find({ landlord_id: user._id, rented: true }).countDocuments();
@@ -32,13 +33,15 @@ async function getDashboardStats(user) {
         createdAt: {
             $gte: moment().startOf('year').toDate(),
             $lte: moment().endOf('year').toDate()
-        }
+        },
+        landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid
     });
 
     const recentTransaction = await Transaction.aggregate([
         {
             $match: {
-                landlordID: user._id
+                landlordID: user._id,
+                landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid
             }
         },
         {
@@ -123,10 +126,14 @@ async function getDashboardStatsPM(user) {
         createdAt: {
             $gte: moment().startOf('year').toDate(),
             $lte: moment().endOf('year').toDate()
-        }
+        },
+        pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
     });
 
-    const recentTransaction = await Transaction.find({ pmID: user._id }).sort({ createdAt: -1 }).limit(3).select('amount property renter date')
+    const recentTransaction = await Transaction.find({
+        pmID: user._id,
+        pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
+    }).sort({ createdAt: -1 }).limit(3).select('amount property renter date')
     let data = [{ 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0, 10: 0, 11: 0, 12: 0 }];
     totalIncome.map((i) => {
         const date = moment.unix(i.date);

@@ -28,3 +28,15 @@ export const ETRANSACTION_TYPE = {
     bankTransfer: "bank_transfer",
     rentPayment: "rentPayment"
 }
+
+export const ETRANSACTION_LANDLORD_PAYMENT_STATUS = {
+    paid: "paid",
+    pending: "pending",
+    rejected : "rejected",
+}
+
+export const ETRANSACTION_PM_PAYMENT_STATUS = {
+    paid: "paid",
+    pending: "pending",
+    rejected : "rejected",
+}

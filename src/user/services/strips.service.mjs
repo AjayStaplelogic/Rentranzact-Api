@@ -12,7 +12,7 @@ import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
 import { Notification } from "../models/notification.model.mjs";
 import * as commissionServices from "../services/commission.service.mjs";
 import { EPaymentType } from "../enums/wallet.enum.mjs";
-import { ETRANSACTION_TYPE } from "../enums/common.mjs";
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS, ETRANSACTION_TYPE } from "../enums/common.mjs";
 import * as referralService from "../services/referral.service.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
@@ -227,7 +227,7 @@ async function addStripeTransaction(body, renterApplicationID) {
 
         // Requesting Admin for transfer admin account to landlord account
         if (propertyDetails?.landlord_id) {
-            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails);
+            TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails, data._id);
 
             // Sending email to landlord about successful rent payment
             TransactionServices.sendRentPaymentNotificationAndEmail({
@@ -338,7 +338,9 @@ async function rechargeWallet(body) {
                         type: "CREDIT",
                         payment_mode: body?.paymentMethod,
                         transaction_type: ETRANSACTION_TYPE.rechargeWallet,
-                        receiver_id: userDetail._id
+                        receiver_id: userDetail._id,
+                        landlord_payment_status : ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                        pm_payment_status : ETRANSACTION_PM_PAYMENT_STATUS.paid,
                     }
 
                     if (UserRoles.LANDLORD === userDetail?.role) {
@@ -532,7 +534,7 @@ async function addStripeTransactionForOld(body, renterApplicationID) {
 
     // Requesting Admin for transfer admin account to landlord account
     if (propertyDetails?.landlord_id) {
-        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails);
+        TransferServices.makeTransferForPropertyRent(propertyDetails, null, breakdown.landlord_earning, breakdown, renterDetails, data?._id);
 
         // Sending email to landlord about successful rent payment
         TransactionServices.sendRentPaymentNotificationAndEmail({
