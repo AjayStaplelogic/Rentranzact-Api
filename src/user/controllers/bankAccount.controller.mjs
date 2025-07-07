@@ -1,7 +1,7 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import * as  bankAccountValidations from "../validations/bankAccount.validation.mjs";
 import { validator } from "../helpers/schema-validator.mjs";
-import { verifyBankAccountWithFlutterwave } from "../services/flutterwave.service.mjs";
+import { getAllBanksWithFlutterwave, verifyBankAccountWithFlutterwave } from "../services/flutterwave.service.mjs";
 import BankAccounts from "../models/bankAccounts.model.mjs";
 import { EBankAccountStatus } from "../enums/bankAccounts.enum.mjs";
 import * as cryptoServices from "../../helpers/crypto.mjs";
@@ -26,6 +26,7 @@ export const verifyAndUpdateBankAccount = async (req, res) => {
                     account_number: cryptoServices.encryptionForFrontend(account.account_number),
                     account_bank: req.body.account_bank,
                     status: EBankAccountStatus.verified,
+                    bank_name: req.body.bank_name,
                 },
                 {
                     new: true,
@@ -51,6 +52,15 @@ export const getBankAccount = async (req, res) => {
         });
 
         return sendResponse(res, get_account, "success", true, 200);
+    } catch (error) {
+        return sendResponse(res, null, `${error}`, false, 400);
+    }
+}
+
+export const getAllBanks = async (req, res) => {
+    try {
+        const banks = await getAllBanksWithFlutterwave("NG")
+        return sendResponse(res, banks, "success", true, 200);
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400);
     }

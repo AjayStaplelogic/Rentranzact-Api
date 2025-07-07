@@ -482,9 +482,29 @@ async function verifyBankAccountWithFlutterwave(account_bank, account_number) {
     }
 }
 
+
+async function getAllBanksWithFlutterwave(country_code="NG") {
+    const url = `https://api.flutterwave.com/v3/banks/${country_code}`;
+    const config = {
+        headers: {
+            "Authorization": `Bearer ${process.env.FLUTTERWAVE_SECRET}`
+        }
+    }
+    try {
+        const { data } = await axios.get(url, config);
+        return data?.data;
+    } catch (error) {
+        if (error?.response?.data?.message) {
+            throw error?.response?.data?.message
+        }
+        throw error;
+    }
+}
+
 export {
     addFlutterwaveTransaction,
     addToWallet,
     addFlutterwaveTransactionForOld,
-    verifyBankAccountWithFlutterwave
+    verifyBankAccountWithFlutterwave,
+    getAllBanksWithFlutterwave
 };

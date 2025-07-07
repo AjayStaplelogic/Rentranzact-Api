@@ -9,6 +9,8 @@ router.put('/transfer/initiate-approval', TransferController.updateInitiateAppro
 router.put('/transfer/update-approval', TransferController.updateApprovalStatus); // Step 2: Update Approval
 router.put('/transfer/update-status', TransferController.updateTransferStatus);  // Step 3 : transfer
 router.put('/transfer/update-transfer-date', TransferController.updateTransferDate);  
+router.get('/transfers/export-to-xlsx', TransferController.allTransfersExportToXlsx);
+
 
 export default router;
 
