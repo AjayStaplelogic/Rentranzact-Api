@@ -8,7 +8,7 @@ const AccountSchema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: "users",
         index: true,
-        required : true
+        required: true
     },
     account_holder_name: {
         type: String
@@ -19,13 +19,16 @@ const AccountSchema = new Schema({
     account_number: {
         type: String
     },
+    bank_name: {
+        type: String
+    },
     currency: {
         type: String,
     },
     status: {
         type: String,
-        enum : Object.values(EBankAccountStatus),
-        default : EBankAccountStatus.pending
+        enum: Object.values(EBankAccountStatus),
+        default: EBankAccountStatus.pending
     },
     isDeleted: {
         type: Boolean,
