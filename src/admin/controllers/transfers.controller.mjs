@@ -13,6 +13,7 @@ import * as UserTransferService from "../../user/services/transfer.service.mjs"
 import moment from "moment";
 import { Transaction } from "../../user/models/transactions.model.mjs";
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
+import { generateXlxs } from "../services/xlxs.service.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -145,6 +146,7 @@ export const getAllTransfers = async (req, res) => {
                     agent_fee: "$agent_fee",
                     landlord_earning: "$landlord_earning",
                     reference_number: "$reference_number",
+                    transferredAt : "$transferredAt"
                 }
             },
             {
@@ -280,8 +282,8 @@ export const updateTransferStatus = async (req, res) => {
 
                         case ETRANSFER_TYPE.rentPayment:
                             await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
-                                landlord_payment_status : ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
-                                pm_payment_status : ETRANSACTION_PM_PAYMENT_STATUS.paid
+                                landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
                             })
                             break
 
@@ -479,5 +481,163 @@ export const updateTransferDate = async (req, res) => {
 
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400)
+    }
+};
+
+export const allTransfersExportToXlsx = async (req, res) => {
+    try {
+        let { search, status, transfer_type, start_date, end_date, timezone } = req.query;
+        const sort_key = req.query.sort_key || "createdAt";
+        const sort_order = req.query.sort_order || "desc";
+        let query = {
+            isDeleted: false
+        };
+        if (status) {
+            query.status = { $in: status.split(",") };
+        };
+
+        if (search) {
+            query.$or = [
+                { property_name: { $regex: search, $options: 'i' } },
+                { to_name: { $regex: search, $options: 'i' } },
+                { property_address: { $regex: search, $options: 'i' } },
+                { reference_number: { $regex: search, $options: 'i' } },
+            ]
+        }
+
+        let sort_query = {};
+        sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
+
+        if (transfer_type) { query.transfer_type = transfer_type };
+
+        if (start_date && end_date) {
+            query.transferredAt = {
+                $gte: moment(start_date).tz(timezone, true).startOf("day").toDate(),
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (start_date && !end_date) {
+            query.transferredAt = {
+                $gte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        } if (!start_date && end_date) {
+            query.transferredAt = {
+                $lte: moment(end_date).tz(timezone, true).endOf("day").toDate()
+            }
+        }
+        let pipeline = [
+            {
+                $match: query
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "to",
+                    foreignField: "_id",
+                    as: "to_detail"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$to_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "admins",
+                    localField: "approvedBy",
+                    foreignField: "_id",
+                    as: "approvedBy_detail"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$approvedBy_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "renter_id",
+                    foreignField: "_id",
+                    as: "renter_detail"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$renter_detail",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $lookup: {
+                    from: "bank_accounts",
+                    localField: "to",
+                    foreignField: "user_id",
+                    as: "bank_account_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$bank_account_details",
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    // createdAt: "$createdAt",
+                    // updatedAt: "$updatedAt",
+                    // status: "$status",
+                    // transfer_type: "$transfer_type",
+                    // description: "$description",
+                    // from: "$from",
+                    // is_from_admin: "$is_from_admin",
+                    // property_id: "$property_id",
+                    // amount: "$amount",
+                    "Property Name": "$property_name",
+                    // property_images: "$property_images",
+                    "Property Address": "$property_address",
+                    "Landlord’s Name": "$to_detail.fullName",
+                    // approvedBy_name: "$approvedBy_detail.fullName",
+                    // initiatedAt: "$initiatedAt",
+                    // initiateRejectedAt: "$initiateRejectedAt",
+                    "Renter’s Name": "$renter_detail.fullName",
+                    "Account Number": "$bank_account_details.account_number",
+                    "Bank Code": "$bank_account_details.account_bank",
+                    "Gross Amount (Total Paid)": "$rent_paid",
+                    // rtz_percentage: "$rtz_percentage",
+                    "RTZ Commission": "$rtz_fee",
+                    "Property Manager Commission": "$agent_fee",
+                    "Net Amount Payable to Landlord": "$landlord_earning",
+                    "Reference Number": "$reference_number",
+                    "transferredAt" : "$transferredAt",
+                    "Payment Status" : "Paid"
+                }
+            },
+            {
+                $sort: sort_query
+            },
+            {
+                $unset : ["_id"]
+            }
+        ];
+
+        let data = await Transfers.aggregate(pipeline);
+        // console.log(data, '==========data')
+        const columnWidths = [
+            { wpx: 100 },
+            { wpx: 200 },
+            { wpx: 100 },
+        ];
+
+        const buffer = await generateXlxs(data, "Sheet 1", columnWidths)
+        res.setHeader("Content-type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.setHeader("Content-Disposition", `attachment; filename="transfers.xlsx"`)
+        return res.send(buffer);
+        // return sendResponse(res, data, "success", true, 200);
+    } catch (error) {
+        // console.log(error,'========error')
+        return sendResponse(res, {}, `${error}`, false, 500);
     }
 };
