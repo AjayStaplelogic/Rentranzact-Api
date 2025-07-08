@@ -7,6 +7,7 @@ import * as referralService from "../../user/services/referral.service.mjs";
 import CreditScores from "../../user/models/creditscore.model.mjs";
 import { Admin } from "../models/admin.model.mjs";
 import ConnectedAccounts from "../../user/models/connectedAccounts.model.mjs";
+import BankAccounts from "../../user/models/bankAccounts.model.mjs";
 
 async function addUserByAdmin(body) {
 

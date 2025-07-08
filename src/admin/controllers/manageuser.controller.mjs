@@ -1,6 +1,6 @@
 import { User } from "../../user/models/user.model.mjs";
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus } from "../services/manageuser.service.mjs";
+import { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus, isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
 import { EACCOUNT_STATUS } from "../../user/enums/user.enum.mjs";
 
 async function addUser(req, res) {
@@ -172,6 +172,23 @@ async function getAllUsersDropdown(req, res) {
   }
 }
 
+async function isBankAccountAdded(req, res) {
+  try {
+    console.log('****************************8888')
+    let { user_id } = req.query;
+    console.log(user_id, '==========user_id')
+    if (!user_id) {
+      return sendResponse(res, null, "User Id is required", false, 400);
+    }
+
+    const is_account_added = await isUserAddedBankAccounts(user_id);
+    return sendResponse(res, is_account_added, "Success", true, 200);
+
+  } catch (error) {
+    return sendResponse(res, null, `${error}`, false, 400)
+  }
+};
+
 export {
   searchUsers,
   addUser,
@@ -180,5 +197,6 @@ export {
   deleteUser,
   updateStatus,
   updateAccountStatus,
-  getAllUsersDropdown
+  getAllUsersDropdown,
+  isBankAccountAdded
 }
