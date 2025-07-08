@@ -34,7 +34,7 @@ async function getDashboardStats(user) {
             $gte: moment().startOf('year').toDate(),
             $lte: moment().endOf('year').toDate()
         },
-        landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid
+        landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
     });
 
     const recentTransaction = await Transaction.aggregate([
@@ -60,6 +60,11 @@ async function getDashboardStats(user) {
             }
         },
         {
+            $set : {
+                amount : "$allCharges.landlord_earning"
+            }
+        },
+        {
             $sort: {
                 createdAt: -1
             }
@@ -75,7 +80,12 @@ async function getDashboardStats(user) {
         const month = date.month() + 1;
         for (let obj of data) {
             if (obj?.hasOwnProperty(month)) {
-                obj[month] += i.amount;
+                if(i?.allCharges?.landlord_earning){
+                    obj[month] += i?.allCharges?.landlord_earning;
+                }
+                // else{
+                //     obj[month] += 0;
+                // }
             }
         }
     })

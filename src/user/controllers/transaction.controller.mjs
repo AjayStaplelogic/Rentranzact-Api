@@ -110,7 +110,8 @@ async function getAllRentTransactions(req, res) {
           createdAt: "$createdAt",
           updatedAt: "$updatedAt",
           property_manager_name: "$property_mananger_details.fullName",
-          property_manager_image: "$property_mananger_details.picture"
+          property_manager_image: "$property_mananger_details.picture",
+          allCharges : "$allCharges",
         }
       },
       {
