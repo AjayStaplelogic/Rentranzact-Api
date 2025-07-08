@@ -172,7 +172,7 @@ async function isUserAddedBankAccounts(user_id) {
     user_id: user_id,
     isDeleted: false,
     charges_enabled : true,
-    charges_enabled : true,
+    payouts_enabled : true,
   });
   if (get_connected_account) {
     res_obj.stripe = true;
