@@ -271,6 +271,7 @@ export const updateTransferStatus = async (req, res) => {
                                 payload.connect_acc_id = get_connected_account._id;
                                 payload.transfer_id = initiate_transfer.id;
                                 payload.conversion_rate = converted_currency.rate;
+                                payload.converted_amount = Number(converted_currency.amount);
                             } else {
                                 return sendResponse(res, null, "Unable to intitated transfer", false, 400);
 
