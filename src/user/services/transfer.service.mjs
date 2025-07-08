@@ -47,14 +47,14 @@ export const makeTransferForPropertyRent = async (property_data = null, property
                 property_address: property_data?.address?.addressText ?? "",
                 property_images: property_data?.images ?? [],
 
-                rent_paid : rental_breakdown.rent_paid,
-                rtz_percentage : rental_breakdown.rtz_percentage,
-                rtz_fee : rental_breakdown.rtz_fee,
-                agent_fee : rental_breakdown.agent_fee,
-                landlord_earning : rental_breakdown.landlord_earning,
-                landlord_id : property_data?.landlord_id,
-                renter_id : renterDetails._id,
-                transaction_id : transaction_id
+                rent_paid: rental_breakdown.rent_paid,
+                rtz_percentage: rental_breakdown.rtz_percentage,
+                rtz_fee: rental_breakdown.rtz_fee,
+                agent_fee: rental_breakdown.agent_fee,
+                landlord_earning: rental_breakdown.landlord_earning,
+                landlord_id: property_data?.landlord_id,
+                renter_id: renterDetails._id,
+                transaction_id: transaction_id
             }
 
             return await createTransferInDB(transfer_payload);
@@ -234,4 +234,34 @@ export const makeTransferForReferralBonus = async (referral_data = null) => {
     }
 
     return false;
+}
+
+export const sendTransferNotificationAndEmailToLandlordForRentPayment = (options) => {
+    let { transferDetials } = options;
+    User.findById(transferDetials.to).then(async receiver_details => {
+        const renterDetails = await User.findById(transferDetials.renter_id);
+
+        // Sending email notification to landlord
+        // transferSucceedEmail({
+        //     email: receiver_details.email,
+        //     fullName: receiver_details.fullName,
+        //     amount: transferDetials.amount,
+        //     property_name: transferDetials.property_name,
+        // });
+
+        // Sending system notification to landlord
+        const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.wallet_view;
+        notification_payload.notificationHeading = `Rent successfully received for '${transferDetials.property_name}' from ${renterDetails.fullName ?? ""}`;
+        notification_payload.notificationBody = `Rent successfully received for '${transferDetials.property_name}' from ${renterDetails.fullName ?? ""}`;
+        notification_payload.landlordID = receiver_details.role === UserRoles.LANDLORD ? receiver_details._id : null;
+        notification_payload.propertyID = transferDetials.property_id;;
+        notification_payload.send_to = transferDetials.to;
+        notification_payload.property_manager_id = receiver_details.role === UserRoles.PROPERTY_MANAGER ? receiver_details._id : null;
+        const metadata = {
+            "propertyID": transferDetials.property_id.toString(),
+            "redirectTo": "wallet_view",
+        }
+        NotificationService.createNotification(notification_payload, metadata, receiver_details)
+    });
 }
