@@ -6,6 +6,7 @@ import activityLog from "../helpers/activityLog.mjs";
 import * as referralService from "../../user/services/referral.service.mjs";
 import CreditScores from "../../user/models/creditscore.model.mjs";
 import { Admin } from "../models/admin.model.mjs";
+import ConnectedAccounts from "../../user/models/connectedAccounts.model.mjs";
 
 async function addUserByAdmin(body) {
 
@@ -161,4 +162,30 @@ async function changeStatus(id) {
   };
 }
 
-export { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus };
+async function isUserAddedBankAccounts(user_id) {
+  const res_obj = {
+    stripe: false,
+    local: false
+  }
+  const get_connected_account = await ConnectedAccounts.findOne({
+    user_id: user_id,
+    isDeleted: false
+  });
+  if (get_connected_account) {
+    res_obj.stripe = true;
+  }
+
+  const get_account = await BankAccounts.findOne({
+    user_id: user_id,
+    isDeleted: false
+  });
+
+  if (get_account) {
+    res_obj.local = true;
+  }
+
+  return res_obj;
+
+}
+
+export { addUserByAdmin, getUsersList, getUserByID, deleteUserService, searchUsersService, changeStatus, isUserAddedBankAccounts };
