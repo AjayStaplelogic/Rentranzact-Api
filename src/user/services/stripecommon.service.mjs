@@ -110,6 +110,7 @@ export const createAccount = async (user) => {
     const account = await stripe.accounts.create({
         type: 'custom',
         country: "NG",
+        default_currency: "usd",
         email: user.email,
         capabilities: {
             transfers: { requested: true, },
