@@ -289,6 +289,7 @@ async function transactionByIdService(id) {
         payment_mode: "$payment_mode",
         intentID: "$intentID",
         wallet: "$wallet",
+        allCharges: "$allCharges",
       }
     }
   ])
