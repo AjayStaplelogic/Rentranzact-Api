@@ -15,6 +15,7 @@ import { Transaction } from "../../user/models/transactions.model.mjs";
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
 import { generateXlxs } from "../services/xlxs.service.mjs";
 import { isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
+import { decrypt, decryptionForFrontend } from "../../helpers/crypto.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -250,7 +251,7 @@ export const updateTransferStatus = async (req, res) => {
 
 
                 const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
-                if (is_user_have_connected_account) {
+                if (is_user_have_connected_account.stripe && !is_user_have_connected_account.local) {
                     const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
                     if (get_connected_account) {
                         const converted_currency = await CommonHelpers.convert_currency(
@@ -619,20 +620,21 @@ export const allTransfersExportToXlsx = async (req, res) => {
                     // property_images: "$property_images",
                     "Property Address": "$property_address",
                     "Landlord’s Name": "$to_detail.fullName",
+                    "Net Amount Payable to Landlord": "$landlord_earning",
+                    "Account Number": "$bank_account_details.account_number",
+                    "Bank": "$bank_account_details.bank_name",
+                    "Bank Code": "$bank_account_details.account_bank",
                     // approvedBy_name: "$approvedBy_detail.fullName",
                     // initiatedAt: "$initiatedAt",
                     // initiateRejectedAt: "$initiateRejectedAt",
                     "Renter’s Name": "$renter_detail.fullName",
-                    "Account Number": "$bank_account_details.account_number",
-                    "Bank Code": "$bank_account_details.account_bank",
                     "Gross Amount (Total Paid)": "$rent_paid",
                     // rtz_percentage: "$rtz_percentage",
                     "RTZ Commission": "$rtz_fee",
                     "Property Manager Commission": "$agent_fee",
-                    "Net Amount Payable to Landlord": "$landlord_earning",
                     "Reference Number": "$reference_number",
                     "Payment Date   ": "$transferredAt",
-                    "Payment Status": "Paid"
+                    "Payment Status": "$status"
                 }
             },
             {
@@ -644,6 +646,13 @@ export const allTransfersExportToXlsx = async (req, res) => {
         ];
 
         let data = await Transfers.aggregate(pipeline);
+        if(data && data.length > 0){
+            data = data.map(item=>({
+                ...item,
+                "Account Number" : decryptionForFrontend(item["Account Number"]),
+                "Payment Status" : item["Payment Status"] === ETRANSFER_STATUS.transferred ? "Paid" : "Pending"
+            }))
+        }
         // console.log(data, '==========data')
         const columnWidths = [
             { wpx: 100 },
@@ -657,7 +666,7 @@ export const allTransfersExportToXlsx = async (req, res) => {
         return res.send(buffer);
         // return sendResponse(res, data, "success", true, 200);
     } catch (error) {
-        // console.log(error,'========error')
+        console.log(error,'========error')
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 };

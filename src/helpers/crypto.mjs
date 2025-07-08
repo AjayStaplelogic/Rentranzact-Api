@@ -82,3 +82,23 @@ export const encryptionForFrontend = (plaintext) => {
     return iv.toString(encoding) + encrypted.toString('base64');
 
 };
+
+
+export const decryptionForFrontend = (encryptedText) => {
+    // Length of IV in the encoded format
+    const ivLength = encoding === 'hex' ? 32 : 24; // 16 bytes in hex = 32 chars, base64 = 24 chars
+
+    const ivEncoded = encryptedText.slice(0, ivLength);
+    const encryptedData = encryptedText.slice(ivLength);
+
+    const iv = Buffer.from(ivEncoded, encoding);
+    const encryptedBuffer = Buffer.from(encryptedData, 'base64');
+
+    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    const decrypted = Buffer.concat([
+        decipher.update(encryptedBuffer),
+        decipher.final()
+    ]);
+
+    return decrypted.toString('utf8');
+};
