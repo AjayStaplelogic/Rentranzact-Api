@@ -286,9 +286,9 @@ export const updateTransferStatus = async (req, res) => {
                     // payload.converted_amount = Number(converted_currency.amount);
                     let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                     if (update_transfer) {
-                        UserTransferService.sendTransferNotificationAndEmail({
-                            transferDetials: update_transfer
-                        });
+                        // UserTransferService.sendTransferNotificationAndEmail({
+                        //     transferDetials: update_transfer
+                        // });
 
                         switch (update_transfer.transfer_type) {
                             case ETRANSFER_TYPE.referralBonus:
@@ -299,7 +299,11 @@ export const updateTransferStatus = async (req, res) => {
                                 await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
                                     landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
                                     pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
-                                })
+                                });
+
+                                UserTransferService.sendTransferNotificationAndEmailToLandlordForRentPayment({
+                                    transferDetials: update_transfer
+                                });
                                 break
 
                         }
