@@ -250,7 +250,7 @@ export const updateTransferStatus = async (req, res) => {
 
 
                 const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
-                if (is_user_have_connected_account) {
+                if (is_user_have_connected_account.stripe && !is_user_have_connected_account.local) {
                     const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
                     if (get_connected_account) {
                         const converted_currency = await CommonHelpers.convert_currency(
