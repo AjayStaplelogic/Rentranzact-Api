@@ -120,9 +120,9 @@ export const createAccount = async (user) => {
             name: user.fullName,
             product_description: "Test product description"
         },
-        tos_acceptance: {
-            service_agreement: 'recipient',
-        },
+        // tos_acceptance: {
+        //     service_agreement: 'recipient',
+        // },
         metadata: {
             user_id: user._id,
         },
