@@ -170,7 +170,9 @@ async function isUserAddedBankAccounts(user_id) {
   }
   const get_connected_account = await ConnectedAccounts.findOne({
     user_id: user_id,
-    isDeleted: false
+    isDeleted: false,
+    charges_enabled : true,
+    charges_enabled : true,
   });
   if (get_connected_account) {
     res_obj.stripe = true;
