@@ -14,6 +14,7 @@ import moment from "moment";
 import { Transaction } from "../../user/models/transactions.model.mjs";
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
 import { generateXlxs } from "../services/xlxs.service.mjs";
+import { isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -146,7 +147,7 @@ export const getAllTransfers = async (req, res) => {
                     agent_fee: "$agent_fee",
                     landlord_earning: "$landlord_earning",
                     reference_number: "$reference_number",
-                    transferredAt : "$transferredAt"
+                    transferredAt: "$transferredAt"
                 }
             },
             {
@@ -247,62 +248,76 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                // if (get_connected_account) {
-                //     const converted_currency = await CommonHelpers.convert_currency(
-                //         get_transfer.to_currency,
-                //         get_transfer.from_currency,
-                //         Number(get_transfer.amount)
-                //     )
 
-                // if (converted_currency && converted_currency.amount > 0) {
-                //     const initiate_transfer = await StripeCommonServices.transferFunds(
-                //         get_connected_account.connect_acc_id,
-                //         Number(converted_currency.amount),
-                //         get_transfer?.from_currency
-                //     );
+                const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
+                if (is_user_have_connected_account) {
+                    const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                    if (get_connected_account) {
+                        const converted_currency = await CommonHelpers.convert_currency(
+                            get_transfer.to_currency,
+                            get_transfer.from_currency,
+                            Number(get_transfer.amount)
+                        )
 
-                //     if (initiate_transfer?.id) {
-                // payload.destination = initiate_transfer.destination;
-                // payload.connect_acc_id = get_connected_account._id;
-                // payload.transfer_id = initiate_transfer.id;
-                // payload.conversion_rate = converted_currency.rate;
-                payload.status = ETRANSFER_STATUS.transferred;
-                // payload.converted_amount = Number(converted_currency.amount);
-                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                if (update_transfer) {
-                    UserTransferService.sendTransferNotificationAndEmail({
-                        transferDetials: update_transfer
-                    });
+                        if (converted_currency && converted_currency.amount > 0) {
+                            const initiate_transfer = await StripeCommonServices.transferFunds(
+                                get_connected_account.connect_acc_id,
+                                Number(converted_currency.amount),
+                                get_transfer?.from_currency
+                            );
 
-                    switch (update_transfer.transfer_type) {
-                        case ETRANSFER_TYPE.referralBonus:
-                            await ReferralServices.finalizeReferralBonus(update_transfer)
-                            break
+                            if (initiate_transfer?.id) {
+                                payload.destination = initiate_transfer.destination;
+                                payload.connect_acc_id = get_connected_account._id;
+                                payload.transfer_id = initiate_transfer.id;
+                                payload.conversion_rate = converted_currency.rate;
+                            } else {
+                                return sendResponse(res, null, "Unable to intitated transfer", false, 400);
 
-                        case ETRANSFER_TYPE.rentPayment:
-                            await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
-                                landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
-                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
-                            })
-                            break
-
+                            }
+                        } else {
+                            return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+                        }
+                    } else {
+                        return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                     }
-                    return sendResponse(res, null, "Transfered successfully", true, 200);
+
+                    payload.status = ETRANSFER_STATUS.transferred;
+                    // payload.converted_amount = Number(converted_currency.amount);
+                    let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                    if (update_transfer) {
+                        UserTransferService.sendTransferNotificationAndEmail({
+                            transferDetials: update_transfer
+                        });
+
+                        switch (update_transfer.transfer_type) {
+                            case ETRANSFER_TYPE.referralBonus:
+                                await ReferralServices.finalizeReferralBonus(update_transfer)
+                                break
+
+                            case ETRANSFER_TYPE.rentPayment:
+                                await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
+                                    landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                                    pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
+                                })
+                                break
+
+                        }
+                        return sendResponse(res, null, "Transfered successfully", true, 200);
+                    }
                 }
+
             }
+            // return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+            // }
+
+            // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+            // }
+            // return sendResponse(res, null, "Invalid recipient", false, 400);
 
         }
-        // return sendResponse(res, null, "Unable to intitated transfer", false, 400);
-        // }
 
-        // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
-        // }
-        // return sendResponse(res, null, "Invalid recipient", false, 400);
-
-        // }
-
-        // return sendResponse(res, null, "Data not found", false, 404);
+        return sendResponse(res, null, "Data not found", false, 404);
     } catch (error) {
         return sendResponse(res, null, `${error}`, false, 400)
     }
@@ -611,15 +626,15 @@ export const allTransfersExportToXlsx = async (req, res) => {
                     "Property Manager Commission": "$agent_fee",
                     "Net Amount Payable to Landlord": "$landlord_earning",
                     "Reference Number": "$reference_number",
-                    "transferredAt" : "$transferredAt",
-                    "Payment Status" : "Paid"
+                    "Payment Date   ": "$transferredAt",
+                    "Payment Status": "Paid"
                 }
             },
             {
                 $sort: sort_query
             },
             {
-                $unset : ["_id"]
+                $unset: ["_id"]
             }
         ];
 
