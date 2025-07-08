@@ -283,41 +283,40 @@ export const updateTransferStatus = async (req, res) => {
                     } else {
                         return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                     }
-
-                    payload.status = ETRANSFER_STATUS.transferred;
-                    // payload.converted_amount = Number(converted_currency.amount);
-                    let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                    if (update_transfer) {
-                        // UserTransferService.sendTransferNotificationAndEmail({
-                        //     transferDetials: update_transfer
-                        // });
-
-                        switch (update_transfer.transfer_type) {
-                            case ETRANSFER_TYPE.referralBonus:
-                                await ReferralServices.finalizeReferralBonus(update_transfer)
-                                break
-
-                            case ETRANSFER_TYPE.rentPayment:
-                                await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
-                                    landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
-                                    pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
-                                });
-
-                                UserTransferService.sendTransferNotificationAndEmailToLandlordForRentPayment({
-                                    transferDetials: update_transfer
-                                });
-                                break
-
-                        }
-                        return sendResponse(res, null, "Transfered successfully", true, 200);
-                    }
                 }
+                
+                payload.status = ETRANSFER_STATUS.transferred;
+                // payload.converted_amount = Number(converted_currency.amount);
+                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                if (update_transfer) {
+                    // UserTransferService.sendTransferNotificationAndEmail({
+                    //     transferDetials: update_transfer
+                    // });
 
+                    switch (update_transfer.transfer_type) {
+                        case ETRANSFER_TYPE.referralBonus:
+                            await ReferralServices.finalizeReferralBonus(update_transfer)
+                            break
+
+                        case ETRANSFER_TYPE.rentPayment:
+                            await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
+                                landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
+                            });
+
+                            UserTransferService.sendTransferNotificationAndEmailToLandlordForRentPayment({
+                                transferDetials: update_transfer
+                            });
+                            break
+
+                    }
+                    return sendResponse(res, null, "Transfered successfully", true, 200);
+                }
             }
             // return sendResponse(res, null, "Unable to intitated transfer", false, 400);
             // }
 
-            // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+            return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             // }
             // return sendResponse(res, null, "Invalid recipient", false, 400);
 
