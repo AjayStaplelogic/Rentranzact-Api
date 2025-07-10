@@ -114,7 +114,8 @@ async function addPropertyService(
     total_space_for_rent: body.total_space_for_rent || 0,
     total_administrative_offices: body.total_administrative_offices || 0,
     is_legal_partner: body.is_legal_partner || false,
-    serviceChargeDuration: body.serviceChargeDuration || ""
+    serviceChargeDuration: body.serviceChargeDuration || "",
+    is_caution_legal_in_region: body.is_caution_legal_in_region || false,
   };
 
   if (body.type != "Open Space") {
@@ -895,7 +896,7 @@ async function deletePropertyService(userID, propertyID, role) {
   }
 }
 
-function getRentalBreakUp(propertyDetails,  rent_paid=0) {
+function getRentalBreakUp(propertyDetails, rent_paid = 0) {
   const breakdown = {
     service_charge: 0,
     rent: 0,
@@ -908,7 +909,7 @@ function getRentalBreakUp(propertyDetails,  rent_paid=0) {
     rtz_fee: 0,
     rtz_percentage: 0,
     landlord_earning: 0,
-    rent_paid : 0
+    rent_paid: 0
   };
   const rent = Number(propertyDetails.rent);
   breakdown.rent = rent;
@@ -916,7 +917,9 @@ function getRentalBreakUp(propertyDetails,  rent_paid=0) {
   breakdown.landlord_earning += rent;
   breakdown.service_charge = propertyDetails.servicesCharges;
   breakdown.agency_fee = (rent * RentBreakDownPer.AGENCY_FEE) / 100;
-  breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+  if (propertyDetails.is_caution_legal_in_region) {
+    breakdown.caution_deposite = (rent * RentBreakDownPer.CAUTION_FEE_PERCENT) / 100;
+  }
   breakdown.insurance = 0;    // variable declaration for future use
   breakdown.rtz_fee = (rent * RentBreakDownPer.RTZ_FEE_PERCENT) / 100;
   breakdown.rtz_percentage = RentBreakDownPer.RTZ_FEE_PERCENT;

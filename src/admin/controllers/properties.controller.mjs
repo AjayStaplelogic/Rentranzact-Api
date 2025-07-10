@@ -476,7 +476,8 @@ async function addProperty(req, res) {
       total_administrative_offices: body.total_administrative_offices || 0,
       is_legal_partner: body.is_legal_partner || false,
       serviceChargeDuration: body.serviceChargeDuration || "",
-      approval_status: ApprovalStatus.APPROVED
+      approval_status: ApprovalStatus.APPROVED,
+      is_caution_legal_in_region: body.is_caution_legal_in_region || false,
     };
 
     if (body.type != "Open Space") {
