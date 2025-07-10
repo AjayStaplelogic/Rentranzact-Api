@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { sendResponse } from "../helpers/sendResponse.mjs";
 import Commissions from "../models/commissions.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
 const ObjectId = mongoose.Types.ObjectId;
 
 export const getCommissions = async (req, res) => {
@@ -16,17 +17,40 @@ export const getCommissions = async (req, res) => {
         if (search) {
             query.$or = [
                 { property_name: { $regex: search, $options: 'i' } },
+                { to_name: { $regex: search, $options: 'i' } },
             ]
         }
 
         const sort_query = {};
         sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
 
-        query.to = new ObjectId(req?.user?.data?._id);
+
+        if (req.user.data.role === UserRoles.PROPERTY_MANAGER) {
+            query.to = new ObjectId(req?.user?.data?._id);
+        }
+
+        if (req.user.data.role === UserRoles.LANDLORD) {
+            query.from = new ObjectId(req?.user?.data?._id);
+        }
+
         if (type) { query.type = type; }
         const pipeline = [
             {
                 $match: query
+            },
+            {
+                $lookup: {
+                    from: "users",
+                    foreignField: "_id",
+                    localField: "to",
+                    as: "to_details"
+                }
+            },
+            {
+                $unwind: {
+                    path: "$to_details",
+                    preserveNullAndEmptyArrays: true
+                }
             },
             {
                 $project: {
@@ -44,6 +68,7 @@ export const getCommissions = async (req, res) => {
                     rent: "$rent",
                     commission: "$commission",
                     commission_per: "$commission_per",
+                    to_name: "$to_details.fullName"
                 }
             },
             {
