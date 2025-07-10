@@ -260,6 +260,10 @@ const propertySchema = new mongoose.Schema(
     approval_count : {    // Number of times property approved
       type: Number,
       default: 0
+    },
+    is_caution_legal_in_region : {
+      type : Boolean,
+      default : false
     }
   },
   { timestamps: true }
