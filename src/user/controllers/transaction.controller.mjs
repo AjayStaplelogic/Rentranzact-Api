@@ -111,7 +111,7 @@ async function getAllRentTransactions(req, res) {
           updatedAt: "$updatedAt",
           property_manager_name: "$property_mananger_details.fullName",
           property_manager_image: "$property_mananger_details.picture",
-          allCharges : "$allCharges",
+          allCharges: "$allCharges",
         }
       },
       {
@@ -164,7 +164,8 @@ async function downloadTransactionPdf(req, res) {
         property_name: get_transaction?.property ?? "",
         description: `Rent for ${get_transaction?.property ?? ""}`,
         renter_name: get_renter?.fullName ?? "",
-        payment_method: get_transaction?.payment_mode ?? ""
+        payment_method: get_transaction?.payment_mode ?? "",
+        property_address: get_transaction?.property_address ?? "",
       }
       // Convert HTML content to PDF (returns PDF as buffer)
       const htmlContent = getRentTransactionHtml(payload)
@@ -197,7 +198,8 @@ async function adminDownloadTransactionPdf(req, res) {
           property_name: get_transaction?.property ?? "",
           description: `Rent for ${get_transaction?.property ?? ""}`,
           renter_name: get_renter?.fullName ?? "",
-          payment_method: get_transaction?.payment_mode ?? ""
+          payment_method: get_transaction?.payment_mode ?? "",
+          property_address: get_transaction?.property_address ?? "",
         }
         // Convert HTML content to PDF (returns PDF as buffer)
         const htmlContent = getRentTransactionHtml(payload)
