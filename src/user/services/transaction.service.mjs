@@ -361,7 +361,7 @@ const sendRentPaymentNotificationAndEmail = (options) => {
  * @returns {string} contains html in string format
  */
 const getRentTransactionHtml = (options) => {
-  const { transaction_date, amount, property_name, description, renter_name, payment_method } = options;
+  const { transaction_date, amount, property_name, description, renter_name, payment_method, property_address } = options;
   let html = `
 <!DOCTYPE html>
 <html>
@@ -392,6 +392,7 @@ const getRentTransactionHtml = (options) => {
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Transaction Amount:</span></strong><span style="color:#54bdc3"> ₦${amount ?? ""}</span></p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Amount in Words:</span></strong><span style="color:#54bdc3"> ${numberToWords(amount) ?? ""} Naira</span></p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Property Name:</span></strong><span style="color:#54bdc3"> ${property_name ?? ""}</span></p>
+      <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Property Address:</span></strong><span style="color:#54bdc3"> ${property_address ?? ""}</span></p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Payment Description:</span></strong><span style="color:#54bdc3"> ${description ?? ""}</span></p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Paid by:</span></strong><span style="color:#54bdc3"> ${renter_name ?? ""}</span></p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Received by:</span></strong><span style="color:#54bdc3"> Rentranzact Ltd</span></p>
