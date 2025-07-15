@@ -284,7 +284,7 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                     }
                 }
-                
+
                 payload.status = ETRANSFER_STATUS.transferred;
                 // payload.converted_amount = Number(converted_currency.amount);
                 let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
@@ -378,15 +378,15 @@ export const updateApprovalStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                if (get_connected_account) {
+                // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                // if (get_connected_account) {
                     let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
                     if (update_transfer) {
                         TransferService.sendTransferNotifications(update_transfer, current_user_id);
                         return sendResponse(res, null, "Approval status updated successfully", true, 200);
                     }
-                }
-                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+                // }
+                // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             }
             return sendResponse(res, null, "Invalid recipient", false, 400);
         }
@@ -447,15 +447,15 @@ export const updateInitiateApprovalStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                if (get_connected_account) {
-                    let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                    if (update_transfer) {
-                        TransferService.sendTransferNotifications(update_transfer, current_user_id);
-                        return sendResponse(res, null, "Updated successfully", true, 200);
-                    }
+                // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                // if (get_connected_account) {
+                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                if (update_transfer) {
+                    TransferService.sendTransferNotifications(update_transfer, current_user_id);
+                    return sendResponse(res, null, "Updated successfully", true, 200);
                 }
-                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
+                // }
+                // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             }
             return sendResponse(res, null, "Invalid recipient", false, 400);
         }
@@ -645,11 +645,11 @@ export const allTransfersExportToXlsx = async (req, res) => {
         ];
 
         let data = await Transfers.aggregate(pipeline);
-        if(data && data.length > 0){
-            data = data.map(item=>({
+        if (data && data.length > 0) {
+            data = data.map(item => ({
                 ...item,
-                "Account Number" : decryptionForFrontend(item["Account Number"]),
-                "Payment Status" : item["Payment Status"] === ETRANSFER_STATUS.transferred ? "Paid" : "Pending"
+                "Account Number": decryptionForFrontend(item["Account Number"]),
+                "Payment Status": item["Payment Status"] === ETRANSFER_STATUS.transferred ? "Paid" : "Pending"
             }))
         }
         // console.log(data, '==========data')
@@ -665,7 +665,7 @@ export const allTransfersExportToXlsx = async (req, res) => {
         return res.send(buffer);
         // return sendResponse(res, data, "success", true, 200);
     } catch (error) {
-        console.log(error,'========error')
+        console.log(error, '========error')
         return sendResponse(res, {}, `${error}`, false, 500);
     }
 };
