@@ -14,7 +14,7 @@ import { Admin } from "../models/admin.model.mjs";
 async function loginAdmin(body) {
   const { email, password, fcmToken } = body;
 
-  const admin = await Admin.findOne({ email: email });
+  const admin = await Admin.findOne({ email: email.toLowerCase().trim(), isDeleted: false });
 
   if (admin) {
     const isPasswordValid = await new Promise((resolve, reject) => {
@@ -33,7 +33,8 @@ async function loginAdmin(body) {
         const adminData = await Admin.aggregate([
           {
             $match: {
-              email: email
+              email: email.toLowerCase().trim(),
+              isDeleted : false
             }
           },
           {
@@ -50,7 +51,7 @@ async function loginAdmin(body) {
           {
             $project: {
               // _id: 0, // Exclude the default MongoDB _id field
-              id : "$_id",
+              id: "$_id",
               email: 1, // Include the email field from the Admin collection
               role: 1, // Include other fields from Admin collection
               fullName: 1, // Include other fields from Admin collection
@@ -68,14 +69,14 @@ async function loginAdmin(body) {
 
 
         const accessToken = await accessTokenGenerator(admin);
-       
+
         // If fcm token found in req then updating it in current document to send FCM notifications
         if (fcmToken) {
           await Admin.findByIdAndUpdate(admin._id, {
             fcmToken: fcmToken
           })
         }
-        
+
         if (admin.role === "superAdmin") {
           return {
             data: admin,
