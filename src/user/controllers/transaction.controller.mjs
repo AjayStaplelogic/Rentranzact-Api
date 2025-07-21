@@ -153,6 +153,7 @@ async function getAllRentTransactions(req, res) {
 
 async function downloadTransactionPdf(req, res) {
   try {
+    const role = req?.user?.data?.role;
     const get_transaction = await Transaction.findById(req.query.id)
     if (get_transaction) {
       // let get_property = await Property.findById(get_transaction.propertyID);
@@ -160,7 +161,7 @@ async function downloadTransactionPdf(req, res) {
 
       let payload = {
         transaction_date: get_transaction?.createdAt,
-        amount: get_transaction?.amount,
+        amount: role === UserRoles.RENTER ? get_transaction?.amount : get_transaction?.allCharges?.landlord_earning,
         property_name: get_transaction?.property ?? "",
         description: `Rent for ${get_transaction?.property ?? ""}`,
         renter_name: get_renter?.fullName ?? "",
