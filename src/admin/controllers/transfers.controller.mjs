@@ -16,6 +16,7 @@ import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } 
 import { generateXlxs } from "../services/xlxs.service.mjs";
 import { isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
 import { decrypt, decryptionForFrontend } from "../../helpers/crypto.mjs";
+import { EAccountType } from "../../user/enums/property.enums.mjs";
 
 export const getAllTransfers = async (req, res) => {
     try {
@@ -220,7 +221,7 @@ export const updateTransferStatus = async (req, res) => {
             _id: id,
             isDeleted: false,
             status: ETRANSFER_STATUS.approvedByEmp
-        });
+        }).populate("property_id");
 
         if (get_transfer) {
 
@@ -249,41 +250,43 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-
-                const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
-                if (is_user_have_connected_account.stripe && !is_user_have_connected_account.local) {
-                    const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
-                    if (get_connected_account) {
-                        const converted_currency = await CommonHelpers.convert_currency(
-                            get_transfer.to_currency,
-                            get_transfer.from_currency,
-                            Number(get_transfer.amount)
-                        )
-
-                        if (converted_currency && converted_currency.amount > 0) {
-                            const initiate_transfer = await StripeCommonServices.transferFunds(
-                                get_connected_account.connect_acc_id,
-                                Number(converted_currency.amount),
-                                get_transfer?.from_currency
-                            );
-
-                            if (initiate_transfer?.id) {
-                                payload.destination = initiate_transfer.destination;
-                                payload.connect_acc_id = get_connected_account._id;
-                                payload.transfer_id = initiate_transfer.id;
-                                payload.conversion_rate = converted_currency.rate;
-                                payload.converted_amount = Number(converted_currency.amount);
+                if(get_transfer?.property_id?.payout_account_type === EAccountType.dom){
+                    const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
+                    if (is_user_have_connected_account.stripe) {
+                        const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
+                        if (get_connected_account) {
+                            const converted_currency = await CommonHelpers.convert_currency(
+                                get_transfer.to_currency,
+                                get_transfer.from_currency,
+                                Number(get_transfer.amount)
+                            )
+    
+                            if (converted_currency && converted_currency.amount > 0) {
+                                const initiate_transfer = await StripeCommonServices.transferFunds(
+                                    get_connected_account.connect_acc_id,
+                                    Number(converted_currency.amount),
+                                    get_transfer?.from_currency
+                                );
+    
+                                if (initiate_transfer?.id) {
+                                    payload.destination = initiate_transfer.destination;
+                                    payload.connect_acc_id = get_connected_account._id;
+                                    payload.transfer_id = initiate_transfer.id;
+                                    payload.conversion_rate = converted_currency.rate;
+                                    payload.converted_amount = Number(converted_currency.amount);
+                                } else {
+                                    return sendResponse(res, null, "Unable to intitated transfer", false, 400);
+    
+                                }
                             } else {
-                                return sendResponse(res, null, "Unable to intitated transfer", false, 400);
-
+                                return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                             }
                         } else {
                             return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                         }
-                    } else {
-                        return sendResponse(res, null, "Recipient Account Not Found", false, 400);
                     }
                 }
+
 
                 payload.status = ETRANSFER_STATUS.transferred;
                 // payload.converted_amount = Number(converted_currency.amount);
