@@ -37,6 +37,11 @@ const ApprovalStatus = {
   REJECTED: "rejected"
 }
 
+const EAccountType = {
+  local: "local",
+  dom: "dom"
+}
+
 
 export {
   PropertiesCategories,
@@ -46,4 +51,5 @@ export {
   FurnishingType,
   RentBreakDownPer,
   ApprovalStatus,
+  EAccountType
 };

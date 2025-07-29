@@ -124,6 +124,10 @@ async function addPropertyService(
     Property_["number_of_bathrooms"] = body.number_of_bathrooms
   }
 
+  if (body.payout_account_type) {
+    property.payout_account_type = body.payout_account_type;
+  }
+
   const property = await Property.create(Property_);
   if (property) {
     if (property.property_manager_id && role === UserRoles.LANDLORD) {   // property have property manager then informing him via email

@@ -5,7 +5,7 @@
 // 5. In image and documents page, Add the text after Tap to upload the documents(Deed of assignment, deed of sublease, power of attorney).
 
 import mongoose from "mongoose";
-import { ApprovalStatus } from "../enums/property.enums.mjs"
+import { ApprovalStatus, EAccountType } from "../enums/property.enums.mjs"
 const propertySchema = new mongoose.Schema(
   {
     propertyID: {
@@ -169,8 +169,8 @@ const propertySchema = new mongoose.Schema(
       type: Date,
       required: false,
     },
-    next_payment_at : {
-      type : Date,
+    next_payment_at: {
+      type: Date,
     },
     rented: {
       type: Boolean,
@@ -257,14 +257,19 @@ const propertySchema = new mongoose.Schema(
       enum: Object.values(ApprovalStatus),
       default: ApprovalStatus.PENDING
     },
-    approval_count : {    // Number of times property approved
+    approval_count: {    // Number of times property approved
       type: Number,
       default: 0
     },
-    is_caution_legal_in_region : {
-      type : Boolean,
-      default : false
+    is_caution_legal_in_region: {
+      type: Boolean,
+      default: false
+    },
+    payout_account_type: {
+      type: String,
+      enum: Object.values(EAccountType)
     }
+
   },
   { timestamps: true }
 );

@@ -30,7 +30,7 @@ async function addProperty(req, res) {
   const id = req.user.data._id;
   const files = req.files;
 
-  console.log(req.images, '==============req.images')
+  // console.log(req.images, '==============req.images')
   if (!files || files.length === 0) {
     return res.status(400).send("No files uploaded.");
   }
