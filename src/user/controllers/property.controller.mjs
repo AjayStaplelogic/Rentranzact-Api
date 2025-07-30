@@ -703,6 +703,54 @@ async function getAllPropertiesDropdown(req, res) {
   }
 }
 
+async function updateRentDueDate(req, res) {
+  try {
+    const { isError, errors } = validator(req.body, PropertyValidations.updateRentDueDate);
+    if (isError) {
+      let errorMessage = errors[0].replace(/['"]/g, "")
+      return sendResponse(res, [], errorMessage, false, 422);
+    }
+
+    const role = req?.user?.data?.role;
+    const query = {
+      _id: req.body.property_id,
+      [role === UserRoles.LANDLORD ? "landlord_id" : "property_manager_id"]: req?.user?.data?._id,
+      rented: true
+    }
+
+    const data = await Property.findOneAndUpdate(query, {
+      rent_period_due: req.body.rent_period_due
+    }, {
+      new: true
+    });
+    if (data) {
+      // Sending system notification to property manager
+      User.findById(data.renterID).then(renter_details => {
+
+        // Sending system notification to property manager
+        const notification_payload = {};
+        notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.property_view;
+        notification_payload.notificationHeading = `Rent due date changed for property - ${data?.propertyName ?? ""}`;
+        notification_payload.notificationBody = `Rent due date changed for property - ${data?.propertyName ?? ""}`;
+        notification_payload.landlordID = data?.landlord_id;
+        notification_payload.propertyID = data._id;
+        notification_payload.send_to = renter_details._id;
+        notification_payload.property_manager_id = data?.property_manager_id ?? null;
+        const metadata = {
+          "propertyID": data._id.toString(),
+          "redirectTo": "property",
+        }
+        NotificationService.createNotification(notification_payload, metadata, renter_details)
+      })
+
+      return sendResponse(res, null, `Rent due date updated successfully`, true, 200);
+    }
+    return sendResponse(res, null, `Invalid Id`, false, 400);
+  } catch (error) {
+    return sendResponse(res, [], `${error}`, false, 500);
+  }
+}
+
 export {
   getPropertyListByPmID,
   addProperty,
@@ -719,5 +767,6 @@ export {
   getPropertyManagerDetails,
   teminatePM,
   editProperty,
-  getAllPropertiesDropdown
+  getAllPropertiesDropdown,
+  updateRentDueDate
 };
