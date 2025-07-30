@@ -19,7 +19,8 @@ import {
   getPropertyListByPmID,
   teminatePM,
   editProperty,
-  getAllPropertiesDropdown
+  getAllPropertiesDropdown,
+  updateRentDueDate
 } from "../controllers/property.controller.mjs";
 import multer from "multer";
 import { v4 as uuidv4 } from "uuid";
@@ -266,6 +267,8 @@ router.put("/property/edit", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_
 )
 
 router.get("/properties/dropdown", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), getAllPropertiesDropdown)
+router.put("/property/update-rent-due-date", authorizer([UserRoles.LANDLORD, UserRoles.PROPERTY_MANAGER]), updateRentDueDate)
+
 
 export default router;
 
