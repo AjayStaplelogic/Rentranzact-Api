@@ -125,7 +125,7 @@ async function addPropertyService(
   }
 
   if (body.payout_account_type) {
-    property.payout_account_type = body.payout_account_type;
+    Property_["payout_account_type"] = body.payout_account_type;
   }
 
   const property = await Property.create(Property_);
