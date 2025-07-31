@@ -95,6 +95,9 @@ const transactionSchema = new mongoose.Schema(
       type: String,
       enum: Object.values(ETRANSACTION_PM_PAYMENT_STATUS),
       default: ETRANSACTION_PM_PAYMENT_STATUS.pending
+    },
+    landlord_transfer_date: {
+      type: Date
     }
   },
   { timestamps: true }
