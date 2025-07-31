@@ -24,6 +24,7 @@ import * as NotificationService from "../services/notification.service.mjs";
 import * as PropertyEmails from "../emails/property.email.mjs";
 import * as PropertyValidations from "../validations/property.validation.mjs"
 import { validator } from "../helpers/schema-validator.mjs";
+import moment from "moment";
 
 async function addProperty(req, res) {
   const { body } = req;
