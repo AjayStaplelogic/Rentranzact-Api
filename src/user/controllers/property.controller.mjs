@@ -719,7 +719,7 @@ async function updateRentDueDate(req, res) {
     }
 
     const data = await Property.findOneAndUpdate(query, {
-      rent_period_due: req.body.rent_period_due
+      rent_period_due: moment(req.body.rent_period_due).unix()
     }, {
       new: true
     });
