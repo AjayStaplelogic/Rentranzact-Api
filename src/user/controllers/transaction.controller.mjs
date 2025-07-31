@@ -112,6 +112,7 @@ async function getAllRentTransactions(req, res) {
           property_manager_name: "$property_mananger_details.fullName",
           property_manager_image: "$property_mananger_details.picture",
           allCharges: "$allCharges",
+          landlord_transfer_date: "$landlord_transfer_date",
         }
       },
       {
@@ -160,7 +161,7 @@ async function downloadTransactionPdf(req, res) {
       let get_renter = await User.findById(get_transaction.renterID);
 
       let payload = {
-        transaction_date: get_transaction?.createdAt,
+        transaction_date: get_transaction?.landlord_transfer_date,
         amount: role === UserRoles.RENTER ? get_transaction?.amount : get_transaction?.allCharges?.landlord_earning,
         property_name: get_transaction?.property ?? "",
         description: `Rent for ${get_transaction?.property ?? ""}`,
@@ -194,7 +195,7 @@ async function adminDownloadTransactionPdf(req, res) {
         let get_renter = await User.findById(get_transaction.renterID);
 
         let payload = {
-          transaction_date: get_transaction?.createdAt,
+          transaction_date: get_transaction?.landlord_transfer_date,
           amount: get_transaction?.amount,
           property_name: get_transaction?.property ?? "",
           description: `Rent for ${get_transaction?.property ?? ""}`,

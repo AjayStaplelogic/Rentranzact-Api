@@ -15,7 +15,7 @@ import { Transaction } from "../../user/models/transactions.model.mjs";
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
 import { generateXlxs } from "../services/xlxs.service.mjs";
 import { isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
-import { decrypt, decryptionForFrontend } from "../../helpers/crypto.mjs";
+import {  decryptionForFrontend } from "../../helpers/crypto.mjs";
 import { EAccountType } from "../../user/enums/property.enums.mjs";
 
 export const getAllTransfers = async (req, res) => {
@@ -250,7 +250,7 @@ export const updateTransferStatus = async (req, res) => {
                         return sendResponse(res, null, "Invalid status", false, 400);
                 }
 
-                if(get_transfer?.property_id?.payout_account_type === EAccountType.dom){
+                if (get_transfer?.property_id?.payout_account_type === EAccountType.dom) {
                     const is_user_have_connected_account = await isUserAddedBankAccounts(get_recipient._id);
                     if (is_user_have_connected_account.stripe) {
                         const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
@@ -260,14 +260,14 @@ export const updateTransferStatus = async (req, res) => {
                                 get_transfer.from_currency,
                                 Number(get_transfer.amount)
                             )
-    
+
                             if (converted_currency && converted_currency.amount > 0) {
                                 const initiate_transfer = await StripeCommonServices.transferFunds(
                                     get_connected_account.connect_acc_id,
                                     Number(converted_currency.amount),
                                     get_transfer?.from_currency
                                 );
-    
+
                                 if (initiate_transfer?.id) {
                                     payload.destination = initiate_transfer.destination;
                                     payload.connect_acc_id = get_connected_account._id;
@@ -276,7 +276,7 @@ export const updateTransferStatus = async (req, res) => {
                                     payload.converted_amount = Number(converted_currency.amount);
                                 } else {
                                     return sendResponse(res, null, "Unable to intitated transfer", false, 400);
-    
+
                                 }
                             } else {
                                 return sendResponse(res, null, "Recipient Account Not Found", false, 400);
@@ -304,7 +304,8 @@ export const updateTransferStatus = async (req, res) => {
                         case ETRANSFER_TYPE.rentPayment:
                             await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
                                 landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
-                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid
+                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid,
+                                landlord_transfer_date: update_transfer.transferredAt
                             });
 
                             UserTransferService.sendTransferNotificationAndEmailToLandlordForRentPayment({
@@ -383,11 +384,11 @@ export const updateApprovalStatus = async (req, res) => {
 
                 // const get_connected_account = await AccountServices.getUserConnectedAccount(get_recipient._id);
                 // if (get_connected_account) {
-                    let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
-                    if (update_transfer) {
-                        TransferService.sendTransferNotifications(update_transfer, current_user_id);
-                        return sendResponse(res, null, "Approval status updated successfully", true, 200);
-                    }
+                let update_transfer = await Transfers.findByIdAndUpdate(id, payload, { new: true });
+                if (update_transfer) {
+                    TransferService.sendTransferNotifications(update_transfer, current_user_id);
+                    return sendResponse(res, null, "Approval status updated successfully", true, 200);
+                }
                 // }
                 // return sendResponse(res, null, "Recipient Account Not Found", false, 400);
             }
@@ -495,6 +496,12 @@ export const updateTransferDate = async (req, res) => {
             let update_transfer = await Transfers.findByIdAndUpdate(get_transfer._id, payload, { new: true });
 
             if (update_transfer) {
+                if (transferredAt) {
+                    await Transaction.findByIdAndUpdate(update_transfer.transaction_id, {
+                        landlord_transfer_date: update_transfer.transferredAt
+                    });
+                }
+
                 return sendResponse(res, null, "Date updated successfully", true, 200);
             }
 

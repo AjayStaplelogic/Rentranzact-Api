@@ -290,6 +290,7 @@ async function transactionByIdService(id) {
         intentID: "$intentID",
         wallet: "$wallet",
         allCharges: "$allCharges",
+        landlord_transfer_date: "$landlord_transfer_date",
       }
     }
   ])
