@@ -934,6 +934,10 @@ function getRentalBreakUp(propertyDetails, rent_paid = 0) {
     breakdown.landlord_earning += breakdown.service_charge;
   }
 
+  if (propertyDetails.payment_count) {
+    breakdown.landlord_earning = breakdown.landlord_earning - breakdown.rtz_fee;
+  }
+
   if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {       // If property owner is landlord
     breakdown.agent_fee = (rent * RentBreakDownPer.AGENT_FEE_PERCENT) / 100;
   }
