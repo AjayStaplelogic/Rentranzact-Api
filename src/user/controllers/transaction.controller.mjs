@@ -113,6 +113,7 @@ async function getAllRentTransactions(req, res) {
           property_manager_image: "$property_mananger_details.picture",
           allCharges: "$allCharges",
           landlord_transfer_date: "$landlord_transfer_date",
+          transaction_type: "$transaction_type",
         }
       },
       {
