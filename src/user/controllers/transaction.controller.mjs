@@ -118,6 +118,7 @@ async function getAllRentTransactions(req, res) {
       },
       {
         $match: query2
+        
       },
       {
         $facet: {
