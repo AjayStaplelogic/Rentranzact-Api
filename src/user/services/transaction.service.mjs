@@ -388,7 +388,7 @@ const getRentTransactionHtml = (options) => {
           <span style="color:#cee83a">Transaction Date:</span>
         </strong>
         <span style="color:#54bdc3"> 
-          ${moment(transaction_date).format("DD/MM/YYYY HH:MM")}
+          ${moment(transaction_date).format("DD/MM/YYYY")}
         </span>
       </p>
       <p><strong style="display: inline-block; width: 200px;"><span style="color:#cee83a">Transaction Amount:</span></strong><span style="color:#54bdc3"> ₦${amount ?? ""}</span></p>
