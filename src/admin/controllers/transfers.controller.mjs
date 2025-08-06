@@ -143,6 +143,8 @@ export const getAllTransfers = async (req, res) => {
                     renter_name: "$renter_detail.fullName",
                     account_number: "$bank_account_details.account_number",
                     account_bank: "$bank_account_details.account_bank",
+                    account_holder_name: "$bank_account_details.account_holder_name",
+                    bank_name: "$bank_account_details.bank_name",
                     rent_paid: "$rent_paid",
                     rtz_percentage: "$rtz_percentage",
                     rtz_fee: "$rtz_fee",
