@@ -15,7 +15,7 @@ import { Transaction } from "../../user/models/transactions.model.mjs";
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS } from "../../user/enums/common.mjs";
 import { generateXlxs } from "../services/xlxs.service.mjs";
 import { isUserAddedBankAccounts } from "../services/manageuser.service.mjs";
-import {  decryptionForFrontend } from "../../helpers/crypto.mjs";
+import { decryptionForFrontend } from "../../helpers/crypto.mjs";
 import { EAccountType } from "../../user/enums/property.enums.mjs";
 
 export const getAllTransfers = async (req, res) => {
@@ -620,30 +620,16 @@ export const allTransfersExportToXlsx = async (req, res) => {
             },
             {
                 $project: {
-                    // createdAt: "$createdAt",
-                    // updatedAt: "$updatedAt",
-                    // status: "$status",
-                    // transfer_type: "$transfer_type",
-                    // description: "$description",
-                    // from: "$from",
-                    // is_from_admin: "$is_from_admin",
-                    // property_id: "$property_id",
-                    // amount: "$amount",
+                    createdAt: "$createdAt",
                     "Property Name": "$property_name",
-                    // property_images: "$property_images",
                     "Property Address": "$property_address",
                     "Landlord’s Name": "$to_detail.fullName",
                     "Net Amount Payable to Landlord": "$landlord_earning",
                     "Account Number": "$bank_account_details.account_number",
                     "Bank Name": "$bank_account_details.bank_name",
                     "Account Holder Name": "$bank_account_details.account_holder_name",
-                    // "Bank Code": "$bank_account_details.account_bank",
-                    // approvedBy_name: "$approvedBy_detail.fullName",
-                    // initiatedAt: "$initiatedAt",
-                    // initiateRejectedAt: "$initiateRejectedAt",
                     "Renter’s Name": "$renter_detail.fullName",
                     "Gross Amount (Total Paid)": "$rent_paid",
-                    // rtz_percentage: "$rtz_percentage",
                     "RTZ Commission": "$rtz_fee",
                     "Property Manager Commission": "$agent_fee",
                     "Legal Fee": "$legal_Fee",
@@ -657,7 +643,7 @@ export const allTransfersExportToXlsx = async (req, res) => {
                 $sort: sort_query
             },
             {
-                $unset: ["_id"]
+                $unset: ["_id", "createdAt"]
             }
         ];
 
@@ -665,11 +651,11 @@ export const allTransfersExportToXlsx = async (req, res) => {
         if (data && data.length > 0) {
             data = data.map(item => ({
                 ...item,
-                "Account Number": decryptionForFrontend(item["Account Number"]),
+                "Account Number": item["Account Number"] ? decryptionForFrontend(item["Account Number"]) : "",
                 "Payment Status": item["Payment Status"] === ETRANSFER_STATUS.transferred ? "Paid" : "Pending"
             }))
         }
-        // console.log(data, '==========data')
+
         const columnWidths = [
             { wpx: 100 },
             { wpx: 200 },
@@ -680,7 +666,6 @@ export const allTransfersExportToXlsx = async (req, res) => {
         res.setHeader("Content-type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         res.setHeader("Content-Disposition", `attachment; filename="transfers.xlsx"`)
         return res.send(buffer);
-        // return sendResponse(res, data, "success", true, 200);
     } catch (error) {
         console.log(error, '========error')
         return sendResponse(res, {}, `${error}`, false, 500);
