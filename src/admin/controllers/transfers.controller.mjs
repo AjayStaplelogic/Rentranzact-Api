@@ -151,7 +151,9 @@ export const getAllTransfers = async (req, res) => {
                     agent_fee: "$agent_fee",
                     landlord_earning: "$landlord_earning",
                     reference_number: "$reference_number",
-                    transferredAt: "$transferredAt"
+                    transferredAt: "$transferredAt",
+                    legal_Fee: "$legal_Fee",
+                    caution_deposite: "$caution_deposite",
                 }
             },
             {
@@ -644,6 +646,8 @@ export const allTransfersExportToXlsx = async (req, res) => {
                     // rtz_percentage: "$rtz_percentage",
                     "RTZ Commission": "$rtz_fee",
                     "Property Manager Commission": "$agent_fee",
+                    "Legal Fee": "$legal_Fee",
+                    "Caution Deposite": "$caution_deposite",
                     "Reference Number": "$reference_number",
                     "Payment Date   ": "$transferredAt",
                     "Payment Status": "$status"
