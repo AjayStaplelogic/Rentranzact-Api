@@ -54,7 +54,9 @@ export const makeTransferForPropertyRent = async (property_data = null, property
                 landlord_earning: rental_breakdown.landlord_earning,
                 landlord_id: property_data?.landlord_id,
                 renter_id: renterDetails._id,
-                transaction_id: transaction_id
+                transaction_id: transaction_id,
+                legal_Fee: rental_breakdown.legal_Fee,
+                caution_deposite: rental_breakdown.caution_deposite
             }
 
             return await createTransferInDB(transfer_payload);

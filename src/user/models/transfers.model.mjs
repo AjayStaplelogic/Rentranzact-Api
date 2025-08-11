@@ -144,6 +144,12 @@ const schema = new Schema({
     agent_fee: {
         type: Number
     },
+    legal_Fee: {
+        type: Number
+    },
+    caution_deposite: {
+        type: Number
+    },
     landlord_earning: {
         type: Number
     },
