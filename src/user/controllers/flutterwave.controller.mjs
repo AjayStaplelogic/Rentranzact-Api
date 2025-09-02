@@ -37,7 +37,10 @@ async function flutterwave(req, res) {
     console.log("*********** Passed Switch Case ***********");
     if (req.body["event"] === "charge.completed") {
       if (body?.data?.status === "successful") {
-        const { meta_data } = body;
+        let { meta_data } = body;
+        if(!meta_data){
+          meta_data = body?.data;
+        }
 
         if (meta_data.type === "initiated-bill-payment") {            // Inititate bill payment after succesfully collected from customer
           ElectricityService.initiateBillPaymentFromWebhook(req.body);

@@ -20,7 +20,11 @@ import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
 import axios from "axios";
 
 async function addFlutterwaveTransaction(body, renterApplicationID) {
-    const { status, amount, created_at, id, meta_data } = body?.data;
+    const { status, amount, created_at, id } = body?.data;
+    let meta_data = body?.data?.meta_data;
+    if (!meta_data) {
+        meta_data = body.meta_data
+    }
     const momentObject = moment(created_at);
 
     // Get the timestamp (milliseconds since the Unix epoch)
@@ -288,7 +292,11 @@ async function addToWallet(body) {
 }
 
 async function addFlutterwaveTransactionForOld(body) {
-    const { status, amount, created_at, id, meta_data } = body.data;
+    const { status, amount, created_at, id } = body.data;
+    let meta_data = body?.data?.meta_data;
+    if (!meta_data) {
+        meta_data = body.meta_data
+    }
     const momentObject = moment(created_at);
     // Get the timestamp (milliseconds since the Unix epoch)
     const created = momentObject.unix();
@@ -483,7 +491,7 @@ async function verifyBankAccountWithFlutterwave(account_bank, account_number) {
 }
 
 
-async function getAllBanksWithFlutterwave(country_code="NG") {
+async function getAllBanksWithFlutterwave(country_code = "NG") {
     const url = `https://api.flutterwave.com/v3/banks/${country_code}`;
     const config = {
         headers: {
