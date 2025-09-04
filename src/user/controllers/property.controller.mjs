@@ -131,8 +131,8 @@ async function getAllProperties(req, res) {
       inDemand,
       rented
     } = req.query;
-    const page = Number(req.query.page || 1);
-    const count = Number(req.query.count || 20);
+    const page = Number(req.query.page) || 1;
+    const count = Number(req.query.count) || 20;
     const sort_key = req.query.sort_key || "createdAt";
     const sort_order = req.query.sort_order || "desc";
 
@@ -178,6 +178,8 @@ async function getAllProperties(req, res) {
 
     let sort_query = {};
     sort_query[sort_key] = sort_order == "desc" ? -1 : 1;
+    sort_query["createdAt"] = -1;
+    
     let favorite_arr = [];
     if (user_id) {
       let get_user = await User.findById(user_id);
@@ -222,11 +224,13 @@ async function getAllProperties(req, res) {
               then: true,
               else: false
             }
-          }
+          },
         }
       },
       {
         $project: {
+          _id: "$_id",
+          id: "$_id",
           propertyID: "$propertyID",
           category: "$category",
           address: "$address",
@@ -255,7 +259,7 @@ async function getAllProperties(req, res) {
           availability: "$availability",
           landmark: "$landmark",
           rented: "$rented",
-          liked: "$liked"
+          liked: "$liked",
         }
       },
       {
