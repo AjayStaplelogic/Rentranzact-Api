@@ -65,7 +65,9 @@ export const getAllAccounts = async (req, res) => {
         let { search, sortBy } = req.query;
         let page = Number(req.query.page || 1);
         let count = Number(req.query.count || 20);
-        let query = {};
+        let query = {
+            isDeleted : false
+        };
 
         let skip = Number(page - 1) * count;
         if (search) {
