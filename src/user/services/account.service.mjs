@@ -104,7 +104,7 @@ export const addUpdateExternalAccount = async (user_id, account_data) => {
  */
 export const deleteExternalAccountFromWebhook = async (event) => {
     const data = event?.data?.object;
-    if (data) {
+    if (data && data.id) {
         await Accounts.updateMany({
             external_acc_id: data?.id,
         }, {
