@@ -21,8 +21,8 @@ export const rentPaidEmail = (options) => {
     You will receive the amount once it is approved by the administration.</p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(19, 85, 109, 1);
+            color: rgba(255, 255, 255, 1);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
@@ -63,15 +63,15 @@ export const rentPaidEmailToRenter = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that we have received <strong>₦${amount}</strong> for the rent of <strong>${property_name}</strong> property. </p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
    <a href="${process.env.BACKEND_URL}/api/admin/transactions/download?id=${transaction_id}" style=" display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(19, 85, 109, 1);
+            color: rgba(255, 255, 255, 1);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
             margin-top: 20px" class="download-button" target="_blank">Download Invoice</a>
    <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(19, 85, 109, 1);
+            color: rgba(255, 255, 255, 1);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
@@ -113,15 +113,15 @@ export const rentReminderEmailToRenter = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your rent payment of property <strong>${property_name}</strong> is due on Date <strong>${moment(next_payment_at).format("DD-MM-YYYY")}</strong>. </p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
    <a href="${process.env.FRONTEND_URL}/rented-property-detail/${property_id}" style=" display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(19, 85, 109, 1);
+            color: rgba(255, 255, 255, 1);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
             margin-top: 20px" class="download-button" target="_blank">View Property</a>
    <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
-            color: white;
+            background-color: rgba(19, 85, 109, 1);
+            color: rgba(255, 255, 255, 1);
             padding: 10px 20px;
             text-decoration: none;
             border-radius: 5px;
@@ -143,7 +143,7 @@ export const rentReminderEmailToRenter = (options) => {
     }
 }
 
-// rentReminderEmailToRenter({
+// rentPaidEmail({
 //     email: "rani@yopmail.com",
 //     property_name: "Villa da visatara KM",
 //     renter_name: "sunny",
