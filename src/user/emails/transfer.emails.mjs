@@ -20,7 +20,7 @@ export const transferSucceedEmail = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that rentrazact has approved the rent payment and transferred to your wallet successfully. 
    Your can withdraw the amount of <strong>${amount}</strong> referenced to property <strong>${property_name}</strong> from your wallet. Thank you for choosing our services.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;

@@ -20,7 +20,7 @@ export const electricityBillInitiated = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your electricity bill payment has been successfully initiated. 
     The amount of <strong>${amount}</strong> referenced to meter number <strong>${meter_number}</strong> will be processed shortly.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -62,7 +62,7 @@ export const electricityBillPaid = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your electricity bill payment has been successfully paid. 
     The amount of <strong>${amount}</strong> referenced to meter number <strong>${meter_number}</strong>. Thank you for choosing our services.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -104,7 +104,7 @@ export const electricityBillFailed = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your electricity bill payment has been failed due to some technical reasons. 
     The amount of <strong>${amount}</strong> referenced to meter number <strong>${meter_number}</strong>. Refund will be intiated shortly. We are sorry for inconvenience</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -146,7 +146,7 @@ export const electricityBillRefundInitiated = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your electricity bill payment refund has been successfully initiated. 
     The amount of <strong>${amount}</strong> referenced to meter number <strong>${meter_number}</strong>. Thank you for choosing our services.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -188,7 +188,7 @@ export const electricityBillRefundCompleted = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that your electricity bill payment refund has been completed and your current status is <strong>${status}</strong>. 
     The amount of <strong>${amount}</strong> referenced to meter number <strong>${meter_number}</strong>. Thank you for choosing our services.</p>
     <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;

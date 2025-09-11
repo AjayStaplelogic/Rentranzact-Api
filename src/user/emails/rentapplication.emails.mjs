@@ -20,14 +20,14 @@ export const applicationAcceptedViaInviteRenter = (options) => {
         <p style="font-size: 16px; color: #555555">We would like to inform you that landlord have acceppted your rent application for property <strong>${property_name}</strong> and marked as rented for you. Current rent period will expire on <strong> ${moment(rent_expiration_date).format("DD MMM YYYY")} </strong></p>
         <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>
         <a href="${process.env.FRONTEND_URL}/rented-property-detail/${property_id}" style=" display: inline-block;
-                 background-color: #007bff;
+                 background-color: rgba(19, 85, 109, 1);
                  color: white;
                  padding: 10px 20px;
                  text-decoration: none;
                  border-radius: 5px;
                  margin-top: 20px" class="download-button" target="_blank">View Property</a>
         <a href="${process.env.FRONTEND_URL}/login" class="button" style=" display: inline-block;
-                 background-color: #007bff;
+                 background-color: rgba(19, 85, 109, 1);
                  color: white;
                  padding: 10px 20px;
                  text-decoration: none;
@@ -48,7 +48,7 @@ export const applicationAcceptedViaInviteRenter = (options) => {
 
 // try {
 //     applicationAcceptedViaInviteRenter({
-//         email: "frewoikiprevoi-7190@yopmail.com",
+//         email: "rani@yopmail.com",
 //         property_id: "66b5c62537a9bec8bec98046",
 //         property_name: "Sunny ka beda",
 //         renter_name: "Sunny Dhiman The Gangster",
@@ -56,3 +56,4 @@ export const applicationAcceptedViaInviteRenter = (options) => {
 // } catch (error) {
 //     console.log(error, '=======error')
 // }
+

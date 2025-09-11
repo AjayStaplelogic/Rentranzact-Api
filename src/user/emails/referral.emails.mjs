@@ -18,7 +18,12 @@ export const sendReferralLink = (options) => {
   color: #ffffff;
   text-decoration:none; 
   border-radius: 5px;
-  background-color: #13556d;
+  background-color: rgba(19, 85, 109, 1);
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 20px";
+  display: inline-block;
   ">Sign Up</a>
   </span>
   <p>Looking forward to serve you better.</p>
@@ -33,3 +38,4 @@ export const sendReferralLink = (options) => {
 
     sendMail(email, "Referral program invitation!", html)
 }
+

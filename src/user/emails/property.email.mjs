@@ -20,7 +20,7 @@ export const assignPMToProperty = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that <strong>${landlord_name}</strong> assigned you as property manager on <strong>${property_name}</strong>. 
     Please click on the button to view property details.</p>
     <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -42,7 +42,6 @@ export const assignPMToProperty = (options) => {
     }
 }
 
-
 export const assignLandlordToProperty = (options) => {
     try {
         let { email, property_id, property_manager_name, landlord_name, property_name } = options;
@@ -63,7 +62,7 @@ export const assignLandlordToProperty = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that <strong>${property_manager_name}</strong> added a new property <strong>${property_name}</strong>
     on your behalf. Please click on the button to view property details.</p>
     <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -105,7 +104,7 @@ export const editRent = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that rent of your property has been changed by landlord from <strong>₦${old_rent}</strong> to <strong>₦${new_rent}</strong> for property <strong>${property_name}</strong>. 
     Please click on the button to view property details.</p>
     <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -127,7 +126,6 @@ export const editRent = (options) => {
     }
 }
 
-
 export const assignPMToPropertyEmailToRenter = (options) => {
     try {
         let { email, property_id, renter_name, property_manager_name, landlord_name, property_name } = options;
@@ -148,7 +146,7 @@ export const assignPMToPropertyEmailToRenter = (options) => {
     <p style="font-size: 16px; color: #555555">We would like to inform you that landlord <strong>${landlord_name}</strong> has assigned a new property manager <strong>${property_manager_name}</strong> to property <strong>${property_name}</strong>. 
     Please click on the button to view property details.</p>
     <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}" class="button" style=" display: inline-block;
-            background-color: #007bff;
+            background-color: rgba(19, 85, 109, 1);
             color: white;
             padding: 10px 20px;
             text-decoration: none;
@@ -173,7 +171,7 @@ export const assignPMToPropertyEmailToRenter = (options) => {
 
 
 // assignPMToPropertyEmailToRenter({
-//     email : "frenenefrimmeu-3510@yopmail.com",
+//     email : "rani@yopmail.com",
 //         renter_name : "Sunny Dhiman",
 //         property_id : "jdfjkd",
 //         property_manager_name : "Sunny Dhiman Manager",
@@ -182,4 +180,5 @@ export const assignPMToPropertyEmailToRenter = (options) => {
 //         old_rent : 10,
 //         new_rent : 20000000
 // })
+
 

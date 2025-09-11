@@ -34,3 +34,4 @@ const forgot_password_email = (options) => {
 export {
   forgot_password_email
 }
+
