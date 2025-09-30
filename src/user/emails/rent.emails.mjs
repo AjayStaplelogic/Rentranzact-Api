@@ -15,8 +15,6 @@ export const rentPaidEmail = (options) => {
 
 <div class="container" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
     <h2 style="color: #333333">Rent Payment Update </h2>
-   <!-- <p style="font-size: 16px; color: #333333;">Dear <strong>${fullName}</strong>,</p> --!>
-   <!-- <p style="font-size: 16px; color: #555555">We hope this message finds you well.</p>  --!>
     <p style="font-size: 16px; color: #555555">We would like to inform you that <strong>${renter_name}</strong> has paid the rent of <strong>₦${amount}</strong> for the <strong>${property_name}</strong> property. 
     You will receive the amount once it is approved by the administration.</p>
    <p style="font-size: 16px; color: #555555"> Thank you for choosing our services.</p>

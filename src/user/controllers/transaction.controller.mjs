@@ -163,7 +163,7 @@ async function downloadTransactionPdf(req, res) {
       let get_renter = await User.findById(get_transaction.renterID);
 
       let payload = {
-        transaction_date: get_transaction?.landlord_transfer_date,
+        transaction_date: role === UserRoles.RENTER ? get_transaction?.createdAt : get_transaction?.landlord_transfer_date,
         amount: role === UserRoles.RENTER ? get_transaction?.amount : get_transaction?.allCharges?.landlord_earning,
         property_name: get_transaction?.property ?? "",
         description: `Rent for ${get_transaction?.property ?? ""}`,
