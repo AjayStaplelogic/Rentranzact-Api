@@ -78,7 +78,7 @@ export const notifyRenterLinkingInitialized = (options) => {
   const { email, property_id, property_name, address, landlord_name } = options;
 
   const first_message = `
-    We are pleased to inform you that we have successfully initiated the rental linking process for <strong>${property_name}</strong>,located at ${address}.
+    We are pleased to inform you that we have successfully initiated the rental linking process for <strong>${property_name}</strong> located at ${address}.
   `;
 
   const second_message = `
