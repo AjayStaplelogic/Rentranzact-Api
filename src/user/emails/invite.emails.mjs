@@ -74,3 +74,70 @@ background-color: rgba(19, 85, 109, 1);
   sendMail(email, "Exciting Opportunity to Rent Our Property!", html)
 }
 
+export const notifyRenterLinkingInitialized = (options) => {
+  const { email, property_id, property_name, address, landlord_name } = options;
+
+  const first_message = `
+    We are pleased to inform you that we have successfully initiated the rental linking process for <strong>${property_name}</strong>,located at ${address}.
+  `;
+
+  const second_message = `
+   We are currently awaiting confirmation from the ${landlord_name}. Once he confirms, you will be fully linked to the ${property_name}.
+  `;
+
+  let html = `
+    <html>
+      <head>
+        <title>Rental Linking Initiated</title>
+      </head>
+      <body>
+        <div style="
+          border: 1px solid gray;
+          border-radius: 10px;
+          padding: 10px;
+          width: 66%;
+          margin: auto;
+        ">
+          <h4>Dear Renter</h4>
+
+          <p style="line-height: 18px">
+            ${first_message}
+          </p>
+
+          <p style="line-height: 18px">
+            ${second_message}
+          </p>
+
+          <p style="line-height: 18px">
+            You will be notified as soon as the confirmation is completed. No further action is required from your side at this time.
+          </p>
+
+          <span>
+            <a href="${process.env.FRONTEND_URL}/property-detail/${property_id}"
+              style="
+                color: #ffffff;
+                text-decoration: none;
+                border-radius: 5px;
+                background-color: rgba(19, 85, 109, 1);
+                padding: 10px;
+                display: inline-block;
+              ">
+              View Property
+            </a>
+          </span>
+
+          <p style="margin-top: 20px;">
+            Best regards,<br />
+            <strong>Rentranzact Team</strong>
+          </p>
+        </div>
+      </body>
+    </html>
+  `;
+
+  sendMail(
+    email,
+    "Rental Linking Process Initiated",
+    html
+  );
+};

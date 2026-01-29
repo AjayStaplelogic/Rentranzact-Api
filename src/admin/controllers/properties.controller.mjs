@@ -1,5 +1,5 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { getPropertiesList, getPropertyByID, deletePropertyByID, leaseAggrementsList } from "../services/properties.service.mjs";
+import { getPropertiesList, getPropertyByID, deletePropertyByID, leaseAggrementsList, addRentApplicationFromAdmin } from "../services/properties.service.mjs";
 import { Property } from "../../user/models/property.model.mjs"
 import { User } from "../../user/models/user.model.mjs"
 import * as propertyValidation from "../validations/property.validation.mjs"
@@ -495,6 +495,13 @@ async function addProperty(req, res) {
     return sendResponse(res, null, error.message, false, 400);
   }
 }
+
+async function addRentApplication(req, res) {
+  const body = req.body;
+  const data = await addRentApplicationFromAdmin(body);
+  sendResponse(res, data.data, data.message, data.status, data.statusCode);
+}
+
 export {
   properties,
   property,
@@ -505,5 +512,6 @@ export {
   editProperty,
   updatePropertyApprovalStatus,
   deleteAggrementByID,
-  addProperty
+  addProperty,
+  addRentApplication
 }

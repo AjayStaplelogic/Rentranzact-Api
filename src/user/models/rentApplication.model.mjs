@@ -24,7 +24,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     employmentStatus: {
       type: String,
-      required: true,
+      // required: true,
     },
     employerName: {
       type: String,
@@ -38,16 +38,16 @@ const rentApplicationSchema = new mongoose.Schema(
 
     occupation: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     kinFirstName: {
       type: String,
-      required: true,
+      // required: true,
     },
     kinLastName: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     kinDOB: {
@@ -57,16 +57,16 @@ const rentApplicationSchema = new mongoose.Schema(
 
     kinContactNumber: {
       type: String,
-      required: true,
+      // required: true,
     },
     kinEmail: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     relationshipKin: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     name: {
@@ -79,7 +79,7 @@ const rentApplicationSchema = new mongoose.Schema(
 
     checkinDate: {
       type: String,
-      required: true,
+      // required: true,
     },
 
     checkoutDate: {
@@ -105,7 +105,7 @@ const rentApplicationSchema = new mongoose.Schema(
 
     rentNowPayLater: {
       type: Boolean,
-      required: true,
+      // required: true,
     },
     renterID: {
       type: String,
@@ -114,7 +114,7 @@ const rentApplicationSchema = new mongoose.Schema(
 
     permanentAddress: {
       type: String,
-      required: true,
+      // required: true,
     },
     permanentCity: {
       type: String,
@@ -124,7 +124,7 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     permanentZipcode: {
       type: Number,
-      required: true,
+      // required: true,
     },
     permanentContactNumber: {
       type: String,
@@ -159,11 +159,11 @@ const rentApplicationSchema = new mongoose.Schema(
     },
     previousLandlordAddress: {
       type: String,
-      required: true
+      // required: true
     },
     previousLandlordName: {
       type: String,
-      required: true
+      // required: true
     },
     pmID: {
       type: String,

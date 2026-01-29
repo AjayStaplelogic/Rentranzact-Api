@@ -10,7 +10,8 @@ import {
     editProperty,
     updatePropertyApprovalStatus,
     deleteAggrementByID,
-    addProperty
+    addProperty,
+    addRentApplication
 } from "../controllers/properties.controller.mjs"
 import { generateRandomFileName } from "../../user/helpers/randomNameGenerator.mjs";
 import multer from "multer";
@@ -230,7 +231,7 @@ router.post(
     }
 );
 
-
+router.post("/property/rentApplication", addRentApplication);
 
 export default router;
 
