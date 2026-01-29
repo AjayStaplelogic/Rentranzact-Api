@@ -1,5 +1,5 @@
 import { sendResponse } from "../helpers/sendResponse.mjs";
-import { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID } from "../services/rentapplication.service.mjs"
+import { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID, addRentApplicationViaInvite } from "../services/rentapplication.service.mjs"
 import { rentApplication } from "../models/rentApplication.model.mjs";
 import { identityVerifier } from "../helpers/identityVerifier.mjs";
 import { UserRoles } from "../enums/role.enums.mjs";
@@ -12,7 +12,12 @@ async function addRentApplication(req, res) {
   const body = req.body;
   const user = req.user.data;
 
-  const data = await addRentApplicationService(body, user);
+  let data = null;
+  if (body.invitation_token) {
+    data = await addRentApplicationViaInvite(body, user);
+  } else {
+    data = await addRentApplicationService(body, user);
+  }
 
   sendResponse(res, data.data, data.message, data.status, data.statusCode);
 

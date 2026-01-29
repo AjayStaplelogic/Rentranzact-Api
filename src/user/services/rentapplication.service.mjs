@@ -16,6 +16,34 @@ import { RentingHistory } from "../models/rentingHistory.model.mjs";
 
 async function addRentApplicationService(body, user) {
   try {
+
+    const requiredFields = [
+      "employmentStatus",
+      "occupation",
+      "kinFirstName",
+      "kinLastName",
+      "kinContactNumber",
+      "kinEmail",
+      "relationshipKin",
+      "checkinDate",
+      "rentNowPayLater",
+      "permanentAddress",
+      "permanentZipcode",
+      "previousLandlordAddress",
+      "previousLandlordName"
+    ];
+
+    for (const field of requiredFields) {
+      if (!body[field]) {
+        return {
+          data: null,
+          message: `${field} is required`,
+          status: false,
+          statusCode: 400,
+        };
+      }
+    }
+
     const renterID = user._id;
     const {
       propertyID,
@@ -56,7 +84,7 @@ async function addRentApplicationService(body, user) {
     const landlord = await Property.findById(propertyID);
     const payload = {
       propertyID: propertyID,
-      propertyCategory : landlord?.category,
+      propertyCategory: landlord?.category,
       employmentStatus,
       occupation,
       kinFirstName,
@@ -334,6 +362,211 @@ async function addRentApplicationService(body, user) {
         statusCode: 400,
       };
     }
+
+  } catch (error) {
+    return {
+      data: [],
+      message: `${error}`,
+      status: false,
+      statusCode: 400,
+    };
+  }
+}
+async function addRentApplicationViaInvite(body, user) {
+  try {
+    const { propertyID, identificationType } = body;
+    const renterID = user._id;
+    const landlord = await Property.findById(propertyID);
+
+    // ********* If renter submit application with invite *************//
+    const get_invitaton = await Invites.findOne({
+      invitation_token: body.invitation_token,
+    });
+
+    if (get_invitaton) {
+      if ([EInviteStatus.accepted, EInviteStatus.rejected].includes(get_invitaton.invite_status)) {
+        return {
+          data: null,
+          message: "Invitation already used",
+          status: false,
+          statusCode: 400,
+        };
+      }
+
+      if (get_invitaton.invited_by.toString() != landlord.property_manager_id && get_invitaton.invited_by.toString() != landlord.landlord_id) {
+        return {
+          data: null,
+          message: "You can't use inviation of other who is not your property manager or landlord",
+          status: false,
+          statusCode: 400,
+        };
+      }
+
+      if (get_invitaton.property_id.toString() != body.propertyID) {
+        return {
+          data: null,
+          message: "Sorry you are not allowed to access this inivitation to rent this property",
+          status: false,
+          statusCode: 400,
+        };
+      }
+    } else {
+      return {
+        data: null,
+        message: "Invalid Invitation code",
+        status: false,
+        statusCode: 400,
+      };
+    }
+    // ********* If renter submit application with invite *************//
+
+    const payload = {
+      // Invitation details
+      invite_id: get_invitaton._id,
+      invitation_token: get_invitaton.invitation_token,
+
+      propertyID: propertyID,
+      propertyCategory: landlord?.category,
+      renterID: renterID,
+      landlordID: landlord.landlord_id,
+      pmID: landlord.property_manager_id,
+      propertyName: landlord.propertyName,
+
+      firstName: body.firstName || "",
+      middleName: body.middleName || "",
+      lastName: body.lastName || "",
+      emailID: body.emailID || "",
+      contactNumber: body.contactNumber,
+      alternativeContactNumber: body.alternativeContactNumber || "",
+      gender: body.gender || "",
+      maritialStatus: body.maritialStatus || "",
+      identitiy_doc: body.identitiy_doc || "",
+      invitation_token: body.invitation_token || "",
+      kinDOB: body.kinDOB || "",
+
+      // verification rlated keys
+      verifcationType: body.identificationType,
+      voter_id: body.voter_id || "",
+      bvn: body.bvn || "",
+      nin: body.nin || "",
+    };
+
+    // verifying personal details
+    let smile_identification_payload = {
+      first_name: body.firstName,
+      last_name: body.lastName,
+      middle_name: body.middleName,
+      bvn: body.bvn,
+      dob: body.kinDOB,
+      nin: body.nin,
+      voter_id: body.voter_id,
+      kinContactNumber: body.contactNumber,
+      kinEmail: body.emailID,
+    }
+    const verifyStatus = await identityVerifier(identificationType, smile_identification_payload);     // uncomment this code after client recharge for smile identity verification
+
+    if (!verifyStatus) {
+      return {
+        data: [],
+        message: "Personal information is incorrect",
+        status: false,
+        statusCode: 400,
+      };
+    }
+
+    //add kin details to the user
+    payload["isPersonalDetailsVerified"] = true;
+    const renterDetails = await User.findById(renterID);
+
+    let data = await rentApplication.create(payload);
+    if (data) {
+      let user_update_payload = {
+        maritialStatus: data.maritialStatus,
+        phone: data.contactNumber
+      };
+      user_update_payload.fullName = data.firstName;
+      if (data.middleName) {
+        user_update_payload.fullName.concat(' ', data.middleName)
+      }
+
+      if (data.lastName) {
+        user_update_payload.fullName.concat(' ', data.lastName)
+      }
+
+      // user_update_payload.kinDetails = {
+      //   first_name: data.kinFirstName,
+      //   last_name: data.kinLastName,
+      //   middle_name: data.kinMiddleName,
+      //   bvn: data.bvn,
+      //   dob: data.kinDOB,
+      //   nin: data.nin,
+      //   voter_id: data.voter_id,
+      //   kinContactNumber: data.kinContactNumber,
+      //   kinEmail: data.kinEmail,
+      //   relationshipKin: data.relationshipKin,
+      //   identificationType: data.verifcationType,
+      // }
+
+      const updatedRenter = await User.findByIdAndUpdate(renterID, user_update_payload, { new: true });
+      User.findById(landlord.landlord_id).then(async (landlordDetails) => {
+        if (landlordDetails) {
+          let notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+          notification_payload.notificationHeading = "Rent Application Update";
+          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+          notification_payload.renterID = renterID;
+          notification_payload.landlordID = landlord.landlord_id;
+          notification_payload.renterApplicationID = data._id;
+          notification_payload.propertyID = landlord._id;
+          notification_payload.send_to = landlordDetails._id;
+          notification_payload.amount = landlord.rent;
+
+          const metadata = {
+            "propertyID": landlord._id.toString(),
+            "redirectTo": "rentApplication",
+            "rentApplication": data._id.toString()
+          }
+          NotificationService.createNotification(notification_payload, metadata, landlordDetails)
+        }
+      })
+
+      await User.findById(landlord.property_manager_id).then(async (propertyManagerDetails) => {
+        if (propertyManagerDetails) {
+          let notification_payload = {};
+          notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
+          notification_payload.notificationHeading = "Rent Application Update";
+          notification_payload.notificationBody = `${renterDetails.fullName} applied rent application for ${landlord.propertyName}`;
+          notification_payload.renterID = renterID;
+          notification_payload.landlordID = landlord?.landlord_id;
+          notification_payload.renterApplicationID = data._id;
+          notification_payload.propertyID = landlord._id;
+          notification_payload.send_to = propertyManagerDetails._id;
+          notification_payload.property_manager_id = propertyManagerDetails._id;
+          notification_payload.amount = landlord.rent;
+
+          const metadata = {
+            "propertyID": landlord._id.toString(),
+            "redirectTo": "rentApplication",
+            "rentApplication": data._id.toString()
+          }
+          NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
+        }
+      })
+
+      return {
+        data: data,
+        message: "rent application successfully created",
+        status: true,
+        statusCode: 200,
+      };
+    }
+    return {
+      data: [],
+      message: "Something went wrong",
+      status: false,
+      statusCode: 400,
+    };
+
 
   } catch (error) {
     return {
@@ -854,6 +1087,11 @@ async function getRentApplicationByID(id) {
   }
 }
 
-
-
-export { addRentApplicationService, rentApplicationsList, updateRentApplications, getRentApplicationsByUserID, getRentApplicationByID };
+export {
+  addRentApplicationService,
+  rentApplicationsList,
+  updateRentApplications,
+  getRentApplicationsByUserID,
+  getRentApplicationByID,
+  addRentApplicationViaInvite
+};
