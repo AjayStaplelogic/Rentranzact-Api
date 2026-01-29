@@ -26,7 +26,6 @@ async function addRentApplicationService(body, user) {
       "kinEmail",
       "relationshipKin",
       "checkinDate",
-      "rentNowPayLater",
       "permanentAddress",
       "permanentZipcode",
       "previousLandlordAddress",
