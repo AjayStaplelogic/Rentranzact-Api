@@ -9,7 +9,11 @@ import { rentApplication } from "../../user/models/rentApplication.model.mjs";
 import { identityVerifier } from "../../user/helpers/identityVerifier.mjs";
 import * as NotificationService from "../../user/services/notification.service.mjs";
 import * as InviteEmails from "../../user/emails/invite.emails.mjs"
-import { Db } from "mongodb";
+import * as PropertyServices from "../../user/services/property.service.mjs";
+import { RentApplicationStatus } from "../../user/enums/rentApplication.enums.mjs";
+import moment from "moment";
+import { RentingHistory } from "../../user/models/rentingHistory.model.mjs";
+
 
 async function leaseAggrementsList(req) {
   let { filters, search } = req.query;
@@ -239,10 +243,10 @@ async function addRentApplicationFromAdmin(body) {
     }
 
     const renterID = body.renterID;
-    const { propertyID, identificationType } = body;
+    const { propertyID, identificationType, rent_expiration_date } = body;
 
     const landlord = await Property.findById(propertyID);
-    const payload = {
+    let payload = {
       propertyID: propertyID,
       propertyCategory: landlord?.category,
       renterID: renterID,
@@ -295,25 +299,79 @@ async function addRentApplicationFromAdmin(body) {
     //add kin details to the user
     payload["isPersonalDetailsVerified"] = true;
     const renterDetails = await User.findById(renterID);
+    const breakdown = PropertyServices.getRentalBreakUp(landlord);
+    payload = {
+      ...payload,
+      applicationStatus: RentApplicationStatus.ACCEPTED,
+      rent: breakdown?.rent ?? 0,
+      insurance: breakdown?.insurance ?? 0,
+      legal_Fee: breakdown?.legal_Fee ?? 0,
+      caution_deposite: breakdown?.caution_deposite ?? 0,
+      total_amount: breakdown?.total_amount ?? 0,
+      agency_fee: breakdown?.agency_fee ?? 0,
+      agent_fee: breakdown?.agent_fee ?? 0,
+      rtz_fee: breakdown?.rtz_fee ?? 0,
+      landlord_earning: breakdown?.landlord_earning ?? 0,
+    };
+
     let data = await rentApplication.create(payload);
     if (data) {
+      const propertyDetails = landlord;
+      // ********************** Skiping payment flow ****************//
+      let lease_end_timestamp = "";
+      if (["commercial", "residential"].includes(propertyDetails.category)) {
+        lease_end_timestamp = moment().add(1, "years").unix();
+      } else if (propertyDetails.category === "short stay") {
+        lease_end_timestamp = moment().add(1, "months").unix();
+      }
 
-      const owner = await User.findById(landlord.landlord_id).lean()
+      const updateProperty = await Property.findByIdAndUpdate(data.propertyID, {
+        rented: true,
+        renterID: data.renterID,
+        rent_period_start: moment().unix().toString(),
+        rent_period_end: moment(rent_expiration_date).unix(),
+        rent_period_due: moment(rent_expiration_date).unix(),
+        payment_count: 1,
+        lease_end_timestamp: lease_end_timestamp,
+        inDemand: false,        // setting this to false because when property is rented then should remove from in demand
+        next_payment_at: new Date(rent_expiration_date)
+      }, {
+        new: true
+      });
+
+      if (updateProperty) {
+        const addRenterHistory = new RentingHistory({
+          renterID: updateProperty.renterID,
+          landlordID: updateProperty?.landlord_id,
+          rentingType: updateProperty?.rentType,
+          rentingEnd: updateProperty?.rent_period_end,
+          rentingStart: updateProperty?.rent_period_start,
+          propertyID: updateProperty?._id,
+          renterActive: true,
+          pmID: updateProperty?.property_manager_id,
+        })
+
+        addRenterHistory.save()
+      }
+
+      // ********************** Skiping payment flow ****************//
+      
       // Sending email to lady
-      InviteEmails.notifyRenterLinkingInitialized({
+      InviteEmails.notifyRenterPropertyLinked({
         email: renterDetails.email,
         property_id: landlord._id,
         address: landlord?.address?.addressText,
-        property_name : landlord?.propertyName,
-        landlord_name : owner?.fullName ?? ""
+        property_name: landlord?.propertyName,
+        rent_expiration_date: rent_expiration_date ?? ""
       });
+      
 
       User.findById(landlord.landlord_id).then(async (landlordDetails) => {
         if (landlordDetails) {
           let notification_payload = {};
           notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
-          notification_payload.notificationHeading = "Rent Application Update";
-          notification_payload.notificationBody = `Admin applied renter application on behalf of ${renterDetails.fullName} for ${landlord.propertyName}`;
+          notification_payload.notificationHeading = "Admin Linked Renter";
+          notification_payload.notificationBody = `Admin linked renter ${renterDetails.fullName} to ${landlord.propertyName}`;
           notification_payload.renterID = renterID;
           notification_payload.landlordID = landlord.landlord_id;
           notification_payload.renterApplicationID = data._id;
@@ -327,6 +385,16 @@ async function addRentApplicationFromAdmin(body) {
             "rentApplication": data._id.toString()
           }
           NotificationService.createNotification(notification_payload, metadata, landlordDetails)
+
+          // Informing to landlord via email
+          InviteEmails.notifyLandlordPropertyLinked({
+            email: landlordDetails.email,
+            property_id: landlord._id,
+            address: landlord?.address?.addressText,
+            property_name: landlord?.propertyName,
+            rent_expiration_date: rent_expiration_date ?? "",
+            renter_name: renterDetails?.fullName ?? ""
+          });
         }
       })
 
@@ -334,8 +402,8 @@ async function addRentApplicationFromAdmin(body) {
         if (propertyManagerDetails) {
           let notification_payload = {};
           notification_payload.redirect_to = ENOTIFICATION_REDIRECT_PATHS.rent_application_view;
-          notification_payload.notificationHeading = "Rent Application Update";
-          notification_payload.notificationBody = `Admin applied renter application on behalf of ${renterDetails.fullName} for ${landlord.propertyName}`;
+          notification_payload.notificationHeading = "Admin Linked Renter";
+          notification_payload.notificationBody = `Admin linked renter ${renterDetails.fullName} to ${landlord.propertyName}`;
           notification_payload.renterID = renterID;
           notification_payload.landlordID = landlord?.landlord_id;
           notification_payload.renterApplicationID = data._id;
@@ -350,13 +418,23 @@ async function addRentApplicationFromAdmin(body) {
             "rentApplication": data._id.toString()
           }
           NotificationService.createNotification(notification_payload, metadata, propertyManagerDetails)
+
+          // Informing to property manager via email
+          InviteEmails.notifyLandlordPropertyLinked({
+            email: propertyManagerDetails.email,
+            property_id: landlord._id,
+            address: landlord?.address?.addressText,
+            property_name: landlord?.propertyName,
+            rent_expiration_date: rent_expiration_date ?? "",
+            renter_name: renterDetails?.fullName ?? ""
+          });
         }
       })
 
 
       return {
         data: data,
-        message: "rent application successfully created",
+        message: "Renter linked to property successfully",
         status: true,
         statusCode: 200,
       };
@@ -370,6 +448,7 @@ async function addRentApplicationFromAdmin(body) {
 
 
   } catch (error) {
+    console.log(error,'======error')
     return {
       data: [],
       message: `${error}`,
