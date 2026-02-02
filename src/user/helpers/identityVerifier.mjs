@@ -69,7 +69,6 @@ async function identityVerifier(identificationType, kinDetails) {
             return  err
         });
 
-        console.log(response, '===========response')
         if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.surname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
             return true
         } else {
