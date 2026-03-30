@@ -1,4 +1,24 @@
 import axios from "axios";
+import { RentType } from "../enums/property.enums.mjs";
+import { Property } from "../models/property.model.mjs";
+import { Transaction } from "../models/transactions.model.mjs";
+import { RentingHistory } from "../models/rentingHistory.model.mjs";
+import moment from "moment";
+import { User } from "../models/user.model.mjs";
+import { rentApplication } from "../models/rentApplication.model.mjs";
+import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
+import * as commissionServices from "../services/commission.service.mjs";
+import { Notification } from "../models/notification.model.mjs";
+import { EPaymentType } from "../enums/wallet.enum.mjs"
+import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS, ETRANSACTION_TYPE } from "../enums/common.mjs";
+import * as referralService from "../services/referral.service.mjs";
+import * as TransferServices from "../services/transfer.service.mjs";
+import * as PropertyServices from "../services/property.service.mjs";
+import * as TransactionServices from "../../user/services/transaction.service.mjs";
+import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
+
 
 export const payViaGlobalPayService = async (payload, userData) => {
     try {
@@ -12,7 +32,7 @@ export const payViaGlobalPayService = async (payload, userData) => {
         const data = {
             amount: payload.amount,
             merchantTransactionReference: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-            redirectUrl: payload.is_mobile === true ? `` : `${FRONTEND_URL}/payment-method`,
+            redirectUrl: payload.is_mobile === true ? `` : `${process.env.FRONTEND_URL}/payment-method`,
             customer: {
                 lastName: "string",
                 firstName: userData?.fullName,
@@ -44,6 +64,70 @@ export const payViaGlobalPayService = async (payload, userData) => {
         }
 
     } catch (error) {
-        return sendResponse(res, {}, `${error}`, false, 500);
+        throw error;
+    }
+};
+
+
+export const addToWallet = (data, meta_data) => {
+    try {
+        console.log('**********Add To Wallet Functio n***********')
+        let { finalAmount, status, PaymentDate, TransactionReference } = data;
+        let { userID } = meta_data;
+        const created = moment(PaymentDate).unix();
+        const amount = finalAmount
+        const id = TransactionReference;
+        if (status?.toLowerCase() === "successful") {
+            User.findById(userID).then(async (userDetail) => {
+                if (userDetail) {
+                    const transfer = await TransferServices.transferForWalletRecharge(
+                        userDetail._id,
+                        "USD",
+                        "NGN",
+                        amount
+                    )
+                    console.log(transfer, '==========transfer')
+                    if (transfer) {
+                        let payload = {
+                            amount,
+                            status,
+                            createdAt: created,
+                            type: "CREDIT",
+                            userID,
+                            intentID: id,
+                            payment_type: EPaymentType.rechargeWallet
+                        }
+
+                        let add_wallet = await Wallet.create(payload);
+                        if (add_wallet) {
+                            let transaction_payload = {
+                                wallet: true,
+                                amount: amount,
+                                status: status,
+                                date: created,
+                                intentID: id,
+                                type: "CREDIT",
+                                payment_mode: "flutterwave",
+                                transaction_type: ETRANSACTION_TYPE.rechargeWallet,
+                                receiver_id: userDetail._id,
+                                landlord_payment_status: ETRANSACTION_LANDLORD_PAYMENT_STATUS.paid,
+                                pm_payment_status: ETRANSACTION_PM_PAYMENT_STATUS.paid,
+                            };
+
+                            if (userDetail.role === UserRoles.LANDLORD) {
+                                transaction_payload.landlordID = userDetail._id;
+                            } else if (userDetail.role === UserRoles.RENTER) {
+                                transaction_payload.renterID = userDetail._id;
+                            } else if (userDetail.role === UserRoles.PROPERTY_MANAGER) {
+                                transaction_payload.pmID = userDetail._id;
+                            }
+
+                            let create_transaction = await Transaction.create(transaction_payload);
+                        }
+                    }
+                }
+            });
+        }
+    } catch (error) {
     }
 }
