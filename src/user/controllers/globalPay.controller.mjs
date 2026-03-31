@@ -3,6 +3,7 @@ import { addToWallet, payViaGlobalPayService } from "../services/globalPay.servi
 import crypto from "crypto";
 import { Property } from "../models/property.model.mjs";
 import { completeRentTransaction } from "../services/rentpayment.service.mjs";
+import * as cryptoServices from "../../helpers/crypto.mjs";
 
 export const payViaGlobalPay = async (req, res) => {
     try {
