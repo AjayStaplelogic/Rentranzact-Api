@@ -1,23 +1,12 @@
 import axios from "axios";
-import { RentType } from "../enums/property.enums.mjs";
-import { Property } from "../models/property.model.mjs";
-import { Transaction } from "../models/transactions.model.mjs";
-import { RentingHistory } from "../models/rentingHistory.model.mjs";
 import moment from "moment";
-import { User } from "../models/user.model.mjs";
-import { rentApplication } from "../models/rentApplication.model.mjs";
-import { RentApplicationStatus } from "../enums/rentApplication.enums.mjs";
-import { Wallet } from "../models/wallet.model.mjs";
-import { UserRoles } from "../enums/role.enums.mjs";
-import * as commissionServices from "../services/commission.service.mjs";
-import { Notification } from "../models/notification.model.mjs";
-import { EPaymentType } from "../enums/wallet.enum.mjs"
 import { ETRANSACTION_LANDLORD_PAYMENT_STATUS, ETRANSACTION_PM_PAYMENT_STATUS, ETRANSACTION_TYPE } from "../enums/common.mjs";
-import * as referralService from "../services/referral.service.mjs";
+import { UserRoles } from "../enums/role.enums.mjs";
+import { EPaymentType } from "../enums/wallet.enum.mjs";
+import { Transaction } from "../models/transactions.model.mjs";
+import { User } from "../models/user.model.mjs";
+import { Wallet } from "../models/wallet.model.mjs";
 import * as TransferServices from "../services/transfer.service.mjs";
-import * as PropertyServices from "../services/property.service.mjs";
-import * as TransactionServices from "../../user/services/transaction.service.mjs";
-import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
 
 
 export const payViaGlobalPayService = async (payload, userData) => {
@@ -34,11 +23,11 @@ export const payViaGlobalPayService = async (payload, userData) => {
             merchantTransactionReference: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
             redirectUrl: payload.is_mobile === true ? `` : `${process.env.FRONTEND_URL}/payment-method`,
             customer: {
-                lastName: "string",
+                lastName: "na",
                 firstName: userData?.fullName,
                 currency: "NGN",
                 phoneNumber: userData?.phone ?? "",
-                address: "customer address",
+                address: "",
                 emailAddress: userData?.email,
                 paymentFormCustomFields: meta_data_arr
             }
