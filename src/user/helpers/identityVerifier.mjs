@@ -16,6 +16,29 @@ let partner_params = {
     job_type: 5,
 };
 
+// This function is made to handle both old response and new response from smile identification API
+const normalizeIdentityResponse = (data) => {
+    // OLD dataponse structure
+    if (data?.FullData) {
+        return {
+            firstName: data.FullData.firstname,
+            middleName: data.FullData.middlename,
+            lastName: data.FullData.surname,
+            dob: data.FullData.dateOfBirth
+        };
+    }
+
+    // NEW dataponse structure
+    return {
+        firstName: data?.FirstName,
+        middleName: data?.OtherNames || '', // fallback
+        lastName: data?.LastName,
+        dob: data?.DOB
+    };
+};
+
+const safeLower = (str) => (str || '').toLowerCase();
+
 async function identityVerifier(identificationType, kinDetails) {
 
     if (identificationType === IdentificationType.BVN) {
@@ -38,12 +61,21 @@ async function identityVerifier(identificationType, kinDetails) {
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => false)
 
-        if (response?.FullData?.FirstName.trim().toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.trim().toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.trim().toLowerCase() === last_name.toLowerCase() && response?.FullData?.DateOfBirth === dob) {
+        // This was old response from the API, now response changed from their side so this code is commented (Dated : 1 April 2026)
+        // if (response?.FullData?.FirstName.trim().toLowerCase() === first_name.toLowerCase() && response?.FullData?.MiddleName.trim().toLowerCase() === middle_name.toLowerCase() && response?.FullData?.LastName.trim().toLowerCase() === last_name.toLowerCase() && response?.FullData?.DateOfBirth === dob) {
+        //     return true
+        // } else {
+        //     return false
+        // }
 
-            return true
-        } else {
-            return false
-        }
+        // Response changed by API so added this function to handle both previous and new response (Dated : 1 April 2026)
+        const data = normalizeIdentityResponse(response);
+        return (
+            safeLower(data.firstName) === safeLower(first_name) &&
+            safeLower(data.middleName) === safeLower(middle_name) &&
+            safeLower(data.lastName) === safeLower(last_name) &&
+            data.dob === dob
+        );
 
 
     } else if (identificationType === IdentificationType.NIN_V2) {
@@ -65,15 +97,25 @@ async function identityVerifier(identificationType, kinDetails) {
 
 
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => {
-          console.log(err, '=========err')
-            return  err
+            console.log(err, '=========err')
+            return err
         });
 
-        if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.surname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
-            return true
-        } else {
-            return false
-        }
+        // This was old response from the API, now response changed from their side so this code is commented (Dated : 1 April 2026)
+        // if (response?.FullData?.firstname.toLowerCase() === first_name.toLowerCase() && response?.FullData?.middlename.toLowerCase() === middle_name.toLowerCase() && response?.FullData?.surname.toLowerCase() === last_name.toLowerCase() && response?.FullData?.dateOfBirth === dob) {
+        //     return true
+        // } else {
+        //     return false
+        // }
+
+        // Response changed by API so added this function to handle both previous and new response (Dated : 1 April 2026)
+        const data = normalizeIdentityResponse(response);
+        return (
+            safeLower(data.firstName) === safeLower(first_name) &&
+            safeLower(data.middleName) === safeLower(middle_name) &&
+            safeLower(data.lastName) === safeLower(last_name) &&
+            data.dob === dob
+        );
 
     } else if (identificationType === IdentificationType.VOTER_ID) {
 
@@ -96,15 +138,27 @@ async function identityVerifier(identificationType, kinDetails) {
         const response = await connection.submit_job(partner_params, id_info, options).then((res) => res).catch((err) => console.log(err, "-errrrrr") & false);
         const year = moment(dob, "YYYY-MM-DD").format("YYYY");
 
-        if (response?.FullData?.FirstName.trim().toLowerCase() === first_name.toLowerCase() && response?.FullData?.LastName.trim().toLowerCase() === last_name.toLowerCase() && response?.FullData?.DOB_Y === Number(year)) {
+        // This was old response from the API, now response changed from their side so this code is commented (Dated : 1 April 2026)
+        // if (response?.FullData?.FirstName.trim().toLowerCase() === first_name.toLowerCase() && response?.FullData?.LastName.trim().toLowerCase() === last_name.toLowerCase() && response?.FullData?.DOB_Y === Number(year)) {
 
-            return true
-        } else {
-            return false
-        }
+        //     return true
+        // } else {
+        //     return false
+        // }
 
+        // Response changed by API so added this function to handle both previous and new response (Dated : 1 April 2026)
+        const data = normalizeIdentityResponse(response);
+        return (
+            safeLower(data.firstName) === safeLower(first_name) &&
+            safeLower(data.middleName) === safeLower(middle_name) &&
+            safeLower(data.lastName) === safeLower(last_name) &&
+            data.dob === dob
+        );
+
+    }else{
+        return false
     }
-}
+};
 
 export {
     identityVerifier
