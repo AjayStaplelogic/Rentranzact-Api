@@ -21,7 +21,7 @@ export const payViaGlobalPayService = async (payload, userData) => {
         const data = {
             amount: payload.amount,
             merchantTransactionReference: `${Date.now()}-${Math.floor(Math.random() * 10000)}`,
-            redirectUrl: payload.is_mobile === true ? `` : `${process.env.FRONTEND_URL}/payment-method`,
+            redirectUrl: payload.is_mobile === true ? `` : `${process.env.FRONTEND_URL}`,
             customer: {
                 lastName: "na",
                 firstName: userData?.fullName,
