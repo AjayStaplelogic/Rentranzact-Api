@@ -56,8 +56,8 @@ import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
  */
 
 export const completeRentTransaction = async (data, options = {}) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
+    // const session = await mongoose.startSession();
+    // session.startTransaction();
 
     try {
         const { status, amount, created_at, id, payment_mode, renterApplicationID } = data;
@@ -68,13 +68,13 @@ export const completeRentTransaction = async (data, options = {}) => {
         const { propertyID, userID, notificationID, wallet } = meta_data;
         const { handleReferral = false, handleLeaseEnd = false } = options;
 
-        const renterDetails = await User.findById(userID).session(session);
-        const propertyDetails = await Property.findById(propertyID).session(session);
-        const landlordDetails = await User.findById(propertyDetails?.landlord_id).session(session);
+        const renterDetails = await User.findById(userID);
+        const propertyDetails = await Property.findById(propertyID);
+        const landlordDetails = await User.findById(propertyDetails?.landlord_id);
 
         if (!propertyDetails) {
-            await session.abortTransaction();
-            session.endSession();
+            // await session.abortTransaction();
+            // session.endSession();
             return { data: [], message: "Property not found", status: false };
         }
 
@@ -121,7 +121,7 @@ export const completeRentTransaction = async (data, options = {}) => {
                 inDemand: false,
                 next_payment_at: new Date(nextRentTimestamp * 1000),
             },
-            { new: true, session }
+            { new: true }
         );
 
         // Add renting history
@@ -135,7 +135,7 @@ export const completeRentTransaction = async (data, options = {}) => {
             renterActive: true,
             pmID: propertyDetails?.property_manager_id,
         });
-        await addRenterHistory.save({ session });
+        await addRenterHistory.save();
 
         // Rental breakdown & transaction
         let breakdown = PropertyServices.getRentalBreakUp(propertyDetails, amount);
@@ -164,20 +164,19 @@ export const completeRentTransaction = async (data, options = {}) => {
         }
 
         const transaction = new Transaction(changePayload);
-        await transaction.save({ session });
+        await transaction.save();
 
         // Update application status if provided
         if (renterApplicationID) {
             await rentApplication.findByIdAndUpdate(
                 renterApplicationID,
                 { applicationStatus: RentApplicationStatus.COMPLETED },
-                { session }
             );
         }
 
         // Commit transaction
-        await session.commitTransaction();
-        session.endSession();
+        // await session.commitTransaction();
+        // session.endSession();
 
         // Non-critical actions (email, transfers, referral) can be done outside transaction
         if (propertyDetails.property_manager_id && propertyDetails.landlord_id) {
@@ -228,8 +227,8 @@ export const completeRentTransaction = async (data, options = {}) => {
         return { propertyDetails: updatedProperty, transaction, breakdown };
 
     } catch (error) {
-        await session.abortTransaction();
-        session.endSession();
+        // await session.abortTransaction();
+        // session.endSession();
         throw error;
     }
 };
