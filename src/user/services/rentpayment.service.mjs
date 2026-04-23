@@ -15,6 +15,7 @@ import * as TransferServices from "../services/transfer.service.mjs";
 import * as PropertyServices from "../services/property.service.mjs";
 import * as TransactionServices from "../../user/services/transaction.service.mjs";
 import { rentPaidEmailToRenter } from "../emails/rent.emails.mjs";
+import { ETRANSACTION_TYPE } from "../enums/common.mjs";
 
 
 /**
