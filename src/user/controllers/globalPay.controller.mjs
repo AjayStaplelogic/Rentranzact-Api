@@ -120,7 +120,7 @@ export const globalPayWebhook = async (req, res) => {
             data.amount = data.finalAmount;
             data.created_at = data.PaymentDate;
             data.id = data.TransactionReference;
-            data.status = data.status.toLowerCase();
+            data.status = data.Status.toLowerCase();
 
             // Telling is payment is made from global pay
             data.payment_mode = "global pay";
