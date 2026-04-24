@@ -132,27 +132,30 @@ export const globalPayWebhook = async (req, res) => {
             // handling db functions
             const { wallet, renterApplicationID, propertyID } = meta_data;
 
-            // If transaction is related to wallet then calling wallet function
-            if (wallet === "true") {
-                addToWallet(data, meta_data)
-            } else {
-
-                // If Not wallet then considering it as property payment if property found
-                let property = await Property.findById(propertyID);
-                if (property) {
-                    // If property have 0 payment, considering it as new property for rent or first payment of rent
-                    if (!property.payment_count || property.payment_count == 0) {
-                        data.renterApplicationID = renterApplicationID;
-                        await completeRentTransaction(data, {
-                            handleLeaseEnd: true,
-                            handleReferral: true
-                        });
-                    } else if (property.payment_count > 0) {
-                        // If property already have payments then considering it as already rented and paying rent amount
-                        await completeRentTransaction(data)
+            if(["successful", "Successful"].includes(data.status)){
+                // If transaction is related to wallet then calling wallet function
+                if (wallet === "true") {
+                    addToWallet(data, meta_data)
+                } else {
+    
+                    // If Not wallet then considering it as property payment if property found
+                    let property = await Property.findById(propertyID);
+                    if (property) {
+                        // If property have 0 payment, considering it as new property for rent or first payment of rent
+                        if (!property.payment_count || property.payment_count == 0) {
+                            data.renterApplicationID = renterApplicationID;
+                            await completeRentTransaction(data, {
+                                handleLeaseEnd: true,
+                                handleReferral: true
+                            });
+                        } else if (property.payment_count > 0) {
+                            // If property already have payments then considering it as already rented and paying rent amount
+                            await completeRentTransaction(data)
+                        }
                     }
                 }
             }
+
 
             return res.json({
                 ResponseCode: "00",
